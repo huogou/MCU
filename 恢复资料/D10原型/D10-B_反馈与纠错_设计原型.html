@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>D10-B 反馈与纠错 · 小程序原型</title>
+<style>
+/* ===== 设计 Token（严格继承 mcu-miniprogram app.wxss） ===== */
+:root {
+  --bg: #0B0E14;
+  --bg-2: #11151F;
+  --bg-3: #161B27;
+  --card: #151A26;
+  --card-2: #1B2130;
+  --line: rgba(255,255,255,.08);
+  --gold: #E9A93B;
+  --gold-2: #f4c86a;
+  --text: #ECEFF5;
+  --text-2: #AEB6C6;
+  --text-3: #7A8296;
+  --route: #8B6FE8;
+  --green: #28B487;
+  --red: #E8483F;
+  --p1: #5B8DEF;
+  --p3: #F0A932;
+  --p4: #8B6FE8;
+  --p5: #E8483F;
+  --p6: #C25B8E;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  padding: 40px 20px;
+}
+
+/* ===== 原型展示框架 ===== */
+.proto-header {
+  max-width: 900px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+.proto-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.proto-header p {
+  font-size: 14px;
+  color: #8a8fa8;
+}
+
+.screen-row {
+  display: flex;
+  gap: 32px;
+  max-width: 900px;
+  margin: 0 auto 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.screen-label {
+  text-align: center;
+  margin-bottom: 12px;
+}
+.screen-label .num {
+  display: inline-block;
+  background: var(--gold);
+  color: #1a1408;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+.screen-label .title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+/* ===== 手机帧 ===== */
+.phone {
+  width: 375px;
+  min-height: 720px;
+  background: var(--bg);
+  border-radius: 32px;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,.1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.phone-status-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.phone-content {
+  padding: 0 14px 80px;
+  min-height: calc(720px - 44px - 50px);
+}
+
+.phone-tabbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(11,14,20,.96);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-3);
+  gap: 2px;
+}
+.tab-item.active { color: var(--gold); }
+.tab-icon { font-size: 18px; }
+
+/* ===== 通用组件 ===== */
+.sec-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 18px 2px 9px;
+  display: flex;
+  align-items: center;
+}
+.sec-title .bar {
+  width: 4px;
+  height: 15px;
+  border-radius: 2px;
+  background: var(--gold);
+  margin-right: 7px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: #1a1408;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 11px 20px;
+  text-align: center;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  background: rgba(233,169,59,.10);
+  color: var(--gold-2);
+  border: 1px solid rgba(233,169,59,.30);
+  border-radius: 999px;
+  padding: 9px 16px;
+  text-align: center;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ===== 屏幕 1：我的 MCU（底部反馈入口） ===== */
+.mm-head { padding: 12px 2px 4px; }
+.mm-title { font-size: 20px; font-weight: 800; color: var(--text); }
+.mm-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+
+.mm-overview { display: flex; align-items: center; gap: 16px; padding: 18px 14px; }
+.ring {
+  width: 125px; height: 125px; border-radius: 50%; flex: none;
+  background-color: rgba(255,255,255,.06);
+  background-image: conic-gradient(var(--gold) 35%, rgba(255,255,255,.06) 0);
+  display: flex; align-items: center; justify-content: center;
+}
+.ring-inner {
+  width: 96px; height: 96px; border-radius: 50%; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.ring-num { font-size: 29px; font-weight: 800; color: var(--gold); line-height: 1; }
+.ring-total { font-size: 12px; color: var(--text-3); }
+.ring-label { font-size: 11px; color: var(--text-2); margin-top: 5px; }
+.ring-pct { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+.mm-ov-meta { flex: 1; }
+.mm-ov-phase { display: flex; align-items: center; gap: 5px; }
+.mm-ov-phase-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--p4); }
+.mm-ov-phase-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.mm-ov-row { font-size: 13px; color: var(--text-2); margin-top: 8px; }
+.mm-ov-strong { color: var(--gold-2); font-weight: 700; }
+
+.mm-state { margin-top: 12px; }
+.mm-route-tag { font-size: 11px; color: var(--route); font-weight: 700; }
+.mm-route-status { font-size: 10px; padding: 1px 7px; border-radius: 999px; background: rgba(233,169,59,.14); color: var(--gold-2); }
+.mm-route-name { font-size: 16px; font-weight: 700; margin-top: 6px; }
+.mm-prog { display: flex; align-items: center; gap: 8px; margin-top: 9px; }
+.mm-prog-bar { flex: 1; height: 6px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+.mm-prog-fill { height: 100%; width: 40%; background: var(--route); border-radius: 999px; }
+.mm-prog-num { font-size: 11px; color: var(--text-3); }
+
+.mm-next-line { font-size: 13px; color: var(--text-2); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.mm-next-name { color: var(--text); font-weight: 700; }
+.mm-next-go { color: var(--gold-2); }
+
+/* ★ 反馈入口 ★ */
+.feedback-entry {
+  margin-top: 20px;
+  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.feedback-entry:hover { border-color: rgba(233,169,59,.3); }
+.feedback-entry-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(233,169,59,.10);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.feedback-entry-text { flex: 1; }
+.feedback-entry-t { font-size: 14px; font-weight: 600; color: var(--text); }
+.feedback-entry-s { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.feedback-entry-arrow { font-size: 16px; color: var(--text-3); }
+
+.mm-clear { margin-top: 20px; text-align: center; font-size: 13px; color: var(--text-3); padding: 10px; }
+
+/* ===== 屏幕 2：电影详情（纠错入口） ===== */
+.mv-nav-bar { display: flex; align-items: center; padding: 8px 14px 0; gap: 8px; }
+.mv-back { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+.mv-back-ic { font-size: 22px; color: var(--text-2); }
+.mv-nav-label { font-size: 13px; color: var(--text-3); }
+
+.movie-hero { position: relative; padding: 12px 16px 16px; display: flex; gap: 14px; }
+.hero-bg { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none;
+  background: linear-gradient(160deg, rgba(139,111,232,.13), transparent 50%, #0B0E14); }
+.mv-poster-wrap { width: 110px; height: 160px; border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(233,169,59,.2); flex-shrink: 0; position: relative; z-index: 1;
+  background: var(--bg-3); display: flex; align-items: center; justify-content: center; }
+.mv-poster-fb { font-size: 40px; font-weight: 800; color: rgba(255,255,255,.5); }
+.hero-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 1; }
+.hero-phase { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; }
+.hero-phase-dot { width: 3px; height: 14px; border-radius: 2px; background: var(--p4); }
+.hero-phase-text { font-size: 11px; color: var(--text-3); }
+.hero-title { font-size: 20px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+.hero-en { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+.hero-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip { padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line);
+  font-size: 10px; color: var(--text-3); }
+.chip.gold { color: var(--gold-2); border-color: rgba(233,169,59,.2); background: rgba(233,169,59,.06); }
+
+.watch-status { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  border-radius: 999px; font-size: 11px; font-weight: 600; margin-top: 7px; align-self: flex-start;
+  background: rgba(233,169,59,.1); color: var(--gold); border: 1px solid rgba(233,169,59,.2); }
+.ws-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.movie-cta-section { padding: 0 16px 12px; }
+.movie-cta { width: 100%; padding: 13px 0; font-size: 15px; font-weight: 700;
+  border-radius: 8px; text-align: center; background: var(--gold); color: #0B0E14; }
+
+/* 观影位置 */
+.sequence-section { padding: 0 16px; margin-bottom: 14px; }
+.sequence-label { font-size: 12px; font-weight: 600; color: var(--text-3); margin-bottom: 8px; }
+.sequence-row { display: flex; gap: 6px; align-items: stretch; }
+.seq-card { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+  padding: 8px 5px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.seq-card.current { background: rgba(233,169,59,.1); border-color: rgba(233,169,59,.5); }
+.seq-card.disabled { opacity: .45; }
+.seq-poster { width: 36px; height: 52px; border-radius: 4px; background: var(--bg-3);
+  display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: rgba(255,255,255,.5); }
+.seq-name { font-size: 11px; color: var(--text-2); line-height: 1.3; }
+.seq-card.current .seq-name { color: var(--gold); font-weight: 600; }
+.seq-role { font-size: 10px; color: var(--text-3); }
+.seq-arrow { display: flex; align-items: center; color: var(--text-3); font-size: 17px; flex-shrink: 0; }
+
+/* 看完之后 */
+.after-section { margin: 0 16px 14px; }
+.mark-watched-btn { width: 100%; padding: 11px 0; font-size: 14px; font-weight: 600;
+  background: var(--card); color: var(--green); border: 1px solid rgba(40,180,135,.2);
+  border-radius: 8px; text-align: center; margin-bottom: 10px; }
+
+.next-rec { background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  padding: 10px; display: flex; gap: 10px; }
+.next-rec-poster { width: 50px; height: 72px; border-radius: 6px; background: var(--bg-3); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: rgba(255,255,255,.5); }
+.next-rec-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.next-rec-label { font-size: 11px; color: var(--gold); font-weight: 600; margin-bottom: 3px; }
+.next-rec-cn { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.next-rec-why { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+.next-rec-arrow { display: flex; align-items: center; color: var(--text-3); font-size: 17px; flex-shrink: 0; }
+
+/* 信息区 */
+.mv-sec { margin: 12px 16px 0; background: var(--card); border: 1px solid var(--line);
+  border-radius: 8px; padding: 14px; }
+.mv-h { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 9px; }
+.mv-p { font-size: 13px; line-height: 1.7; color: var(--text-2); }
+
+/* ★ 纠错入口 ★ */
+.correction-entry {
+  margin: 16px 16px 0;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(233,169,59,.06);
+  border: 1px solid rgba(233,169,59,.15);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.correction-entry:hover { border-color: rgba(233,169,59,.3); }
+.correction-entry-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(233,169,59,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.correction-entry-text { flex: 1; }
+.correction-entry-t { font-size: 13px; font-weight: 600; color: var(--gold-2); }
+.correction-entry-s { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.correction-entry-arrow { font-size: 14px; color: var(--text-3); }
+
+/* 底部栏 */
+.mv-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 55px; display: flex;
+  background: rgba(11,14,20,.96); border-top: 1px solid var(--line); }
+.mv-bar-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-2); }
+.mv-bar-ic { font-size: 17px; }
+.mv-bar-tx { font-size: 11px; margin-top: 2px; }
+.mv-bar-btn.on { color: var(--gold); }
+
+/* ===== 屏幕 3：反馈页面（正常态） ===== */
+.fb-page { padding-bottom: 20px; }
+
+.fb-header { padding: 16px 14px 4px; }
+.fb-back { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.fb-back-ic { font-size: 22px; color: var(--text-2); cursor: pointer; }
+.fb-back-label { font-size: 13px; color: var(--text-3); }
+
+.fb-title { font-size: 20px; font-weight: 800; color: var(--text); }
+.fb-subtitle { font-size: 12px; color: var(--text-3); margin-top: 4px; line-height: 1.6; }
+
+/* 反馈对象 */
+.fb-target {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fb-target-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(139,111,232,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.fb-target-text { flex: 1; }
+.fb-target-label { font-size: 11px; color: var(--text-3); }
+.fb-target-name { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.fb-target-tag { font-size: 10px; color: var(--text-3); background: rgba(255,255,255,.05); padding: 2px 8px; border-radius: 999px; }
+
+/* 反馈类型 */
+.fb-types-title { font-size: 14px; font-weight: 700; color: var(--text); margin: 20px 0 10px; }
+
+.fb-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fb-type-card {
+  padding: 14px 12px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.fb-type-card:hover { border-color: rgba(233,169,59,.3); }
+.fb-type-card.selected {
+  border-color: rgba(233,169,59,.5);
+  background: rgba(233,169,59,.08);
+}
+.fb-type-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.fb-type-icon.err { background: rgba(232,72,63,.12); }
+.fb-type-icon.order { background: rgba(240,169,50,.12); }
+.fb-type-icon.route { background: rgba(139,111,232,.12); }
+.fb-type-icon.func { background: rgba(91,141,239,.12); }
+.fb-type-icon.suggest { background: rgba(40,180,135,.12); }
+.fb-type-icon.other { background: rgba(255,255,255,.06); }
+
+.fb-type-text { flex: 1; }
+.fb-type-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.fb-type-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+.fb-type-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+  font-size: 10px; color: transparent;
+}
+.fb-type-card.selected .fb-type-check {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1408;
+}
+
+/* 详细说明 */
+.fb-detail-title { font-size: 14px; font-weight: 700; color: var(--text); margin: 20px 0 10px; }
+.fb-detail-textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+.fb-detail-textarea::placeholder { color: var(--text-3); }
+.fb-detail-textarea:focus { border-color: rgba(233,169,59,.3); }
+.fb-char-count { text-align: right; font-size: 11px; color: var(--text-3); margin-top: 6px; }
+
+/* 隐私提示 */
+.fb-privacy {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--text-3);
+}
+.fb-privacy-icon { font-size: 12px; }
+
+/* 提交按钮 */
+.fb-submit {
+  margin-top: 24px;
+  width: 100%;
+  padding: 14px 0;
+  background: var(--gold);
+  color: #1a1408;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 999px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+}
+.fb-submit:active { background: #D4992F; }
+.fb-submit:disabled {
+  background: rgba(233,169,59,.3);
+  color: rgba(26,20,8,.5);
+  cursor: not-allowed;
+}
+
+/* ===== 屏幕 4：成功态 ===== */
+.success-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(720px - 44px - 50px);
+  padding: 40px 32px;
+  text-align: center;
+}
+.success-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(40,180,135,.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin-bottom: 20px;
+}
+.success-title { font-size: 18px; font-weight: 700; color: var(--text); }
+.success-desc { font-size: 13px; color: var(--text-2); margin-top: 8px; line-height: 1.6; }
+.success-btn { margin-top: 32px; }
+
+/* ===== 屏幕 5：空态/异常态 ===== */
+.empty-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(720px - 44px - 50px);
+  padding: 40px 32px;
+  text-align: center;
+}
+.empty-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: rgba(255,255,255,.04);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin-bottom: 16px;
+}
+.empty-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.empty-desc { font-size: 13px; color: var(--text-2); margin-top: 8px; line-height: 1.6; }
+.empty-btn { margin-top: 24px; }
+
+/* ===== 屏幕 6：反馈页（无电影关联） ===== */
+.fb-target-empty {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px dashed rgba(255,255,255,.12);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fb-target-empty-text { flex: 1; }
+.fb-target-empty-label { font-size: 11px; color: var(--text-3); }
+.fb-target-empty-name { font-size: 13px; color: var(--text-3); margin-top: 2px; font-style: italic; }
+
+/* ===== 流程箭头 ===== */
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto 12px;
+  font-size: 13px;
+  color: #8a8fa8;
+  gap: 8px;
+}
+.flow-arrow .arrow-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,.1);
+}
+.flow-arrow .arrow-label {
+  background: rgba(233,169,59,.15);
+  color: var(--gold-2);
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ===== 路径标注 ===== */
+.path-label {
+  max-width: 900px;
+  margin: 0 auto 24px;
+  padding: 12px 16px;
+  background: rgba(139,111,232,.08);
+  border: 1px solid rgba(139,111,232,.2);
+  border-radius: 12px;
+  font-size: 13px;
+  color: #B9A6F5;
+  text-align: center;
+}
+.path-label strong { color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- 原型标题 -->
+<div class="proto-header">
+  <h1>D10-B 反馈与纠错 · 小程序原型</h1>
+  <p>设计 AI · 2026-08-18 · 待策划确认</p>
+</div>
+
+<!-- ==================== 路径 A：全局反馈 ==================== -->
+<div class="path-label"><strong>路径 A</strong>：我的 MCU → 反馈与纠错 → 选择类型 → 填写 → 提交 → 成功</div>
+
+<div class="screen-row">
+
+  <!-- 屏幕 1：我的 MCU（带反馈入口） -->
+  <div>
+    <div class="screen-label">
+      <span class="num">A-1</span>
+      <span class="title">我的 MCU（底部新增反馈入口）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content">
+        <div class="mm-head">
+          <div class="mm-title">我的 MCU 旅程</div>
+          <div class="mm-sub">你的观影档案与当前旅程控制中心</div>
+        </div>
+
+        <!-- 进度总览 -->
+        <div class="mm-overview card">
+          <div class="ring">
+            <div class="ring-inner">
+              <span class="ring-num">13</span>
+              <span class="ring-total">/ 38</span>
+              <span class="ring-label">电影主线</span>
+              <span class="ring-pct">34%</span>
+            </div>
+          </div>
+          <div class="mm-ov-meta">
+            <div class="mm-ov-phase">
+              <span class="mm-ov-phase-dot"></span>
+              <span class="mm-ov-phase-name">第四阶段</span>
+            </div>
+            <div class="mm-ov-row">34% 电影主线完成</div>
+            <div class="mm-ov-row"><span class="mm-ov-strong">21</span> 部全部内容</div>
+          </div>
+        </div>
+
+        <!-- 当前路线 -->
+        <div class="mm-state card">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span class="mm-route-tag">当前路线</span>
+              <span class="mm-route-status">进行中</span>
+            </div>
+            <div class="mm-route-name">新手入坑路线</div>
+            <div class="mm-prog">
+              <div class="mm-prog-bar"><div class="mm-prog-fill"></div></div>
+              <span class="mm-prog-num">5 / 12</span>
+            </div>
+          </div>
+          <div class="mm-next-line">
+            接下来 → <span class="mm-next-name">《钢铁侠2》</span> <span class="mm-next-go">查看详情 ›</span>
+          </div>
+        </div>
+
+        <!-- ★ 反馈与纠错入口 ★ -->
+        <div class="feedback-entry">
+          <div class="feedback-entry-icon">✎</div>
+          <div class="feedback-entry-text">
+            <div class="feedback-entry-t">反馈与纠错</div>
+            <div class="feedback-entry-s">发现错误或有建议？告诉我们</div>
+          </div>
+          <div class="feedback-entry-arrow">›</div>
+        </div>
+
+        <div class="mm-clear">清空观影记录</div>
+      </div>
+
+      <div class="phone-tabbar">
+        <div class="tab-item"><span class="tab-icon">⌂</span>首页</div>
+        <div class="tab-item"><span class="tab-icon">☰</span>路线</div>
+        <div class="tab-item"><span class="tab-icon">◎</span>探索</div>
+        <div class="tab-item active"><span class="tab-icon">◈</span>我的MCU</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屏幕 2：反馈页面（从我的 MCU 进入，无电影关联） -->
+  <div>
+    <div class="screen-label">
+      <span class="num">A-2</span>
+      <span class="title">反馈与纠错（无电影关联态）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content fb-page">
+        <div class="fb-header">
+          <div class="fb-back">
+            <span class="fb-back-ic">‹</span>
+            <span class="fb-back-label">我的 MCU</span>
+          </div>
+          <div class="fb-title">反馈与纠错</div>
+          <div class="fb-subtitle">发现错误、功能问题或有更好的建议，都可以告诉我们。</div>
+        </div>
+
+        <!-- 反馈对象（无关联） -->
+        <div class="fb-target-empty">
+          <div class="fb-target-icon" style="background:rgba(255,255,255,.06);"></div>
+          <div class="fb-target-empty-text">
+            <div class="fb-target-empty-label">反馈对象</div>
+            <div class="fb-target-empty-name">未指定（可选）</div>
+          </div>
+        </div>
+
+        <!-- 反馈类型 -->
+        <div class="fb-types-title">你想反馈什么？</div>
+        <div class="fb-types">
+          <div class="fb-type-card">
+            <div class="fb-type-icon err"></div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">电影信息错误</div>
+              <div class="fb-type-desc">片名、年份、阶段等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon order">⇅</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">观影顺序错误</div>
+              <div class="fb-type-desc">时间线或推荐顺序</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon route">☰</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">路线/推荐问题</div>
+              <div class="fb-type-desc">路线内容或推荐逻辑</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon func">⚙</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">功能或页面问题</div>
+              <div class="fb-type-desc">Bug、显示异常等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon suggest">💡</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">产品建议</div>
+              <div class="fb-type-desc">新功能或改进建议</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon other">…</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">其他</div>
+              <div class="fb-type-desc">以上都不符合</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+        </div>
+
+        <!-- 详细说明 -->
+        <div class="fb-detail-title">详细说明</div>
+        <textarea class="fb-detail-textarea" placeholder="请告诉我们哪里有问题，例如哪部电影、哪个位置，以及你认为应该如何调整。"></textarea>
+        <div class="fb-char-count">0 / 500</div>
+
+        <!-- 隐私提示 -->
+        <div class="fb-privacy">
+          <span class="fb-privacy-icon">🔒</span>
+          <span>匿名反馈，不收集个人信息</span>
+        </div>
+
+        <!-- 提交按钮（未填内容时禁用） -->
+        <button class="fb-submit" disabled>提交反馈</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屏幕 3：成功态 -->
+  <div>
+    <div class="screen-label">
+      <span class="num">A-3</span>
+      <span class="title">提交成功</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content">
+        <div class="success-page">
+          <div class="success-icon">✓</div>
+          <div class="success-title">感谢你的反馈</div>
+          <div class="success-desc">我们会根据反馈持续完善 MCU 观影导航。</div>
+          <div class="success-btn">
+            <div class="btn-primary" style="width:200px;">返回</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-tabbar">
+        <div class="tab-item"><span class="tab-icon">⌂</span>首页</div>
+        <div class="tab-item"><span class="tab-icon">☰</span>路线</div>
+        <div class="tab-item"><span class="tab-icon">◎</span>探索</div>
+        <div class="tab-item active"><span class="tab-icon">◈</span>我的MCU</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 路径 B：电影场景纠错 ==================== -->
+<div class="path-label"><strong>路径 B</strong>：电影详情 → 发现信息有误？提交纠错 → 自动带入电影 → 选择类型 → 填写 → 提交 → 成功</div>
+
+<div class="screen-row">
+
+  <!-- 屏幕 4：电影详情（带纠错入口） -->
+  <div>
+    <div class="screen-label">
+      <span class="num">B-1</span>
+      <span class="title">电影详情（底部新增纠错入口）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content">
+        <!-- 返回导航 -->
+        <div class="mv-nav-bar">
+          <div class="mv-back"><span class="mv-back-ic">‹</span></div>
+          <span class="mv-nav-label">新手入坑路线</span>
+        </div>
+
+        <!-- Hero -->
+        <div class="movie-hero">
+          <div class="hero-bg"></div>
+          <div class="mv-poster-wrap">
+            <span class="mv-poster-fb">钢</span>
+          </div>
+          <div class="hero-info">
+            <div class="hero-phase">
+              <span class="hero-phase-dot"></span>
+              <span class="hero-phase-text">第1阶段 · 无限传奇</span>
+            </div>
+            <div class="hero-title">钢铁侠</div>
+            <div class="hero-en">Iron Man</div>
+            <div class="hero-chips">
+              <span class="chip gold">必看</span>
+              <span class="chip">2008</span>
+            </div>
+            <div class="watch-status">
+              <span class="ws-dot"></span>
+              <span>未观看</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="movie-cta-section">
+          <div class="movie-cta">开始观看</div>
+        </div>
+
+        <!-- 观影位置 -->
+        <div class="sequence-section">
+          <div class="sequence-label">观影位置</div>
+          <div class="sequence-row">
+            <div class="seq-card disabled">
+              <div class="seq-poster">—</div>
+              <div class="seq-name">—</div>
+              <div class="seq-role">无前作</div>
+            </div>
+            <div class="seq-arrow">›</div>
+            <div class="seq-card current">
+              <div class="seq-poster">钢</div>
+              <div class="seq-name">钢铁侠</div>
+              <div class="seq-role">当前</div>
+            </div>
+            <div class="seq-arrow">›</div>
+            <div class="seq-card">
+              <div class="seq-poster">钢2</div>
+              <div class="seq-name">钢铁侠2</div>
+              <div class="seq-role">下一部</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 看完之后 -->
+        <div class="after-section">
+          <div class="mark-watched-btn">标记为已观看</div>
+          <div class="next-rec">
+            <div class="next-rec-poster">钢2</div>
+            <div class="next-rec-info">
+              <div class="next-rec-label">看完这部之后</div>
+              <div class="next-rec-cn">钢铁侠2</div>
+              <div class="next-rec-why">托尼公开身份后的直接续集</div>
+            </div>
+            <div class="next-rec-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- 信息区 -->
+        <div class="mv-sec">
+          <div class="mv-h">为什么重要</div>
+          <div class="mv-p">MCU 开山之作，确立了整个电影宇宙的基调和风格。</div>
+        </div>
+
+        <!-- ★ 纠错入口 ★ -->
+        <div class="correction-entry">
+          <div class="correction-entry-icon"></div>
+          <div class="correction-entry-text">
+            <div class="correction-entry-t">发现信息有误？提交纠错</div>
+            <div class="correction-entry-s">帮助我们完善电影信息</div>
+          </div>
+          <div class="correction-entry-arrow">›</div>
+        </div>
+
+        <div style="height:60px;"></div>
+      </div>
+
+      <!-- 底部栏 -->
+      <div class="mv-bar">
+        <div class="mv-bar-btn"><span class="mv-bar-ic">○</span><span class="mv-bar-tx">已看</span></div>
+        <div class="mv-bar-btn"><span class="mv-bar-ic">☆</span><span class="mv-bar-tx">想看</span></div>
+        <div class="mv-bar-btn"><span class="mv-bar-ic">♡</span><span class="mv-bar-tx">收藏</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屏幕 5：反馈页面（从电影详情进入，自动带入电影） -->
+  <div>
+    <div class="screen-label">
+      <span class="num">B-2</span>
+      <span class="title">反馈与纠错（自动带入电影）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content fb-page">
+        <div class="fb-header">
+          <div class="fb-back">
+            <span class="fb-back-ic">‹</span>
+            <span class="fb-back-label">钢铁侠</span>
+          </div>
+          <div class="fb-title">反馈与纠错</div>
+          <div class="fb-subtitle">发现错误、功能问题或有更好的建议，都可以告诉我们。</div>
+        </div>
+
+        <!-- 反馈对象（自动带入） -->
+        <div class="fb-target">
+          <div class="fb-target-icon">🎬</div>
+          <div class="fb-target-text">
+            <div class="fb-target-label">反馈对象</div>
+            <div class="fb-target-name">钢铁侠 Iron Man</div>
+          </div>
+          <div class="fb-target-tag">只读</div>
+        </div>
+
+        <!-- 反馈类型 -->
+        <div class="fb-types-title">你想反馈什么？</div>
+        <div class="fb-types">
+          <div class="fb-type-card">
+            <div class="fb-type-icon err">⚠</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">电影信息错误</div>
+              <div class="fb-type-desc">片名、年份、阶段等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card selected">
+            <div class="fb-type-icon order">⇅</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">观影顺序错误</div>
+              <div class="fb-type-desc">时间线或推荐顺序</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon route">☰</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">路线/推荐问题</div>
+              <div class="fb-type-desc">路线内容或推荐逻辑</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon func">⚙</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">功能或页面问题</div>
+              <div class="fb-type-desc">Bug、显示异常等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon suggest">💡</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">产品建议</div>
+              <div class="fb-type-desc">新功能或改进建议</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon other">…</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">其他</div>
+              <div class="fb-type-desc">以上都不符合</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+        </div>
+
+        <!-- 详细说明 -->
+        <div class="fb-detail-title">详细说明</div>
+        <textarea class="fb-detail-textarea">钢铁侠的时间线位置应该是 2008 年，但在某些路线中被排在了 2010 年之后，建议调整。</textarea>
+        <div class="fb-char-count">42 / 500</div>
+
+        <!-- 隐私提示 -->
+        <div class="fb-privacy">
+          <span class="fb-privacy-icon">🔒</span>
+          <span>匿名反馈，不收集个人信息</span>
+        </div>
+
+        <!-- 提交按钮（已填内容，可提交） -->
+        <button class="fb-submit">提交反馈</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屏幕 6：成功态（同 A-3） -->
+  <div>
+    <div class="screen-label">
+      <span class="num">B-3</span>
+      <span class="title">提交成功（同 A-3）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content">
+        <div class="success-page">
+          <div class="success-icon">✓</div>
+          <div class="success-title">感谢你的反馈</div>
+          <div class="success-desc">我们会根据反馈持续完善 MCU 观影导航。</div>
+          <div class="success-btn">
+            <div class="btn-primary" style="width:200px;">返回</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-tabbar">
+        <div class="tab-item"><span class="tab-icon">⌂</span>首页</div>
+        <div class="tab-item"><span class="tab-icon">☰</span>路线</div>
+        <div class="tab-item"><span class="tab-icon">◎</span>探索</div>
+        <div class="tab-item active"><span class="tab-icon">◈</span>我的MCU</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== 异常态 ==================== -->
+<div class="path-label"><strong>异常态</strong>：网络异常 / 提交失败</div>
+
+<div class="screen-row">
+
+  <!-- 屏幕 7：网络异常态 -->
+  <div>
+    <div class="screen-label">
+      <span class="num">E-1</span>
+      <span class="title">网络异常（提交失败）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content">
+        <div class="empty-page">
+          <div class="empty-icon"></div>
+          <div class="empty-title">提交失败</div>
+          <div class="empty-desc">网络连接异常，请检查网络后重试。<br>你的反馈内容已本地保存。</div>
+          <div class="empty-btn">
+            <div class="btn-ghost">重新提交</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 屏幕 8：空内容校验 -->
+  <div>
+    <div class="screen-label">
+      <span class="num">E-2</span>
+      <span class="title">空内容校验（未填详细说明）</span>
+    </div>
+    <div class="phone">
+      <div class="phone-status-bar">
+        <span>9:41</span>
+        <span>●●●</span>
+      </div>
+      <div class="phone-content fb-page">
+        <div class="fb-header">
+          <div class="fb-back">
+            <span class="fb-back-ic">‹</span>
+            <span class="fb-back-label">钢铁侠</span>
+          </div>
+          <div class="fb-title">反馈与纠错</div>
+          <div class="fb-subtitle">发现错误、功能问题或有更好的建议，都可以告诉我们。</div>
+        </div>
+
+        <div class="fb-target">
+          <div class="fb-target-icon">🎬</div>
+          <div class="fb-target-text">
+            <div class="fb-target-label">反馈对象</div>
+            <div class="fb-target-name">钢铁侠 Iron Man</div>
+          </div>
+          <div class="fb-target-tag">只读</div>
+        </div>
+
+        <div class="fb-types-title">你想反馈什么？</div>
+        <div class="fb-types">
+          <div class="fb-type-card selected">
+            <div class="fb-type-icon err">⚠</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">电影信息错误</div>
+              <div class="fb-type-desc">片名、年份、阶段等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon order">⇅</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">观影顺序错误</div>
+              <div class="fb-type-desc">时间线或推荐顺序</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon route">☰</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">路线/推荐问题</div>
+              <div class="fb-type-desc">路线内容或推荐逻辑</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon func">⚙</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">功能或页面问题</div>
+              <div class="fb-type-desc">Bug、显示异常等</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon suggest">💡</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">产品建议</div>
+              <div class="fb-type-desc">新功能或改进建议</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+          <div class="fb-type-card">
+            <div class="fb-type-icon other">…</div>
+            <div class="fb-type-text">
+              <div class="fb-type-name">其他</div>
+              <div class="fb-type-desc">以上都不符合</div>
+            </div>
+            <div class="fb-type-check">✓</div>
+          </div>
+        </div>
+
+        <div class="fb-detail-title">详细说明</div>
+        <textarea class="fb-detail-textarea" placeholder="请告诉我们哪里有问题，例如哪部电影、哪个位置，以及你认为应该如何调整。" style="border-color:rgba(232,72,63,.4);"></textarea>
+        <div class="fb-char-count" style="color:var(--red);">请填写详细说明后提交</div>
+
+        <div class="fb-privacy">
+          <span class="fb-privacy-icon">🔒</span>
+          <span>匿名反馈，不收集个人信息</span>
+        </div>
+
+        <button class="fb-submit" disabled>提交反馈</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 设计说明 -->
+<div style="max-width:900px;margin:48px auto 0;padding:24px;background:rgba(255,255,255,.03);border-radius:16px;border:1px solid rgba(255,255,255,.06);">
+  <h3 style="font-size:15px;font-weight:700;color:#fff;margin-bottom:12px;">设计说明</h3>
+  <div style="font-size:13px;color:#8a8fa8;line-height:1.8;">
+    <p><strong style="color:#ccc;">Token 继承：</strong>所有颜色、圆角、字体、间距严格继承 app.wxss 现有 Token 系统。</p>
+    <p><strong style="color:#ccc;">入口设计：</strong>「我的 MCU」底部轻量入口 + 电影详情内容区底部纠错入口，均不抢占核心 CTA。</p>
+    <p><strong style="color:#ccc;">反馈对象：</strong>从电影详情进入时自动携带 movieId，显示为只读标签；从「我的 MCU」进入时不强制选择。</p>
+    <p><strong style="color:#ccc;">类型选择：</strong>6 种类型双列卡片布局，单选，选中态用金色边框 + 金色勾选标识。</p>
+    <p><strong style="color:#ccc;">表单极简：</strong>仅「类型 + 详细说明」两个必填项，无姓名/手机/邮箱等个人信息。</p>
+    <p><strong style="color:#ccc;">提交校验：</strong>未填详细说明时按钮禁用 + 红色提示文案。</p>
+    <p><strong style="color:#ccc;">成功态：</strong>居中绿色勾选图标 + 感谢文案 + 返回按钮，无复杂反馈编号/进度追踪。</p>
+    <p><strong style="color:#ccc;">异常态：</strong>网络失败时提示「内容已本地保存」+ 重新提交按钮。</p>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>漫威电影详情 - 这部在 MCU 里意味着什么 · MCU 宇宙导航</title>
+<meta name="description" content="一部漫威电影在 MCU 里承担什么作用？它在上映顺序和故事时间线里排第几？看完之后该看什么、之前该先看什么、和其他作品有什么关系？">
+<meta name="keywords" content="漫威电影解析,漫威电影在MCU里的意义,漫威电影观看顺序,漫威电影关系">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main>
+  <section class="section">
+    <div class="wrap">
+      <div id="detail">
+        <div class="empty">正在加载……</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="app-foot"></div>
+
+<script src="data/movies.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+  <script src="data/stills.js"></script>
+  <script src="data/visuals.js"></script>
+  <script src="assets/js/app.js"></script>
+<script>
+(function () {
+  MCU.ui.mount('movie.html');
+
+  var id = MCU.ui.param('id');
+  var m = MCU.data.get(id);
+  var box = document.getElementById('detail');
+
+  if (!m) {
+    box.innerHTML = '<div class="empty">没有找到这部作品。<br><a class="btn" href="index.html" style="margin-top:14px">回到首页</a></div>';
+    return;
+  }
+
+  /* 动态标题：让每部作品的详情页拥有独立、不重复的 title（SEO） */
+  document.title = m.cn + ' - MCU 宇宙导航';
+
+  var phaseName = { 1: '第一阶段', 2: '第二阶段', 3: '第三阶段', 4: '第四阶段', 5: '第五阶段', 6: '第六阶段' }[m.phase] || ('第 ' + m.phase + ' 阶段');
+  var sagaName = m.saga === 'infinity' ? '无限传奇' : '多元宇宙传奇';
+  var seen = MCU.progress.isSeen(m.id);
+
+  /* ---- 为什么重要（V1.3 电影化呈现）---- */
+  var meaning = '<div class="why-important">'
+    + '<h2>为什么这部重要</h2>'
+    + '<p>' + MCU.ui.esc(m.role) + '</p>'
+    + (m.sf ? '<div class="sf-quote"><b>一句话简介（无剧透）：</b>' + MCU.ui.esc(m.sf) + '</div>' : '')
+    + '</div>';
+
+  /* ---- 双时间线定位 ---- */
+  var tl = '<div class="card" style="margin-top:16px">'
+    + '<div class="hd"><h2>它在两条时间线上的位置</h2></div>'
+    + '<div class="pos-grid">'
+    +   pos(MCU.ui.orderAxisLabel(m), '第 ' + m.ro + ' 部', MCU.ui.releaseLabel(m))
+    +   pos('故事时间线', MCU.ui.esc(m.coLabel), '按剧情发生年代排序')
+    +   pos('所属阶段', phaseName, '<span style="color:' + MCU.data.phaseColor(m.phase) + '">●</span> 阶段色')
+    +   (m.saga
+          ? pos('所属传奇', sagaName, m.saga === 'infinity' ? '2008–2019 主线' : '2021 起新篇')
+          : pos('内容类型', (MCU.data.typeLabel[m.type] || '内容'), '电影 / 剧集 / 特别呈现 / 短片'))
+    + '</div></div>';
+
+  function pos(k, v, x) {
+    return '<div class="pos"><div class="pos-k">' + k + '</div><div class="pos-v">' + v + '</div>'
+      + (x ? '<div class="pos-x">' + x + '</div>' : '') + '</div>';
+  }
+
+  /* ---- 下一部推荐（三种目的）---- */
+  var modeKeys = ['mainline', 'understand', 'complete'];
+  var nextHtml = modeKeys.map(function (mk) {
+    var r = MCU.rec.next(m.id, mk);
+    if (!r) return '';
+    var mode = MCU.rec.modes[mk];
+    var card = MCU.ui.movieCard(r.movie);
+    return '<div style="margin-top:14px">'
+      + '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">'
+      +   '<b style="font-size:15px">' + MCU.ui.esc(mode.label) + '</b>'
+      +   '<span class="dim2">' + MCU.ui.esc(mode.desc) + '</span>'
+      +   (r.fallback ? '<span class="chip" style="margin-left:auto">综合推荐</span>' : '<span class="chip chip-red" style="margin-left:auto">官方推荐</span>')
+      + '</div>'
+      + card
+      + '<div class="dim" style="font-size:13.5px;margin-top:9px;line-height:1.7">' + MCU.ui.esc(r.why) + '</div>'
+      + '</div>';
+  }).join('');
+
+  var nextBlock = '<div class="card" style="margin-top:16px">'
+    + '<div class="hd"><h2>我看完这部，接下来看什么</h2>'
+    +   '<span class="dim2">按你的观影目的，有三种不同的下一部</span></div>'
+    + nextHtml
+    + '<div style="margin-top:18px"><a class="btn btn-sm" href="next.html?from=' + m.id + '">换一种目的看看 →</a></div>'
+    + '</div>';
+
+  /* ---- 前置作品（建议先看）---- */
+  var pre = MCU.rec.prereqOf(m.id);
+  var preBlock = '<div class="card" style="margin-top:16px">'
+    + '<div class="hd"><h2>看这之前，建议先看</h2>'
+    +   '<span class="dim2">' + (pre.length ? pre.length + ' 部前置作品' : '剧情相对独立，可以直接看') + '</span></div>'
+    + (pre.length ? '<div class="rel-list">' + pre.map(function (l) { return MCU.ui.relationItem(l, m.id); }).join('') + '</div>'
+                  : '<div class="dim" style="font-size:14px">这部作品的剧情相对独立，不需要补前面的特定作品就能看懂。</div>')
+    + '</div>';
+
+  /* ---- 全部关系（它和其他作品有什么关系）---- */
+  var rels = MCU.data.relationsOf(m.id);
+  var relBlock = '<div class="card" style="margin-top:16px">'
+    + '<div class="hd"><h2>它和其他作品有什么关系</h2>'
+    +   '<span class="dim2">' + rels.length + ' 条关系 · 每条都说明为什么</span></div>'
+    + '<div class="rel-list">' + rels.map(function (l) { return MCU.ui.relationItem(l, m.id); }).join('') + '</div>'
+    + '</div>';
+
+  /* ---- 相关角色 ---- */
+  var charPills = (m.chars || []).map(function (cid) {
+    var c = MCU.data.getChar(cid);
+    if (!c) return '';
+    return '<button class="char" data-char="' + cid + '">' + MCU.ui.esc(c.cn) + '</button>';
+  }).join('');
+  var charBlock = '<div class="card" style="margin-top:16px">'
+    + '<div class="hd"><h2>相关角色</h2>'
+    +   '<span class="dim2">点开看 TA 出现在哪些作品</span></div>'
+    + '<div class="chars">' + (charPills || '<span class="dim">暂未收录相关角色信息</span>') + '</div>'
+    + '<div id="char-films" style="margin-top:14px"></div>'
+    + '</div>';
+
+  /* ---- 拼装 ---- */
+  var v = MCU.data.visual(m.id);
+  var posterSrc = MCU.ui.movieVisual(m); /* 返回 <img> 或 <div class="mv-fallback"> */
+  /* V1.3 A6：大背景用 16:9 backdrop（真实剧照），不再错用 2:3 海报；
+     统一经 data.visual 取，消除对 MCU_POSTERS 的直读。无 backdrop 则不加（阶段色兜底）。 */
+  var backdropImg = v.backdrop
+    ? '<div class="detail-backdrop"><img src="' + v.backdrop + '" alt=""></div>'
+    : '';
+
+  var html = ''
+    + '<div class="detail-head detail-head-v13" style="--phase-color:' + MCU.data.phaseColor(m.phase) + '">'
+    +   backdropImg
+    +   '<svg class="detail-reactor" viewBox="0 0 120 120" aria-hidden="true">'
+    +     '<circle cx="60" cy="60" r="46" fill="none" stroke="var(--phase-color, var(--gold))" stroke-width="2"/>'
+    +     '<circle cx="60" cy="60" r="31" fill="none" stroke="var(--phase-color, var(--gold))" stroke-width="1.2" stroke-dasharray="5 6"/>'
+    +     '<path d="M60 38L79 72H41L60 38z" fill="none" stroke="var(--phase-color, var(--gold))" stroke-width="1.6" stroke-linejoin="round"/>'
+    +     '<circle cx="60" cy="60" r="7" fill="var(--phase-color, var(--gold))" opacity=".5"/>'
+    +     '<path d="M60 8v8M60 104v8M8 60h8M104 60h8" stroke="var(--phase-color, var(--gold))" stroke-width="2" stroke-linecap="round"/>'
+    +   '</svg>'
+    +   '<div class="detail-stones" aria-hidden="true">'
+    +     '<i title="空间宝石" style="--stone:#5B8DEF"></i>'
+    +     '<i title="心灵宝石" style="--stone:#F0A932"></i>'
+    +     '<i title="现实宝石" style="--stone:#E8483F"></i>'
+    +     '<i title="力量宝石" style="--stone:#8B6FE8"></i>'
+    +     '<i title="灵魂宝石" style="--stone:#E8823F"></i>'
+    +     '<i title="时间宝石" style="--stone:#28B487"></i>'
+    +   '</div>'
+    +   '<div class="detail-hero">'
+    +     '<div class="detail-poster" style="--phase-color:' + MCU.data.phaseColor(m.phase) + '">'
+    +       posterSrc
+    +     '</div>'
+    +     '<div class="detail-hero-info">'
+    +       '<div style="display:flex;align-items:center;gap:10px">'
+    +         '<span class="mcard-phase" style="width:4px;height:18px;background:' + MCU.data.phaseColor(m.phase) + '"></span>'
+    +         '<span class="mcard-order" style="font-size:12px">' + phaseName + ' · ' + MCU.ui.orderLabel(m) + '</span>'
+    +       '</div>'
+    +       '<h1>' + MCU.ui.esc(m.cn) + '</h1>'
+    +       '<div class="detail-en">' + MCU.ui.esc(m.en) + ' · ' + m.year + '</div>'
+    +       '<div class="detail-meta">'
+    +         (m.mainline ? '<span class="chip chip-red">核心主线</span>' : '')
+    +         (m.starter ? '<span class="chip chip-blue">适合新手</span>' : '')
+    +         MCU.ui.typeBadge(m.type)
+    +         MCU.ui.impBadge(m.importance)
+    +         (m.saga ? '<span class="chip">' + sagaName + '</span>' : '')
+    +         '<button class="seen-toggle' + (seen ? ' on' : '') + '" id="seen-btn" data-stat="click_start_watch" data-id="' + m.id + '">'
+    +           (seen ? '✓ 已看' : '标记已看') + '</button>'
+    +       '</div>'
+    +       (m.role ? '<div style="margin-top:12px;font-size:14.5px;color:var(--text-2);line-height:1.65;max-width:520px">' + MCU.ui.esc(m.role) + '</div>' : '')
+    +     '</div>'
+    +   '</div>'
+    + '</div>'
+
+    + meaning
+    + tl
+    + nextBlock
+    + preBlock
+    + relBlock
+    + charBlock
+    + '<div class="detail-next-cta">'
+    +   '<div>'
+    +     '<div class="detail-next-cta-t">看完这部，下一步是什么？</div>'
+    +     '<div class="detail-next-cta-d">告诉我想怎么看，我给你下一部推荐，并说清楚为什么。</div>'
+    +   '</div>'
+    +   '<a class="btn btn-primary" href="next.html?from=' + m.id + '">找下一部 →</a>'
+    + '</div>'
+    + MCU.ui.mpEntry({ variant: 'inline', title: '在小程序标记已看', desc: '纳入你的观影进度和 MCU 轨迹', payload: { type: 'movie', id: m.id } });
+
+  box.innerHTML = html;
+  box.insertAdjacentHTML('beforeend', '<button class="complain-inline" type="button" data-fb>'
+    + '<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    + '发现信息有误？我要吐槽</button>');
+
+  /* ---- 交互 ---- */
+  var seenBtn = document.getElementById('seen-btn');
+  seenBtn.onclick = function () {
+    var now = MCU.progress.toggle(m.id);
+    seenBtn.classList.toggle('on', now);
+    seenBtn.textContent = now ? '✓ 已看' : '标记已看';
+    /* V1.3 6.1：达到 5/10/20 部里程碑时，在详情页底部插入旅程卡 */
+    var ms = MCU.progress.checkMilestone();
+    if (ms) {
+      var wrap = document.createElement('div');
+      wrap.style.marginTop = '16px';
+      wrap.innerHTML = MCU.ui.mpCard(ms.title, ms.desc, '保存进度', false);
+      box.appendChild(wrap);
+      window.scrollTo({ top: wrap.offsetTop - 80, behavior: 'smooth' });
+    }
+  };
+
+  Array.prototype.forEach.call(box.querySelectorAll('[data-char]'), function (btn) {
+    btn.onclick = function () {
+      var c = MCU.data.getChar(btn.getAttribute('data-char'));
+      var films = MCU.data.filmsOfChar(c.id);
+      var panel = document.getElementById('char-films');
+      if (panel.dataset.open === c.id) { panel.innerHTML = ''; panel.dataset.open = ''; return; }
+      panel.dataset.open = c.id;
+      panel.innerHTML = '<div style="font-size:13px;color:var(--text-2);line-height:1.7">'
+        + '<b style="color:var(--text)">' + MCU.ui.esc(c.cn) + '</b> 共出现在 ' + films.length + ' 部作品中'
+        + (c.note ? '：<span class="dim2">' + MCU.ui.esc(c.note) + '</span>' : '')
+        + '</div>'
+        + '<div class="grid-movies" style="margin-top:12px">'
+        + films.map(function (f) { return MCU.ui.movieCard(f); }).join('')
+        + '</div>';
+      window.scrollTo({ top: panel.offsetTop - 80, behavior: 'smooth' });
+    };
+  });
+})();
+</script>
+</body>
+</html>

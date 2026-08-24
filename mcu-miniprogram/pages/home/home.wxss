@@ -1,0 +1,422 @@
+/* ============================================================
+ * 首页 home（Tab1）· D12-A Step3-4
+ * 样式依据：D10-A 冻结稿 CSS（恢复资料/D10原型/D10-A_观影主线强化原型.html）
+ * 换算：原型 px × 2 = rpx；颜色全部引用 app.wxss 全局 Token（零 raw hex 泄漏）
+ * ============================================================ */
+
+.home-page {
+  padding: 0; /* 首页采用原型 20px 页边距的分段式布局，由各区块自带 padding */
+}
+
+/* ══════ 通用：section 标签 / 海报阶段色兜底 ══════ */
+
+.section-label {
+  padding: 0 40rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-weak);
+  margin-bottom: 16rpx;
+  letter-spacing: 0.02em;
+}
+
+.label-gap {
+  margin-top: 28rpx;
+}
+
+/* 海报阶段色兜底（135deg 渐变：阶段色 → 60% 黑；与 D10 冻结稿 poster-p1..p6 一致） */
+.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
+.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
+.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
+.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
+.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
+.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }
+
+.poster-text {
+  font-size: 22rpx;
+  font-weight: 800;
+  color: var(--white-a60);
+}
+
+.spacer-sm { height: 24rpx; }
+
+/* ══════ 新用户态 ══════ */
+
+/* 品牌引导 */
+.home-hero {
+  padding: 56rpx 40rpx 40rpx;
+  text-align: center;
+}
+.home-hero .brand {
+  font-size: 26rpx;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+}
+.home-hero .hero-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 12rpx;
+}
+.home-hero .hero-sub {
+  font-size: 26rpx;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+
+/* 热门起点 pills */
+.pills-row {
+  display: flex;
+  gap: 12rpx;
+  padding: 0 40rpx;
+  white-space: nowrap;
+  margin-bottom: 40rpx;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 10rpx 24rpx;
+  font-size: 26rpx;
+  color: var(--text-sub);
+  background: var(--surface-2);
+  border: 1rpx solid var(--white-a08);
+  border-radius: 40rpx;
+  letter-spacing: 0.01em;
+}
+.pill:active { border-color: var(--gold); color: var(--gold); }
+
+/* 功能入口卡 */
+.feature-cards {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 40rpx;
+  margin-bottom: 40rpx;
+}
+.feat-card {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1rpx solid var(--white-a08);
+  border-radius: 28rpx;
+  padding: 24rpx 20rpx;
+  text-align: center;
+}
+.feat-card-hover { border-color: var(--gold-a50); }
+.feat-ic {
+  width: 56rpx;
+  height: 56rpx;
+  margin: 0 auto 16rpx;
+  background: var(--gold-a10);
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.feat-ic-img {
+  width: 34rpx;
+  height: 34rpx;
+}
+.feat-title {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6rpx;
+  letter-spacing: 0.01em;
+}
+.feat-desc {
+  font-size: 20rpx;
+  color: var(--text-weak);
+  line-height: 1.4;
+}
+
+/* 新手引导 CTA：从《钢铁侠》开始 */
+.home-cta {
+  margin: 0 40rpx;
+  background: linear-gradient(135deg, var(--gold-a08), var(--gold-a03));
+  border: 1rpx solid var(--gold-a20);
+  border-radius: 28rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+}
+.cta-hover { opacity: 0.9; }
+.cta-poster {
+  width: 96rpx;
+  height: 140rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.cta-poster-text {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: var(--white-a70);
+}
+.cta-text { flex: 1; min-width: 0; }
+.cta-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8rpx;
+}
+.cta-desc {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  line-height: 1.4;
+}
+.cta-btn {
+  flex-shrink: 0;
+  padding: 20rpx 36rpx;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 26rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* ══════ 老用户态 ══════ */
+
+/* ① 当前旅程状态卡（V1.1 Step2：当前路线 / 当前阶段 / 观看进度） */
+.journey-card {
+  margin: 32rpx 40rpx 0;
+  background: linear-gradient(135deg, var(--gold-a08), var(--gold-a02));
+  border: 1rpx solid var(--gold-a20);
+  border-radius: 28rpx;
+  padding: 28rpx 32rpx;
+}
+.journey-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  margin-bottom: 20rpx;
+}
+.journey-row {
+  display: flex;
+}
+.j-item {
+  flex: 1;
+  min-width: 0;
+}
+.j-key {
+  font-size: 20rpx;
+  color: var(--text-weak);
+  margin-bottom: 6rpx;
+  letter-spacing: 0.02em;
+}
+.j-val {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 观影进度 */
+.progress-card {
+  margin: 32rpx 40rpx 0;
+  background: var(--surface-2);
+  border: 1rpx solid var(--white-a08);
+  border-radius: 28rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 32rpx;
+}
+.progress-ring {
+  width: 144rpx;
+  height: 144rpx;
+  flex-shrink: 0;
+  position: relative;
+}
+.ring-canvas {
+  width: 144rpx;
+  height: 144rpx;
+}
+.ring-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.ring-num-b {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+}
+.ring-num-s {
+  font-size: 20rpx;
+  color: var(--text-weak);
+  margin-top: 4rpx;
+}
+.progress-info { flex: 1; min-width: 0; }
+.pi-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 8rpx;
+}
+.pi-sub {
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+.phase-tag {
+  display: inline-block;
+  margin-top: 12rpx;
+  padding: 6rpx 16rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  border-radius: 8rpx;
+  letter-spacing: 0.02em;
+  background: var(--p2-a15);
+  color: var(--p2);
+}
+
+/* 继续观看 */
+.continue-card {
+  margin: 24rpx 40rpx 0;
+  background: var(--surface-2);
+  border: 1rpx solid var(--white-a08);
+  border-radius: 28rpx;
+  padding: 28rpx;
+  display: flex;
+  gap: 28rpx;
+}
+.continue-hover { border-color: var(--gold-a50); }
+.continue-poster {
+  width: 112rpx;
+  height: 160rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.continue-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.continue-meta .label {
+  font-size: 22rpx;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 8rpx;
+  letter-spacing: 0.04em;
+}
+.continue-meta .c-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6rpx;
+}
+.continue-meta .next-hint {
+  font-size: 24rpx;
+  color: var(--text-sub);
+  line-height: 1.4;
+}
+.continue-btn {
+  margin-top: 16rpx;
+  padding: 14rpx 32rpx;
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+  letter-spacing: 0.02em;
+  align-self: flex-start;
+}
+
+/* 下一站卡内「上次看到」小字（V1.1 Step2） */
+.last-seen {
+  font-weight: 400;
+  color: var(--text-weak);
+  font-size: 22rpx;
+}
+
+/* 主线看完完成态卡（V1.1 Step2：推荐无结果时） */
+.done-card {
+  align-items: center;
+}
+
+/* 快捷入口 */
+.quick-row {
+  display: flex;
+  gap: 16rpx;
+  padding: 28rpx 40rpx 0;
+}
+.quick-card {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1rpx solid var(--white-a08);
+  border-radius: 28rpx;
+  padding: 28rpx;
+}
+.quick-hover { border-color: var(--gold-a50); }
+.q-ic {
+  width: 56rpx;
+  height: 56rpx;
+  margin-bottom: 16rpx;
+}
+.q-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4rpx;
+}
+.q-desc {
+  font-size: 22rpx;
+  color: var(--text-weak);
+}
+
+/* 最近看过 */
+.recent-row {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 40rpx;
+  white-space: nowrap;
+}
+.recent-item {
+  display: inline-flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 128rpx;
+}
+.recent-hover { opacity: 0.85; }
+.recent-poster {
+  width: 128rpx;
+  height: 180rpx;
+  border-radius: 16rpx;
+  margin-bottom: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.recent-name {
+  font-size: 22rpx;
+  color: var(--text-sub);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

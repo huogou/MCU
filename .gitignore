@@ -1,0 +1,16 @@
+# WorkBuddy 项目数据与个人上下文（工具管理目录，不纳入版本库）
+.workbuddy/
+
+# 依赖
+node_modules/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.log
+
+# 小程序渲染产物（原型预览图，可重新生成；已归档副本见 AI生成文件/小程序/原型图/）
+mcu-miniprogram/assets/preview/_*.png
+mcu-miniprogram/assets/preview/_*.svg
+mcu-miniprogram/assets/icons/tab/_*.png
+mcu-miniprogram/assets/icons/tab/_*.svg

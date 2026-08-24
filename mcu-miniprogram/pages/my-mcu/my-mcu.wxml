@@ -1,0 +1,114 @@
+<!-- 我的MCU my-mcu（Tab4） - D12-A Step3-7-B 恢复 + V1.1 Step3 我的MCU 2.0 + Step5 成就墙
+     结构：① 顶部个人进度区（X/59 与首页一致）② 分享入口（Step4 接入）+ 成就墙（Step5）
+           ③ 当前路线区（名称/阶段/进度）④ 最近观看区 ⑤ 观看记录列表（时间倒序）
+           ⑥ 收藏区 ⑦ 反馈入口 -->
+<view class="mcu-page">
+
+  <!-- ① 顶部个人进度区：已观看数量 / 总数量（统一 X/59，与首页一致） -->
+  <view class="mcu-hero">
+    <view class="mcu-hero-label">我的漫威旅程</view>
+    <view class="mcu-explore">
+      <text class="mcu-explore-num">{{explored}}</text>
+      <text class="mcu-explore-sep">/</text>
+      <text class="mcu-explore-total">{{total}}</text>
+    </view>
+    <view class="mcu-explore-tip">已探索作品</view>
+    <view class="mcu-progress">
+      <view class="mcu-progress-bar" style="width:{{percent}}%"></view>
+    </view>
+    <view class="mcu-progress-tip">整体进度 {{percent}}% · 已看 {{explored}} 部</view>
+  </view>
+
+  <!-- ② 分享入口（Step4 已接入 share 页；成就入口被下方成就墙替代） -->
+  <view class="entry-row">
+    <view class="entry-card {{item.primary ? 'entry-primary' : ''}}" wx:for="{{entrances}}" wx:key="key" data-key="{{item.key}}" bindtap="goEntry" hover-class="entry-hover" hover-stay-time="80">
+      <view class="entry-title">{{item.title}}</view>
+      <view class="entry-desc">{{item.desc}}</view>
+      <view class="entry-badge" wx:if="{{item.primary}}">生成海报</view>
+    </view>
+  </view>
+
+  <!-- ②.5 我的成就（V1.1 Step5：成就墙，已获得金徽章 / 未获得灰徽章 + 进度 x/6） -->
+  <view class="section-label">我的成就 · {{achProgress.count}} / {{achProgress.total}}</view>
+  <scroll-view class="ach-row" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="ach-item" wx:for="{{achievements}}" wx:key="id"
+          data-id="{{item.id}}" data-gained="{{item.gained}}"
+          bindtap="onTapAch" hover-class="ach-hover" hover-stay-time="80">
+      <view class="ach-badge {{item.gained ? 'gained' : ''}}">{{item.icon}}</view>
+      <view class="ach-name {{item.gained ? 'gained' : ''}}">{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <!-- ③ 当前路线区（增强：路线名称 + 当前阶段 Phase N + 当前进度） -->
+  <view class="section-label">当前路线</view>
+  <view class="route-next-card" wx:if="{{current}}" bindtap="goRoute">
+    <view class="route-next-info">
+      <view class="rn-label">继续你的路线 · {{current.phaseText}}</view>
+      <view class="rn-title">{{current.name}}</view>
+      <view class="rn-sub">{{current.watched}} / {{current.total}} 部 · 下一部 {{current.nextName}}</view>
+      <view class="rn-progress">
+        <view class="rn-progress-bar" style="width:{{current.percent}}%"></view>
+      </view>
+    </view>
+    <view class="route-next-btn {{current.nextId ? '' : 'is-disabled'}}">继续观看</view>
+  </view>
+
+  <!-- ④ 最近观看区（V1.1 Step3：最近 3 部，海报+名称+完成状态） -->
+  <view class="section-label">最近观看</view>
+  <block wx:if="{{recentList.length}}">
+    <scroll-view class="recent-row" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="recent-item" wx:for="{{recentList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
+        <view class="recent-poster poster-p{{item.phase}}">
+          <text class="recent-letter">{{item.letter}}</text>
+          <view class="recent-badge">已看</view>
+        </view>
+        <view class="recent-name">{{item.cn}}</view>
+      </view>
+    </scroll-view>
+  </block>
+  <view wx:else class="empty-tip">还没有观看记录，去首页挑一部开始吧</view>
+
+  <!-- ⑤ 观看记录列表（按观看时间倒序） -->
+  <view class="section-label">观看记录 · {{watchedCount}} 部</view>
+  <view class="card-list">
+    <block wx:if="{{watchedList.length}}">
+      <view class="work-card" wx:for="{{watchedList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
+        <view class="wc-poster poster-p{{item.phase}}">{{item.letter}}</view>
+        <view class="wc-info">
+          <view class="wc-name">{{item.cn}}</view>
+          <view class="wc-sub">{{item.en}} · {{item.phaseText}} · {{item.typeLabel}}</view>
+        </view>
+        <view class="wc-badge done">已看</view>
+      </view>
+    </block>
+    <view wx:else class="empty-tip">还没有观看记录，去首页挑一部开始吧</view>
+  </view>
+
+  <!-- ⑥ 收藏 / 记录区域：有数据则展示，无数据保留入口不新增复杂逻辑 -->
+  <view class="section-label">我的收藏 · {{favCount}}</view>
+  <view class="card-list">
+    <block wx:if="{{hasFav}}">
+      <view class="work-card" wx:for="{{favList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
+        <view class="wc-poster poster-p{{item.phase}}">{{item.letter}}</view>
+        <view class="wc-info">
+          <view class="wc-name">{{item.cn}}</view>
+          <view class="wc-sub">{{item.en}} · {{item.phaseText}} · {{item.typeLabel}}</view>
+        </view>
+        <view class="wc-badge fav">★</view>
+      </view>
+    </block>
+    <view wx:else class="empty-tip">还没有收藏。在电影详情页点击收藏，记录想保留的作品</view>
+  </view>
+
+  <!-- ⑦ 反馈入口（Step3-8）：置于个人页底部，不进入核心观影流程 -->
+  <view class="section-label">反馈与帮助</view>
+  <view class="fb-entry" bindtap="goFeedback">
+    <view class="fb-entry-info">
+      <view class="fb-entry-title">我要吐槽</view>
+      <view class="fb-entry-sub">发现问题？顺手反馈，帮我们把导航做更准</view>
+    </view>
+    <view class="fb-entry-arrow">&rsaquo;</view>
+  </view>
+
+  <view class="mcu-bottom-space"></view>
+</view>

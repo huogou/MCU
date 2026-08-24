@@ -1,0 +1,44 @@
+<!-- 路线 routes（Tab2） - D12-A Step3-6 恢复 -->
+<view class="routes-page">
+
+  <!-- 头部：标题 + 双 Tab -->
+  <view class="routes-header">
+    <view class="rh-title">观影路线</view>
+    <view class="route-tabs">
+      <view wx:for="{{tabs}}" wx:key="key"
+            class="route-tab {{activeTab === item.key ? 'active' : ''}}"
+            data-key="{{item.key}}" bindtap="switchTab">{{item.label}}</view>
+    </view>
+  </view>
+
+  <!-- 当前路线进度 -->
+  <block wx:if="{{current}}">
+    <view class="section-label">当前路线进度</view>
+    <view class="route-next-card" data-id="{{current.routeId}}" bindtap="goDetail">
+      <view class="route-next-info">
+        <view class="rn-label">{{current.name}} · 第 {{current.index}} / {{current.total}} 部</view>
+        <view class="rn-title">下一部：{{current.nextName}}</view>
+        <view class="rn-sub">{{current.nextSub}}</view>
+      </view>
+      <view class="route-next-btn {{current.nextId ? '' : 'is-disabled'}}" catchtap="goNext">{{current.nextId ? '去看' : '已完成'}}</view>
+    </view>
+  </block>
+
+  <!-- 路线列表 -->
+  <view class="route-list">
+    <view wx:for="{{list}}" wx:key="id"
+          class="route-card {{item.current ? 'current-route' : ''}}"
+          data-id="{{item.id}}" bindtap="goDetail">
+      <view class="rc-top">
+        <view class="rc-name">{{item.name}}</view>
+        <view class="rc-count">{{item.count}} 部</view>
+      </view>
+      <view class="rc-tag">{{item.tagline}}</view>
+      <view class="rc-for">{{item.forWho}}</view>
+      <view class="rc-progress">
+        <view class="bar" style="width:{{item.percent}}%;background:var(--success)"></view>
+      </view>
+    </view>
+  </view>
+
+</view>

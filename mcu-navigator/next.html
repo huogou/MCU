@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我看完这部，下一部看什么 - MCU 宇宙导航</title>
+<meta name="description" content="选择你刚看完的漫威电影，立刻得到下一部推荐，并说明推荐理由。支持只看主线、完整看懂、按顺序全看三种观影目的。">
+<meta name="keywords" content="看完某部漫威电影之后看什么,漫威电影下一部,漫威观影顺序推荐">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main>
+  <section class="section">
+    <div class="wrap-narrow">
+      <h1>我刚看完……</h1>
+      <p class="lead" style="margin-top:12px">选一部你最近看完的，然后告诉我你想怎么看下去。每条推荐都会说清为什么是它。</p>
+
+      <div style="margin-top:26px">
+        <div class="picker">
+          <div class="filter-btns" id="filter-btns"></div>
+          <div class="select-wrap">
+            <select id="from-select">
+              <option value="">选择一部作品……</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modes" id="modes"></div>
+      </div>
+
+      <div class="result" id="result"></div>
+    </div>
+  </section>
+</main>
+
+<div id="app-foot"></div>
+
+<script src="data/movies.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+  <script src="data/stills.js"></script>
+  <script src="data/visuals.js"></script>
+  <script src="assets/js/app.js"></script>
+<script>
+(function () {
+  MCU.ui.mount('next.html');
+
+  var sel = document.getElementById('from-select');
+  var modesEl = document.getElementById('modes');
+  var resultEl = document.getElementById('result');
+  var filterEl = document.getElementById('filter-btns');
+  var mode = 'mainline';
+
+  /* ---- 下拉：按内容类型筛选 + 分组 ----
+   * 重要：阶段（Phase 1-6）只用于「院线电影」，绝不混入剧集/特别呈现/短片。
+   * 电影按电影专属上映序号（1-38 已上映 + 39-40 即将上映）排序，
+   * 不用 CONTENT 的全局 ro（1-59），避免"第1阶段"里出现短片/剧集。 */
+  var FILTERS = [
+    { key: 'movie',   label: '电影' },
+    { key: 'series',  label: '剧集' },
+    { key: 'special', label: '特别呈现' },
+    { key: 'short',   label: '短片' }
+  ];
+  var currentFilter = 'movie';   /* 页面默认进入【电影】 */
+
+  /* 院线电影全集（含尚未上映），带电影专属序号 _morder / _status */
+  function allMovies() {
+    var released = (window.MCU_MOVIES || []).map(function (m) {
+      var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k]; return c;
+    }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
+    released.forEach(function (m, i) { m._morder = i + 1; m._status = 'released'; });
+
+    var up = (window.MCU_UPCOMING || []).map(function (m) {
+      var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k]; return c;
+    }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
+    up.forEach(function (m, i) {
+      m.type = 'movie'; m.phase = 6;
+      m.year = parseInt(String(m.date || '').slice(0, 4), 10) || '';
+      m._morder = released.length + i + 1;   // 39、40
+      m._status = 'upcoming';
+      m.id = '';                            // 尚未上映，不可作为"刚看完"的作品被选中
+    });
+    return released.concat(up);
+  }
+
+  function cloneList(arr, type) {
+    return (arr || []).map(function (m) {
+      var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k];
+      if (type) c.type = type; return c;
+    }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
+  }
+
+  function movieOpt(m) {
+    var status = m._status === 'upcoming' ? '🕐即将上映' : '✅已上映';
+    var seen = (m._status !== 'upcoming' && m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
+    return '<option value="' + MCU.ui.esc(m.id || '') + '">'
+      + m._morder + '. ' + MCU.ui.esc(m.cn) + '（' + m.year + '）' + status + seen + '</option>';
+  }
+  function otherOpt(m) {
+    var seen = (m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
+    return '<option value="' + MCU.ui.esc(m.id || '') + '">' + MCU.ui.esc(m.cn) + '（' + m.year + '）' + seen + '</option>';
+  }
+
+  function movieGroups(movies) {
+    var byPhase = {};
+    movies.forEach(function (m) { (byPhase[m.phase] = byPhase[m.phase] || []).push(m); });
+    var phases = Object.keys(byPhase).map(Number).sort(function (a, b) { return a - b; });
+    var out = '';
+    phases.forEach(function (p) {
+      out += '<optgroup label="电影 · 第 ' + p + ' 阶段">';
+      byPhase[p].sort(function (a, b) { return a._morder - b._morder; })
+        .forEach(function (m) { out += movieOpt(m); });
+      out += '</optgroup>';
+    });
+    return out;
+  }
+  function plainGroup(arr, label) {
+    var items = cloneList(arr);
+    var out = '<optgroup label="' + label + '">';
+    items.forEach(function (m) { out += otherOpt(m); });
+    out += '</optgroup>';
+    return out;
+  }
+
+  function buildOptions() {
+    var movies = allMovies();
+    var html = '<option value="">选择一部作品……</option>';
+    if (currentFilter === 'movie') {
+      html += movieGroups(movies);
+    } else if (currentFilter === 'series') {
+      html += plainGroup(window.MCU_SERIES, '剧集');   /* 剧集：扁平列表，不做第X阶段分组 */
+    } else if (currentFilter === 'special') {
+      html += plainGroup(window.MCU_SPECIAL, '特别呈现');
+    } else if (currentFilter === 'short') {
+      html += plainGroup(window.MCU_SHORT, '短片');
+    }
+    sel.innerHTML = html;
+  }
+
+  /* 五个内容筛选按钮 */
+  function renderFilters() {
+    filterEl.innerHTML = FILTERS.map(function (f) {
+      return '<button type="button" class="tbtn' + (f.key === currentFilter ? ' on' : '') + '" data-f="' + f.key + '">' + f.label + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(filterEl.querySelectorAll('.tbtn'), function (b) {
+      b.onclick = function () {
+        currentFilter = b.getAttribute('data-f');
+        var prev = sel.value;
+        buildOptions();
+        sel.value = prev;                     /* 若原选择仍在新列表中存在则保留，否则浏览器回落到首项 */
+        if (sel.value !== prev) sel.value = '';
+        renderFilters();
+        render();
+      };
+    });
+  }
+
+  /* ---- 三种观影目的 ---- */
+  function renderModes() {
+    var keys = ['mainline', 'understand', 'complete'];
+    modesEl.innerHTML = keys.map(function (k) {
+      var m = MCU.rec.modes[k];
+      return '<button class="mode' + (k === mode ? ' on' : '') + '" data-m="' + k + '">'
+        + '<div class="mode-t">' + m.label + '</div>'
+        + '<div class="mode-d">' + m.desc + '</div></button>';
+    }).join('');
+    Array.prototype.forEach.call(modesEl.querySelectorAll('.mode'), function (b) {
+      b.onclick = function () { mode = b.getAttribute('data-m'); renderModes(); render(); };
+    });
+  }
+
+  /* ---- 结果 ---- */
+  function render() {
+    var id = sel.value;
+    if (!id) {
+      resultEl.innerHTML = '<div class="empty">先在上面选一部你刚看完的作品。<br>'
+        + '还没开始看？推荐从<a href="routes.html?r=newcomer" style="color:var(--red)">新手入坑路线</a>开始。</div>';
+      return;
+    }
+
+    var from = MCU.data.get(id);
+    if (!from) {
+      resultEl.innerHTML = '<div class="empty">这部作品还未上映，暂时无法推荐下一部。</div>';
+      return;
+    }
+    var r = MCU.rec.next(id, mode);
+
+    if (!r) {
+      /* 终点信息全部数据驱动：最新已上映取自 MCU_MOVIES 中 date 最大者，
+         下一部取自 MCU_UPCOMING 中 date 最小（最近）者。禁止硬编码日期。 */
+      var _rel = (window.MCU_MOVIES || []).slice().sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+      var _latest = _rel[0];
+      var _up = (window.MCU_UPCOMING || []).slice().sort(function (a, b) { return String(a.date || '').localeCompare(String(a.date || '')); })[0];
+      var _end = '《' + MCU.ui.esc(from.cn) + '》已经是这条路径上的最后一部了。<br>';
+      if (_latest) _end += '目前 MCU 最新上映的作品是《' + MCU.ui.esc(_latest.cn) + '》（' + MCU.ui.esc(_latest.date) + '）。<br>';
+      if (_up) _end += '接下来是《' + MCU.ui.esc(_up.cn) + '》，' + MCU.ui.esc(_up.date) + ' 上映。';
+      resultEl.innerHTML = '<div class="empty">' + _end + '</div>';
+      return;
+    }
+
+    var n = r.movie;
+    var v = MCU.data.visual(n.id);
+    var seen = MCU.progress.isSeen(n.id);
+
+    /* V1.3：「你刚看完」回显卡——选的作品本身也要被看见，
+       而不是结果区直接跳到下一部。stepThumb 自带海报兜底。 */
+    var echo = '<div class="rec-from">'
+      + MCU.ui.stepThumb(from)
+      + '<div class="rec-from-info">'
+      +   '<div class="rec-from-label">你刚看完</div>'
+      +   '<a class="rec-from-title" href="movie.html?id=' + from.id + '">' + MCU.ui.esc(from.cn) + '</a>'
+      +   '<div class="rec-from-meta">'
+      +     '<span class="dim2">' + MCU.ui.esc(from.en || '') + ' · ' + (from.year || '') + '</span>'
+      +     (from.type === 'movie'
+              ? '<span class="rec-from-phase" style="background:' + MCU.data.phaseColor(from.phase) + '18;color:' + MCU.data.phaseColor(from.phase) + ';border:1px solid ' + MCU.data.phaseColor(from.phase) + '40">Phase ' + from.phase + '</span>'
+              : '')
+      +     (from.type !== 'movie' ? MCU.ui.typeBadge(from.type) : '')
+      +     MCU.ui.impBadge(from.importance)
+      +   '</div>'
+      + '</div></div>';
+
+    var html = echo + '<div class="rec rec-card rec-v13">'
+      + (v.backdrop ? '<div class="rec-backdrop" style="background-image:url(' + v.backdrop + ')"></div>' : '')
+      + '<svg class="rec-reactor" viewBox="0 0 120 120" aria-hidden="true">'
+      +   '<circle cx="60" cy="60" r="46" fill="none" stroke="var(--gold)" stroke-width="2"/>'
+      +   '<circle cx="60" cy="60" r="30" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-dasharray="5 6"/>'
+      +   '<path d="M60 38L79 72H41L60 38z" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-linejoin="round"/>'
+      +   '<circle cx="60" cy="60" r="7" fill="var(--gold)" opacity=".55"/>'
+      +   '<path d="M60 8v8M60 104v8M8 60h8M104 60h8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/>'
+      + '</svg>'
+      + '<div class="rec-stones" aria-hidden="true">'
+      +   '<i title="空间宝石" style="--stone:#5B8DEF"></i>'
+      +   '<i title="心灵宝石" style="--stone:#F0A932"></i>'
+      +   '<i title="现实宝石" style="--stone:#E8483F"></i>'
+      +   '<i title="力量宝石" style="--stone:#8B6FE8"></i>'
+      +   '<i title="灵魂宝石" style="--stone:#E8823F"></i>'
+      +   '<i title="时间宝石" style="--stone:#28B487"></i>'
+      + '</div>'
+      + '<div class="rec-main">'
+      +   '<div class="rec-visual" style="--phase-color:' + MCU.data.phaseColor(n.phase) + '">'
+      +     MCU.ui.movieVisual(n)
+      +     '<span class="rec-visual-tag">下一部</span>'
+      +   '</div>'
+      +   '<div class="rec-info">'
+      +     '<div class="rec-label">下一部看这个</div>'
+      +     '<h2 class="rec-title">' + MCU.ui.esc(n.cn) + '</h2>'
+      +     '<div class="detail-en">' + MCU.ui.esc(n.en) + '</div>'
+      +     '<div class="rec-meta">'
+      +       '<span class="chip">' + MCU.ui.releaseLabel(n) + '</span>'
+      +       '<span class="chip">第 ' + n.phase + ' 阶段</span>'
+      +       '<span class="chip">' + n.year + ' 年</span>'
+      +       '<span class="chip">' + ((window.MCU_UPCOMING && window.MCU_UPCOMING.some(function (u) { return u.id === n.id; })) ? '即将上映' : '已上映') + '</span>'
+      +       MCU.ui.typeBadge(n.type)
+      +       MCU.ui.impBadge(n.importance)
+      +       '<span class="chip">' + MCU.ui.orderLabel(n) + '</span>'
+      +       '<span class="chip">故事发生在 ' + MCU.ui.esc(n.coLabel) + '</span>'
+      +       (n.mainline ? '<span class="chip chip-red">核心主线</span>' : '')
+      +       (seen ? '<span class="chip" style="color:var(--green);border-color:rgba(40,180,135,.4)">你已标记看过</span>' : '')
+      +     '</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="rec-why">'
+      +   '<strong class="rec-why-t">为什么推荐这部</strong>'
+      +   '<p>' + MCU.ui.esc(r.why) + '</p>'
+      + '</div>'
+      + '<div style="margin-top:20px;display:flex;gap:9px;flex-wrap:wrap">'
+      +   '<a class="btn btn-primary btn-sm" href="movie.html?id=' + n.id + '">看它在宇宙里的位置</a>'
+      +   '<button class="btn btn-sm" id="mark-seen">' + (seen ? '取消已看标记' : '标记为已看') + '</button>'
+      +   '<a class="btn btn-sm" href="map.html?focus=' + n.id + '">在宇宙地图里看</a>'
+      + '</div>'
+      + '<div class="rec-continue">'
+      +   '<span>看完这部？</span>'
+      +   '<a href="next.html?from=' + n.id + '">继续推荐下一部 →</a>'
+      + '</div>'
+      + '</div>';
+
+    /* 另外两种模式的对照，让用户理解"目的不同，答案不同" */
+    var others = ['mainline', 'understand', 'complete'].filter(function (k) { return k !== mode; });
+    var cmp = others.map(function (k) {
+      var rr = MCU.rec.next(id, k);
+      if (!rr) return '';
+      return '<div style="padding:13px 0;border-top:1px solid var(--border)">'
+        + '<div style="font-size:13px;color:var(--text-3)">如果' + MCU.rec.modes[k].label + '</div>'
+        + '<div style="margin-top:4px"><a href="movie.html?id=' + rr.movie.id
+        + '" style="font-weight:550">《' + MCU.ui.esc(rr.movie.cn) + '》</a>'
+        + (rr.movie.id === n.id ? '<span class="dim2"> · 和当前推荐相同</span>' : '') + '</div>'
+        + '</div>';
+    }).join('');
+
+    if (cmp) {
+      html += '<div class="card" style="margin-top:16px">'
+        + '<div style="font-size:13px;color:var(--text-3);margin-bottom:2px">换一个目的，答案会不一样</div>'
+        + cmp + '</div>';
+    }
+
+    /* 前置作品提示 */
+    var pre = MCU.rec.prereqOf(n.id).filter(function (l) {
+      return l.type === 'prereq' && !MCU.progress.isSeen(l.other);
+    });
+    if (pre.length) {
+      html += '<div class="card" style="margin-top:16px">'
+        + '<div class="hd" style="margin-bottom:12px"><h3>看它之前，最好先补这些</h3></div>'
+        + '<div class="rel-list">'
+        + pre.slice(0, 3).map(function (l) { return MCU.ui.relationItem(l, n.id); }).join('')
+        + '</div></div>';
+    }
+
+    html += MCU.ui.mpCard('保存你的 MCU 旅程', '已看、路线与收藏一起保存，换设备也能接着看。', '保存进度', true);
+    resultEl.innerHTML = html;
+
+    var mk = document.getElementById('mark-seen');
+    if (mk) mk.onclick = function () {
+      MCU.progress.toggle(n.id);
+      var ms = MCU.progress.checkMilestone();
+      render();
+      /* V1.3 6.1：达到 5/10/20 部里程碑时，在推荐结果顶部插入旅程卡 */
+      if (ms) {
+        var wrap = document.createElement('div');
+        wrap.style.marginTop = '16px';
+        wrap.innerHTML = MCU.ui.mpCard(ms.title, ms.desc, '保存进度', false);
+        resultEl.insertBefore(wrap, resultEl.firstChild);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+  }
+
+  sel.onchange = function () {
+    render();
+    var u = new URL(window.location.href);
+    if (sel.value) { u.searchParams.set('from', sel.value); }
+    else { u.searchParams.delete('from'); }
+    history.replaceState(null, '', u.toString());
+  };
+
+  var pre = MCU.ui.param('from');
+  renderFilters();
+  buildOptions();
+  if (pre && MCU.data.get(pre)) sel.value = pre;
+
+  renderModes();
+  render();
+})();
+</script>
+</body>
+</html>

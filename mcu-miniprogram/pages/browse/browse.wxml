@@ -1,0 +1,28 @@
+<!-- 浏览全部 browse - Step3-7-C 恢复 -->
+<view class="mcu-page">
+  <view class="page-head">
+    <view class="page-title">浏览全部</view>
+    <view class="page-sub">MCU 全部作品 · 按阶段排列</view>
+  </view>
+
+  <view wx:for="{{groups}}" wx:key="phase" class="phase-group">
+    <view class="group-head">
+      <view class="group-dot" style="background:{{item.color}}"></view>
+      <view class="group-title">{{item.title}}</view>
+      <view class="group-count">{{item.items.length}} 部</view>
+    </view>
+    <view class="film-list">
+      <view wx:for="{{item.items}}" wx:for-item="f" wx:key="id"
+            class="film-row" data-id="{{f.id}}" bindtap="goMovie" hover-class="film-row-hover">
+        <view class="film-letter" style="background:{{f.phaseColor}}">{{f.cn[0]}}</view>
+        <view class="film-info">
+          <view class="film-cn">{{f.cn}}</view>
+          <view class="film-en">{{f.en}} · 第{{f.phase}}阶段</view>
+        </view>
+        <view class="film-status status-{{f.status}}">{{f.status==='watched'?'已看':(f.status==='watching'?'在看':'未看')}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-pad"></view>
+</view>

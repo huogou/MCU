@@ -1,0 +1,32 @@
+<!-- 宇宙全景图 panorama（由 explore 进入） - Step3-7-C 恢复 -->
+<view class="mcu-page pano-page">
+  <view class="page-head">
+    <view class="page-title">宇宙全景图</view>
+    <view class="page-sub">横向滑动查看 · 点击卡片进入详情</view>
+  </view>
+
+  <scroll-view class="pano-scroll" scroll-x scroll-y>
+    <view class="pano-map" style="width:{{mapW}}px;height:{{mapH}}px;">
+      <canvas type="2d" id="panoCanvas" class="pano-canvas" style="width:{{canvasW}}px;height:{{canvasH}}px;"></canvas>
+
+      <view wx:for="{{phases}}" wx:key="phase" class="phase-col" style="left:{{item.left}}px;height:{{mapH}}px;">
+        <view class="phase-tag">{{item.title}}</view>
+        <view class="phase-years">{{item.years}}</view>
+      </view>
+
+      <view wx:for="{{nodes}}" wx:key="id"
+            class="pano-node {{item.main?'node-main':''}} {{item.upcoming?'node-upcoming':''}}"
+            style="left:{{item.left}}px;top:{{item.top}}px;width:{{cardW}}px;height:{{cardH}}px;"
+            data-id="{{item.id}}" bindtap="goMovie">
+        <view class="node-letter" style="background:{{item.phaseColor}}">{{item.letter}}</view>
+        <view class="node-title">{{item.title}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="legend">
+    <view class="legend-item"><view class="legend-line" style="background:rgba(233,169,59,0.7)"></view>主线</view>
+    <view class="legend-item"><view class="legend-line" style="background:rgba(91,141,239,0.6)"></view>支线</view>
+    <view class="legend-item"><view class="legend-line" style="background:rgba(139,111,232,0.6)"></view>跨宇宙</view>
+  </view>
+</view>

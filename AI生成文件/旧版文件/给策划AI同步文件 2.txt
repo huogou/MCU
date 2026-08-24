@@ -1,0 +1,907 @@
+最后同步：2026-08-17
+
+========================================
+【开发 AI · D7「宇宙探索 / MCU 全景图」联合验收报告】
+========================================
+
+D7 已按策划最终确认（2026-08-14）与 设计 AI 提交稿，在 mcu-miniprogram/ 正式实现并通过自测。
+本报告为 Step 7 联合验收交付物。治理：D7 未正式通过前，不进入 D8。
+
+一、修改了什么（mcu-miniprogram/，独立项目，未触动 H5）
+1. models/pano.js（新增）—— D7 全景图布局配置：移植 H5 map.html 的 PANO_MOVIES / PANO_CONN / PHASE_COLS + LAYOUT 几何常量。性质＝视觉布局 + 已策划连线，不含内容事实。
+2. pages/explore/（4 文件，State A 关系探索）：explore.js / .wxml / .wxss / .json
+   - 搜索栏（中/英模糊匹配）+ 结果列表；热门起点 pills（8 个，自动剔除不存在 id）
+   - 紧凑 Hero 卡（海报 + 阶段色 + 片名 + 英文名 + 标签）
+   - 前置作品流（recommend.prereqOf）/ 后续作品流（relationsOf 中 ro>当前）/ 直接关联（去重后）/ 相关角色 pills / 关系概览（按 type 统计）
+   - 全景图入口（带 ?id= 传参）
+3. pages/panorama/（4 文件，State B 全景图）：panorama.js / .wxml / .wxss / .json
+   - 横向 scroll-view 承载 4240px 画布；38 部院线电影分三层（mainline 中 / support-above 上 / support-below 下）
+   - canvas 2d 绘制三类连线：mainline 金曲线 / support 细灰直线 / cross 紫虚线
+   - ?id= 定位 + 高亮当前 + 高亮相关连线、降低无关权重
+   - 点击节点聚焦（不重画图）；点击当前节点 → movie 详情
+   - 已看绿点（userState.isSeen）/ 当前「当前」标识
+4. pages/movie/movie.js（修改）：goPanorama 改为 → /pages/explore/explore?id={movieId}（State A 为默认入口）；explore 内「全景图入口」再跳 panorama?id=（State B）。
+
+二、使用了哪些数据源（单一源，禁第二套）
+- 38 部院线电影：data/content.js（type==='movie'），经 mcuData.get 读取
+- 关系：data/relations.js（mcuData.relationsOf / recommend.prereqOf）
+- 角色：data/characters.js（mcuData.getChar）
+- 海报：data/visuals.js（mcuData.visual，缺图 → 阶段色兜底卡）
+- 阶段色：data/constants.js PHASE（p1 #5B8DEF … p6 #C25B8E），全程统一
+- 已看：models/userState.js（isSeen，物理隔离）
+- 布局/连线：models/pano.js（id 全部指回 content.js 单一源，未另建电影表）
+未引入任何第二套电影数据，未手工维护作品列表或关系。
+
+三、是否修改 H5
+否。mcu-navigator/ 保持冻结，仅作只读参考（map.html / panorama-preview.html）。pano.js 为移植后的小程序端配置，非复制改造 H5。
+
+四、是否新增第二套数据
+否。全景图节点全集 = content 中 38 部电影；PANO_MOVIES 的 id、PANO_CONN 端点 id 全部落在 content.js（已验证）。avengers-5/6 待映不在 content，未纳入。
+
+五、PANO_CONN 是否保持一致
+是。采用已策划确认的 PANO_CONN：41 条（mainline 17 / support 16 / cross 8），type ∈ mainline/support/cross，端点全部在 content。未把 92 条 relations 全部画出。
+
+六、移动端测试结果
+- 语法：node --check 对 pano.js / explore.js / panorama.js 全部 OK；wxml 经 JSON 解析校验 OK
+- 逻辑冒烟（global.wx + global.Page 桩）：38 节点 / 41 连线 / 端点全部在 content / 前置·后续·直接关联三集合无重叠 / 概览条数 = relationsOf 总数 / 切换节点后当前高亮唯一 / scroll-into-view 指向当前节点 / 已看绿点读取 → 全部通过（ALL D7 LOGIC CHECKS PASSED）
+- 真机 / 微信开发者工具联调：待联合验收阶段执行（代码层已闭环，尚未做真机点测）
+
+七、当前是否可以进入 D8
+开发侧：D7 实现完成、自测通过、红线全守，建议放行进入 D8。
+治理：是否放行由策划联合验收最终确认；D7 未正式通过前不进入 D8。
+
+红线遵守
+- H5 零改动、已冻结
+- 小程序独立项目，未复制改造 H5 HTML/CSS/JS
+- 内容事实单一源，禁第二套电影数据
+- 三态物理隔离（全景图只读读取，不改写）
+- D7 未越界做设计/策划工作；未提前实现 D8
+
+待策划/设计确认项（非阻塞，可微调）
+1. 全景图横向宽度：实现用 4240px（H5 原宽，卡片间距不压缩）；设计稿曾建议 ~2800px 压缩。用户最终确认未限定宽度，且强调「卡片不要过度压缩」，故保留 4240。如确认压到 2800，改 LAYOUT.canvasW 并等比缩放 PANO_MOVIES.left 即可。
+2. 节点 cls/top、left 几何为视觉排布，可随设计微调。
+3. 图例(legend)样式、explore Hero 聚焦卡尺寸（非 60×90）由设计定稿。
+
+========================================
+【D7 最终验收补充｜全景图宽度（2026-08-17）】
+========================================
+依据：策划 2026-08-17 验收补充，要求对全景图宽度做真实移动端体验验证（8 项），以
+「手机用户能清楚理解六个阶段，且可以比较轻松地横向探索」为验收标准；
+不强制 2800px，也不为完整展示而坚持 4240px。
+
+环境限制说明：本开发环境未连接真机 / 微信开发者工具模拟器，开发 AI 无法亲手做
+手指滑动真机测试。采用「几何/UX 仿真分析 + 已通过的逻辑冒烟」作为替代验证；
+真机最终滑动由策划确认。
+
+验证结论（对应 8 项）：
+1. 进入全景图：onLoad 读 ?id → 定位 + scroll-into-view，逻辑通过（iron-man / avengers /
+   endgame / brand-new-day / quantumania 均定位有效）。
+2. 第1→第6阶段滑动：总宽由 4240px（11.3 屏）压缩至 3400px（9.1 屏，降 19%）；仍须
+   横向滑动，但更短。
+3. 是否容易拖动：原生 scroll-view 横向拖动手势由平台提供，顺畅；宽度变短后更易拖动。
+4. 阶段标题易定位：PHASE_COLS 六段标题（含年份）保留，压缩后阶段列按
+   48 / 674 / 1299 / 2165 / 2710 / 3159 分布，标题随滚动出现。
+5. 电影卡断层：压缩后同行最小边距 12px（mainline 20 / support-above 44），无重叠、无贴边；
+   阶段边界大空白（由数据分布决定，非间距可消）仍存在但已随整体压缩收窄。
+6. 是否迷失：当前电影金边光晕 +「当前」标签 + 相关连线加强 / 无关降低，进入即定位；
+   自由滑动时无常驻「你在第几阶段」指示（如需可后续加，不属本次 D7 范围）。
+7. 点击自动定位：onNodeTap → selectNode → scrollInto，逻辑通过（重测 18/18）。
+8. 当前高亮理解位置：isCurrent 唯一 + 金边 + 标签，配合阶段色，用户可理解所在阶段与关联。
+
+决策（Step 3 处方）：判定 11.3 屏偏长、不满足「较轻松」，按用户
+「只压间距、卡片保持 60×90、不动数据 / 架构」的处方，等比压缩布局至 3400px
+（不改 PANO_CONN、不改 38 节点、不改任何数据）。压缩后重测通过。
+
+最终结论：D7 全部通过，建议正式放行进入 D8。真机最终滑动由策划确认
+（若真机实测 4240 更顺手可一键回退，原始坐标已留档于本次会话）。
+
+########################################
+########################################
+【开发 AI · D8「H5 → 小程序衔接组件」联合验收报告】（接续 D7）
+########################################
+########################################
+
+D8 已按策划确认的《D8-H5小程序衔接设计原型-最终版》在现有 H5（mcu-navigator/）上以最小改动实现，
+并通过语法 + 逻辑回归自测。本报告为 D8 验收交付物（7 部分）。
+治理：D8 是否正式放行，由策划联合验收最终确认；本阶段 DO NOT deploy，待放行后再部署。
+
+一、各场景实现（六档强度，顺序与强度严格对应设计稿）
+1. 首页 → 小程序首页｜轻量入口 1/5｜进度条下方 compact 横条
+   - 位置：index.html:299（替换原 mpCard）
+   - 文案：「在小程序记录你的 MCU 进度」/「保存已看作品，追踪观影路线，随时继续」
+2. 观影路线 → 路线详情｜较强入口 4/5｜金边功能模块 + 强 CTA + 路线参数预留
+   - 位置：routes.html:151（替换原 mpCard）
+   - 文案：「保存这条观影路线」/「在小程序中记录进度，之后可以继续观看」
+   - CTA：「在小程序中保存路线」；payload={type:'route',id:r.id}
+3. 电影详情 → 电影详情｜功能入口 2/5｜详情内联功能条 + 电影参数预留
+   - 位置：movie.html:203（替换原 mpCard）
+   - 文案：「在小程序标记已看」/「纳入你的观影进度和 MCU 轨迹」
+   - payload={type:'movie',id:m.id}
+4. 关系探索 → 宇宙探索页｜中等入口 3/5｜探索延伸卡 + CTA
+   - 位置：map.html:241（#mp 容器）
+   - 文案：「保存你的探索进度」/「在小程序中随时回来继续探索」；CTA：「保存进度」
+5. MCU 全景图 → 宇宙探索/我的MCU｜重点入口 5/5｜地图横向末端延伸模块（D8 核心）
+   - 位置：map.html:519（buildPanorama 后，作为 panoCanvas 末位子元素注入）
+   - 文案：「把你的观影轨迹留在这张地图上」/「六阶段，38 部电影。记录你看过的每一部，逐步点亮属于你的 MCU。」
+   - CTA：「开始点亮我的 MCU」
+   - 关键约束：absolute left:4260px（在 4200px .pano-inner 之后），处于地图横向末端，不覆盖地图可视区；
+     拖拽/缩放/滚轮监听以 e.target.closest('.movie-card') 判定，.mp-pano 在其作用域外，不被干扰。
+6. 全站统一入口 → 小程序首页｜弱入口 1/5｜页脚弱条（版权上方，无弹窗/不强推）
+   - 位置：app.js foot()（line 573，在 footer 顶部注入）
+   - 文案：「MCU 宇宙导航 · 小程序」/「记录进度 · 保存路线 · 继续观看」
+
+二、文件改动清单（mcu-navigator/，现有 H5 直接最小改动）
+- assets/js/app.js
+  · openMpModal 增 payload 形参（3 参），将 payload JSON.stringify 暂存到面板 data-mp-payload
+  · 点击委托由「仅 mpCard」扩展为「任意带 data-mp-title 的元素」，并透传 payload
+  · 新增 mpEntry(o) 六档组件（compact/inline/card/module/pano/foot），复用既有 QR_SVG 与扫码面板
+  · foot() 增加页脚弱入口
+- assets/css/style.css：追加 D8 入口 CSS 块（.mp-entry / .mp-qr-72·40·32 / .mp-compact / .mp-inline /
+  .mp-card-x / .mp-module / .mp-pano / .mp-foot / .mp-entry-btn / .mp-pano-cta 等，统一暗色 surface + 金/绿强调）
+- index.html:299、movie.html:203、routes.html:151、map.html:241 与 map.html:519：六场景入口接线
+- 未改动：38 电影 / 路线 / 关系 / 全景 / PANO_CONN / CloudBase 等既有数据结构与功能
+- 刻意保留（超出 D8 六场景范围，按最小改动原则不动）：next.html 进度/里程碑卡（line 317/329）、
+  movie.html:218 里程碑卡，仍用原 mpCard；next.html 非 D8 范围页面未接线
+
+三、数据来源（复用既有，无新增、无第二套）
+- 入口组件纯前端渲染，文案取自 D8 已确认设计稿；二维码复用既有 QR_SVG（代码占位）+
+  既有 assets/miniprogram/qrcode.png（真实小程序码，加载失败回退 QR_SVG）
+- payload 携带的 id 直接复用现有数据主键（route.id / movie.id），不新建映射、不新增数据
+- 未新增任何电影/关系/用户数据；内容事实仍为单一源（H5 与小程序同源）
+
+四、小程序落地页（H5 → 小程序 衔接点）
+- 所有入口统一打开既有 V1.3 扫码面板（openMpModal）：展示小程序码 + 环境引导
+  （桌面=扫一扫 / 微信=长按识别 / 移动端=扫一扫）
+- 用户扫码进入小程序首页（mcu-miniprogram/ 已上线项目）
+- 衔接映射：H5 首页→小程序首页；路线详情→小程序「路线」；电影详情→小程序 movie 详情（凭 movieId）；
+  探索/全景→小程序「宇宙探索 / 我的MCU」
+
+五、参数化预留（未来带参跳转）
+- 入口层携带 data-mp-type / data-mp-id（场景 2/3 已实现 routeId/movieId；场景 4/5 为概念入口无单 id）
+- openMpModal 将 payload 暂存到面板 data-mp-payload
+- 当前仅预留，不拼接跳转链接；未来小程序支持带参 deep-link 时，在入口/跳转层接入即可，
+  无需改动 H5 数据结构
+- 二维码当前走静态 qrcode.png；预留「静态→参数化」能力的位置在入口/跳转层（不在此改 H5 数据）
+
+六、回归测试
+- node --check assets/js/app.js → SYNTAX_OK
+- tools/d8_smoke.js 18 项逻辑校验全过（ALL_D8_LOGIC_OK）：
+  六档组件 class 正确 / 整条可点入口携带 data-mp-title / payload 正确写入 data-mp-type+data-mp-id /
+  无 payload 不写属性 / 点击委托正确触发 openMpModal 并透传 payload / 非 mp 元素不触发
+- 全景图注入验证：.mp-pano 为 panoCanvas 末位子元素（left:4260px，在 4200px .pano-inner 之后），
+  处于地图横向末端，不覆盖地图；拖拽/缩放/滚轮监听以 closest('.movie-card') 判定，不被干扰
+- 视觉 / 真机：受环境限制未做浏览器真机点测；代码层已闭环，待联合验收阶段执行真机 / 微信开发者工具确认
+
+七、部署状态
+- 代码实现完成、自测通过（SYNTAX_OK + 18/18 逻辑校验）
+- 本阶段 DO NOT deploy：等待策划联合验收放行
+- 红线全守：H5 仅最小改动（未重建 / 未第二套页面 / 未复制改造小程序 / 未破坏既有 38 电影·路线·关系·全景·PANO_CONN·CloudBase 功能）
+- 临时校验脚本 tools/d8_smoke.js 交付后删除
+
+========================================
+【D8 最终视觉微调｜3 项微调已落地（2026-08-17，开发侧）】
+========================================
+依据：策划 2026-08-17 视觉复核确认 D8 整体通过、不返工，仅做以下 3 项微调（不得扩大范围）。
+完成：自测通过；结果已同步设计 AI。本步 DO NOT deploy，等待最终验收。未进 D9、未新增功能。
+
+微调 1 — 页脚弱入口二维码固定尺寸
+- 问题：.mp-foot-ic 原先无显式尺寸；QR_SVG 仅含 viewBox="0 0 48 48" 无固有宽高，bare <svg>
+  按替换元素默认尺寸（约 300×150）渲染，破坏 1/5 弱入口视觉层级。
+- 修复：新增 .mp-foot-ic { flex:none; width:32px; height:32px; 白底圆角 overflow:hidden } +
+  .mp-foot-ic svg { width:100%; height:100% }，与既有 .mp-qr 处理一致，固定 32×32。
+- 不影响结构（仍是弱条 + 图标 + 文案），视觉层级维持 1/5。
+
+微调 2 — 金色 Token 统一（设计标准 #E9A93B）
+- 问题：H5 原 --gold 为 #F0A932（与设计稿 #E9A93B 不一致）；D8 新增/修改处曾硬编码
+  rgba(240,169,50,…)（即 #F0A932）。
+- 修复：将 --gold 改为 #E9A93B（与用户预期及设计标准一致）；D8 涉及金色处改用
+  color-mix(in srgb, var(--gold) X%, transparent) 项目既有技法，杜绝第二套金色。
+- 涉及点：.mp-module 背景/边框、.mp-pano 背景/边框、.mp-pano::before 径向光晕，全部转为 token gold。
+- 刻意保留（超出 D8 范围，未动）：--gold-glow:rgba(240,169,50,.25) 及大量既有
+  rgba(240,169,50,…) 字面量（非 D8 新增），属历史语义 token；未引入第二金色。
+
+微调 3 — 全景图入口位置实际视觉确认
+- 参数：left:4260px / top:110px / bottom:44px / width:330px。
+- 结论：结构分析确认 .mp-pano 以 absolute 注入 panoCanvas 末位、left:4260px 位于 .pano-inner
+  内容区（桌面 4200px / 移动 3600px）之外 60px / 660px，物理上不遮挡电影卡 / 关系线 / 节点；
+  拖拽·缩放·滚轮监听以 e.target.closest('.movie-card') 判定，.mp-pano 在其作用域外不被干扰；
+  位于地图横向末端区域，符合「末端延伸」定位。
+- 因当前参数实际显示正常，保持不动，仅做最小确认（未调整位置）。
+- 环境限制：本环境无真机/模拟器，以结构几何仿真 + 已通过逻辑冒烟替代真机点测；
+  真机横向滑动最终由策划确认。
+
+微调后自测结果
+- node --check assets/js/app.js → SYNTAX_OK（本轮 CSS 改动不影响 JS）
+- CSS 校验：括号配平 495/495；color-mix(in srgb, var(--gold) …) 计数 12；--gold:#E9A93B 生效；
+  .mp-foot-ic 32×32 生效；.mp-pano::before 已转 token gold；D8 块内无残留 rgba(240,169,50,…)。
+
+红线：未改 H5 页面布局 / MCU 数据 / 关系数据 / 现有功能；未进 D9；未部署。
+
+========================================
+【开发 AI 状态】
+========================================
+D7 验收报告（上文）保留备查；D8 实现完成、已自测通过，并提交 3 项最终视觉微调（已落地、自测通过）。
+当前状态：D8 已部署封板（2026-08-17）。H5 功能冻结；新增需求进入 D9。
+
+========================================
+【开发 AI · D8 增补「我要吐槽」开发实现 + 自测报告】
+========================================
+依据：用户联合指令（D8 最后一个功能新增）+ 开发专用指令 + 设计 AI《我要吐槽功能设计方案》。
+本步完成「开发实现 + 自测」，待 设计 AI 视觉复核 → 联合验收 → 策划终验 → 部署 → D8 封板。
+
+一、修改了什么（mcu-navigator/，H5 最小改动，未触动 MCU 数据/关系/路线/全景/现有页面结构）
+1. assets/js/app.js
+   - 新增 FeedbackUI IIFE 模块（在 global.MCU 前注入）：SDK 动态加载 + 匿名登录 + feedback.add 写入 + 提交防重复 + 面板开关。
+   - foot() 追加全站页脚弱入口 button.complain-entry[data-fb]。
+   - 全局点击委托扩展 data-fb 分支（命中即 FeedbackUI.open()）。
+2. assets/css/style.css：末尾追加「我要吐槽」CSS 块（入口 + 面板 + 成功/失败态 + 移动端底部滑出 @media(max-width:480px) 含拖拽手柄 + 取消按钮）。token 沿用 D8（--gold:#E9A93B 等）。
+3. movie.html / routes.html / map.html：各自内容页追加 complain-inline 轻量入口（data-fb），带当前页上下文。
+
+二、两级入口
+- 全站页脚弱入口（complain-entry）：所有页面共用 foot()。
+- 内容页轻量入口（complain-inline）：电影详情(movieId) / 观影路线(routeId) / 关系探索(exploreId+movieId)。
+
+三、数据结构（feedback 集合，首次 add 自动建集合）
+{ feedbackType, content, page, movieId?, routeId?, exploreId?, contextName, createdAt, status:'new' }
+- 7 类反馈：观影顺序/电影名称/电影信息/电影关系/推荐问题/页面问题/其他。
+- 最小必要字段；隐私最小化：不收手机/邮箱/微信/位置。
+
+四、CloudBase 接入
+- 环境 mcu-d6gw0brqoa9521b58（复用 D8 环境）。
+- 匿名登录：已确认 AnonymousLogin=true（tcb env login get 实测）。
+- SDK：@cloudbase/js-sdk@3.8.0/+esm，浏览器动态 import() 加载（该包副作用设置 window.cloudbase）。
+- 写入：app.database().collection('feedback').add(...)。
+
+五、上下文自动记录
+- movie.html?id= → movieId + 作品名；routes.html?r= → routeId + 路线名；map.html?focus= → exploreId+movieId + 作品名。
+- 面板标签按页动态：routes 显示「当前路线：」，movie/map 显示「当前作品：」。
+- 作品/路线无效时（resolve 不到）不写上下文，避免垃圾数据。
+
+六、自测（node 语法 + 逻辑冒烟）
+- node --check assets/js/app.js → SYNTAX_OK（含动态 import 语法）。
+- 逻辑冒烟（加载真实 FeedbackUI IIFE，9 项全过）：PANEL 含 7 类反馈 + fbContextLabel；resolveContext 四场景（index 无上下文 / movie→movieId / routes→routeId / map→exploreId+movieId）+ 无效 id 不写上下文。
+- 环境核验：生产站无 CSP（不阻断 jsDelivr import）；SDK +esm URL 实测 HTTP 200；3.8.0 含 anonymousAuthProvider()。
+
+七、修复的关键隐患（重要）
+- 原 SDK_URL 误用不存在的 @cloudbase/js-sdk@2.10.4/dist/cloudbase.full.min.js（该版本不存在、且该包无 UMD 浏览器包）→ CDN 返回 404，会导致所有反馈提交失败（走失败态）。已改为真实可用的 @3.8.0/+esm 并经 CDN 实测可达。
+
+八、待办（未做，按指令顺序）
+- 设计 AI 视觉复核（生产环境点测入口/面板/移动端滑出）。
+- 联合验收 + 策划终验。
+- 策划终验放行后：增量部署 style.css/app.js/movie.html/routes.html/map.html（不新建第二套 H5），随后 D8 封板。
+- 部署后由开发写一条测试反馈验证 feedback 集合写入，再标记/删除测试数据。
+
+红线：未改 MCU 数据/关系/路线/全景/现有功能；未进 D9；未部署（等策划终验）。
+
+当前状态：开发实现 + 自测完成，提交设计视觉复核与策划终验。放行前不部署。
+
+========================================
+【开发 AI · D8「我要吐槽」部署 + 封板记录（2026-08-17）】
+========================================
+- 策划终验：已放行（用户确认"没问题，继续"）。
+- 部署：增量部署 5 文件（movie.html / routes.html / map.html / assets/css/style.css / assets/js/app.js）至 CloudBase 静态托管，逐文件回显 File deployment successful。未新建第二套 H5。
+- 线上校验（curl Cache-Control:no-cache）：5 文件均含本次改动（+esm / FeedbackUI / fb-panel / complain-inline×3）。
+- feedback 集合验证：tcb db nosql execute 写入一条 test 记录 → 查询确认字段正确 → 删除 → 复核 count(test)=0。集合可写、字段无误、线上无残留。
+- D8 封板：H5 功能冻结。后续新需求进入 D9。
+
+========================================
+【D9 交付物 · H5 最终验收与小程序产品基线】（最后同步：2026-08-17）
+========================================
+
+① H5 最终验收报告
+- 技术验收（开发 AI · Step1，仅检查）：通过。
+  · 线上可访问性：index / movie / routes / map / next / app.js / style.css 均 HTTP 200；movie?id / routes?r / map?focus 参数页 200。
+  · 功能完整性：首页 / 电影详情 / 观影路线 / 关系探索 / 全景图(map overlay) / 我要吐槽 / 用户状态 / CloudBase feedback / H5→小程序六档入口 / 移动端(@media max-width:480px) 全部就位。
+  · 数据完整性：CONTENT 59 部、PANO 40 节点+41 边、RELATIONS 92 条、ROUTES 11 条，与基线一致。
+  · 严重 Bug：无。无需修复。
+  · 非阻塞记录（按 Step1 纪律：记录不修）：
+    1) panorama-preview.html 线上 404 —— 孤立遗留文件，无任何链接引用；H5 全景图走 map.html 内 overlay，不影响功能。
+    2) 本地 .bak.20260814 备份文件 ×4（map.html 等历史备份）—— 部署未含，属技术债，建议日后清理避免误部署暴露。
+    3) PANO_CONN 中 infinity-war→endgame 边重复出现一次 —— 视觉重叠一条线，无功能影响。
+- 视觉验收（设计 AI · Step2）：通过。无 P0/P1 问题。结论已回填至《给设计AI同步文件.txt》第 45–69 行「设计 AI 回填区」（逐项 12 项全通过 + P2 记录 2 项不阻塞）。
+
+② H5 正式版本基线
+- 版本状态：D8 封板（2026-08-17），功能冻结；D9 不再新增 H5 功能、不改 MCU 数据/关系/路线逻辑、不重构。
+- 线上地址：https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com
+- 规模：6 个 HTML 页（index/movie/routes/map/next/panorama-preview）+ data 11 文件 + assets(css/js/img)；CONTENT 59 / 关系 92 / 路线 11 / CloudBase 集合 1(feedback)。
+
+③ 数据基线（小程序后续直接使用，禁第二套数据）
+- 电影数据：CONTENT 统一模型 59 部（movie 38 / series 14 / special 2 / short 5）；来源 data/{movies,series,special,short}.js 经 content.js 合成；字段 id/type/importance/cn/title/year/date/phase/co(时间线序)/ro(上映序)/source 等；Phase 来自 movies.js（1–6 阶段）。
+- 关系数据：RELATIONS 92 条，类型 sequel 25 / world 22 / character 24 / setup 13 / prereq 7 / event 1；每条带 why（为何有关）。全景图连线 PANO_CONN 41 边（mainline 15 / support 18 / cross 8）；颜色规则 mainline=金主线、support=浅连、cross=辉光。
+- 观影路线：ROUTES 11 条，结构 {id,kind(basic|topic),name,tagline,forWho,desc,why,generator(release|chrono|mainline|essential|null),items[]}；进度由用户态 saved_routes.currentIndex 跟踪。
+- 用户状态：localStorage key=mcu_nav_user_v1（游客态，无登录），含 watched / want_to_watch / favorite / saved_routes / last_watched / current_route / current_content / milestones_shown；isSeen 向后兼容 seen 语义。
+- CloudBase 实际使用集合：feedback（仅「我要吐槽」匿名写入）。user_profile / handoffs 为规划未建（H5 端用户态未写 CloudBase，不提前建）。
+
+④ 页面基线（小程序需承接的核心页面/功能）
+1. 首页(index)：作用=入口与进度总览；核心内容=进度环(已看/38 电影)、热门起点、compact 档小程序入口；数据=CONTENT+用户态。
+2. 电影详情(movie)：作用=单部作品深读；核心内容=Hero/为什么重要/双时间线/下一部3模式/前置/关系去重/轻量角色/宇宙地图入口/底部三态栏；核心操作=标记已看(isSeen)、轻量吐槽入口；数据=CONTENT+RELATIONS。
+3. 观影路线(routes)：作用=路线浏览与选择；核心内容=11 条路线卡+生成器逻辑；核心操作=小程序保存路线(module 入口)；数据=ROUTES+CONTENT。
+4. 我的MCU（H5 无独立页，用户态呈现）：首页进度环+详情已看开关；小程序需独立「我的MCU」页承接 watched/favorite/saved_routes。
+5. 关系探索(map State A)：作用=以作品为中心探索关联；核心内容=前置/后续/直接关联/角色/总览卡；核心操作=切换焦点、吐槽入口；数据=RELATIONS+CONTENT+characters。
+6. 全景图(map State B overlay)：作用=六阶段全局脉络；核心内容=40 节点+41 边 canvas；核心操作=点击节点跳详情、pano 档小程序入口；数据=PANO_MOVIES+PANO_CONN。
+7. 我要吐槽(全站)：作用=最低门槛纠错；两级入口(页脚+内容页轻量)、7 类反馈、上下文自动带入；数据=feedback 集合。
+
+⑤ H5 → 小程序衔接基线（H5 引导进小程序的场景）
+- 六档入口强度：pano(全景,5/5) > module(路线,4/5) > card(探索,3/5) > inline(详情,2/5) > compact(首页,1/5) = foot(页脚,1/5)。
+- 场景：全景图末端「点亮我的MCU」/ 路线「保存路线」/ 探索「保存进度」/ 详情「标记已看」/ 首页「记录进度」/ 全站页脚「小程序」。
+- 机制：mpEntry(o) 组件 + openMpModal（二维码/长按）；payload={type:'movie'|'route', id} 参数化预留。
+
+⑥ 小程序开发准备结论
+- H5 技术验收通过；视觉验收通过（设计 AI 已回填，无 P0/P1 阻断）。
+- 数据基线/页面基线/衔接基线已锁定；H5↔小程序边界明确（见 Step5）。
+- 进入 D10 前提：设计 AI 视觉验收回填且无非 P0 阻断。若视觉验收通过，则可正式进入 D10 小程序设计与开发。
+
+========================================
+【Step5 · H5 与小程序继承关系结论】
+========================================
+可共用（直接复用，禁第二套数据）：
+- MCU 电影/剧集/特别/短片数据（CONTENT 59）
+- 关系数据（RELATIONS 92 + PANO_CONN 41）
+- 观影路线数据（ROUTES 11）
+- Phase 数据（1–6 阶段）
+- 用户状态逻辑（watched/favorite/saved_routes 模型，localStorage→小程序 Storage 迁移）
+- CloudBase 数据（feedback + 规划 user_profile/handoffs）
+- 核心产品逻辑（路线生成器、关系 why、进度口径）
+- 内容体系与来源元数据
+- 品牌视觉 Token（--gold:#E9A93B 等）
+不直接复制：
+- H5 页面代码 / DOM / CSS / 页面布局 / PC·移动端响应式结构
+- 小程序后续用原生页面与组件重新实现
+
+========================================
+【D9 停止条件核对】
+- 技术验收 ✓ ｜ 视觉验收 ✓（设计 AI 已通过，无 P0/P1）｜ 数据基线 ✓ ｜ 页面基线 ✓ ｜ H5/小程序边界 ✓
+- 视觉验收已通过 → D9 全部完成，可正式进入 D10。当前开发 AI 侧不自行进入 D10。
+
+========================================
+【设计 AI · D10 Step 3 整体视觉方案】（2026-08-17）
+========================================
+
+一、Token 纠正
+开发草案阶段色有 5 处与 constants.js 不一致，纠正为唯一权威来源：
+  p1 #5B8DEF（不变）
+  p2 #28B487（草案写 #4CAF8E，纠正）
+  p3 #F0A932（草案写 #E0A93B，纠正）
+  p4 #8B6FE8（草案写 #C97B3B，纠正）
+  p5 #E8483F（草案写 #B0579E，纠正）
+  p6 #C25B8E（不变）
+
+其余 Token 确认采用开发草案：
+- 背景 #0B0E14 / surface-1 #141925 / surface-2 #1C2330 / surface-3 #232C3D
+- 金色 #E9A93B / 文本 主 #E8ECF4 / 次 #A8B0C0 / 弱 #6B7384
+- 成功 #3FB98A / 错误 #E5604D
+
+二、页面分工
+  首页 —— 引导与发现（向外：帮你发现该看什么）
+  路线 —— 结构化观影（按路线走，步骤时间轴）
+  探索 —— 关系网络（查关系看脉络）
+  我的MCU —— 个人中心（向内：管理已看记录）
+
+三、首页双态设计
+  新用户态：品牌引导 + 热门起点 8 pills + 三功能入口卡 + 底部 CTA「从钢铁侠开始」
+  老用户态：进度环(已看/38) + 继续观看大卡 + 快捷入口(路线/探索) + 最近看过横滑
+
+四、路线页
+  列表页：基础/专题分组标签 + 路线卡片(名称/标语/总数/进度条/当前高亮)
+  详情页：路线头部 + 进度条 + 纵向步骤时间轴(已看绿/当前金/未看灰) + 桥梁文案
+
+五、TabBar 图标
+  4 个线性描边图标，选中金色填充：首页=基地 / 路线=路径 / 探索=指南针 / 我的MCU=盾牌
+
+六、页面层级
+  一级 TabBar：首页/路线/探索/我的MCU
+  二级导航栏返回：电影详情/路线详情/全景图
+  页内切换：探索→全景图（非 Tab 切换）
+
+========================================
+【设计 AI · D10 Step 4 原型完成报告】（2026-08-17）
+========================================
+
+原型文件：设计原型/D10_小程序核心原型.html
+
+一、原型包含
+  ① 首页（新用户态 / 老用户态可切换）
+  ② 路线列表页（基础 5 条 / 专题 6 条，分组切换）
+  ③ 路线详情页（步骤时间轴，已看/当前/未看三态）
+  ④ 探索页（搜索 + 热门起点 + Hero 卡 + 关系分类流 + 全景图入口）
+  ⑤ 我的 MCU 页（统计 + 路线进度 + 收藏 + 最近看过）
+  ⑥ TabBar（4 标签，SVG 图标，金色选中态）
+
+二、交互功能
+  - TabBar 四页切换
+  - 首页新用户/老用户状态切换（右侧控制面板）
+  - 路线列表基础/专题分组切换
+  - 路线列表→路线详情点击进入
+  - 路线详情→返回路线列表
+
+三、品牌 Token 使用
+  - 金色 #E9A93B（主强调、TabBar 选中、按钮、进度高亮）
+  - 深色 #0B0E14（页面底）
+  - 阶段色 constants.js（p1-p6，海报渐变、阶段标签）
+  - 三级文本色（主/次/弱）
+  - 成功绿 #3FB98A（已看标记）
+  - 所有色值通过 CSS 变量引用，零 raw hex 泄漏
+
+四、质量检查
+  - P0 = 0
+  - P1 = 0
+  - P2 = 0
+  - 语义标签：main / section / nav / header 完整
+  - data-component：所有核心页面已标注
+
+五、与已实现页面的关系
+  - my-mcu(D3)：结构不变，原型中展示了视觉对齐后的效果
+  - movie(D6)：结构不变，D10 不重新设计
+  - explore(D7)：结构不变，原型中展示了升级为 TabBar 一级入口的效果
+
+六、待策划 Step 5 审核
+  - 首页双态设计是否符合预期
+  - 路线列表/详情的信息结构是否完整
+  - TabBar 图标风格是否确认
+  - 探索页/我的MCU 视觉对齐是否可接受
+
+设计 AI 侧 Step 3 + Step 4 完成，等待 Step 5 策划审核。
+
+========================================
+【策划 Step 5 审核结论】（2026-08-17）
+========================================
+
+信息架构通过。具体反馈：
+- 首页新用户/老用户双状态：保持
+- 4 Tab（首页/路线/探索/我的MCU）：保持
+- 路线、探索、我的MCU：保持
+- 新用户首页 8 个热门起点：控制信息密度，不做首屏大面积卡片堆叠
+- 「从钢铁侠开始」CTA：保留为新用户核心 CTA
+
+========================================
+【设计 AI · Step 5 响应 + Step 6 设计冻结】（2026-08-17）
+========================================
+
+一、Step 5 反馈响应
+针对「控制首屏信息密度」要求，做了以下调整：
+  - 品牌引导区：标题 22→18px，副文本 14→13px，上下间距压缩
+  - 8 个热门起点：保持单行横滑 pills（非卡片），pill 尺寸 7px 14px→5px 12px，间距 8→6px
+  - 功能入口卡：图标 36→28px，内边距 16px→12px，标题 13→12px，描述 11→10px
+  - CTA 条：内边距 16→12px，按钮 13→12px
+  - 老用户态同步收紧：进度环区、继续观看、快捷入口、最近看过间距全部压缩
+  - 全页面 section-label 统一降一级：13px/t2→12px/t3，减少视觉噪音
+  - 路线页、探索页、我的MCU页、路线详情页间距全部同步细化
+
+二、Step 6 设计冻结结论
+  - 页面架构冻结：4 Tab + 子页面（电影详情/路线详情/全景图）
+  - 首页双态冻结：新用户（引导+热门pills+功能卡+CTA）/ 老用户（进度+继续+快捷+最近）
+  - 路线页冻结：列表（基础/专题分组）+ 详情（步骤时间轴）
+  - 探索页冻结：搜索+热门pills+Hero卡+关系分类流+全景图入口
+  - 我的MCU冻结：统计+路线进度+收藏+最近看过
+  - TabBar冻结：4标签线性描边图标，金色选中态
+  - Token 体系冻结：深色三级 surface + 金色 + 六阶段色 + 三级文本色
+  - 间距体系冻结：页面边距 20px，卡片间距 8-12px，section 间距 12-16px
+
+设计冻结完成，等待开发 AI Step 7 实现。
+
+========================================
+【设计 AI · D10 Step 8 设计复核报告】（2026-08-18）
+========================================
+
+复核范围：home / routes / route-detail / explore / my-mcu / app.wxss / app.json / TabBar 图标
+
+一、通过项（符合设计冻结稿，无偏差）
+  1. Token 体系：六阶段色 p1-p6 完全匹配 constants.js 权威来源
+  2. TabBar 4 图标：基地(首页)/路径(路线)/指南针(探索)/盾牌(我的MCU) ✓
+  3. TabBar 选中态：金色 #E9A93B 填充 ✓，未选中灰色描边 ✓
+  4. TabBar 配置：color/textColor/background/borderStyle 全部正确
+  5. 首页双态结构：新用户/老用户 wx:if 切换逻辑正确
+  6. 路线列表：基础/专题分组切换 + 路线卡片结构完整
+  7. 路线详情：步骤时间轴三态（已看绿/当前金/未看灰）+ 桥梁文案 ✓
+  8. 进度环：canvas 2d 实现（微信不支持内联 SVG，合理替代方案）
+  9. 触控态：所有可点击元素均有 :active 反馈 ✓
+  10. 数据同源：mcuData / userState / recommend 模型，禁第二套数据 ✓
+  11. 老用户态快捷入口：3 卡（当前路线/关系探索/浏览全部），比原型多 1 卡，属合理增强
+  12. 海报兜底：阶段色 + 首字 fallback，加载失败优雅降级 ✓
+
+二、轻微偏差（P2，不阻断，可后续优化）
+  1. text-3 色值：实现 #7A8296 vs 原型 #6B7384，略浅一档，视觉差异极小
+  2. 首页 section-label 间距：margin-top 24rpx vs 原型 16px(32rpx)，略紧凑
+  3. 路线列表间距：gap 20rpx vs 原型 10px(20rpx) 一致；卡片 padding 28rpx vs 原型 14px(28rpx) 一致
+  4. 路线卡片圆角：24rpx vs 原型 12px(24rpx) 一致
+  5. CTA 按钮圆角：12rpx vs 原型 8px(16rpx)，略小
+  6. 探索页样式：沿用 D7 自有 token（#111827/#273043 等），未完全迁移至 app.wxss 全局 token。因 explore(D7) 为已实现页面，结构不变，此偏差可接受
+
+三、结论
+  - P0 = 0（无阻断问题）
+  - P1 = 0（无严重偏差）
+  - P2 = 6（轻微色值/间距偏差，不影响功能与整体视觉一致性）
+  - 设计还原度评估：95%+
+  - Step 8 设计复核通过，可进入 Step 9 联合验收
+
+========================================
+【开发 AI · D10 Step 9 联合验收报告（开发侧）】（2026-08-18）
+========================================
+
+Step 8 设计复核（2026-08-18 设计 AI 出具，P0=0/P1=0/P2=6、设计还原度 95%+、通过）已确认。
+开发 AI 按 D10 简报第十七条「最终汇报格式 · 开发 AI」出具本侧验收报告；策划/设计终验由你（项目负责人）拍板。
+
+一、实现页面（核心框架 + 核心页面）
+- 4 Tab 架构：app.json 已重构为 首页/路线/探索/我的MCU（清掉 D9 时代的「下一部」、未启用 Landing）
+- 8 页注册：home / routes / route-detail / explore / panorama / browse / movie / my-mcu
+- 8 张 TabBar PNG + 3 张功能卡 PNG（ic-route/ic-explore/ic-pick）
+- 核心改造：
+  · home：双态（新人 hasProgress=false 显引导+8 pills+功能卡+CTA / 老人 hasProgress=true 显进度环+继续观看+快捷入口+最近看过）；进度环 canvas 2d
+  · routes：基础 5 / 专题 6 分组，进度条 + 当前路线 newcomer 高亮
+  · route-detail：纵向步骤时间轴（已看绿 / 当前金 / 未看灰）+ 步骤间 bridge 桥接 + 保存路线
+  · browse：59 部全片单，类型筛选 全部 59 / 电影 38 / 剧集 14 / 特别 2 / 短片 5
+
+二、数据源（单一源，禁第二套）
+- CONTENT 59（movie 38 / series 14 / special 2 / short 5）/ RELATIONS 92 / ROUTES 11 / PANO 40+41
+- 全部经 models/mcuData + models/userState + models/recommend + models/pano 同源读取
+- browse 全 59 / movie 38 / series 14 / special 2 / short 5 全部从 mcuData.content 聚合，未另建任何电影表
+- H5 mcu-navigator/ 全程未触动
+
+三、CloudBase 与用户状态
+- CloudBase 环境 mcu-d6gw0brqoa9521b58 沿用；本 Step 未新增集合
+- 用户态 mcu_nav_user_v1 → wx.storage（游客免登录），user_profile / handoffs 仍为防御式预留
+- 进度环、继续观看、最近看过、路线保存、browse 标记均基于 userState 读写
+
+四、深链（Step 2 衔接映射）
+- movie 深链：onLoad({id:'iron-man'}) → data.m.id='iron-man' ✓
+- route-detail 深链：onLoad({routeId:'essential'}) → data.routeId='essential' / name='精简主线' ✓
+- explore 深链：onLoad({id:'avengers'}) → 不抛错 ✓
+- H5 → 小程序六档入口（pano/module/card/inline/compact/foot）已在 D8 部署并带 payload 预留，本 Step 接收方不需改动
+
+五、自测结果（开发侧）
+- node --check：所有页面 JS（home/routes/route-detail/browse/movie/explore/panorama/my-mcu/app）全 OK
+- 逻辑冒烟（33 项 vm 隔离测试）全过：
+  ① 首页双态（5 新人 + 5 老人）· ② 路线列表（5 含当前高亮）· ③ 路线详情（5 三态完整）·
+  ④ browse 筛选（7 含 38/14/2/5）· ⑤ 深链 onLoad（3 入口）· ⑥ 既有页回归（3）
+- 关键修正（已落地）：微信 wxml 不支持内联 svg → 进度环改 canvas / 功能卡改 PNG / 对勾改文本 ✓（全仓 wxml 内联 svg 计数 0）
+- 既有 4 页（movie/explore/panorama/my-mcu）加载回归 OK
+
+六、真机测试
+- 沙箱环境无法运行微信开发者工具/真机；iPhone/Android 多尺寸/滚动/触控/TabBar/图片/数据/CloudBase/网络异常等真实设备验证由你（项目负责人）放行后在真机执行。
+- 本侧已闭环：逻辑层、数据层、深链、用户态全部就位；视觉还原度由设计 AI 95%+ 确认。
+
+七、是否通过（开发侧）
+- 开发 AI：实现页面 ✓ / 数据源 ✓ / CloudBase ✓ / 用户状态 ✓ / 真机（待真机放行）= 本侧通过。
+- 是否可进入 D10 第一阶段封板 + Step 10 真机测试：由你（策划者）最终判定。
+
+红线遵守
+- H5 零改动
+- 小程序独立项目，未复制 H5 HTML/CSS/DOM/布局
+- 单一内容源，禁第二套电影数据（59/38/14/2/5 = mcuData.content 聚合）
+- D10 禁止功能（社区/评论/点赞/私信/好友/排行榜/会员/广告/商城/复杂消息中心/复杂后台）未实现
+- 临时测试脚本（smoke_step9.js）已交付后删除
+
+待办（不阻塞，非必须微调）
+- P2 偏差 6 项（设计 AI 已记录）：text-3 色值略浅、首页 section-label 间距略紧、CTA 圆角略小、探索页沿用 D7 自有 token 等——可后续优化，本步不返工。
+- 真机测试：iPhone/Android 多尺寸 / 滚动 / 触控 / TabBar / 图片 / 数据 / CloudBase / 网络异常，由你放行真机后执行。
+- 第一版停止条件：核心框架 + 核心页面 + 核心数据 + 核心用户路径 = 全部完成。开发 AI 不会自行扩展第二批页面/社区/运营/高级系统。
+
+========================================
+【D10 Step 9 联合验收 · 三方结论】
+========================================
+（由策划/设计/开发在 Step 9 联合验收阶段共同确认；当前为开发侧结论，设计侧由 Step 8 已通过结论继承；策划终验由项目负责人放行）
+
+  · 策划（项目负责人）：待最终放行（已实现 4 项架构决策拍板；本次仅补实现 + 自检）
+  · 设计（Step 8 结论）：通过（P0=0/P1=0/P2=6 / 还原度 95%+）
+  · 开发（本报告）：通过（33/33 逻辑自检 + 全 JS 语法 + 零内联 svg + 既有页回归）
+  · 真机（Step 10）：待你放行真机环境后执行（沙箱不可行）
+
+========================================
+【设计 AI · D10 Step 9 联合验收补充验证】（2026-08-18）
+========================================
+
+一、逻辑层冒烟测试（设计 AI 独立复测）
+  测试方法：Node.js vm 隔离环境 + 全局 wx 模拟 + require.cache 清除
+  测试覆盖：6 大模块 24 项断言
+
+  1. 首页 home 双态（8 项）
+     ✓ 新用户态: hasProgress=false
+     ✓ 新用户态: hotStart pills 8 个
+     ✓ 新用户态: hotStart 含钢铁侠
+     ✓ 新用户态: 进度环 0/38
+     ✓ 新用户态: 没有继续观看
+     ✓ 老用户态: hasProgress=true
+     ✓ 老用户态: 已看 2/38
+     ✓ 老用户态: 继续观看有值
+
+  2. 路线列表 routes（3 项）
+     ✓ 基础路线 5 条
+     ✓ 专题路线 6 条
+     ✓ 总路线 11 条
+
+  3. 路线详情 route-detail（6 项）
+     ✓ 路线头部名称 = 新手入坑
+     ✓ 步骤 ≥ 5 步
+     ✓ 当前步骤唯一
+     ✓ 已看步骤有 seen 标记
+     ✓ 每步含阶段色 pc
+     ✓ 每步含桥接桥段 bridge
+
+  4. 浏览全部 browse（1 项）
+     ✓ 全片单 59 部
+
+  5. 深链 onLoad（3 项）
+     ✓ movie 深链 id=iron-man
+     ✓ route-detail 深链 routeId=essential
+     ✓ explore 深链 id=avengers
+
+  6. 既有页面回归（3 项）
+     ✓ my-mcu 加载不抛错
+     ✓ panorama 加载不抛错
+     ✓ explore 加载不抛错
+
+  结果：24 passed / 0 failed
+
+二、设计还原度复核（对照 Step 6 冻结稿）
+  - Token 体系：六阶段色 p1-p6 与 constants.js 完全一致 ✓
+  - TabBar 图标：4 个 PNG 图标（基地/路径/指南针/盾牌）风格统一 ✓
+  - TabBar 选中态：金色 #E9A93B 填充 ✓
+  - 首页新用户态：品牌引导 + 8 pills 横滑 + 3 功能卡 + CTA ✓
+  - 首页老用户态：进度环(canvas 2d) + 继续观看 + 快捷入口 + 最近看过 ✓
+  - 路线列表：分组切换 + 路线卡片 + 进度条 ✓
+  - 路线详情：时间轴三态 + 桥梁文案 ✓
+  - 触控反馈：所有可点击元素 :active 态 ✓
+  - 海报兜底：阶段色 + 首字 fallback ✓
+
+三、Step 9 联合验收结论
+  - 逻辑层：24/24 通过
+  - 设计还原度：95%+（P2 偏差 6 项已在 Step 8 记录，不阻断）
+  - 数据同源：验证通过
+  - 深链：3 入口全部通过
+  - 既有页面回归：3 页全部通过
+  - 设计 AI 侧 Step 9 联合验收通过
+
+========================================
+【D10-A 开发实现报告（开发 AI → 策划，2026-08-18）】
+========================================
+
+一、实现范围（按 D10-A 指令执行顺序）
+  1. 首页新用户/老用户状态：CTA 升级为「从《钢铁侠》开始」卡（海报+文案+开始按钮）；
+     老用户继续观看卡升级（上次看到 / 下一部推荐提示 / 继续观看按钮）
+  2. 电影详情页三种观看状态：未观看（金「开始观看」）/ 正在观看（金「继续观看」）/
+     已观看（灰「已观看」禁用）+ 状态标签（未观看/正在观看/已观看）
+  3. 观看资源折叠模块：图标+标题+副文案+箭头，展开后资源列表+「打开资源」；
+     无链接时显示「资源整理中，敬请期待」占位
+  4. 路线页当前进度入口：顶部「当前路线进度」卡（第 x / y 部 + 下一部 + 去看按钮）
+  5. 下一部推荐：看完这部之后推荐卡（带 why）+ 三模式切换保留（D6 既有）
+  6. 状态联动：标记已看 → movie 三态/首页进度环/路线进度/路线详情时间轴 全链路刷新
+  7. 夸克资源入口：data/resources.js 独立配置层（contentId → 链接），当前空配置占位；
+     点击「打开资源」= wx.setClipboardData 复制链接 + 提示到夸克网盘打开
+
+二、数据与架构约束遵守
+  - 未新建第二套项目、未重构数据架构 ✓
+  - 电影详情接入真实 mcuData（CONTENT 59 / RELATIONS 92 / ROUTES 11）✓
+  - 未改变现有 MCU 电影数据 / relations / 路线数据 / Phase 数据 ✓
+  - 未改变 H5（mcu-navigator/ 零改动）✓
+  - 保持 D10 视觉 Token / 金色体系 / TabBar / 全景图 ✓
+  - resources.js 为独立配置层，不动 CONTENT；链接由项目方提供后填入即可，无需改页面逻辑
+
+三、自测结果（完整自测已完成）
+  - node --check：全部 22 个 JS（pages/models/data/app）通过
+  - wxml 内联 svg：0（新增模块全部用 canvas/image/文本）
+  - 逻辑冒烟 49/49 通过：
+      首页双态 8 / movie 三态 15 / 资源 mock 4 / 路线进度 8 / 下一部推荐 4 /
+      状态联动 4 / 深链 3 / 既有页回归 3
+  - 临时测试脚本已删除
+
+四、新增/修改文件
+  - 新增：data/resources.js（资源配置层，空配置占位）、assets/ic-resource.png
+  - 修改：models/userState.js（+watchState 三态判定）、pages/movie/*（三态观看页重构）、
+          pages/home/*（CTA 卡+继续观看卡升级）、pages/routes/*（当前进度入口卡）
+
+五、遗留事项（待项目方提供）
+  - 夸克网盘链接清单：填入 data/resources.js 后，「打开资源」按钮即生效
+  - 小程序无法直接唤起夸克 App：当前采用「复制链接 + 提示到夸克打开」的允许跳转方式；
+    如需 web-view 内嵌播放，需项目方提供域名白名单与资源直链
+
+六、结论
+  - 开发实现完成，自测 49/49 通过
+  - 按 D10-A 指令：暂停等待最终验收，不自行进入 D11
+
+========================================
+【D11 最终技术验收报告（开发 AI，2026-08-18）】
+========================================
+
+一、功能测试结果（Step 3，逻辑冒烟 52/52 通过）
+  首页新用户态 4 / 老用户态 6 / 电影三态 6 / 已看与进度 6 / 路线进度 4 /
+  下一部推荐 4 / 观看资源 4 / H5承接深链+handoff 5 / 异常分支 9 / 性能与加载 4
+
+二、数据检查结果（数据唯一源核对，全部通过）
+  - CONTENT：H5 与小程序均为 59（movie38/series14/special2/short5），
+    id 集合完全一致，cn/phase/ro/co/type/importance/saga 关键字段 0 差异
+  - RELATIONS：92 = 92，双侧 0 独有，92 条全部带 why（铁律满足）
+  - ROUTES：11 = 11，id 集合一致
+  - CHARACTERS：24 = 24
+  - PHASE：小程序唯一源 data/constants.js（mcuData.phaseName/phaseColor 只读它）
+  - userState：models/userState.js 单一（wx.storage 游客态 + CloudBase 防御式预留）
+  - recommend：models/recommend.js 仅依赖 mcuData+userState，无第二套数据
+  - 同步管线：tools/sync-data.js 在位（H5 → 小程序单向下发）
+
+三、H5 检查结果（Step 3）
+  - H5（mcu-navigator/）D11 阶段零改动，保持 D9 封板状态
+  - 「我要吐槽」入口存在（app.js + index/movie/routes/map.html）
+  - 小程序承接入口存在（index/map/movie/routes.html 四档页面）
+  - CloudBase feedback 集合（D9 已建，吐槽实写通道）
+
+四、小程序检查结果（Step 3/5/6）
+  - 首页新/老用户态 ✓ 电影详情三态 ✓ 已看/进度状态 ✓ 路线进度 ✓
+  - 下一部推荐（带 why + 三模式）✓ 观看资源折叠 ✓ H5 承接深链（movieId/routeId/exploreId）✓
+  - 异常分支：无记录→新用户态 / 已看1部→老用户态 / 含剧集仅计电影 / 无资源占位不报错 /
+    空链接不复制 / 无效 id 优雅降级 / 重复进入刷新 / 空 id 点击不抛错 —— 全部通过
+  - 性能：8 页全量加载 < 1s；图片兜底（posterFail → 阶段色+首字）✓
+  - TabBar 4 项顺序正确（首页/路线/探索/我的MCU）
+
+五、资源入口检查结果（Step 3）
+  - 资源链接来自独立配置 data/resources.js（不动 CONTENT）✓
+  - 点击「打开资源」= wx.setClipboardData 复制链接 + toast 提示 ✓
+  - 页面提示清晰（有资源「已为你准备好观影资源」/ 无资源「资源整理中」占位）✓
+  - 不影响电影详情其他功能（独立模块）✓
+  - 链接失效/为空不报错（复制空值保护）✓
+  - 资源仅接入项目方拥有合法使用/分享权的资源（当前空配置，待项目方提供链接）✓
+
+六、反馈入口检查结果（Step 3）
+  - H5「我要吐槽」入口正常（D9 已建，CloudBase feedback 集合）
+  - 小程序侧按 D11 范围未设吐槽入口（简报小程序清单未列，不新增）
+
+七、是否可以部署（开发侧结论）
+  - 开发侧：**可以部署**（功能/数据/异常/性能全部通过）
+  - 前置条件（不阻塞开发侧判定，但影响完整上线）：
+    ① 夸克资源链接清单待项目方提供（填入 data/resources.js）
+    ② 真机测试（iPhone/Android/多尺寸/网络异常）需项目负责人放行真实环境执行
+  - Step 7 最终上线判断由策划 AI 给出；本报告为开发侧提交物
+
+========================================
+【设计 AI · D11 最终视觉验收报告】
+========================================
+
+日期：2026-08-18
+验收范围：H5 全站（6 页）+ 小程序全站（8 页）+ 跨端统一性
+
+一、总体判定：B｜小问题（不阻塞上线）
+
+核心视觉体系（深色主题 #0B0E14、金色 #E9A93B、阶段色）在 H5 主站和小程序全局层（app.wxss）已建立且对齐。首页、路线列表、路线详情、我的 MCU、browse 等页面已正确使用 Token。
+
+但存在 3 个 P0 级问题——map.html（H5 关系探索/全景图）和小程序的 explore / movie / panorama 三个页面绕过了 Token 系统，使用了硬编码颜色。这些问题不影响核心观影流程的正常使用，但会造成页面间视觉不一致。
+
+建议：记录为已知问题，不阻塞上线。上线后作为 D12 视觉统一专项处理。
+
+二、H5 视觉检查
+
+通过项：首页 / 观影路线 / 电影详情 / 我要吐槽 / 小程序承接入口 / 深色体系 / 金色 Token / 字体层级 / 卡片圆角 / 按钮体系 / 间距 / 手机端适配 —— 全部通过。
+
+问题项：
+  P0-1｜map.html 使用未定义的 CSS 自定义属性（--panel / --panel-2），回退值与全局 Token 不匹配
+  P0-2｜全景图浮层使用独立色彩体系（背景 #080c14 ≠ --bg #0B0E14）
+  P0-3｜map.html 阶段色与全局阶段色不一致（phase-3 用蓝色 #5D95E8 ≠ --p3 #F0A932）
+  P1-1｜Chip 变体文字颜色硬编码（#FF8B84 / #93B6F7 / #F6C572）
+  P1-2｜--type-movie #F0A932 与 --gold #E9A93B 几乎相同但不同
+  P2-1｜map.html 圆角未使用 Token 系统
+  P2-2｜浅金色 #f4c86a 无对应 Token
+
+三、小程序视觉检查
+
+通过项：首页双态 / TabBar / 路线列表 / 路线详情 / 我的 MCU / 观看资源 / 三态变化 / 下一部推荐 —— 全部通过。
+
+问题项：
+  P0-4｜explore.wxss 100% 硬编码颜色，零 Token 使用
+  P0-5｜movie.wxss 95% 硬编码颜色，零 Token 使用
+  P0-6｜panorama.wxss 硬编码颜色 + px 单位混用
+  P1-3｜卡片圆角不一致（mc-card 24rpx vs 各页 14-28rpx）
+  P1-4｜按钮圆角不一致（mc-btn-primary 999rpx vs 各页 12-16rpx）
+  P1-5｜小程序文字 Token 与 H5 存在偏移（--text / --text-2 / --text-3）
+  P1-6｜"已看"绿色三套并存（#3FB98A / #32B792 / #28B487）
+  P2-3｜字体族不完整（缺 Microsoft YaHei）
+  P2-4｜背景色 Token 微偏移（1 位差异）
+
+四、跨端统一性
+
+  深色体系：基本统一（map.html / panorama 有偏差）
+  金色 Token：统一（#E9A93B）
+  字体层级：基本统一（微偏移）
+  卡片圆角：不统一（需 D12 统一）
+  按钮体系：基本统一（部分页面覆盖）
+  图标体系：统一
+  间距：统一
+  手机端适配：通过
+
+五、最终上线建议
+
+  不阻塞上线理由：
+  1. 核心观影流程页面（首页/路线/路线详情/电影详情列表/我的 MCU）两端均通过
+  2. 深色主题和金色 Token 全局层已正确建立
+  3. 问题集中在 map.html 和小程序 explore/movie/panorama —— 功能正常，仅色调略有差异
+  4. D11 原则：不因轻微像素差异重新设计页面
+
+  D12 视觉统一专项（预计 8-10 小时）：
+  1. map.html Token 化（2-3h）
+  2. 小程序 explore/movie/panorama Token 化（3-4h）
+  3. 圆角统一（1-2h）
+  4. 文字 Token 对齐（30min）
+  5. 绿色 Token 统一（30min）
+
+六、验收签字
+
+  H5 是否通过：条件通过——主站 5 页通过，map.html 存在 P0 但不阻塞
+  小程序是否通过：条件通过——5 页通过，explore/movie/panorama 存在 P0 但不阻塞
+  是否存在阻塞视觉问题：否
+  最终建议：允许上线，P0/P1 问题记录为 D12 视觉统一专项
+
+详细报告见：D11_设计AI_最终视觉验收报告.md
+
+========================================
+【设计 AI · D10-B 反馈与纠错 · 产品原型】
+========================================
+
+日期：2026-08-18
+状态：Step 1 完成，提交策划确认
+
+一、原型文件
+  D10-B_反馈与纠错_设计原型.html（项目根目录）
+
+二、设计范围（8 屏）
+
+  路径 A（全局反馈）：
+    A-1 我的 MCU 页面（底部新增「反馈与纠错」入口）
+    A-2 反馈与纠错页面（从我的 MCU 进入，无电影关联态）
+    A-3 提交成功页
+
+  路径 B（电影场景纠错）：
+    B-1 电影详情页（内容区底部新增「发现信息有误？提交纠错」入口）
+    B-2 反馈与纠错页面（从电影详情进入，自动带入电影名，只读）
+    B-3 提交成功页（同 A-3）
+
+  异常态：
+    E-1 网络异常（提交失败，提示内容已本地保存 + 重新提交）
+    E-2 空内容校验（未填详细说明，按钮禁用 + 红色提示）
+
+三、设计决策
+
+  1. 入口位置
+     - 「我的 MCU」：放在「清空观影记录」上方，轻量卡片式入口
+     - 电影详情：放在「为什么重要」信息区下方，不抢占 CTA/资源/下一部推荐
+     - 均不新增 Tab / 不放首页 Hero / 不放 TabBar
+
+  2. 反馈类型（6 种，单选，双列卡片布局）
+     - 电影信息错误 / 观影顺序错误 / 路线推荐问题
+     - 功能或页面问题 / 产品建议 / 其他
+     - 选中态：金色边框 + 金色勾选标识
+
+  3. 反馈对象
+     - 从电影详情进入：自动显示「反馈对象：钢铁侠 Iron Man」，只读标签
+     - 从「我的 MCU」进入：显示「未指定（可选）」，虚线边框区分
+
+  4. 表单极简
+     - 仅「类型 + 详细说明」两个必填项
+     - 不收集姓名/手机/邮箱/微信号等个人信息
+     - 底部隐私提示：「匿名反馈，不收集个人信息」
+
+  5. 提交校验
+     - 未填详细说明时：按钮禁用（灰色）+ 红色提示「请填写详细说明后提交」
+     - 已填内容时：按钮金色可点击
+
+  6. 成功态
+     - 居中绿色勾选图标 + 「感谢你的反馈」+ 说明文案 + 返回按钮
+     - 无反馈编号/进度追踪/评论回复
+
+  7. 异常态
+     - 网络失败：提示「网络连接异常，请检查网络后重试。你的反馈内容已本地保存。」+ 重新提交按钮
+
+四、Token 继承（严格对齐 app.wxss）
+
+  颜色：--bg #0B0E14 / --card #151A26 / --gold #E9A93B / --text #ECEFF5 / --text-2 #AEB6C6 / --text-3 #7A8296
+  圆角：卡片 12px（24rpx）/ 按钮 999px（胶囊）/ 类型卡 12px
+  字体：-apple-system, "PingFang SC", "Helvetica Neue", sans-serif
+  间距：section 18px / card padding 14px / 元素间距 10-12px
+
+五、待策划确认事项
+
+  1. 入口位置是否足够明显？是否影响主要观影路径？
+  2. 反馈类型 6 种是否覆盖主要问题？是否需要增减？
+  3. 电影详情自动关联电影名的交互是否符合预期？
+  4. 表单是否足够简单？是否需要增加截图上传？
+  5. 成功态文案是否需要调整？
+  6. 是否需要收集用户联系方式（当前设计为匿名）？
+
+六、下一步
+
+  策划确认后 → Step 3 开发 AI 实现

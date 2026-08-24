@@ -1,0 +1,131 @@
+<!-- 首页 home（Tab1）· D12-A Step3-4 + V1.1 Step2 继续观看增强
+     依据：D10-A 冻结稿 首页-新用户 / 首页-老用户（恢复资料/D10原型/D10-A_观影主线强化原型.html）
+     双态切换：hasProgress（由 userState 装配）
+     V1.1 Step2：新增 旅程状态卡 journey-card + 下一站推荐卡 nextCard -->
+
+<view class="mcu-page home-page">
+
+  <!-- ══════ 新用户态 ══════ -->
+  <block wx:if="{{!hasProgress}}">
+
+    <!-- 品牌引导 -->
+    <view class="home-hero">
+      <view class="brand">MCU 宇宙导航</view>
+      <view class="hero-title">欢迎进入 MCU</view>
+      <view class="hero-sub">选一条路线，从《钢铁侠》开始，进度自动记录，一路看完整个宇宙</view>
+    </view>
+
+    <!-- 热门起点 -->
+    <view class="section-label">从热门角色开始</view>
+    <scroll-view class="pills-row" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="pill" wx:for="{{hotStart}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">{{item.cn}}</view>
+    </scroll-view>
+
+    <!-- 功能入口 -->
+    <view class="section-label">选择你的方式</view>
+    <view class="feature-cards">
+      <view class="feat-card" wx:for="{{featureCards}}" wx:key="key" data-key="{{item.key}}" bindtap="goTab" hover-class="feat-card-hover" hover-stay-time="80">
+        <view class="feat-ic">
+          <image class="feat-ic-img" src="{{item.icon}}" mode="aspectFit"/>
+        </view>
+        <view class="feat-title">{{item.title}}</view>
+        <view class="feat-desc">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <!-- 新手引导 CTA：从《钢铁侠》开始 -->
+    <view class="home-cta" wx:if="{{cta}}" data-id="{{cta.id}}" bindtap="goStart" hover-class="cta-hover" hover-stay-time="80">
+      <view class="cta-poster poster-p{{cta.phase}}">
+        <text class="cta-poster-text">{{cta.cn[0]}}</text>
+      </view>
+      <view class="cta-text">
+        <view class="cta-title">从《{{cta.cn}}》开始</view>
+        <view class="cta-desc">{{cta.desc}}</view>
+      </view>
+      <view class="cta-btn">开始</view>
+    </view>
+    <view class="spacer-sm"></view>
+  </block>
+
+  <!-- ══════ 老用户态 ══════ -->
+  <block wx:else>
+
+    <!-- ① 当前旅程状态卡（V1.1 Step2）：当前路线 / 当前阶段 / 观看进度 -->
+    <view class="journey-card" wx:if="{{journey}}">
+      <view class="journey-label">继续你的 MCU 旅程</view>
+      <view class="journey-row">
+        <view class="j-item">
+          <view class="j-key">当前路线</view>
+          <view class="j-val">{{journey.routeName}}</view>
+        </view>
+        <view class="j-item">
+          <view class="j-key">当前阶段</view>
+          <view class="j-val">{{journey.phaseText}}</view>
+        </view>
+        <view class="j-item">
+          <view class="j-key">观看进度</view>
+          <view class="j-val">{{journey.progressText}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ② 观影进度 -->
+    <view class="progress-card">
+      <view class="progress-ring">
+        <canvas type="2d" id="ringCanvas" class="ring-canvas"></canvas>
+        <view class="ring-num">
+          <text class="ring-num-b">{{ring.count}}</text>
+          <text class="ring-num-s">/ {{ring.total}} 部</text>
+        </view>
+      </view>
+      <view class="progress-info">
+        <view class="pi-title">{{phaseTitle}}</view>
+        <view class="pi-sub">已看完 {{ring.count}} 部作品，从这里继续</view>
+        <view class="phase-tag" wx:if="{{phaseTag}}">{{phaseTag}}</view>
+      </view>
+    </view>
+
+    <!-- ③ 下一站推荐卡（V1.1 Step2）：推荐作品为主体 -->
+    <view class="section-label label-gap">下一站</view>
+    <view class="continue-card" wx:if="{{nextCard && nextCard.id}}" data-id="{{nextCard.id}}" bindtap="goNext" hover-class="continue-hover" hover-stay-time="80">
+      <view class="continue-poster poster-p{{nextCard.phase}}">
+        <text class="poster-text">{{nextCard.cn[0]}}</text>
+      </view>
+      <view class="continue-meta">
+        <view class="label">下一站 · {{nextCard.phaseText}}<text class="last-seen" wx:if="{{nextCard.lastSeen}}"> · 上次看到《{{nextCard.lastSeen}}》</text></view>
+        <view class="c-title">{{nextCard.cn}}</view>
+        <view class="next-hint">{{nextCard.whyShort}}</view>
+        <view class="continue-btn">继续观看</view>
+      </view>
+    </view>
+    <view class="continue-card done-card" wx:elif="{{nextCard && nextCard.done}}">
+      <view class="continue-meta">
+        <view class="label">主线已看完</view>
+        <view class="c-title">你已经走完主线旅程</view>
+        <view class="next-hint">去「路线」挑一条新路线，或去「探索」看更多作品</view>
+      </view>
+    </view>
+
+    <!-- 快捷入口 -->
+    <view class="quick-row">
+      <view class="quick-card" wx:for="{{quickCards}}" wx:key="key" data-key="{{item.key}}" bindtap="goTab" hover-class="quick-hover" hover-stay-time="80">
+        <image class="q-ic" src="{{item.icon}}" mode="aspectFit"/>
+        <view class="q-title">{{item.title}}</view>
+        <view class="q-desc">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <!-- 最近看过 -->
+    <view class="section-label label-gap">最近看过</view>
+    <scroll-view class="recent-row" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
+        <view class="recent-poster poster-p{{item.phase}}">
+          <text class="poster-text">{{item.cn[0]}}</text>
+        </view>
+        <view class="recent-name">{{item.cn}}</view>
+      </view>
+    </scroll-view>
+    <view class="spacer-sm"></view>
+  </block>
+
+</view>

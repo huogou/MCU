@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCU 宇宙导航 - 漫威电影观看顺序与宇宙关系导航</title>
+<meta name="description" content="漫威电影不知道怎么接着看？MCU 宇宙导航帮你规划观影路线、回答看完这部下一部看什么，并用关系地图讲清全部 MCU 作品（电影/剧集/特别呈现/短片）之间为什么有关系。">
+<meta name="keywords" content="漫威电影观看顺序,MCU时间线,漫威电影上映顺序,看完之后看什么,漫威电影关系">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main>
+  <section class="hero">
+    <!-- 第二轮「电影内容视觉化」：MCU 电影氛围背景层
+         6 部代表作的风格化海报，低透明 + 虚化 + 渐隐，
+         只负责"这是漫威电影宇宙"的第一印象，不抢标题与 CTA -->
+    <div class="hero-posters" aria-hidden="true">
+      <img src="assets/posters/iron-man.jpg" alt="" onerror="this.style.display='none'">
+      <img src="assets/posters/doctor-strange.jpg" alt="" onerror="this.style.display='none'">
+      <img src="assets/posters/avengers.jpg" alt="" onerror="this.style.display='none'">
+      <img src="assets/posters/guardians.jpg" alt="" onerror="this.style.display='none'">
+      <img src="assets/posters/thor-ragnarok.jpg" alt="" onerror="this.style.display='none'">
+      <img src="assets/posters/spider-man-homecoming.jpg" alt="" onerror="this.style.display='none'">
+    </div>
+    <!-- V1.2 宇宙氛围装饰层 -->
+    <div class="hero-atmosphere" aria-hidden="true">
+      <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+        <!-- 能量轨道环 -->
+        <ellipse class="hero-orbit" cx="600" cy="300" rx="380" ry="220"/>
+        <ellipse class="hero-orbit hero-orbit--2" cx="600" cy="300" rx="480" ry="290"/>
+        <ellipse class="hero-orbit hero-orbit--3" cx="600" cy="300" rx="560" ry="350"/>
+        
+        <!-- 闪烁星光粒子 -->
+        <circle class="hero-star-twinkle" cx="150" cy="120" r="1.2" fill="#fff" style="animation-delay:0s"/>
+        <circle class="hero-star-twinkle" cx="980" cy="80" r="1" fill="#fff" style="animation-delay:.7s"/>
+        <circle class="hero-star-twinkle" cx="250" cy="480" r="1.3" fill="#fff" style="animation-delay:1.4s"/>
+        <circle class="hero-star-twinkle" cx="1050" cy="420" r="0.9" fill="#fff" style="animation-delay:2.1s"/>
+        <circle class="hero-star-twinkle" cx="520" cy="60" r="1.1" fill="#fff" style="animation-delay:0.5s"/>
+        <circle class="hero-star-twinkle" cx="780" cy="520" r="1" fill="#fff" style="animation-delay:1.8s"/>
+        
+        <!-- MCU 符号坐标节点（抽象剪影）-->
+        <!-- 1. 方舟反应堆（左下）-->
+        <g class="hero-sym hero-sym--1" transform="translate(180, 440)">
+          <circle r="18" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+          <circle r="8" fill="var(--gold)" opacity=".6"/>
+          <line x1="-18" y1="0" x2="-28" y2="0" stroke="var(--gold)" stroke-width="1"/>
+          <line x1="18" y1="0" x2="28" y2="0" stroke="var(--gold)" stroke-width="1"/>
+          <line x1="0" y1="-18" x2="0" y2="-28" stroke="var(--gold)" stroke-width="1"/>
+          <line x1="0" y1="18" x2="0" y2="28" stroke="var(--gold)" stroke-width="1"/>
+        </g>
+        
+        <!-- 2. 雷神之锤轮廓（右上）-->
+        <g class="hero-sym hero-sym--2" transform="translate(1000, 140) rotate(-15)">
+          <rect x="-10" y="-14" width="20" height="14" rx="2" fill="none" stroke="var(--blue)" stroke-width="1.5"/>
+          <rect x="-4" y="0" width="8" height="22" rx="1" fill="none" stroke="var(--blue)" stroke-width="1.5"/>
+        </g>
+        
+        <!-- 3. 蜘蛛网纹路（右下）-->
+        <g class="hero-sym hero-sym--3" transform="translate(1020, 460)">
+          <circle r="16" fill="none" stroke="var(--red)" stroke-width="1"/>
+          <line x1="0" y1="-16" x2="0" y2="16" stroke="var(--red)" stroke-width="0.8"/>
+          <line x1="-14" y1="-8" x2="14" y2="8" stroke="var(--red)" stroke-width="0.8"/>
+          <line x1="-14" y1="8" x2="14" y2="-8" stroke="var(--red)" stroke-width="0.8"/>
+        </g>
+        
+        <!-- 4. 神秘法阵圆环（左侧中部）-->
+        <g class="hero-sym hero-sym--4" transform="translate(100, 280)">
+          <circle r="20" fill="none" stroke="var(--purple)" stroke-width="1.2"/>
+          <circle r="12" fill="none" stroke="var(--purple)" stroke-width="0.8" stroke-dasharray="3 3"/>
+          <circle r="4" fill="var(--purple)" opacity=".4"/>
+        </g>
+        
+        <!-- 5. 美国队长盾牌（中央偏右） -->
+        <g class="hero-sym hero-sym--5" transform="translate(800, 320)">
+          <circle r="16" fill="none" stroke="var(--blue)" stroke-width="1.8"/>
+          <circle r="10" fill="none" stroke="var(--blue)" stroke-width="1.2"/>
+          <circle r="4" fill="var(--red)" stroke="var(--red)" stroke-width="0.5"/>
+          <line x1="-12" y1="0" x2="12" y2="0" stroke="var(--red)" stroke-width="1.2"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="var(--red)" stroke-width="1.2"/>
+        </g>
+        
+        <!-- 6. 无限宝石能量（右上方） -->
+        <g class="hero-sym hero-sym--6" transform="translate(880, 180)">
+          <polygon points="0,-12 10.39,6 -10.39,6" fill="none" stroke="var(--gold)" stroke-width="1.2"/>
+          <circle cx="0" cy="-4" r="2.5" fill="var(--gold)" opacity="0.8"/>
+        </g>
+        
+        <!-- 虚线连接线（星座效果）-->
+        <line x1="198" y1="440" x2="990" y2="155" stroke="var(--border-lit)" stroke-width="0.6" stroke-dasharray="4 6" opacity=".3"/>
+        <line x1="1000" y1="155" x2="1020" y2="460" stroke="var(--border-lit)" stroke-width="0.6" stroke-dasharray="4 6" opacity=".3"/>
+        <line x1="1020" y1="460" x2="120" y2="280" stroke="var(--border-lit)" stroke-width="0.6" stroke-dasharray="4 6" opacity=".25"/>
+        <line x1="800" y1="320" x2="1000" y2="140" stroke="var(--border-lit)" stroke-width="0.5" stroke-dasharray="3 5" opacity=".2"/>
+        <line x1="880" y1="180" x2="1000" y2="140" stroke="var(--border-lit)" stroke-width="0.5" stroke-dasharray="3 5" opacity=".2"/>
+      </svg>
+    </div>
+    
+    <div class="wrap">
+      <h1>漫威电影不知道怎么接着看？</h1>
+      <p class="lead">MCU 宇宙导航把它变简单。回答三件事：我应该看什么？它为什么和前面的有关？看完之后看什么？</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="next.html">我刚看完一部，下一部看什么？</a>
+        <a class="btn btn-secondary" href="routes.html?r=newcomer">我应该从哪开始？</a>
+      </div>
+      <a class="hero-explore" href="map.html">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        我想探索这个宇宙
+      </a>
+      <div class="hero-stats hero-stats-v13">
+        <div class="stat"><b id="stat-count">59</b><span>部内容 · 电影 · 剧集 · 短片</span></div>
+        <div class="stat"><b id="stat-routes">11</b><span>条路线 · 5 种方式</span></div>
+        <div class="stat"><b id="stat-phases">6</b><span>个叙事阶段</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V1.2 核心功能区 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="hd hd-stack">
+        <span class="chip chip-red">核心功能</span>
+        <h2>解决三个核心问题</h2>
+        <p class="dim">我应该看什么？它为什么和前面的有关？看完之后看什么？</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- V1.2 四个功能卡片 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="features-four">
+        <a class="feature-card" href="routes.html">
+          <div class="feature-icon" title="美国队长盾牌">
+            <!-- 美国队长盾牌：同心圆环 + 中心五角星 -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="6.2" stroke="currentColor" stroke-width="1.2" opacity=".7"/>
+              <path d="M12 8.4l1.06 2.14 2.36.34-1.71 1.67.4 2.35L12 13.79l-2.11 1.11.4-2.35-1.71-1.67 2.36-.34L12 8.4z" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>观影路线</h3>
+          <p>从新手入坑到按角色深挖，11 条观影路线覆盖 5 种观看方式。</p>
+        </a>
+        
+        <a class="feature-card" href="next.html">
+          <div class="feature-icon" title="钢铁侠方舟反应堆">
+            <!-- 方舟反应堆：外环 + 三角核心 + 能量引线 -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 7.6L15.8 14.2H8.2L12 7.6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="1.4" fill="currentColor"/>
+              <path d="M12 3v1.6M12 19.4V21M3 12h1.6M19.4 12H21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>下一部看什么</h3>
+          <p>告诉你你刚看完哪部，获得下一部推荐以及为什么推荐它。</p>
+        </a>
+        
+        <a class="feature-card" href="map.html">
+          <div class="feature-icon" title="蜘蛛侠蛛网">
+            <!-- 蜘蛛侠蛛网：放射线 + 六边形蛛丝 -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2.5v19M2.5 12h19M5.3 5.3l13.4 13.4M18.7 5.3L5.3 18.7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+              <path d="M12 6.4l3.9 2.3 3.9 2.3-3.9 2.3-3.9 2.3-3.9-2.3-3.9-2.3 3.9-2.3L12 6.4z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" opacity=".85"/>
+              <circle cx="12" cy="12" r="1.1" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>宇宙关系地图</h3>
+          <p>从一部作品出发，看清它与哪些作品、角色、事件有关，以及为什么有关。</p>
+        </a>
+        
+        <a class="feature-card" href="#content-browse">
+          <div class="feature-icon" title="奇异博士魔法环">
+            <!-- 奇异博士魔法环：双环 + 刻度符纹 -->
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="5.6" stroke="currentColor" stroke-width="1" stroke-dasharray="2.4 2.2"/>
+              <path d="M12 5.4v2M12 16.6v2M5.4 12h2M16.6 12h2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="1.3" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>探索作品</h3>
+          <p>浏览全部 MCU 内容，按阶段、类型筛选，了解每部作品的位置。</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="entries">
+        <a class="entry" href="next.html">
+          <div class="entry-no">01</div>
+          <h3>我刚看完某一部</h3>
+          <p>告诉我你看到哪了，我给你下一部。还会说清楚为什么是它——是剧情直接接上，还是有必须补的前置。</p>
+          <div class="entry-go">找下一部 →</div>
+        </a>
+        <a class="entry" href="routes.html?r=newcomer">
+          <div class="entry-no">02</div>
+          <h3>我是第一次看</h3>
+          <p>内容太多了。给你一条只有 12 部作品的入坑路线，砍掉全部支线，看完就完整经历了无限传奇。</p>
+          <div class="entry-go">选一条观影路线 →</div>
+        </a>
+        <a class="entry" href="map.html">
+          <div class="entry-no">03</div>
+          <h3>我想逛这个宇宙</h3>
+          <p>从一部作品出发，看看它与哪些作品有关，以及为什么有关。</p>
+          <div class="entry-go">打开宇宙地图 →</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-sm">
+    <div class="wrap">
+      <div class="card" id="progress-card"></div>
+      <div id="milestone-slot"></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="hd">
+        <h2>换一种顺序看这个宇宙</h2>
+        <a class="dim2" href="routes.html">查看全部路线 →</a>
+      </div>
+      <div class="entries" id="route-preview"></div>
+    </div>
+  </section>
+
+  <section class="section" id="content-browse">
+    <div class="wrap">
+      <div class="hd">
+        <h2>浏览 MCU 全部内容</h2>
+        <span class="dim2" id="content-count"></span>
+      </div>
+      <div class="viewbar" id="viewbar"></div>
+      <div class="typebar" id="typebar"></div>
+      <div class="grid-movies" id="content-grid"></div>
+    </div>
+  </section>
+</main>
+
+<div id="app-foot"></div>
+
+<script src="data/movies.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+  <script src="data/stills.js"></script>
+  <script src="data/visuals.js"></script>
+  <script src="assets/js/app.js"></script>
+<script>
+(function () {
+  MCU.ui.mount('index.html');
+
+  /* ---- hero 内容总数（动态，避免硬编码）---- */
+  var sc = document.getElementById('stat-count');
+  if (sc) { var cc = MCU.data.counts(); sc.textContent = (cc.movie + cc.series + cc.special + cc.short); }
+
+  /* 路线数 / 阶段数 动态取自数据，避免与底层数据脱节 */
+  var rc = document.getElementById('stat-routes');
+  if (rc) rc.textContent = MCU.data.routes.length;
+  var maxPhase = 0;
+  MCU.data.all.forEach(function (m) { if (m.phase > maxPhase) maxPhase = m.phase; });
+  var ph = document.getElementById('stat-phases');
+  if (ph) ph.textContent = maxPhase;
+
+  /* ---- 观影进度卡 ---- */
+  function renderProgress() {
+    var latest = MCU.progress.latest();
+    var count = MCU.progress.count();
+    var html = '<div class="hd" style="margin-bottom:14px"><h3>我的观影进度</h3>'
+             + (count ? '<button class="btn btn-sm" id="clear-progress" style="margin-left:auto">清空</button>' : '')
+             + '</div>'
+             + MCU.ui.progressBar();
+
+    if (latest) {
+      var r = MCU.rec.next(latest.id, 'mainline');
+      html += '<div style="margin-top:16px;font-size:14px" class="dim">'
+           +  '你标记的最新一部是《' + MCU.ui.esc(latest.cn) + '》。'
+           +  (r ? '按主线走，下一部是 <a href="movie.html?id=' + r.movie.id
+                 + '" style="color:var(--red)">《' + MCU.ui.esc(r.movie.cn) + '》</a>。' : '')
+           +  '</div>'
+           +  '<div style="margin-top:14px"><a class="btn btn-primary btn-sm" href="next.html?from='
+           +  latest.id + '">看看下一部推荐</a></div>';
+    } else {
+      html += '<div style="margin-top:14px;font-size:14px" class="dim">'
+           +  '还没有记录。在任意一部作品的详情页点「标记为已看」，这里就会开始计数，'
+           +  '首页也会根据你的进度直接给出下一部。</div>';
+    }
+    html += MCU.ui.mpEntry({ variant: 'compact', title: '在小程序记录你的 MCU 进度', desc: '保存已看作品，追踪观影路线，随时继续' });
+    document.getElementById('progress-card').innerHTML = html;
+
+    var btn = document.getElementById('clear-progress');
+    if (btn) btn.onclick = function () {
+      if (confirm('确定清空全部观影记录？此操作不可恢复。')) {
+        MCU.progress.clear();
+        renderProgress();
+        renderMilestone();
+      }
+    };
+  }
+
+  /* ---- V1.3 最终收口：MCU 旅程里程碑（5 / 10 / 20 部）----
+   * 单一数据源：复用 MCU.progress.checkMilestone()，里程碑状态统一存于
+   * mcu_nav_user_v1.milestones_shown（与 movie.html / next.html 共用），
+   * 不再使用独立的 mcu_milestones_shown 原始键，避免跨页重复弹卡。 */
+  function renderMilestone() {
+    var slot = document.getElementById('milestone-slot');
+    if (!slot) return;
+    var ms = MCU.progress.checkMilestone();
+    if (!ms) { slot.innerHTML = ''; return; }
+
+    slot.innerHTML = '<div class="milestone-card">'
+      + '<div class="milestone-badge">'
+      +   '<svg viewBox="0 0 16 16" fill="none"><path d="M8 1l2.1 4.3 4.7.7-3.4 3.3.8 4.7L8 11.8 3.8 14l.8-4.7L1.2 6l4.7-.7L8 1z" fill="currentColor"/></svg>'
+      +   '已看 ' + ms.n + ' 部'
+      + '</div>'
+      + '<div class="milestone-t">' + MCU.ui.esc(ms.title) + '</div>'
+      + '<div class="milestone-d">' + MCU.ui.esc(ms.desc) + '</div>'
+      + '<div class="milestone-actions">'
+      +   '<button class="btn btn-primary btn-sm" data-mp-title="保存你的 MCU 旅程" data-mp-desc="已看、路线、收藏一起带走。">保存进度到小程序</button>'
+      +   '<button class="btn btn-sm" id="dismiss-milestone">稍后再说</button>'
+      + '</div></div>';
+
+    var dismiss = document.getElementById('dismiss-milestone');
+    if (dismiss) dismiss.onclick = function () { slot.innerHTML = ''; };
+  }
+
+  /* ---- 路线预览 ---- */
+  var picks = ['newcomer', 'essential', 'recommended'];
+  document.getElementById('route-preview').innerHTML = picks.map(function (id) {
+    var r = MCU.data.routeById(id);
+    if (!r) return '';
+    var n = MCU.data.expandRoute(r).length;
+    return '<a class="entry" href="routes.html?r=' + r.id + '">'
+      + '<div class="entry-no">' + n + ' 部</div>'
+      + '<h3>' + MCU.ui.esc(r.name) + '</h3>'
+      + '<p>' + MCU.ui.esc(r.tagline) + '。' + MCU.ui.esc(r.forWho) + '。</p>'
+      + '<div class="entry-go">查看这条路线 →</div></a>';
+  }).join('');
+
+  /* ---- 浏览全部内容（三视图 + 类型过滤）---- */
+  function renderContent() {
+    var list = MCU.data.filtered();
+    var c = document.getElementById('content-count');
+    if (c) c.textContent = '当前视图「' + MCU.data.viewLabel() + '」· 共 ' + list.length + ' 部';
+    document.getElementById('content-grid').innerHTML =
+      list.map(function (m) { return MCU.ui.contentCard(m, { showChrono: true }); }).join('');
+  }
+
+  MCU.ui.bindViewSwitcher(document.getElementById('viewbar'), renderContent);
+  MCU.ui.bindTypeFilter(document.getElementById('typebar'), renderContent);
+
+  renderProgress();
+  renderMilestone();
+  renderContent();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!-- 电影详情 movie（子页，含资源模块）· D12-A Step3-5 恢复 -->
+<view class="mcu-page movie-page">
+
+  <!-- 未找到 -->
+  <view wx:if="{{notFound}}" class="movie-empty">
+    <view class="movie-empty-title">没有这部内容</view>
+    <view class="movie-empty-sub">请从路线或探索入口重新进入</view>
+  </view>
+
+  <block wx:else>
+
+    <!-- 导航栏 -->
+    <view class="movie-nav-bar">
+      <view class="back-btn" bindtap="onBack">
+        <view class="chevron-left"></view>
+      </view>
+      <text class="nav-label">{{phaseText}}</text>
+    </view>
+
+    <!-- ① Hero 区 -->
+    <view class="movie-hero">
+      <view class="hero-bg" style="{{heroBg}}"></view>
+      <view class="poster {{posterClass}}">
+        <image wx:if="{{posterImg}}" class="poster-img" src="{{posterImg}}" mode="aspectFill" />
+        <view wx:else class="poster-fill"><text class="poster-letter">{{posterLetter}}</text></view>
+      </view>
+      <view class="hero-info">
+        <view class="hero-phase">
+          <view class="hero-phase-dot" style="background:{{phaseDot}}"></view>
+          <text class="hero-phase-text">{{phaseText}}</text>
+        </view>
+        <view class="hero-title">{{cn}}</view>
+        <view class="hero-en">{{en}}</view>
+        <view class="hero-chips">
+          <text wx:for="{{chips}}" wx:key="text" class="chip {{item.cls}}">{{item.text}}</text>
+        </view>
+        <view class="watch-status {{status.cls}}">
+          <view class="ico ico-{{status.ico}}"></view>
+          <text>{{status.text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ② 主 CTA -->
+    <view class="movie-cta-section">
+      <view class="movie-cta {{cta.cls}}" bindtap="onPrimaryCta">
+        <view wx:if="{{cta.state !== 'watched'}}" class="ico ico-play"></view>
+        <view wx:else class="ico ico-check"></view>
+        <text>{{cta.text}}</text>
+      </view>
+    </view>
+
+    <!-- ③ 观看资源 -->
+    <view class="resource-module {{resourceExpanded ? 'expanded' : ''}}">
+      <view class="resource-header" bindtap="onToggleResource">
+        <view class="resource-icon">
+          <view class="ico ico-play"></view>
+        </view>
+        <view class="resource-info">
+          <view class="resource-title">{{resource.title}}</view>
+          <view class="resource-sub">{{resource.sub}}</view>
+        </view>
+        <view class="resource-arrow"></view>
+      </view>
+      <view class="resource-body">
+        <view wx:if="{{resource.pending}}" class="resource-pending">观影资源正在整理中，敬请期待</view>
+        <view wx:else class="resource-item">
+          <text class="ri-label">高清在线观看</text>
+          <view class="ri-btn" bindtap="onResourceOpen">打开资源</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- ④ 为什么现在看 -->
+    <view class="why-section">
+      <view class="why-label">为什么现在看这部</view>
+      <view wx:if="{{why.ctx}}" class="why-ctx">{{why.ctx}}</view>
+      <text class="why-text">{{why.text}}</text>
+    </view>
+
+    <!-- ⑤ 前后关联（上映序） -->
+    <view class="sequence-section">
+      <view class="sequence-label">观影位置</view>
+      <view class="sequence-row">
+        <view wx:if="{{seqPrev}}" class="seq-card" data-id="{{seqPrev.id}}" bindtap="onGoMovie">
+          <view class="seq-poster {{seqPrev.posterClass}}"><text>{{seqPrev.letter}}</text></view>
+          <view class="seq-name">{{seqPrev.cn}}</view>
+          <view class="seq-role">{{seqPrev.roleLabel}}</view>
+        </view>
+        <view wx:else class="seq-card seq-placeholder"><view class="seq-role">起点</view></view>
+
+        <view class="seq-arrow"><view class="chevron-right"></view></view>
+
+        <view class="seq-card current">
+          <view class="seq-poster {{seqCur.posterClass}}"><text>{{seqCur.letter}}</text></view>
+          <view class="seq-name">{{seqCur.cn}}</view>
+          <view class="seq-role">{{seqCur.roleLabel}}</view>
+        </view>
+
+        <view class="seq-arrow"><view class="chevron-right"></view></view>
+
+        <view wx:if="{{seqNext}}" class="seq-card" data-id="{{seqNext.id}}" bindtap="onGoMovie">
+          <view class="seq-poster {{seqNext.posterClass}}"><text>{{seqNext.letter}}</text></view>
+          <view class="seq-name">{{seqNext.cn}}</view>
+          <view class="seq-role">{{seqNext.roleLabel}}</view>
+        </view>
+        <view wx:else class="seq-card seq-placeholder"><view class="seq-role">最新一部</view></view>
+      </view>
+    </view>
+
+    <!-- ⑥ 看完之后 -->
+    <view class="after-section">
+      <view class="mark-watched-btn {{mark.marked ? 'marked' : ''}}" bindtap="onMarkWatched">
+        <view class="ico ico-check"></view>
+        <text>{{mark.text}}</text>
+      </view>
+      <view wx:if="{{nextRec}}" class="next-rec" data-id="{{nextRec.id}}" bindtap="onGoMovie">
+        <view class="next-rec-poster {{nextRec.posterClass}}"><text>{{nextRec.letter}}</text></view>
+        <view class="next-rec-info">
+          <view class="next-rec-label">{{nextRec.label}}</view>
+          <view class="next-rec-title">{{nextRec.cn}}</view>
+          <view class="next-rec-desc">{{nextRec.why}}</view>
+        </view>
+        <view class="next-rec-arrow"><view class="chevron-right"></view></view>
+      </view>
+    </view>
+
+  </block>
+
+  <!-- ══════ 成就解锁弹窗（V1.1 Step5：仅观影完成后触发，半屏弹层） ══════ -->
+  <view class="ach-mask" wx:if="{{achPopup}}" bindtap="closeAchPopup">
+    <view class="ach-sheet" catchtap="noop">
+      <view class="ach-close" bindtap="closeAchPopup"><view class="ach-close-x"></view></view>
+      <view class="ach-sheet-badge">{{achPopup.icon}}</view>
+      <view class="ach-sheet-title">成就解锁</view>
+      <view class="ach-sheet-name">{{achPopup.name}}</view>
+      <view class="ach-sheet-desc">{{achPopup.desc}}</view>
+      <view class="ach-sheet-actions">
+        <view class="ach-btn gold" bindtap="goShareFromAch">分享我的进度</view>
+        <view class="ach-btn" bindtap="closeAchPopup">继续旅程</view>
+      </view>
+    </view>
+  </view>
+</view>

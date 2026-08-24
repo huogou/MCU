@@ -1,0 +1,58 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/routes/routes",
+    "pages/route-detail/route-detail",
+    "pages/movie/movie",
+    "pages/explore/explore",
+    "pages/panorama/panorama",
+    "pages/characters/characters",
+    "pages/character/character",
+    "pages/browse/browse",
+    "pages/my-mcu/my-mcu",
+    "pages/feedback/feedback",
+    "pages/share/share"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0B0E14",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "MCU观影导航",
+    "backgroundColor": "#0B0E14",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#6B7384",
+    "selectedColor": "#E9A93B",
+    "backgroundColor": "#141925",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/icons/tab/home.png",
+        "selectedIconPath": "assets/icons/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/routes/routes",
+        "text": "路线",
+        "iconPath": "assets/icons/tab/routes.png",
+        "selectedIconPath": "assets/icons/tab/routes-active.png"
+      },
+      {
+        "pagePath": "pages/explore/explore",
+        "text": "探索",
+        "iconPath": "assets/icons/tab/explore.png",
+        "selectedIconPath": "assets/icons/tab/explore-active.png"
+      },
+      {
+        "pagePath": "pages/my-mcu/my-mcu",
+        "text": "我的MCU",
+        "iconPath": "assets/icons/tab/my-mcu.png",
+        "selectedIconPath": "assets/icons/tab/my-mcu-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

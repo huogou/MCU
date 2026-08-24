@@ -1,0 +1,65 @@
+<!-- 路线详情 route-detail（由 routes 进入）· D12-A Step3-7-A 恢复 -->
+<view class="mcu-page route-detail-page">
+
+  <!-- 未找到 -->
+  <view wx:if="{{notFound}}" class="rd-empty">
+    <view class="rd-empty-title">没有这条路线</view>
+    <view class="rd-empty-sub">请从路线页重新进入</view>
+  </view>
+
+  <block wx:else>
+
+    <!-- ① 顶部区域：名称 / 简介 / 数量 / 进度 -->
+    <view class="rd-header">
+      <view class="rd-kind {{kind === 'topic' ? 'topic' : 'basic'}}">{{kind === 'topic' ? '专题路线' : '基础路线'}}</view>
+      <view class="rd-name">{{name}}</view>
+      <view class="rd-tagline">{{tagline}}</view>
+      <view class="rd-desc">{{desc}}</view>
+
+      <view class="rd-progress-summary">
+        <view class="rd-progress-num">
+          <text class="rd-watched">{{watched}}</text>
+          <text class="rd-total"> / {{total}} 部</text>
+        </view>
+        <view class="rd-bar"><view class="rd-bar-fill" style="width:{{percent}}%"></view></view>
+      </view>
+
+      <view wx:if="{{isCurrent && currentText}}" class="rd-current-banner">{{currentText}}</view>
+    </view>
+
+    <!-- ② 下一部推荐 -->
+    <view class="rd-section-label">下一部</view>
+    <view wx:if="{{hasNext}}" class="rd-next-card" data-id="{{nextId}}" bindtap="goNext">
+      <view class="rd-next-info">
+        <view class="rd-next-name">{{nextName}}</view>
+        <view class="rd-next-phase">{{nextPhase}}</view>
+      </view>
+      <view class="rd-next-btn">去看</view>
+    </view>
+    <view wx:else class="rd-next-done">
+      <view class="ico ico-check"></view>
+      <text>这条路线已经全部看完了</text>
+    </view>
+
+    <!-- ③ 路线电影列表 -->
+    <view class="rd-section-label">路线内容</view>
+    <view class="rd-list">
+      <view wx:for="{{nodes}}" wx:key="id"
+            class="rd-node {{item.statusCls}} {{item.isCurrent ? 'is-current' : ''}}"
+            data-id="{{item.id}}" bindtap="goMovie">
+        <view class="rd-no {{item.isCurrent ? 'current' : ''}}">{{item.no}}</view>
+        <view class="rd-node-main">
+          <view class="rd-node-title">{{item.cn}}</view>
+          <view class="rd-node-en">{{item.en}}</view>
+          <view class="rd-node-meta">
+            <view class="rd-phase-dot" style="background:{{item.phaseColor}}"></view>
+            <text class="rd-phase-text">{{item.phase}}</text>
+            <text class="rd-type">· {{item.typeLabel}}</text>
+          </view>
+        </view>
+        <view class="rd-status {{item.statusCls}}">{{item.statusText}}</view>
+      </view>
+    </view>
+
+  </block>
+</view>

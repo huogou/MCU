@@ -1,0 +1,136 @@
+/* MCU观影导航 V1.0 - 全局样式 / 设计 Token
+ * Token 来源：恢复资料「给策划AI同步文件.txt」D10 权威色值表（唯一权威，零 raw hex 泄漏）
+ * 禁止在页面层写死颜色，一律引用以下 CSS 变量。
+ */
+page {
+  /* 背景与表面 */
+  --bg: #0B0E14;
+  --surface-1: #141925;
+  --surface-2: #1C2330;
+  --surface-3: #232C3D;
+
+  /* 品牌金 */
+  --gold: #E9A93B;
+
+  /* 六阶段色 */
+  --p1: #5B8DEF;
+  --p2: #28B487;
+  --p3: #F0A932;
+  --p4: #8B6FE8;
+  --p5: #E8483F;
+  --p6: #C25B8E;
+
+  /* 三级文本 */
+  --text-main: #E8ECF4;
+  --text-sub: #A8B0C0;
+  --text-weak: #6B7384;
+
+  /* 状态 */
+  --success: #3FB98A;
+  --error: #E5604D;
+
+  /* D12 视觉债清理增补（2026-08-24，值=原硬编码，零视觉变化）：
+   * 色相 alpha 变体统一命名 色-a透明度(%)；阶段色 60% 渐变变体 p{n}-a60 */
+  --white: #FFFFFF;
+  --gold-btn-text: #1A1206;
+  --gold-a02: rgba(233,169,59,0.02);
+  --gold-a03: rgba(233,169,59,0.03);
+  --gold-a04: rgba(233,169,59,0.04);
+  --gold-a06: rgba(233,169,59,0.06);
+  --gold-a08: rgba(233,169,59,0.08);
+  --gold-a10: rgba(233,169,59,0.10);
+  --gold-a12: rgba(233,169,59,0.12);
+  --gold-a14: rgba(233,169,59,0.14);
+  --gold-a15: rgba(233,169,59,0.15);
+  --gold-a20: rgba(233,169,59,0.20);
+  --gold-a30: rgba(233,169,59,0.30);
+  --gold-a50: rgba(233,169,59,0.50);
+  --gold-a55: rgba(233,169,59,0.55);
+  --gold-a60: rgba(233,169,59,0.60);
+  --success-a08: rgba(63,185,138,0.08);
+  --success-a10: rgba(63,185,138,0.10);
+  --success-a15: rgba(63,185,138,0.15);
+  --success-a20: rgba(63,185,138,0.20);
+  --success-a30: rgba(63,185,138,0.30);
+  --error-a15: rgba(229,96,77,0.15);
+  --white-a08: rgba(255,255,255,0.08);
+  --white-a12: rgba(255,255,255,0.12);
+  --white-a50: rgba(255,255,255,0.50);
+  --white-a60: rgba(255,255,255,0.60);
+  --white-a70: rgba(255,255,255,0.70);
+  --bg-a55: rgba(11,14,20,0.55);
+  --bg-a70: rgba(11,14,20,0.70);
+  --black-a35: rgba(0,0,0,0.35);
+  --p1-a60: rgba(91,141,239,0.60);
+  --p2-a60: rgba(40,180,135,0.60);
+  --p3-a60: rgba(240,169,50,0.60);
+  --p4-a60: rgba(139,111,232,0.60);
+  --p5-a60: rgba(232,72,63,0.60);
+  --p6-a60: rgba(194,91,142,0.60);
+  --p1-a06: rgba(91,141,239,0.06);
+  --p5-a06: rgba(232,72,63,0.06);
+  --p1-a20: rgba(91,141,239,0.20);
+  --p5-a20: rgba(232,72,63,0.20);
+  --p2-a15: rgba(40,180,135,0.15);
+  --p4-a15: rgba(139,111,232,0.15);
+
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* —— 通用布局类（全局可用，页面不重复定义） —— */
+.mcu-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding: 20rpx;
+}
+
+.mcu-section {
+  margin-bottom: 16rpx;
+}
+
+.mcu-card {
+  background: var(--surface-1);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 12rpx;
+}
+
+.mcu-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.mcu-sub {
+  font-size: 26rpx;
+  color: var(--text-sub);
+}
+
+.mcu-weak {
+  font-size: 24rpx;
+  color: var(--text-weak);
+}
+
+.mcu-gold {
+  color: var(--gold);
+}
+
+.mcu-btn-gold {
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-weight: 600;
+  border-radius: 999rpx;
+  padding: 20rpx 0;
+  text-align: center;
+}
+
+.mcu-divider {
+  height: 1rpx;
+  background: var(--surface-3);
+  margin: 16rpx 0;
+}

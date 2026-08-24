@@ -1,0 +1,38 @@
+<!-- 关系探索 explore（Tab3） - V1.1 Step6：入口聚合页 -->
+<view class="mcu-page">
+  <view class="page-head">
+    <view class="page-title">关系探索</view>
+    <view class="page-sub">从角色、作品与宇宙全景，读懂 MCU 世界的关系</view>
+  </view>
+
+  <view class="entry-card" bindtap="goPano" hover-class="entry-card-hover">
+    <view class="entry-icon">◈</view>
+    <view class="entry-body">
+      <view class="entry-name">宇宙全景图</view>
+      <view class="entry-desc">一图看尽主线脉络与时间线</view>
+    </view>
+    <view class="entry-arrow">›</view>
+  </view>
+
+  <view class="entry-card" bindtap="goCharacters" hover-class="entry-card-hover">
+    <view class="entry-icon icon-char">✦</view>
+    <view class="entry-body">
+      <view class="entry-name">角色图鉴</view>
+      <view class="entry-desc">{{totalChars}} 位角色 · 阵营、作品与关系图谱</view>
+    </view>
+    <view class="entry-arrow">›</view>
+  </view>
+
+  <view class="section-label">从热门角色开始</view>
+  <view class="char-grid">
+    <view wx:for="{{chars}}" wx:key="id"
+          class="char-card" data-id="{{item.id}}" bindtap="goCharacter" hover-class="char-card-hover">
+      <view class="char-camp" style="background:{{camps[item.camp].color}}22;color:{{camps[item.camp].color}}">{{camps[item.camp].label}}</view>
+      <view class="char-cn">{{item.cn}}</view>
+      <view class="char-en">{{item.en}}</view>
+      <view class="char-first">首登场 · {{item.firstCn}}</view>
+    </view>
+  </view>
+
+  <view class="bottom-pad"></view>
+</view>

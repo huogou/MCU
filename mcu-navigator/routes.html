@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>漫威电影观看顺序 - 新手入坑 / 上映顺序 / MCU 时间线 / 精简主线</title>
+<meta name="description" content="漫威电影按什么顺序看？提供新手入坑、上映顺序、MCU 故事时间线、精简主线四种基础路线，以及蜘蛛侠、复仇者联盟、多元宇宙等专题路线，每条都说明为什么这样排。">
+<meta name="keywords" content="漫威电影观看顺序,漫威电影时间线,漫威电影上映顺序,蜘蛛侠电影观看顺序,复仇者联盟观看顺序,漫威精简主线">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main>
+  <section class="section">
+    <div class="wrap">
+      <h1>漫威电影按什么顺序看</h1>
+      <p class="lead" style="margin-top:12px;max-width:660px">
+        没有唯一正确答案，只有适不适合。下面每条路线都写清了它为谁设计、以及为什么这样排。
+      </p>
+
+      <div class="route-tabs" id="tabs" style="margin-top:26px"></div>
+      <div id="route-body"></div>
+    </div>
+  </section>
+</main>
+
+<div id="app-foot"></div>
+
+<script src="data/movies.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+  <script src="data/stills.js"></script>
+  <script src="data/visuals.js"></script>
+  <script src="assets/js/app.js"></script>
+<script>
+(function () {
+  MCU.ui.mount('routes.html');
+
+  var tabsEl = document.getElementById('tabs');
+  var bodyEl = document.getElementById('route-body');
+  var current = MCU.ui.param('r') || 'newcomer';
+  if (!MCU.data.routeById(current)) current = 'newcomer';
+
+  function renderTabs() {
+    var basic = MCU.data.routes.filter(function (r) { return r.kind === 'basic'; });
+    var topic = MCU.data.routes.filter(function (r) { return r.kind === 'topic'; });
+    function btns(list) {
+      return list.map(function (r) {
+        return '<button class="route-tab' + (r.id === current ? ' on' : '') + '" data-r="' + r.id + '">'
+          + MCU.ui.esc(r.name) + '</button>';
+      }).join('');
+    }
+    tabsEl.innerHTML = '<span class="route-group-label">基础路线</span>' + btns(basic)
+      + '<span class="route-group-label" style="margin-left:4px">专题路线</span>' + btns(topic);
+
+    Array.prototype.forEach.call(tabsEl.querySelectorAll('.route-tab'), function (b) {
+      b.onclick = function () {
+        current = b.getAttribute('data-r');
+        var u = new URL(window.location.href);
+        u.searchParams.set('r', current);
+        history.replaceState(null, '', u.toString());
+        renderTabs(); renderBody();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    });
+  }
+
+  function renderBody() {
+    var r = MCU.data.routeById(current);
+    var list = MCU.data.expandRoute(r);
+
+    /* 动态标题：每条路线拥有独立、不重复的 title（SEO） */
+    document.title = r.name + ' 观影路线 - MCU 宇宙导航';
+    var seenCount = list.filter(function (m) { return MCU.progress.isSeen(m.id); }).length;
+    var isChrono = r.generator === 'chrono';
+
+    var html = '<div class="card">'
+      + '<div class="hd" style="margin-bottom:6px"><h2>' + MCU.ui.esc(r.name) + '</h2>'
+      +   '<span class="chip">' + list.length + ' 部</span>'
+      +   '<span class="dim2">' + MCU.ui.esc(r.tagline) + '</span></div>'
+      + '<p class="dim" style="font-size:14.5px">' + MCU.ui.esc(r.desc) + '</p>'
+      + '<div class="route-why"><b style="color:var(--text)">为什么这样排：</b>' + MCU.ui.esc(r.why) + '</div>'
+      + '<div style="margin-top:16px;font-size:13.5px" class="dim2">适合：' + MCU.ui.esc(r.forWho) + '</div>'
+      + (r.note ? '<div class="route-note">说明：' + MCU.ui.esc(r.note) + '</div>' : '')
+      + '<div style="margin-top:18px">' + progressOf(seenCount, list.length) + '</div>'
+      + '</div>';
+
+    /* V1.3 阶段氛围：电影进入新阶段时插入阶段色带（阶段是院线电影概念，
+       剧集/特别呈现/短片不触发分隔） */
+    var lastPhase = null;
+
+    html += '<div class="steps">' + list.map(function (m, i) {
+      var seen = MCU.progress.isSeen(m.id);
+      var nextM = list[i + 1];
+      var bridge = nextM ? bridgeText(m, nextM) : '';
+
+      var atmo = '';
+      if (m.type === 'movie' && m.phase !== lastPhase) {
+        atmo = '<div class="phase-atmo" style="--pa:' + MCU.data.phaseColor(m.phase) + '"></div>'
+             + '<div class="phase-atmo-label">第 ' + m.phase + ' 阶段</div>';
+      }
+      if (m.type === 'movie') lastPhase = m.phase;
+
+      var v = MCU.data.visual(m.id);
+      return atmo + '<div class="step step-v13' + (seen ? ' done' : '') + '">'
+        + '<div class="step-rail">'
+        +   '<button class="step-dot" data-toggle="' + m.id + '" title="点击标记已看">'
+        +     (seen ? '✓' : (i + 1)) + '</button>'
+        +   '<div class="step-line"></div>'
+        + '</div>'
+        + '<div class="step-body">'
+        +   '<div class="step-thumb">' + (v.poster
+        ? '<img src="' + v.poster + '" alt="《' + MCU.ui.esc(m.cn) + '》海报" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
+        : '') + '</div>'
+        +   '<div class="step-body-inner">'
+        +     '<a href="movie.html?id=' + m.id + '" style="font-size:16.5px;font-weight:550">'
+        +       MCU.ui.esc(m.cn) + '</a>'
+        +     '<div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">'
+        +       MCU.ui.typeBadge(m.type) + MCU.ui.impBadge(m.importance) + '</div>'
+        +     '<div class="dim2" style="margin-top:2px">'
+        +       MCU.ui.esc(m.en) + ' · ' + (isChrono
+                ? '故事发生在 ' + MCU.ui.esc(m.coLabel) + ' · ' + MCU.ui.releaseLabel(m)
+                : MCU.ui.releaseLabel(m) + ' · 故事发生在 ' + MCU.ui.esc(m.coLabel))
+        +     '</div>'
+        +     '<div class="dim" style="font-size:13.5px;margin-top:7px">' + MCU.ui.esc(m.role) + '</div>'
+        +     (bridge ? '<div class="step-bridge">' + bridge + '</div>' : '')
+        +   '</div>'
+        + '</div></div>';
+    }).join('') + '</div>';
+
+    if (window.MCU_UPCOMING && window.MCU_UPCOMING.length && (r.generator === 'release' || r.id === 'multiverse-line')) {
+      html += '<div class="card" style="margin-top:8px">'
+        + '<h3>即将上映</h3>'
+        + window.MCU_UPCOMING.map(function (u) {
+            return '<div style="margin-top:10px;font-size:14px">'
+              + '<b style="font-weight:550">' + MCU.ui.esc(u.cn) + '</b>'
+              + '<span class="dim2"> · ' + u.date + '</span>'
+              + '<div class="dim2">' + MCU.ui.esc(u.note) + '</div></div>';
+          }).join('')
+        + '</div>';
+    }
+
+    html += MCU.ui.mpEntry({ variant: 'module', title: '保存这条观影路线', desc: '在小程序中记录进度，之后可以继续观看', btnTxt: '在小程序中保存路线', payload: { type: 'route', id: r.id } });
+
+    html += '<button class="complain-inline" type="button" data-fb>'
+      + '<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      + '发现信息有误？我要吐槽</button>';
+
+    bodyEl.innerHTML = html;
+
+    Array.prototype.forEach.call(bodyEl.querySelectorAll('[data-toggle]'), function (b) {
+      b.onclick = function () { MCU.progress.toggle(b.getAttribute('data-toggle')); renderBody(); };
+    });
+  }
+
+  /* 相邻两部之间的衔接说明——路线页最有价值的信息 */
+  function bridgeText(a, b) {
+    var links = MCU.data.relationsOf(a.id);
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].other === b.id) {
+        var t = MCU.data.types[links[i].type];
+        return '<b style="color:var(--text-2);font-weight:550">接下来为什么是《'
+          + MCU.ui.esc(b.cn) + '》（' + (t ? t.label : '关联') + '）：</b>' + MCU.ui.esc(links[i].why);
+      }
+    }
+    return '';
+  }
+
+  function progressOf(c, t) {
+    var pct = t ? Math.round(c / t * 100) : 0;
+    return '<div class="prog-shell">'
+      + '<div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%"></div></div>'
+      + '<span class="prog-num">这条路线已看 ' + c + ' / ' + t + '</span></div>';
+  }
+
+  renderTabs();
+  renderBody();
+})();
+</script>
+</body>
+</html>
