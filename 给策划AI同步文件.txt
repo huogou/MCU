@@ -48,16 +48,16 @@ Step1 数据模型 / Step2 首页继续观看 / Step3 我的MCU 2.0 / Step4 分�
 - 状态：发布前冻结，待用户在微信开发者工具上传 v1.1.0 并提审
 - 远程托管仍待用户选平台（GitHub / Gitee / CloudBase）
 
-【九、V1.2 首页重构完成（2026-08-25 10:22+，门控第1页，待截图确认）】
-- 依据：用户 10:22 提供的《V1.2 UI Design System》全量规范（颜色/字体/间距/Icon 固定值），解除【八】"等规范"阻塞
-- 目标：把首页从"工具页"调整为"漫威观影助手首页"；固定六模块结构（禁删）：①品牌区 ②继续观看卡 ③快捷入口(新手入坑/宇宙探索/我的MCU) ④新手路线推荐 ⑤热门角色 ⑥最近观看
-- 已改文件：home.wxml（结构重写）/ home.wxss（V1.2 调色板作用域覆盖 + 全 Token 化，组件规则无裸 hex）/ home.js（数据装配重写：双态继续观看卡 + hotChars 反查关联数 + recent；新增 goContinue）/ app.json（tabBar selectedColor #E9A93B→#F2B233）
-- 双态：仅继续观看卡随 hasProgress 变化（新人=开始观看/钢铁侠；老用户=继续观看/latest.cn/Phase N·saga/已看 X/59）
-- 数据零改动：全部来自 models 单一源；热门角色取 tony/steve/thor/peter，关联数由 mcuData.charAppearances 反查；阶段色取角色首登场作品 phase
-- 验证：node --check home.js = SYNTAX_OK；home.wxss 组件规则无裸 hex；wxml 绑定与 js 输出对齐
-- 产出：AI生成文件/小程序/V1.2首页重构_修改说明与自测报告.md
+【九、V1.2 首页重构完成（2026-08-25 10:47+，门控第1页，待截图确认）】
+- 依据：用户 10:47《V1.2 产品视觉重构》任务书（比 10:22 规范更细，明确固定六模块 + UI + Icon 要求），解除【八】"等规范"阻塞
+- 目标：首页从"功能工具"→"陪用户探索漫威宇宙的观影助手"入口
+- 固定六模块（禁删，已按任务书重做，与 10:22 版不同）：①品牌区(你的漫威宇宙旅程) ②继续观看卡(新人=从钢铁侠开始/Phase1/开始观看；老用户=当前观看进度+下一部电影recommend.next/继续观看) ③我的路线(当前路线+完成进度+路线内下一部) ④宇宙探索入口(时间线→panorama/角色关系→explore Tab/阵营探索→characters) ⑤热门角色(角色+关联数+查看故事线→character详情) ⑥最近观看
+- 已改文件：home.wxml / home.wxss / home.js 全部重写；app.json(tabBar 选中金 #F2B233，上轮已改)
+- 双态：仅继续观看卡随 hasProgress 变化；我的路线/热门角色/探索入口结构常驻
+- 数据零改动：全部来自 models 单一源；hotChars 关联数由 charAppearances 反查；我的路线用 saved_routes/route.items/watched 汇总；跳转目标与既有页面一致（未新增/改业务）
+- 验证：node --check home.js=SYNTAX_OK；home.wxss 仅 .home-page 内 Token 定义含 hex，组件规则全 var()；wxml 绑定与 js 输出对齐
+- 产出：AI生成文件/小程序/V1.2首页重构_修改说明与自测报告.md（修改说明+自测10项+新旧差异+待确认 L1截图/L2 icon资源/L3角色阶段色口径）
 - 待用户：微信开发者工具截首页图 → 本 AI 据截图微调 → 待策划 AI/用户确认后方可进入 ② 路线页（未确认不继续）
-- 待确认项：L2 角色阶段色口径（首登场 phase vs 统一色）；L3 "新手入坑"入口复用 routes.png 是否满足
 
 ============================================================
 策划 AI 决策区（请回写）

@@ -1,8 +1,9 @@
 /* 首页 home（Tab1）· V1.2 重构样式
- * 规范来源：《MCU观影导航 V1.2 UI Design System》（2026-08-25）
+ * 规范来源：《MCU观影导航 V1.2 产品视觉重构》（2026-08-25）
  * 调色板在 .home-page 作用域覆盖为 V1.2 值，组件规则一律引用 CSS 变量（禁裸 hex）。
  * 单位换算：规范 px 按移动端设计基准（375pt 画布）换算 rpx，1px = 2rpx（750rpx=375pt）。
  * 阶段色 poster-pN 沿用既有 phase token（规范未重定义阶段色，保持全局一致）。
+ * 入口统一视觉：所有入口采用「标记 + 标题 + 箭头」一致行式，禁默认微信组件、禁混用图标库。
  */
 
 /* —— V1.2 调色板（仅作用于首页，不污染其他页面） —— */
@@ -18,7 +19,7 @@
   --line: #202938;
   --white: #FFFFFF;
 
-  padding: 32rpx;            /* 页面左右边距 16px */
+  padding: 32rpx;            /* 页面边距 16px */
   min-height: 100vh;
   box-sizing: border-box;
   background: var(--bg);
@@ -27,12 +28,11 @@
 /* 模块间距 24px */
 .brand-area,
 .continue-card,
-.quick-row,
-.route-rec,
+.my-route,
 .section { margin-bottom: 48rpx; }
 .spacer-lg { height: 24rpx; }
 
-/* —— ① 顶部品牌区 —— */
+/* —— ① 品牌区域 —— */
 .brand-area {
   display: flex;
   align-items: center;
@@ -47,7 +47,7 @@
   flex-shrink: 0;
 }
 .brand-title {
-  font-size: 48rpx;          /* 页面标题 24px */
+  font-size: 48rpx;          /* 标题 24px */
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.25;
@@ -60,9 +60,9 @@
 
 /* —— 通用卡片 —— */
 .card {
-  background: var(--surface-1);   /* 主卡片 #161D2B */
-  border-radius: 32rpx;           /* 卡片圆角 16px */
-  padding: 32rpx;                 /* 卡片内部 16px */
+  background: var(--surface-1);   /* 一级卡片 #161D2B */
+  border-radius: 32rpx;           /* 圆角 16px */
+  padding: 32rpx;                 /* 卡片内边距 16px */
   box-sizing: border-box;
 }
 .card-title {
@@ -71,6 +71,21 @@
   color: var(--text-main);
   margin-bottom: 20rpx;
 }
+
+/* —— 强调按钮（仅用于 开始/继续/当前推荐，禁止大面积使用） —— */
+.btn-accent {
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: 28rpx;
+  font-weight: 600;
+  border-radius: 24rpx;      /* 按钮圆角 12px */
+  padding: 18rpx 40rpx;
+  text-align: center;
+  flex-shrink: 0;
+  margin-left: 24rpx;
+}
+.btn-sm { padding: 14rpx 32rpx; }
+.btn-hover { opacity: 0.88; }
 
 /* —— ② 继续观看卡 —— */
 .continue-body {
@@ -89,76 +104,103 @@
   color: var(--text-sub);
   margin-top: 8rpx;
 }
-.movie-progress {
+.movie-progress-label {
   font-size: 24rpx;          /* 辅助 12px */
   color: var(--text-weak);
-  margin-top: 6rpx;
+  margin-top: 10rpx;
 }
-
-/* —— 强调按钮（仅用于 开始/继续/当前推荐，禁止大面积使用） —— */
-.btn-accent {
-  background: var(--gold);
-  color: var(--gold-btn-text);
-  font-size: 28rpx;
-  font-weight: 600;
-  border-radius: 24rpx;      /* 按钮圆角 12px */
-  padding: 18rpx 40rpx;
-  text-align: center;
-  flex-shrink: 0;
-  margin-left: 24rpx;
-}
-.btn-sm { padding: 14rpx 32rpx; }
-.btn-hover { opacity: 0.88; }
-
-/* —— ③ 三个快捷入口（横向卡片，统一 icon） —— */
-.quick-row {
-  display: flex;
-  justify-content: space-between;
-}
-.quick-card {
-  flex: 1;
-  background: var(--surface-2);   /* 次级卡片 #202938 */
-  border-radius: 32rpx;
-  padding: 32rpx 16rpx;
-  margin-right: 20rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
-}
-.quick-card:last-child { margin-right: 0; }
-.quick-ic {
-  width: 56rpx;
-  height: 56rpx;
-  margin-bottom: 16rpx;
-}
-.quick-title {
-  font-size: 28rpx;
-  color: var(--text-main);
-  font-weight: 500;
-}
-.quick-hover { border: 1rpx solid var(--gold); }
-
-/* —— ④ 新手路线推荐 —— */
-.route-rec {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.route-rec-info { flex: 1; min-width: 0; }
-.route-rec-info .card-title { margin-bottom: 10rpx; }
-.route-rec-sub {
+.movie-progress {
   font-size: 28rpx;
   color: var(--text-sub);
+  margin-top: 2rpx;
 }
 
-/* —— ⑤ 热门角色 —— */
+/* —— ③ 我的路线 —— */
+.route-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.route-info { flex: 1; min-width: 0; margin-right: 24rpx; }
+.route-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: var(--text-main);
+}
+.route-progress {
+  font-size: 28rpx;
+  color: var(--text-sub);
+  margin-top: 8rpx;
+}
+.route-next {
+  text-align: right;
+  flex-shrink: 0;
+}
+.next-label {
+  font-size: 24rpx;
+  color: var(--text-weak);
+}
+.next-name {
+  font-size: 28rpx;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 4rpx;
+}
+
+/* —— ④ 宇宙探索入口（统一入口行式） —— */
 .module-title {
   font-size: 36rpx;          /* 模块标题 18px */
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 24rpx;
 }
+.explore-row {
+  display: flex;
+  flex-direction: column;
+}
+.explore-card {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: 32rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
+  box-sizing: border-box;
+}
+.explore-card:last-child { margin-bottom: 0; }
+.explore-ic {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  background: var(--surface-1);
+  color: var(--gold);
+  font-size: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+.explore-body { flex: 1; min-width: 0; }
+.explore-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+.explore-desc {
+  font-size: 24rpx;
+  color: var(--text-weak);
+  margin-top: 6rpx;
+}
+.explore-arrow {
+  font-size: 40rpx;
+  color: var(--text-weak);
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.explore-hover { border: 1rpx solid var(--gold); }
+
+/* —— ⑤ 热门角色（故事入口） —— */
 .char-row {
   display: flex;
   justify-content: space-between;
@@ -197,6 +239,12 @@
   color: var(--text-weak);
   margin-top: 6rpx;
 }
+.char-story {
+  font-size: 24rpx;
+  color: var(--gold);
+  margin-top: 12rpx;
+}
+.char-hover { border: 1rpx solid var(--gold); }
 
 /* —— ⑥ 最近观看（横向卡片） —— */
 .recent-row {

@@ -1,16 +1,19 @@
-<!-- 首页 home（Tab1）· V1.2 重构（严格按《V1.2 UI Design System》）
+<!-- 首页 home（Tab1）· V1.2 重构（严格按《V1.2 产品视觉重构》规范）
      固定结构（自上而下，禁止删除模块）：
-       ① 顶部品牌区 → ② 继续观看卡 → ③ 快捷入口 → ④ 新手路线推荐 → ⑤ 热门角色 → ⑥ 最近观看 → Tab
+       ① 品牌区域 → ② 继续观看卡 → ③ 我的路线 → ④ 宇宙探索入口
+       → ⑤ 热门角色 → ⑥ 最近观看 → Tab
      约束：不新增功能 / 不改数据结构 / 不改跳转逻辑 / 不自行设计（按规范执行）
-     双态：仅「继续观看卡」内容随 hasProgress 变化（新用户=开始观看 / 老用户=继续观看），其余模块常驻 -->
+     双态：仅「继续观看卡」内容随 hasProgress 变化
+       - 新人：从钢铁侠开始 / Phase 1 / 开始观看
+       - 老用户：当前观看进度 / 下一部电影 / 继续观看 -->
 <view class="mcu-page home-page">
 
-  <!-- ═══ ① 顶部品牌区 ═══ -->
+  <!-- ═══ ① 品牌区域 ═══ -->
   <view class="brand-area">
     <view class="brand-mark"></view>
     <view class="brand-text">
       <view class="brand-title">MCU观影导航</view>
-      <view class="brand-sub">找到属于你的漫威观影路线</view>
+      <view class="brand-sub">你的漫威宇宙旅程</view>
     </view>
   </view>
 
@@ -19,39 +22,55 @@
     <view class="card-title">继续观看</view>
     <view class="continue-body">
       <view class="continue-meta">
-        <view class="movie-name">{{continueCard.movieName}}</view>
+        <view class="movie-name">{{continueCard.mainText}}</view>
         <view class="movie-phase">{{continueCard.phaseText}}</view>
-        <view class="movie-progress">{{continueCard.progressText}}</view>
+        <view wx:if="{{continueCard.progressLabel}}" class="movie-progress-label">{{continueCard.progressLabel}}</view>
+        <view wx:if="{{continueCard.progressText}}" class="movie-progress">{{continueCard.progressText}}</view>
       </view>
       <view class="btn-accent" data-id="{{continueCard.movieId}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{continueCard.buttonText}}</view>
     </view>
   </view>
 
-  <!-- ═══ ③ 三个快捷入口 ═══ -->
-  <view class="quick-row">
-    <view class="quick-card" wx:for="{{quickEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goTab" hover-class="quick-hover" hover-stay-time="80">
-      <image class="quick-ic" src="{{item.icon}}" mode="aspectFit"/>
-      <view class="quick-title">{{item.title}}</view>
+  <!-- ═══ ③ 我的路线 ═══ -->
+  <view class="card my-route">
+    <view class="card-title">我的路线</view>
+    <view class="route-body">
+      <view class="route-info">
+        <view class="route-name">{{myRoute.name}}</view>
+        <view class="route-progress">{{myRoute.progressText}}</view>
+      </view>
+      <view class="route-next">
+        <view class="next-label">下一部推荐</view>
+        <view class="next-name">{{myRoute.nextName}}</view>
+      </view>
+    </view>
+    <view wx:if="{{myRoute.nextId}}" class="btn-accent btn-sm" data-id="{{myRoute.nextId}}" bindtap="goMovie" hover-class="btn-hover" hover-stay-time="80">继续路线</view>
+  </view>
+
+  <!-- ═══ ④ 宇宙探索入口 ═══ -->
+  <view class="section">
+    <view class="module-title">宇宙探索</view>
+    <view class="explore-row">
+      <view class="explore-card" wx:for="{{exploreEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goExplore" hover-class="explore-hover" hover-stay-time="80">
+        <view class="explore-ic">{{item.glyph}}</view>
+        <view class="explore-body">
+          <view class="explore-title">{{item.title}}</view>
+          <view class="explore-desc">{{item.desc}}</view>
+        </view>
+        <view class="explore-arrow">›</view>
+      </view>
     </view>
   </view>
 
-  <!-- ═══ ④ 新手路线推荐 ═══ -->
-  <view class="card route-rec">
-    <view class="route-rec-info">
-      <view class="card-title">新手路线推荐</view>
-      <view class="route-rec-sub">{{routeRec.name}} · 共 {{routeRec.count}} 部</view>
-    </view>
-    <view class="btn-accent btn-sm" data-key="route" bindtap="goTab" hover-class="btn-hover" hover-stay-time="80">{{routeRec.buttonText}}</view>
-  </view>
-
-  <!-- ═══ ⑤ 热门角色 ═══ -->
+  <!-- ═══ ⑤ 热门角色（故事入口） ═══ -->
   <view class="section">
     <view class="module-title">热门角色</view>
     <view class="char-row">
-      <view class="char-card" wx:for="{{hotChars}}" wx:key="id">
+      <view class="char-card" wx:for="{{hotChars}}" wx:key="id" data-id="{{item.id}}" bindtap="goChar" hover-class="char-hover" hover-stay-time="80">
         <view class="char-avatar poster-p{{item.phase}}">{{item.initial}}</view>
         <view class="char-name">{{item.name}}</view>
         <view class="char-count">关联 {{item.count}} 部作品</view>
+        <view class="char-story">查看故事线 ›</view>
       </view>
     </view>
   </view>
