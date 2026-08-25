@@ -1,12 +1,12 @@
-<!-- 首页 home（Tab1）· V1.2 重构（严格按《V1.2 UI Design System》+《首页重设计方案》）
+<!-- 首页 home（Tab1）· V1.2 重构（Step 2 按《UI Design System》+《首页高保真设计稿》实现）
      固定结构（自上而下，禁止删除模块）：
        ① 品牌入口 → ② 继续观看(Hero) → ③ 我的路线(Content)
-       → ④ 宇宙探索(三卡) → ⑤ 热门角色(横滚) → ⑥ 最近观看(横滚)
+       → ④ 宇宙探索(纵向三行) → ⑤ 热门角色(横滚) → ⑥ 最近观看(横滚)
      约束：不新增功能 / 不改数据结构 / 不改跳转逻辑 / 不自行设计（按规范执行）
      双态：仅「继续观看」内容随 hasProgress 变化
        - 新人：从钢铁侠开始 / Phase 1 / 开始观看
        - 老用户：当前观看进度 / 下一部电影 / 继续观看
-     图标：品牌盾牌 + 探索入口暂用 Unicode 占位（设计系统 §5.2.3 允许），待设计提供 SVG 替换 -->
+     图标：品牌金色竖条（高保真§①）；探索入口 Unicode 占位（设计系统 §5.2.3 允许），待 SVG 替换 -->
 <view class="mcu-page home-page">
 
   <!-- ═══ ① 品牌入口 ═══ -->
@@ -49,13 +49,16 @@
     <view wx:else class="route-done">已完成当前路线</view>
   </view>
 
-  <!-- ═══ ④ 宇宙探索入口（三卡横向等分，仅图标+名称） ═══ -->
+  <!-- ═══ ④ 宇宙探索入口（三级卡片 ×3，纵向全宽；图标容器+名称+右箭头，高保真§④） ═══ -->
   <view class="section">
     <view class="module-title">宇宙探索</view>
     <view class="explore-row">
-      <view class="explore-card card-compact" wx:for="{{exploreEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goExplore" hover-class="explore-hover" hover-stay-time="80">
-        <view class="explore-ic">{{item.glyph}}</view>
+      <view class="explore-card" wx:for="{{exploreEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goExplore" hover-class="explore-hover" hover-stay-time="80">
+        <view class="explore-ic-wrap">
+          <view class="explore-ic">{{item.glyph}}</view>
+        </view>
         <view class="explore-title">{{item.title}}</view>
+        <view class="explore-arrow">›</view>
       </view>
     </view>
   </view>
@@ -65,7 +68,7 @@
     <view class="module-title">热门角色</view>
     <scroll-view class="char-scroll" scroll-x enable-flex>
       <view class="char-row">
-        <view class="char-card card-compact" wx:for="{{hotChars}}" wx:key="id" data-id="{{item.id}}" bindtap="goChar" hover-class="char-hover" hover-stay-time="80">
+        <view class="char-card" wx:for="{{hotChars}}" wx:key="id" data-id="{{item.id}}" bindtap="goChar" hover-class="char-hover" hover-stay-time="80">
           <view class="char-avatar poster-p{{item.phase}}">{{item.initial}}</view>
           <view class="char-name">{{item.name}}</view>
           <view class="char-count">关联 {{item.count}} 部作品</view>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=375, initial-scale=1.0" />
+<title>MCU观影导航 V1.2 首页 · 视觉预览（Step2 高保真版 · 静态还原，非真机截图）</title>
+<style>
+  :root{
+    --bg:#080B12; --surface-1:#161D2B; --surface-2:#1E2636; --surface-3:#2A3447;
+    --gold:#F2B233; --gold-btn-text:#1A1206;
+    --text-main:#E8ECF4; --text-sub:#8E98AA; --text-weak:#555F73;
+    --p1:#5B8DEF; --p2:#28B487; --p3:#F0A932; --p4:#8B6FE8; --p5:#E8483F; --p6:#C25B8E;
+    --gold-a06:rgba(242,178,51,0.06); --gold-a20:rgba(242,178,51,0.20);
+    --p1-a60:rgba(91,141,239,0.60); --p2-a60:rgba(40,180,135,0.60); --p3-a60:rgba(240,169,50,0.60); --p4-a60:rgba(139,111,232,0.60); --p5-a60:rgba(232,72,63,0.60); --p6-a60:rgba(194,91,142,0.60);
+    --white-a50:rgba(255,255,255,0.5); --white-a60:rgba(255,255,255,0.6);
+    --fs-d:24px; --fs-ds:20px; --fs-t:17px; --fs-b:14px; --fs-c:12px; --fs-m:10px;
+    --s-xs:4px; --s-sm:8px; --s-md:12px; --s-lg:16px; --s-xl:24px; --s-2xl:32px; --page-x:16px;
+    --font:-apple-system,"PingFang SC","Helvetica Neue",Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:#000; font-family:var(--font); display:flex; justify-content:center; padding:24px 0;}
+  .phone{width:375px; background:var(--bg); min-height:760px; padding:var(--s-2xl) var(--page-x); color:var(--text-main); font-size:var(--fs-b); line-height:1.5;}
+  .toggle{position:fixed; top:16px; right:16px; z-index:9; background:var(--surface-2); border:1px solid var(--surface-3); color:var(--gold); font-size:12px; padding:8px 12px; border-radius:8px; cursor:pointer;}
+  /* ① brand */
+  .brand{display:flex; align-items:center; margin-bottom:var(--s-xl);}
+  .brand-mark{width:5px; height:32px; border-radius:3px; background:var(--gold); margin-right:10px; flex-shrink:0;}
+  .brand-title{font-size:var(--fs-d); font-weight:700; color:var(--text-main); line-height:1.25;}
+  .brand-sub{font-size:var(--fs-b); color:var(--text-sub); margin-top:3px;}
+  /* card title */
+  .card-title{font-size:var(--fs-t); font-weight:600; color:var(--text-sub); margin-bottom:var(--s-lg);}
+  .module-title{font-size:var(--fs-t); font-weight:600; color:var(--text-main); margin-bottom:var(--s-lg);}
+  /* ② hero */
+  .continue{background:linear-gradient(135deg,var(--gold-a06),var(--surface-1)); border:2px solid var(--gold-a20); border-radius:12px; padding:16px; margin-bottom:var(--s-xl);}
+  .movie-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
+  .movie-phase{font-size:var(--fs-c); color:var(--text-weak); margin-top:var(--s-xs);}
+  .movie-progress-label{font-size:var(--fs-m); color:var(--text-weak); margin-top:var(--s-sm);}
+  .movie-progress{font-size:var(--fs-c); color:var(--gold); font-weight:600; margin-top:var(--s-xs);}
+  .btn-accent{width:100%; background:var(--gold); color:var(--gold-btn-text); font-size:var(--fs-t); font-weight:600; border-radius:8px; height:44px; line-height:44px; text-align:center; margin-top:var(--s-lg);}
+  /* ③ my route */
+  .myroute{background:var(--surface-2); border:1px solid var(--surface-3); border-radius:8px; padding:12px; margin-bottom:var(--s-xl);}
+  .route-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
+  .route-progress{font-size:var(--fs-c); color:var(--text-weak); margin-top:var(--s-xs);}
+  .route-next{margin-top:var(--s-lg);}
+  .next-label{font-size:var(--fs-m); color:var(--text-weak);}
+  .next-name{font-size:var(--fs-b); font-weight:500; color:var(--gold); margin-top:var(--s-xs);}
+  .btn-ghost{display:inline-block; color:var(--gold); font-size:var(--fs-b); font-weight:500; margin-top:var(--s-lg);}
+  /* ④ explore */
+  .explore-card{display:flex; align-items:center; background:var(--surface-2); border-radius:6px; min-height:36px; padding:10px 12px; margin-bottom:8px;}
+  .explore-ic-wrap{width:24px; height:24px; border-radius:6px; background:var(--surface-1); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .explore-ic{font-size:14px; line-height:1; color:var(--gold);}
+  .explore-title{font-size:var(--fs-b); font-weight:500; color:var(--text-main); margin-left:10px;}
+  .explore-arrow{margin-left:auto; font-size:var(--fs-c); color:var(--text-weak);}
+  .explore-hint{margin-bottom:var(--s-xl);}
+  /* ⑤ hot chars */
+  .char-scroll{display:flex; gap:8px; margin-bottom:var(--s-xl); overflow-x:auto;}
+  .char-card{flex-shrink:0; width:78px; background:var(--surface-2); border-radius:6px; padding:10px 6px; display:flex; flex-direction:column; align-items:flex-start;}
+  .char-avatar{width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:var(--fs-ds); font-weight:700; color:var(--white-a60); margin-bottom:var(--s-sm);}
+  .char-name{font-size:var(--fs-b); color:var(--text-main); font-weight:500;}
+  .char-count{font-size:var(--fs-c); color:var(--text-weak); margin-top:3px;}
+  .char-story{font-size:var(--fs-c); color:var(--gold); font-weight:400; margin-top:6px;}
+  /* ⑥ recent */
+  .recent-scroll{display:flex; gap:12px; margin-bottom:var(--s-2xl); overflow-x:auto;}
+  .recent-item{flex-shrink:0; width:60px; display:flex; flex-direction:column; align-items:center;}
+  .recent-poster{width:60px; height:80px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:var(--fs-d); font-weight:700; color:var(--white-a50);}
+  .recent-name{font-size:var(--fs-c); color:var(--text-sub); margin-top:6px; width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;}
+  .p1{background:linear-gradient(135deg,var(--p1),var(--p1-a60));}
+  .p2{background:linear-gradient(135deg,var(--p2),var(--p2-a60));}
+  .p3{background:linear-gradient(135deg,var(--p3),var(--p3-a60));}
+  .p4{background:linear-gradient(135deg,var(--p4),var(--p4-a60));}
+  .p5{background:linear-gradient(135deg,var(--p5),var(--p5-a60));}
+  .p6{background:linear-gradient(135deg,var(--p6),var(--p6-a60));}
+  .note{font-size:11px; color:var(--text-weak); text-align:center; margin-top:16px; line-height:1.6;}
+</style>
+</head>
+<body>
+<button class="toggle" onclick="toggleState()">切换：新人态 / 老用户态</button>
+<div class="phone" id="screen">
+
+  <!-- ① 品牌入口 -->
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-text">
+      <div class="brand-title">MCU观影导航</div>
+      <div class="brand-sub">你的漫威宇宙旅程</div>
+    </div>
+  </div>
+
+  <!-- ② 继续观看 Hero -->
+  <div class="continue">
+    <div class="card-title">继续观看</div>
+    <div class="continue-body">
+      <div class="movie-name" id="cName">从钢铁侠开始</div>
+      <div class="movie-phase" id="cPhase">Phase 1</div>
+      <div class="movie-progress-label" id="cLabel" style="display:none">当前观看进度</div>
+      <div class="movie-progress" id="cProg" style="display:none">已看 12 / 59</div>
+      <div class="btn-accent" id="cBtn">开始观看</div>
+    </div>
+  </div>
+
+  <!-- ③ 我的路线 -->
+  <div class="myroute">
+    <div class="card-title">我的路线</div>
+    <div class="route-info">
+      <div class="route-name">新手入坑</div>
+      <div class="route-progress">已完成 12 / 59 部</div>
+    </div>
+    <div class="route-next">
+      <div class="next-label">下一部推荐</div>
+      <div class="next-name">奇异博士</div>
+    </div>
+    <div class="btn-ghost">继续路线</div>
+  </div>
+
+  <!-- ④ 宇宙探索 -->
+  <div class="explore-hint">
+    <div class="module-title">宇宙探索</div>
+    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">◷</div></div><div class="explore-title">时间线</div><div class="explore-arrow">›</div></div>
+    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">✦</div></div><div class="explore-title">角色关系</div><div class="explore-arrow">›</div></div>
+    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">◈</div></div><div class="explore-title">阵营探索</div><div class="explore-arrow">›</div></div>
+  </div>
+
+  <!-- ⑤ 热门角色 -->
+  <div>
+    <div class="module-title">热门角色</div>
+    <div class="char-scroll">
+      <div class="char-card"><div class="char-avatar p1">钢</div><div class="char-name">钢铁侠</div><div class="char-count">关联 26 部作品</div><div class="char-story">查看故事线</div></div>
+      <div class="char-card"><div class="char-avatar p1">美</div><div class="char-name">美国队长</div><div class="char-count">关联 24 部作品</div><div class="char-story">查看故事线</div></div>
+      <div class="char-card"><div class="char-avatar p1">雷</div><div class="char-name">雷神</div><div class="char-count">关联 22 部作品</div><div class="char-story">查看故事线</div></div>
+      <div class="char-card"><div class="char-avatar p3">蜘</div><div class="char-name">蜘蛛侠</div><div class="char-count">关联 18 部作品</div><div class="char-story">查看故事线</div></div>
+    </div>
+  </div>
+
+  <!-- ⑥ 最近观看 -->
+  <div>
+    <div class="module-title">最近观看</div>
+    <div class="recent-scroll">
+      <div class="recent-item"><div class="recent-poster p1">钢</div><div class="recent-name">钢铁侠</div></div>
+      <div class="recent-item"><div class="recent-poster p2">浩</div><div class="recent-name">无敌浩克</div></div>
+      <div class="recent-item"><div class="recent-poster p2">钢</div><div class="recent-name">钢铁侠2</div></div>
+      <div class="recent-item"><div class="recent-poster p2">雷</div><div class="recent-name">雷神</div></div>
+      <div class="recent-item"><div class="recent-poster p3">复</div><div class="recent-name">复仇者联盟</div></div>
+      <div class="recent-item"><div class="recent-poster p3">钢</div><div class="recent-name">钢铁侠3</div></div>
+    </div>
+  </div>
+
+  <div class="note">本预览为 Step2 高保真版静态还原（同一组 V1.2 Token + 高保真布局），用于布局/配色核验。<br>正式验收需你在微信开发者工具编译 mcu-miniprogram/ 截取真机首页。</div>
+</div>
+
+<script>
+let returning = false;
+function toggleState(){
+  returning = !returning;
+  document.getElementById('cName').textContent = returning ? '复仇者联盟' : '从钢铁侠开始';
+  document.getElementById('cPhase').textContent = returning ? 'Phase 3 · 无限传奇' : 'Phase 1';
+  document.getElementById('cLabel').style.display = returning ? 'block' : 'none';
+  document.getElementById('cProg').style.display = returning ? 'block' : 'none';
+  document.getElementById('cBtn').textContent = returning ? '继续观看' : '开始观看';
+}
+</script>
+</body>
+</html>
