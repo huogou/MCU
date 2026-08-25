@@ -1,4 +1,4 @@
-<!-- 首页 home（Tab1）· V1.2 重构（Step 2 按《UI Design System》+《首页高保真设计稿》实现）
+<!-- 首页 home（Tab1）· V1.2 重构（Final 校准：按《MCU-V1.2-UI-Design-System-Final》+ 设计验收意见 P0/P1）
      固定结构（自上而下，禁止删除模块）：
        ① 品牌入口 → ② 继续观看(Hero) → ③ 我的路线(Content)
        → ④ 宇宙探索(纵向三行) → ⑤ 热门角色(横滚) → ⑥ 最近观看(横滚)
@@ -6,7 +6,7 @@
      双态：仅「继续观看」内容随 hasProgress 变化
        - 新人：从钢铁侠开始 / Phase 1 / 开始观看
        - 老用户：当前观看进度 / 下一部电影 / 继续观看
-     图标：品牌金色竖条（高保真§①）；探索入口 Unicode 占位（设计系统 §5.2.3 允许），待 SVG 替换 -->
+     图标：品牌金色竖条（Final§2.2①）；探索入口/箭头 Unicode 占位（Final §1.8 许可），待 SVG 替换 -->
 <view class="mcu-page home-page">
 
   <!-- ═══ ① 品牌入口 ═══ -->
@@ -72,7 +72,7 @@
           <view class="char-avatar poster-p{{item.phase}}">{{item.initial}}</view>
           <view class="char-name">{{item.name}}</view>
           <view class="char-count">关联 {{item.count}} 部作品</view>
-          <view class="char-story">查看故事线</view>
+          <view class="char-story">查看故事线 ›</view>
         </view>
       </view>
     </scroll-view>

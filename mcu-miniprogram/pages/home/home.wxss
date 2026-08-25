@@ -1,7 +1,9 @@
-/* 首页 home（Tab1）· V1.2 重构样式（Step 2）
- * 依据：Design System（系统基准/Token）+ 首页高保真设计稿（页面级细节基准）
- * 裁定：两者冲突时——基础组件样式随 Design System（§8.2 Primary 34rpx、§② movie-name 600），
- *       页面级细节随高保真（品牌竖条/探索纵向/角色卡 156rpx/头像 88rpx/最近观看 24rpx 等）。
+/* 首页 home（Tab1）· V1.2 重构样式（Final 校准）
+ * 依据：《MCU-V1.2-UI-Design-System-Final.md》（统一终稿）
+ * 本版按设计侧《首页V1.2设计验收意见》P0+P1 校准：
+ *   P0① CTA 字号 34→28rpx；P0② 移除全部 500 字重（4处→400）+ movie-progress 600→400；
+ *   P0③ 角色卡 align-items center；P1④ movie-phase 24→28rpx、weak→sub；
+ *   P1⑤ 进度值 600→400；P1⑥ card-title margin-bottom 32→24rpx；另按 Final§⑤ 补故事线 "›"。
  * 颜色一律 var()，组件规则零裸 hex；字号 5 级、卡片 3 级、模块间距 48rpx。
  */
 
@@ -20,7 +22,7 @@
   margin-bottom: var(--space-xl);
 }
 
-/* —— ① 品牌入口（金色竖条，高保真§①：10×64rpx，无图标） —— */
+/* —— ① 品牌入口（金色竖条，Final§2.2①：10×64rpx，无图标） —— */
 .brand-area {
   display: flex;
   align-items: center;
@@ -51,10 +53,10 @@
   font-size: var(--fs-title);            /* 34rpx Title */
   font-weight: 600;
   color: var(--text-sub);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);        /* 24rpx（Final §1.7 模块标题与内容间距） */
 }
 
-/* —— ② 继续观看 Hero Card（Design System §6.2 + 高保真§②） —— */
+/* —— ② 继续观看 Hero Card（Final §2.2②） —— */
 .continue-card {
   /* 在全局 .card-hero 基础上追加金色微渐变 + 金色边框 */
   background: linear-gradient(135deg, var(--gold-a06), var(--surface-1));
@@ -67,12 +69,12 @@
 .continue-meta { min-width: 0; }
 .movie-name {
   font-size: var(--fs-title);            /* 34rpx */
-  font-weight: 600;                      /* Design System §②（600）优先于高保真新人态 700 */
+  font-weight: 600;                      /* Final §②：600 */
   color: var(--text-main);
 }
 .movie-phase {
-  font-size: var(--fs-caption);          /* 24rpx Caption */
-  color: var(--text-weak);
+  font-size: var(--fs-body);             /* 28rpx Body（Final §②，P1④ 校准） */
+  color: var(--text-sub);                /* 描述层（P1④ 校准） */
   margin-top: var(--space-xs);
 }
 .movie-progress-label {
@@ -83,7 +85,7 @@
 .movie-progress {
   font-size: var(--fs-caption);          /* 24rpx */
   color: var(--gold);
-  font-weight: 600;
+  font-weight: 400;                      /* Final §②：400（P1⑤/P0② 校准，金色已承担强调） */
   margin-top: var(--space-xs);
 }
 
@@ -93,7 +95,7 @@
   box-sizing: border-box;
   background: var(--gold);
   color: var(--gold-btn-text);
-  font-size: var(--fs-title);            /* 34rpx（Design System §8.2 Primary） */
+  font-size: var(--fs-body);             /* 28rpx（Final §1.9 Primary，P0① 校准） */
   font-weight: 600;
   border-radius: 16rpx;
   height: 88rpx;
@@ -108,12 +110,12 @@
   display: inline-block;
   color: var(--gold);
   font-size: var(--fs-body);             /* 28rpx */
-  font-weight: 500;
+  font-weight: 400;                      /* P0② 校准（Final 禁用 500） */
   margin-top: var(--space-lg);
 }
 .btn-ghost.btn-hover { opacity: 0.7; }
 
-/* —— ③ 我的路线（Content Card，纵向堆叠；高保真§③） —— */
+/* —— ③ 我的路线（Content Card，纵向堆叠；Final §2.2③） —— */
 .route-body { display: block; }
 .route-info { min-width: 0; }
 .route-name {
@@ -133,8 +135,8 @@
 }
 .next-name {
   font-size: var(--fs-body);             /* 28rpx */
-  font-weight: 500;
-  color: var(--gold);                    /* 高保真§③：下一部片名金色 */
+  font-weight: 400;                      /* P0② 校准 */
+  color: var(--gold);                    /* Final §③：推荐片名金色 */
   margin-top: var(--space-xs);
 }
 .route-done {
@@ -143,12 +145,12 @@
   margin-top: var(--space-lg);
 }
 
-/* —— ④ 宇宙探索入口（纵向全宽三行；高保真§④：72rpx 行 + 48rpx 图标容器 + 名称 + 右箭头） —— */
+/* —— ④ 宇宙探索入口（纵向全宽三行；Final §2.2④） —— */
 .module-title {
   font-size: var(--fs-title);            /* 34rpx Title，用 --text-main 突出模块标题 */
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);        /* 24rpx（Final §1.7） */
 }
 .explore-row { display: block; }
 .explore-card {
@@ -175,11 +177,11 @@
 .explore-ic {
   font-size: 28rpx;
   line-height: 1;
-  color: var(--gold);                    /* 高保真§④：图标金色 */
+  color: var(--gold);                    /* Final §2.2④：图标金色 */
 }
 .explore-title {
   font-size: var(--fs-body);             /* 28rpx */
-  font-weight: 500;
+  font-weight: 400;                      /* P0② 校准 */
   color: var(--text-main);
   margin-left: 20rpx;
 }
@@ -190,7 +192,7 @@
 }
 .explore-hover { border: 1rpx solid var(--gold-a20); }
 
-/* —— ⑤ 热门角色（横向滚动；高保真§⑤：卡宽 156rpx / 头像 88rpx / 故事线 24rpx 400） —— */
+/* —— ⑤ 热门角色（横向滚动；Final §2.2⑤：卡 156rpx / 头像 88rpx / 居中） —— */
 .char-scroll {
   width: 100%;
   white-space: nowrap;
@@ -204,7 +206,7 @@
   width: 156rpx;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;                   /* P0③ 校准（Final §⑤：居中） */
   background: var(--surface-2);
   border-radius: 12rpx;
   padding: 20rpx 12rpx;
@@ -226,7 +228,7 @@
 .char-name {
   font-size: var(--fs-body);             /* 28rpx */
   color: var(--text-main);
-  font-weight: 500;
+  font-weight: 400;                      /* P0② 校准 */
 }
 .char-count {
   font-size: var(--fs-caption);          /* 24rpx */
@@ -241,7 +243,7 @@
 }
 .char-hover { border: 1rpx solid var(--gold-a20); }
 
-/* —— ⑥ 最近观看（横向滚动；高保真§⑥：项目间距 24rpx / 片名 24rpx） —— */
+/* —— ⑥ 最近观看（横向滚动；Final §2.2⑥） —— */
 .recent-scroll {
   width: 100%;
   white-space: nowrap;

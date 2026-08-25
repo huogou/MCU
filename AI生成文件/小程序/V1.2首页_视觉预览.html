@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=375, initial-scale=1.0" />
-<title>MCU观影导航 V1.2 首页 · 视觉预览（Step2 高保真版 · 静态还原，非真机截图）</title>
+<title>MCU观影导航 V1.2 首页 · 视觉预览（Final 校准版 · 静态还原，非真机截图）</title>
 <style>
   :root{
     --bg:#080B12; --surface-1:#161D2B; --surface-2:#1E2636; --surface-3:#2A3447;
@@ -27,35 +27,35 @@
   .brand-title{font-size:var(--fs-d); font-weight:700; color:var(--text-main); line-height:1.25;}
   .brand-sub{font-size:var(--fs-b); color:var(--text-sub); margin-top:3px;}
   /* card title */
-  .card-title{font-size:var(--fs-t); font-weight:600; color:var(--text-sub); margin-bottom:var(--s-lg);}
-  .module-title{font-size:var(--fs-t); font-weight:600; color:var(--text-main); margin-bottom:var(--s-lg);}
+  .card-title{font-size:var(--fs-t); font-weight:600; color:var(--text-sub); margin-bottom:var(--s-md);}
+  .module-title{font-size:var(--fs-t); font-weight:600; color:var(--text-main); margin-bottom:var(--s-md);}
   /* ② hero */
   .continue{background:linear-gradient(135deg,var(--gold-a06),var(--surface-1)); border:2px solid var(--gold-a20); border-radius:12px; padding:16px; margin-bottom:var(--s-xl);}
   .movie-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
-  .movie-phase{font-size:var(--fs-c); color:var(--text-weak); margin-top:var(--s-xs);}
+  .movie-phase{font-size:var(--fs-b); color:var(--text-sub); margin-top:var(--s-xs);}
   .movie-progress-label{font-size:var(--fs-m); color:var(--text-weak); margin-top:var(--s-sm);}
-  .movie-progress{font-size:var(--fs-c); color:var(--gold); font-weight:600; margin-top:var(--s-xs);}
-  .btn-accent{width:100%; background:var(--gold); color:var(--gold-btn-text); font-size:var(--fs-t); font-weight:600; border-radius:8px; height:44px; line-height:44px; text-align:center; margin-top:var(--s-lg);}
+  .movie-progress{font-size:var(--fs-c); color:var(--gold); font-weight:400; margin-top:var(--s-xs);}
+  .btn-accent{width:100%; background:var(--gold); color:var(--gold-btn-text); font-size:var(--fs-b); font-weight:600; border-radius:8px; height:44px; line-height:44px; text-align:center; margin-top:var(--s-lg);}
   /* ③ my route */
   .myroute{background:var(--surface-2); border:1px solid var(--surface-3); border-radius:8px; padding:12px; margin-bottom:var(--s-xl);}
   .route-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
   .route-progress{font-size:var(--fs-c); color:var(--text-weak); margin-top:var(--s-xs);}
   .route-next{margin-top:var(--s-lg);}
   .next-label{font-size:var(--fs-m); color:var(--text-weak);}
-  .next-name{font-size:var(--fs-b); font-weight:500; color:var(--gold); margin-top:var(--s-xs);}
-  .btn-ghost{display:inline-block; color:var(--gold); font-size:var(--fs-b); font-weight:500; margin-top:var(--s-lg);}
+  .next-name{font-size:var(--fs-b); font-weight:400; color:var(--gold); margin-top:var(--s-xs);}
+  .btn-ghost{display:inline-block; color:var(--gold); font-size:var(--fs-b); font-weight:400; margin-top:var(--s-lg);}
   /* ④ explore */
   .explore-card{display:flex; align-items:center; background:var(--surface-2); border-radius:6px; min-height:36px; padding:10px 12px; margin-bottom:8px;}
   .explore-ic-wrap{width:24px; height:24px; border-radius:6px; background:var(--surface-1); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .explore-ic{font-size:14px; line-height:1; color:var(--gold);}
-  .explore-title{font-size:var(--fs-b); font-weight:500; color:var(--text-main); margin-left:10px;}
+  .explore-title{font-size:var(--fs-b); font-weight:400; color:var(--text-main); margin-left:10px;}
   .explore-arrow{margin-left:auto; font-size:var(--fs-c); color:var(--text-weak);}
   .explore-hint{margin-bottom:var(--s-xl);}
   /* ⑤ hot chars */
   .char-scroll{display:flex; gap:8px; margin-bottom:var(--s-xl); overflow-x:auto;}
-  .char-card{flex-shrink:0; width:78px; background:var(--surface-2); border-radius:6px; padding:10px 6px; display:flex; flex-direction:column; align-items:flex-start;}
+  .char-card{flex-shrink:0; width:78px; background:var(--surface-2); border-radius:6px; padding:10px 6px; display:flex; flex-direction:column; align-items:center;}
   .char-avatar{width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:var(--fs-ds); font-weight:700; color:var(--white-a60); margin-bottom:var(--s-sm);}
-  .char-name{font-size:var(--fs-b); color:var(--text-main); font-weight:500;}
+  .char-name{font-size:var(--fs-b); color:var(--text-main); font-weight:400;}
   .char-count{font-size:var(--fs-c); color:var(--text-weak); margin-top:3px;}
   .char-story{font-size:var(--fs-c); color:var(--gold); font-weight:400; margin-top:6px;}
   /* ⑥ recent */
@@ -123,10 +123,10 @@
   <div>
     <div class="module-title">热门角色</div>
     <div class="char-scroll">
-      <div class="char-card"><div class="char-avatar p1">钢</div><div class="char-name">钢铁侠</div><div class="char-count">关联 26 部作品</div><div class="char-story">查看故事线</div></div>
-      <div class="char-card"><div class="char-avatar p1">美</div><div class="char-name">美国队长</div><div class="char-count">关联 24 部作品</div><div class="char-story">查看故事线</div></div>
-      <div class="char-card"><div class="char-avatar p1">雷</div><div class="char-name">雷神</div><div class="char-count">关联 22 部作品</div><div class="char-story">查看故事线</div></div>
-      <div class="char-card"><div class="char-avatar p3">蜘</div><div class="char-name">蜘蛛侠</div><div class="char-count">关联 18 部作品</div><div class="char-story">查看故事线</div></div>
+      <div class="char-card"><div class="char-avatar p1">钢</div><div class="char-name">钢铁侠</div><div class="char-count">关联 26 部作品</div><div class="char-story">查看故事线 ›</div></div>
+      <div class="char-card"><div class="char-avatar p1">美</div><div class="char-name">美国队长</div><div class="char-count">关联 24 部作品</div><div class="char-story">查看故事线 ›</div></div>
+      <div class="char-card"><div class="char-avatar p1">雷</div><div class="char-name">雷神</div><div class="char-count">关联 22 部作品</div><div class="char-story">查看故事线 ›</div></div>
+      <div class="char-card"><div class="char-avatar p3">蜘</div><div class="char-name">蜘蛛侠</div><div class="char-count">关联 18 部作品</div><div class="char-story">查看故事线 ›</div></div>
     </div>
   </div>
 
@@ -143,7 +143,7 @@
     </div>
   </div>
 
-  <div class="note">本预览为 Step2 高保真版静态还原（同一组 V1.2 Token + 高保真布局），用于布局/配色核验。<br>正式验收需你在微信开发者工具编译 mcu-miniprogram/ 截取真机首页。</div>
+  <div class="note">本预览为 Final 校准版静态还原（同一组 V1.2 Token + Final 布局，含设计验收 P0/P1 校准），用于布局/配色核验。<br>正式验收需你在微信开发者工具编译 mcu-miniprogram/ 截取真机首页。</div>
 </div>
 
 <script>
