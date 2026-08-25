@@ -156,6 +156,11 @@ function toggleState(){
   document.getElementById('cProg').style.display = returning ? 'block' : 'none';
   document.getElementById('cBtn').textContent = returning ? '继续观看' : '开始观看';
 }
+(function(){
+  var q = new URLSearchParams(location.search);
+  if (q.get('state') === 'returning') toggleState();
+  if (q.get('clean') === '1') document.querySelector('.toggle').style.display = 'none';
+})();
 </script>
 </body>
 </html>
