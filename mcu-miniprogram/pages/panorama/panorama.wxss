@@ -1,25 +1,25 @@
-/* panorama 宇宙全景图 - Step3-7-C 恢复，全 Token 化 */
+/* panorama 宇宙全景图 · V1.2 统一视觉，全 Token 化 */
 .pano-page { display: flex; flex-direction: column; height: 100vh; background: var(--bg); }
 
-.page-head { padding: 32rpx 32rpx 16rpx; }
-.page-title { font-size: 40rpx; font-weight: 700; color: var(--text-main); }
-.page-sub { font-size: 22rpx; color: var(--text-sub); margin-top: 6rpx; }
+.page-head { padding: var(--space-lg) var(--page-x) var(--space-sm); }
+.page-title { font-size: var(--fs-display-sm); font-weight: 700; color: var(--text-main); }
+.page-sub { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 6rpx; }
 
 .pano-scroll { flex: 1; }
 .pano-map { position: relative; background: var(--surface-1); }
 
 .pano-canvas { position: absolute; left: 0; top: 0; z-index: 1; }
 
-.phase-col { position: absolute; top: 0; border-left: 1rpx solid var(--surface-3); padding: 16rpx 14rpx; box-sizing: border-box; z-index: 2; }
-.phase-tag { font-size: 24rpx; font-weight: 700; color: var(--text-sub); white-space: nowrap; }
+.phase-col { position: absolute; top: 0; border-left: 1rpx solid var(--surface-3); padding: var(--space-sm) 14rpx; box-sizing: border-box; z-index: 2; }
+.phase-tag { font-size: var(--fs-caption); font-weight: 700; color: var(--text-sub); white-space: nowrap; }
 .phase-years { font-size: 18rpx; color: var(--text-weak); margin-top: 4rpx; white-space: nowrap; }
 
 .pano-node { position: absolute; z-index: 3; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 12rpx; display: flex; flex-direction: column; overflow: hidden; }
 .node-main { border-color: var(--gold-a60); }
 .node-upcoming { opacity: 0.6; border-style: dashed; }
-.node-letter { height: 60rpx; color: var(--white); font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.node-title { flex: 1; font-size: 20rpx; color: var(--text-main); padding: 8rpx; line-height: 1.25; display: flex; align-items: center; justify-content: center; text-align: center; }
+.node-letter { height: 60rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.node-title { flex: 1; font-size: var(--fs-mini); color: var(--text-main); padding: var(--space-xs); line-height: 1.25; display: flex; align-items: center; justify-content: center; text-align: center; }
 
-.legend { display: flex; gap: 40rpx; padding: 20rpx 32rpx; background: var(--surface-1); border-top: 1rpx solid var(--surface-3); }
-.legend-item { display: flex; align-items: center; font-size: 22rpx; color: var(--text-sub); }
+.legend { display: flex; gap: 40rpx; padding: 20rpx var(--page-x); background: var(--surface-1); border-top: 1rpx solid var(--surface-3); }
+.legend-item { display: flex; align-items: center; font-size: var(--fs-mini); color: var(--text-sub); }
 .legend-line { width: 36rpx; height: 6rpx; border-radius: 3rpx; margin-right: 10rpx; }

@@ -14,16 +14,16 @@
     "pages/share/share"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#0B0E14",
+    "navigationBarBackgroundColor": "#080B12",
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "MCU观影导航",
-    "backgroundColor": "#0B0E14",
+    "backgroundColor": "#080B12",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#6B7384",
+    "color": "#555F73",
     "selectedColor": "#F2B233",
-    "backgroundColor": "#141925",
+    "backgroundColor": "#161D2B",
     "borderStyle": "black",
     "list": [
       {

@@ -1,20 +1,16 @@
-/* ============================================================
- * 我的MCU 样式 · D12-A Step3-7-B
- * 依据：D10 Token 体系（深色背景 / 金色强调 / 卡片结构 / 进度展示）
- * 换算：原型 px × 2 = rpx；颜色全部引用 app.wxss 全局 Token（零 raw hex 泄漏）
- * Token 映射：--bg / --surface-2 / --surface-3 / --text-main / --text-sub
- *           / --text-weak / --gold / --success / --p1..p6（阶段色）
- *           --gold-a20→var(--gold-a20) / --gold-a50→var(--gold-a50)
- * ============================================================ */
+/* 我的MCU 样式 · V1.2 统一视觉
+ * 颜色全部引用 app.wxss 全局 Token（零 raw hex 泄漏）
+ * 字号/间距统一使用全局 var(--fs-*) / var(--space-*)
+ */
 
 .mcu-page {
   min-height: 100vh;
   box-sizing: border-box;
   background: var(--bg);
-  padding-bottom: 40rpx;
+  padding-bottom: var(--space-2xl);
 }
 
-/* 海报阶段色兜底（与 movie 页一致：135deg 阶段色 → 60% 阶段色） */
+/* 海报阶段色兜底 */
 .poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
 .poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
 .poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
@@ -24,20 +20,20 @@
 
 /* ══════ ① 顶部用户状态区 ══════ */
 .mcu-hero {
-  padding: 40rpx 40rpx 36rpx;
+  padding: var(--space-xl) var(--page-x) 36rpx;
   background: linear-gradient(160deg, var(--gold-a10), transparent 60%);
   border-bottom: 2rpx solid var(--surface-3);
 }
 .mcu-hero-label {
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-weak);
   letter-spacing: 0.06em;
-  margin-bottom: 16rpx;
+  margin-bottom: var(--space-sm);
 }
 .mcu-explore {
   display: flex;
   align-items: baseline;
-  gap: 8rpx;
+  gap: var(--space-xs);
 }
 .mcu-explore-num {
   font-size: 72rpx;
@@ -48,21 +44,21 @@
 }
 .mcu-explore-sep,
 .mcu-explore-total {
-  font-size: 40rpx;
+  font-size: var(--fs-display-sm);
   font-weight: 600;
   color: var(--text-sub);
 }
 .mcu-explore-tip {
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-weak);
-  margin-top: 8rpx;
+  margin-top: var(--space-xs);
 }
 .mcu-progress {
   height: 12rpx;
   background: var(--surface-3);
   border-radius: 6rpx;
   overflow: hidden;
-  margin: 24rpx 0 12rpx;
+  margin: var(--space-md) 0 12rpx;
 }
 .mcu-progress-bar {
   height: 100%;
@@ -71,60 +67,59 @@
   transition: width 0.3s ease;
 }
 .mcu-progress-tip {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--text-weak);
 }
 
 /* ══════ 区块标签 ══════ */
 .section-label {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--text-weak);
-  margin: 32rpx 40rpx 16rpx;
+  margin: var(--space-lg) var(--page-x) var(--space-sm);
   letter-spacing: 0.02em;
 }
 
 /* ══════ ② 当前路线卡 ══════ */
 .route-next-card {
-  margin: 0 40rpx 8rpx;
+  margin: 0 var(--page-x) var(--space-xs);
   background: var(--surface-2);
   border: 2rpx solid var(--gold-a20);
-  border-radius: 24rpx;
-  padding: 28rpx;
+  border-radius: 16rpx;
+  padding: var(--space-md);
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: var(--space-md);
 }
 .route-next-info {
   flex: 1;
   min-width: 0;
 }
 .rn-label {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--gold);
   font-weight: 600;
-  margin-bottom: 8rpx;
+  margin-bottom: var(--space-xs);
   letter-spacing: 0.04em;
 }
 .rn-title {
-  font-size: 32rpx;
+  font-size: var(--fs-title);
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 6rpx;
 }
 .rn-sub {
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-sub);
 }
 .route-next-btn {
-  padding: 16rpx 32rpx;
+  padding: var(--space-sm) var(--space-lg);
   background: var(--gold);
-  color: var(--bg);
-  font-size: 24rpx;
+  color: var(--gold-btn-text);
+  font-size: var(--fs-caption);
   font-weight: 600;
   border: none;
-  border-radius: 8rpx;
+  border-radius: var(--space-xs);
   flex-shrink: 0;
-  letter-spacing: 0.02em;
 }
 .route-next-btn.is-disabled {
   background: var(--surface-3);
@@ -133,19 +128,19 @@
 
 /* ══════ ③ ④ 列表卡片 ══════ */
 .card-list {
-  padding: 0 40rpx;
+  padding: 0 var(--page-x);
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: var(--space-sm);
 }
 .work-card {
   display: flex;
   align-items: center;
-  gap: 24rpx;
+  gap: var(--space-md);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
   border-radius: 16rpx;
-  padding: 20rpx 24rpx;
+  padding: 20rpx var(--space-md);
 }
 .wc-poster {
   width: 80rpx;
@@ -155,7 +150,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34rpx;
+  font-size: var(--fs-title);
   font-weight: 700;
   color: var(--white);
   text-shadow: 0 2rpx 6rpx var(--black-a35);
@@ -166,13 +161,13 @@
   min-width: 0;
 }
 .wc-name {
-  font-size: 28rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--text-main);
   margin-bottom: 4rpx;
 }
 .wc-sub {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--text-weak);
   white-space: nowrap;
   overflow: hidden;
@@ -180,10 +175,10 @@
 }
 .wc-badge {
   flex-shrink: 0;
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   font-weight: 600;
   padding: 6rpx 16rpx;
-  border-radius: 8rpx;
+  border-radius: var(--space-xs);
 }
 .wc-badge.done {
   color: var(--text-weak);
@@ -195,18 +190,18 @@
   border: 2rpx solid var(--gold-a30);
 }
 
-/* ══════ ② 后续入口预留（V1.1 Step3：分享 / 成就，只展示入口） ══════ */
+/* ══════ 后续入口预留 ══════ */
 .entry-row {
   display: flex;
-  gap: 16rpx;
-  padding: 24rpx 40rpx 0;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--page-x) 0;
 }
 .entry-card {
   flex: 1;
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 20rpx;
-  padding: 24rpx;
+  border-radius: 16rpx;
+  padding: var(--space-md);
   position: relative;
   overflow: hidden;
 }
@@ -216,14 +211,14 @@
 }
 .entry-hover { opacity: 0.88; }
 .entry-title {
-  font-size: 28rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--text-main);
   margin-bottom: 6rpx;
 }
 .entry-card.entry-primary .entry-title { color: var(--gold); }
 .entry-desc {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--text-weak);
 }
 .entry-badge {
@@ -231,18 +226,18 @@
   top: 0;
   right: 0;
   padding: 6rpx 14rpx;
-  font-size: 20rpx;
-  color: var(--bg);
+  font-size: var(--fs-mini);
+  color: var(--gold-btn-text);
   background: var(--gold);
-  border-radius: 0 20rpx 0 14rpx;
+  border-radius: 0 16rpx 0 14rpx;
   font-weight: 600;
 }
 
-/* ══════ ②.5 我的成就墙（V1.1 Step5：横滑徽章，已获得金 / 未获得灰） ══════ */
+/* ══════ 成就墙 ══════ */
 .ach-row {
   display: flex;
   gap: 20rpx;
-  padding: 0 40rpx;
+  padding: 0 var(--page-x);
   white-space: nowrap;
 }
 .ach-item {
@@ -260,7 +255,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40rpx;
+  font-size: var(--fs-display-sm);
   font-weight: 700;
   background: var(--surface-3);
   border: 2rpx solid var(--surface-3);
@@ -273,7 +268,7 @@
   color: var(--gold);
 }
 .ach-name {
-  font-size: 22rpx;
+  font-size: var(--fs-mini);
   color: var(--text-weak);
   white-space: nowrap;
   overflow: hidden;
@@ -284,7 +279,7 @@
   color: var(--text-main);
 }
 
-/* ══════ ③ 当前路线卡（增强：路线进度条） ══════ */
+/* ══════ 路线进度条 ══════ */
 .rn-progress {
   height: 8rpx;
   background: var(--surface-3);
@@ -299,11 +294,11 @@
   transition: width 0.3s ease;
 }
 
-/* ══════ ④ 最近观看（V1.1 Step3：横滑 3 部，海报+名称+已看徽章） ══════ */
+/* ══════ 最近观看 ══════ */
 .recent-row {
   display: flex;
   gap: 20rpx;
-  padding: 0 40rpx;
+  padding: 0 var(--page-x);
   white-space: nowrap;
 }
 .recent-item {
@@ -325,7 +320,7 @@
   position: relative;
 }
 .recent-letter {
-  font-size: 44rpx;
+  font-size: var(--fs-display-sm);
   font-weight: 800;
   color: var(--white-a70);
 }
@@ -335,13 +330,13 @@
   left: 0;
   right: 0;
   padding: 6rpx 0;
-  font-size: 20rpx;
+  font-size: var(--fs-mini);
   text-align: center;
   color: var(--text-weak);
   background: var(--bg-a55);
 }
 .recent-name {
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-sub);
   display: block;
   white-space: nowrap;
@@ -351,41 +346,41 @@
 
 /* ══════ 空态 ══════ */
 .empty-tip {
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-weak);
   line-height: 1.6;
-  padding: 24rpx 8rpx;
+  padding: var(--space-md) var(--space-xs);
 }
 .mcu-bottom-space {
   height: 40rpx;
 }
 
-/* ══════ ⑤ 反馈入口（Step3-8） ══════ */
+/* ══════ 反馈入口 ══════ */
 .fb-entry {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 0 40rpx 16rpx;
-  padding: 28rpx 24rpx;
+  margin: 0 var(--page-x) var(--space-sm);
+  padding: var(--space-md) var(--space-md);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 20rpx;
+  border-radius: 16rpx;
 }
 .fb-entry-info { flex: 1; min-width: 0; }
 .fb-entry-title {
-  font-size: 30rpx;
+  font-size: var(--fs-title);
   font-weight: 600;
   color: var(--text-main);
 }
 .fb-entry-sub {
-  margin-top: 8rpx;
-  font-size: 24rpx;
+  margin-top: var(--space-xs);
+  font-size: var(--fs-caption);
   color: var(--text-sub);
   line-height: 1.5;
 }
 .fb-entry-arrow {
-  font-size: 40rpx;
+  font-size: var(--fs-display-sm);
   color: var(--text-weak);
-  margin-left: 16rpx;
+  margin-left: var(--space-sm);
   flex-shrink: 0;
 }

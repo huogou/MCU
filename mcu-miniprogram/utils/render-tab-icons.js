@@ -29,10 +29,10 @@ const ICONS = {
   }
 };
 
-// —— 双态样式（D10 Token） ——
+// —— 双态样式（V1.2 Token） ——
 const STATES = {
-  normal: { stroke: '#6B7384', fill: 'none' },            // text-weak
-  active: { stroke: '#E9A93B', fill: 'rgba(233,169,59,0.15)' } // gold + 15% 金填充
+  normal: { stroke: '#555F73', fill: 'none' },            // text-weak
+  active: { stroke: '#F2B233', fill: 'rgba(242,178,51,0.15)' } // gold + 15% 金填充
 };
 
 const OUT_DIR = path.join(__dirname, '..', 'assets', 'icons', 'tab');

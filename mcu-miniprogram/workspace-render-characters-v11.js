@@ -23,8 +23,8 @@ const userState = require('./models/userState.js');
 const { CHARACTERS, CAMPS } = require('./data/characters.js');
 const { TYPE_LABEL } = require('./data/content.js');
 
-const BG = '#0B0E14', S1 = '#141925', S2 = '#1C2330', S3 = '#232C3D';
-const GOLD = '#E9A93B', TXT = '#E8ECF4', SUB = '#A8B0C0', WEAK = '#6B7384';
+const BG = '#080B12', S1 = '#161D2B', S2 = '#1E2636', S3 = '#2A3447';
+const GOLD = '#F2B233', TXT = '#E8ECF4', SUB = '#8E98AA', WEAK = '#555F73';
 const LINE = 'rgba(255,255,255,0.08)';
 const FONT = 'Microsoft YaHei, PingFang SC, sans-serif';
 

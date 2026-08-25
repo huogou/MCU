@@ -1,24 +1,23 @@
-/* browse 浏览全部 - Step3-7-C 恢复，全 Token 化 */
-.mcu-page { min-height: 100vh; background: var(--bg); padding: 0 32rpx; box-sizing: border-box; }
+/* browse 浏览全部 · V1.2 统一视觉 */
 
-.page-head { padding: 40rpx 0 24rpx; }
-.page-title { font-size: 44rpx; font-weight: 700; color: var(--text-main); }
-.page-sub { font-size: 24rpx; color: var(--text-sub); margin-top: 8rpx; }
+.page-head { padding: var(--space-xl) 0 var(--space-md); }
+.page-title { font-size: var(--fs-display); font-weight: 700; color: var(--text-main); }
+.page-sub { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
 
-.phase-group { margin-bottom: 32rpx; }
-.group-head { display: flex; align-items: center; margin: 8rpx 0 18rpx; }
+.phase-group { margin-bottom: var(--space-lg); }
+.group-head { display: flex; align-items: center; margin: var(--space-xs) 0 18rpx; }
 .group-dot { width: 16rpx; height: 16rpx; border-radius: 50%; margin-right: 14rpx; }
-.group-title { font-size: 30rpx; font-weight: 700; color: var(--text-main); }
-.group-count { font-size: 22rpx; color: var(--text-weak); margin-left: auto; }
+.group-title { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); }
+.group-count { font-size: var(--fs-mini); color: var(--text-weak); margin-left: auto; }
 
-.film-list { display: flex; flex-direction: column; gap: 16rpx; }
+.film-list { display: flex; flex-direction: column; gap: var(--space-sm); }
 .film-row { display: flex; align-items: center; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 16rpx; padding: 20rpx; }
 .film-row-hover { background: var(--surface-3); }
-.film-letter { width: 64rpx; height: 64rpx; border-radius: 12rpx; color: var(--white); font-size: 30rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 20rpx; flex-shrink: 0; }
+.film-letter { width: 64rpx; height: 64rpx; border-radius: 12rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 20rpx; flex-shrink: 0; }
 .film-info { flex: 1; min-width: 0; }
-.film-cn { font-size: 28rpx; color: var(--text-main); font-weight: 600; }
-.film-en { font-size: 20rpx; color: var(--text-sub); margin-top: 4rpx; }
-.film-status { font-size: 20rpx; padding: 6rpx 16rpx; border-radius: 20rpx; flex-shrink: 0; }
+.film-cn { font-size: var(--fs-body); color: var(--text-main); font-weight: 600; }
+.film-en { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 4rpx; }
+.film-status { font-size: var(--fs-mini); padding: 6rpx 16rpx; border-radius: 20rpx; flex-shrink: 0; }
 .status-unwatched { color: var(--gold); background: var(--gold-a15); }
 .status-watching { color: var(--success); background: var(--success-a15); }
 .status-watched { color: var(--text-weak); background: var(--surface-3); }

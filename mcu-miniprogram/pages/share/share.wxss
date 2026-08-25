@@ -1,22 +1,18 @@
-/* ============================================================
- * 分享海报 share（V1.1 Step4）· 样式
- * 深色宇宙风（与 V1.0 Token 一致）：bg / surface / gold / 文本三级
- * 全 Token 化（零 raw hex 泄漏）
- * ============================================================ */
+/* 分享海报 share · V1.2 统一视觉 */
 
 .share-page {
   min-height: 100vh;
   box-sizing: border-box;
   background: var(--bg);
-  padding: 24rpx 40rpx 60rpx;
+  padding: var(--space-md) var(--page-x) var(--space-2xl);
 }
 
-/* 海报画布预览（显示比例 750:1100） */
+/* 海报画布预览 */
 .poster-stage {
   background: var(--surface-1);
   border: 2rpx solid var(--surface-3);
   border-radius: 24rpx;
-  padding: 24rpx;
+  padding: var(--space-md);
   overflow: hidden;
 }
 .poster-canvas {
@@ -28,20 +24,20 @@
 
 .poster-tip {
   margin-top: 20rpx;
-  font-size: 24rpx;
+  font-size: var(--fs-caption);
   color: var(--text-sub);
   text-align: center;
 }
 
 /* 操作区 */
 .actions {
-  margin-top: 32rpx;
+  margin-top: var(--space-lg);
   display: flex;
   gap: 20rpx;
 }
 .action-btn {
   flex: 1;
-  font-size: 28rpx;
+  font-size: var(--fs-body);
   font-weight: 600;
   line-height: 88rpx;
   height: 88rpx;
@@ -52,7 +48,7 @@
 }
 .action-btn.primary {
   background: var(--gold);
-  color: var(--bg);
+  color: var(--gold-btn-text);
 }
 .action-btn:not(.primary) {
   background: var(--surface-2);
@@ -62,8 +58,8 @@
 .btn-hover { opacity: 0.85; }
 
 .share-note {
-  margin-top: 24rpx;
-  font-size: 22rpx;
+  margin-top: var(--space-md);
+  font-size: var(--fs-mini);
   color: var(--text-weak);
   text-align: center;
 }

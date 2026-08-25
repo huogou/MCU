@@ -43,7 +43,7 @@ const IMP_COLOR = {
 
 /* 全景图连线颜色（对应 H5 map.html .conn-mainline / .conn-support / .conn-cross） */
 const CONN_COLOR = {
-  mainline: '#E9A93B',
+  mainline: '#F2B233',
   support:  'rgba(255,255,255,0.15)',
   cross:    '#9B6DFF'
 };

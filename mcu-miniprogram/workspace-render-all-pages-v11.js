@@ -12,8 +12,8 @@ const { CHARACTERS, CAMPS } = require('./data/characters.js');
 const { PHASE_COLS, PANO_MOVIES, LAYOUT } = require('./models/pano.js');
 const { PHASE_LABEL } = require('./data/constants.js');
 
-const BG='#0B0E14', S1='#141925', S2='#1C2330', S3='#232C3D', GOLD='#E9A93B';
-const TXT='#E8ECF4', SUB='#A8B0C0', WEAK='#6B7384', LINE='rgba(255,255,255,0.08)';
+const BG='#080B12', S1='#161D2B', S2='#1E2636', S3='#2A3447', GOLD='#F2B233';
+const TXT='#E8ECF4', SUB='#8E98AA', WEAK='#555F73', LINE='rgba(255,255,255,0.08)';
 const P=['#5B8DEF','#28B487','#F0A932','#8B6FE8','#E8483F','#C25B8E'];
 const F='Microsoft YaHei, PingFang SC, sans-serif';
 

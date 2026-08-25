@@ -18,16 +18,16 @@ const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 const shareData = require('../../models/shareData.js');
 
-/* ---- Token 权威色值（与 app.wxss 一致，canvas 直写） ---- */
+/* ---- Token 权威色值 V1.2（与 app.wxss 一致，canvas 直写） ---- */
 const C = {
-  bg: '#0B0E14',
-  surface1: '#141925',
-  surface2: '#1C2330',
-  surface3: '#232C3D',
-  gold: '#E9A93B',
+  bg: '#080B12',
+  surface1: '#161D2B',
+  surface2: '#1E2636',
+  surface3: '#2A3447',
+  gold: '#F2B233',
   textMain: '#E8ECF4',
-  textSub: '#A8B0C0',
-  textWeak: '#6B7384',
+  textSub: '#8E98AA',
+  textWeak: '#555F73',
   p: ['#5B8DEF', '#28B487', '#F0A932', '#8B6FE8', '#E8483F', '#C25B8E']
 };
 

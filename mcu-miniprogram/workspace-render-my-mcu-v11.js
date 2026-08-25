@@ -2,7 +2,7 @@
 const sharp = require('sharp');
 const fs = require('fs');
 
-const BG = '#0B0E14', S2 = '#1C2330', GOLD = '#E9A93B', TXT = '#E8ECF4', SUB = '#A8B0C0', WEAK = '#6B7384', LINE = 'rgba(255,255,255,0.08)';
+const BG = '#080B12', S2 = '#1E2636', GOLD = '#F2B233', TXT = '#E8ECF4', SUB = '#8E98AA', WEAK = '#555F73', LINE = 'rgba(255,255,255,0.08)';
 const P1 = '#5B8DEF', P2 = '#28B487', P3 = '#F0A932', P4 = '#8B6FE8';
 
 function card(x, y, w, h, fill, stroke) {
@@ -24,7 +24,7 @@ svg += txt(72, 170, '4', 76, GOLD, 700);
 svg += txt(146, 158, '/', 42, SUB, 600);
 svg += txt(186, 158, '59', 42, SUB, 600);
 svg += txt(72, 206, '已探索作品', 24, WEAK);
-svg += `<rect x="72" y="236" width="606" height="10" rx="5" fill="#232C3D"/><rect x="72" y="236" width="41" height="10" rx="5" fill="${GOLD}"/>`;
+svg += `<rect x="72" y="236" width="606" height="10" rx="5" fill="#2A3447"/><rect x="72" y="236" width="41" height="10" rx="5" fill="${GOLD}"/>`;
 svg += txt(72, 272, '整体进度 7% · 已看 4 部', 22, WEAK);
 
 /* ② 入口预留行 */
@@ -42,7 +42,7 @@ svg += card(40, 544, 670, 220, S2, 'rgba(233,169,59,0.2)');
 svg += txt(72, 596, '继续你的路线 · Phase 2', 24, GOLD, 600);
 svg += txt(72, 644, '新手入坑', 34, TXT, 700);
 svg += txt(72, 692, '2 / 12 部 · 下一部 奇异博士', 24, SUB);
-svg += `<rect x="72" y="716" width="606" height="8" rx="4" fill="#232C3D"/><rect x="72" y="716" width="101" height="8" rx="4" fill="${GOLD}"/>`;
+svg += `<rect x="72" y="716" width="606" height="8" rx="4" fill="#2A3447"/><rect x="72" y="716" width="101" height="8" rx="4" fill="${GOLD}"/>`;
 svg += `<rect x="576" y="580" width="102" height="56" rx="8" fill="${GOLD}"/><text x="598" y="618" font-size="24" fill="${BG}" font-weight="600" font-family="PingFang SC, sans-serif">继续观看</text>`;
 
 /* ④ 最近观看 */
@@ -66,7 +66,7 @@ rows.forEach(function (r, i) {
   svg += txt(76, y + 38, r[2][0], 20, 'rgba(255,255,255,0.7)', 700);
   svg += txt(120, y + 32, r[2], 24, TXT, 600);
   svg += txt(120, y + 50, r[3] + ' · ' + r[4] + ' · ' + r[5], 18, WEAK);
-  svg += `<rect x="600" y="${y + 16}" width="74" height="30" rx="6" fill="#232C3D"/><text x="620" y="${y + 37}" font-size="20" fill="${WEAK}" font-family="PingFang SC, sans-serif">已看</text>`;
+  svg += `<rect x="600" y="${y + 16}" width="74" height="30" rx="6" fill="#2A3447"/><text x="620" y="${y + 37}" font-size="20" fill="${WEAK}" font-family="PingFang SC, sans-serif">已看</text>`;
 });
 svg += `</svg>`;
 fs.writeFileSync('assets/icons/tab/_my-mcu-v11-old-preview.svg', svg);
@@ -81,7 +81,7 @@ svg2 += txt(72, 170, '0', 76, GOLD, 700);
 svg2 += txt(146, 158, '/', 42, SUB, 600);
 svg2 += txt(186, 158, '59', 42, SUB, 600);
 svg2 += txt(72, 206, '已探索作品', 24, WEAK);
-svg2 += `<rect x="72" y="236" width="606" height="10" rx="5" fill="#232C3D"/>`;
+svg2 += `<rect x="72" y="236" width="606" height="10" rx="5" fill="#2A3447"/>`;
 svg2 += txt(72, 272, '整体进度 0% · 已看 0 部', 22, WEAK);
 svg2 += card(40, 324, 326, 150, `linear-gradient(135deg, rgba(233,169,59,0.10), rgba(233,169,59,0.02))`, 'rgba(233,169,59,0.3)');
 svg2 += txt(64, 380, '分享我的 MCU 进度', 28, GOLD, 600);
@@ -94,7 +94,7 @@ svg2 += card(40, 544, 670, 200, S2, 'rgba(233,169,59,0.2)');
 svg2 += txt(72, 596, '继续你的路线 · Phase 1', 24, GOLD, 600);
 svg2 += txt(72, 644, '新手入坑', 34, TXT, 700);
 svg2 += txt(72, 692, '0 / 12 部 · 下一部 钢铁侠', 24, SUB);
-svg2 += `<rect x="72" y="712" width="606" height="8" rx="4" fill="#232C3D"/>`;
+svg2 += `<rect x="72" y="712" width="606" height="8" rx="4" fill="#2A3447"/>`;
 svg2 += txt(72, 800, '最近观看', 24, WEAK);
 svg2 += txt(72, 850, '还没有观看记录，去首页挑一部开始吧', 24, WEAK);
 svg2 += txt(72, 920, '观看记录 · 0 部', 24, WEAK);
