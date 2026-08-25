@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>MCU观影导航 · V1.1 12页原型图与差异对照（策划审查页）</title>
+<style>
+  :root {
+    --bg:#0B0E14; --surface-1:#141925; --surface-2:#1B2233;
+    --text:#E8ECF4; --text-2:#A8B0C0; --text-3:#6B7384;
+    --gold:#E9A93B; --success:#3FB98A; --error:#E5604D;
+    --p1:#5B8DEF; --p2:#28B487; --p3:#F0A932; --p4:#8B6FE8; --p5:#E8483F; --p6:#C25B8E;
+    --border:#252B3A;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; line-height: 1.6; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+  h1 { font-size: 28px; margin: 0 0 8px; color: var(--text); }
+  h2 { font-size: 20px; margin: 40px 0 16px; color: var(--gold); border-left: 4px solid var(--gold); padding-left: 12px; }
+  h3 { font-size: 16px; margin: 24px 0 12px; color: var(--text); }
+  .meta { color: var(--text-2); font-size: 13px; margin: 4px 0; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; margin-right: 6px; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--border); }
+  .badge.gold { background: rgba(233,169,59,.15); color: var(--gold); border-color: rgba(233,169,59,.4); }
+  .badge.success { background: rgba(63,185,138,.15); color: var(--success); border-color: rgba(63,185,138,.4); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px; margin-top: 16px; }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: border-color .2s; }
+  .card:hover { border-color: var(--gold); }
+  .card .imgbox { background: #000; aspect-ratio: 750/1100; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .card .imgbox img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .card .info { padding: 12px 14px 16px; }
+  .card .num { color: var(--gold); font-weight: 600; font-size: 13px; }
+  .card .title { font-size: 15px; font-weight: 600; margin: 4px 0; color: var(--text); }
+  .card .file { font-size: 11px; color: var(--text-3); font-family: monospace; word-break: break-all; }
+  .card .note { font-size: 12px; color: var(--text-2); margin-top: 8px; line-height: 1.5; }
+  .card .tags { margin-top: 8px; }
+  .card .tag { display: inline-block; font-size: 11px; padding: 1px 8px; border-radius: 8px; margin-right: 4px; background: rgba(91,141,239,.12); color: var(--p1); }
+  .card .tag.p2 { background: rgba(40,180,135,.12); color: var(--p2); }
+  .card .tag.p3 { background: rgba(240,169,50,.12); color: var(--p3); }
+  .card .tag.p4 { background: rgba(139,111,232,.12); color: var(--p4); }
+  .card .tag.p5 { background: rgba(232,72,63,.12); color: var(--p5); }
+  .card .tag.p6 { background: rgba(194,91,142,.12); color: var(--p6); }
+  details { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 12px 0; }
+  details summary { cursor: pointer; color: var(--text); font-weight: 600; user-select: none; list-style: none; padding-left: 0; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: "▸ "; color: var(--gold); margin-right: 6px; font-size: 12px; }
+  details[open] summary::before { content: "▾ "; }
+  details .content { margin-top: 14px; color: var(--text-2); font-size: 14px; }
+  details .content table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+  details .content table th, details .content table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: top; }
+  details .content table th { color: var(--gold); font-weight: 600; background: rgba(233,169,59,.04); }
+  details .content table td:first-child { color: var(--text); font-weight: 500; }
+  details .content p { margin: 8px 0; }
+  details .content code { background: var(--bg); padding: 1px 6px; border-radius: 3px; font-size: 12px; color: var(--text); }
+  .nav-toc { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: var(--text-2); }
+  .nav-toc a { color: var(--p1); text-decoration: none; margin-right: 12px; }
+  .nav-toc a:hover { text-decoration: underline; }
+  footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-3); font-size: 12px; text-align: center; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 500; }
+  .pill.new { background: rgba(63,185,138,.18); color: var(--success); }
+  .pill.has { background: rgba(91,141,239,.18); color: var(--p1); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MCU 观影导航 · V1.1 12 页原型图与差异对照</h1>
+    <p class="meta">生成时间：2026-08-25 · 审查发起：WorkBuddy（开发 AI）→ 策划 AI</p>
+    <p class="meta">目的：把 V1.1 上线前的 21 张原型图 + 与 D10-A 旧版差异对照报告集中放到一个可访问页面，便于策划审查是否有开发漏设计要求。</p>
+    <div style="margin-top:12px;">
+      <span class="badge gold">21 张原型图</span>
+      <span class="badge">1 份差异对照报告</span>
+      <span class="badge success">真机验证 13/13 已通过</span>
+      <span class="badge">数据一致性 35/35 已通过</span>
+    </div>
+  </header>
+
+  <div class="nav-toc">
+    <strong style="color:var(--text);">目录：</strong>
+    <a href="#p1">一、12 页面原型图</a>
+    <a href="#diff">二、与 D10-A 旧版差异对照</a>
+    <a href="#conclusion">三、视觉与数据一致性结论</a>
+    <a href="#ask">四、请策划回复</a>
+  </div>
+
+  <h2 id="p1">一、12 页面原型图（21 张）</h2>
+  <p class="meta">按页面编号排列；每张图均基于真实数据（mcuData / userState / shareData / pano）渲染，无编造数据。文件名原样可在 <code>mcu-miniprogram/assets/preview/</code> 或 <code>AI生成文件/小程序/原型图/</code> 找到。</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_home-v11-new-preview.png" alt="首页 new" /></div>
+      <div class="info">
+        <span class="num">#1 · 首页（new）</span>
+        <div class="pill has">已有</div>
+        <div class="title">首页 · 新用户态</div>
+        <div class="file">_home-v11-new-preview.png</div>
+        <div class="note">状态：hasProgress=false。含品牌引导 + 热门起点 8 + 功能卡 + 「从钢铁侠开始」CTA。</div>
+        <div class="tags"><span class="tag">首页</span><span class="tag p2">新用户</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_home-v11-old-preview.png" alt="首页 old" /></div>
+      <div class="info">
+        <span class="num">#2 · 首页（old）</span>
+        <div class="pill has">已有</div>
+        <div class="title">首页 · 老用户态</div>
+        <div class="file">_home-v11-old-preview.png</div>
+        <div class="note">状态：hasProgress=true。含旅程卡 + 下一站推荐 + 进度环。「继续观看」入口。</div>
+        <div class="tags"><span class="tag">首页</span><span class="tag p5">老用户</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-routes.png" alt="路线" /></div>
+      <div class="info">
+        <span class="num">#3 · 路线</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">路线 · 11 条真实路线</div>
+        <div class="file">_page-routes.png</div>
+        <div class="note">双 Tab（基础/专题）+ 当前路线进度卡 + 路线列表。</div>
+        <div class="tags"><span class="tag">路线</span><span class="tag p3">11 条</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-route-detail.png" alt="路线详情" /></div>
+      <div class="info">
+        <span class="num">#4 · 路线详情</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">路线详情 · 新手入坑（12 部）</div>
+        <div class="file">_page-route-detail.png</div>
+        <div class="note">顶部进度卡 + 下一部推荐 + 5 部顺序预览。</div>
+        <div class="tags"><span class="tag">路线</span><span class="tag p3">进度</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-movie.png" alt="电影详情" /></div>
+      <div class="info">
+        <span class="num">#5 · 电影详情</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">电影详情 · 钢铁侠·未看</div>
+        <div class="file">_page-movie.png</div>
+        <div class="note">Hero + chips + CTA + 观看资源（折叠）+ 为什么 + 前后关联 + 看完之后。三态：unwatched/watching/watched。</div>
+        <div class="tags"><span class="tag">电影</span><span class="tag p6">三态</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-explore.png" alt="探索" /></div>
+      <div class="info">
+        <span class="num">#6 · 探索</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">探索 · 24 角色 + 全景入口</div>
+        <div class="file">_page-explore.png</div>
+        <div class="note">全景入口 + 角色图鉴入口 + 6 角色预览网格。</div>
+        <div class="tags"><span class="tag">探索</span><span class="tag p4">24 角色</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-panorama.png" alt="全景图" /></div>
+      <div class="info">
+        <span class="num">#7 · 全景图</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">全景图 · 6 阶段 + 8 节点</div>
+        <div class="file">_page-panorama.png</div>
+        <div class="note">金色主线 + 横滚。750 缩放下年份有轻微重叠，真机 4200px 无此问题。</div>
+        <div class="tags"><span class="tag">全景</span><span class="tag p3">横滚</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-browse.png" alt="浏览全部" /></div>
+      <div class="info">
+        <span class="num">#8 · 浏览全部</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">浏览全部 · 阶段分组</div>
+        <div class="file">_page-browse.png</div>
+        <div class="note">按 Phase1-6 阶段分组列出所有电影行。</div>
+        <div class="tags"><span class="tag">浏览</span><span class="tag p2">阶段</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_characters-list-preview.png" alt="角色图鉴" /></div>
+      <div class="info">
+        <span class="num">#9 · 角色图鉴</span>
+        <div class="pill has">已有</div>
+        <div class="title">角色图鉴 · 24 位 + 8 阵营</div>
+        <div class="file">_characters-list-preview.png</div>
+        <div class="note">阵营筛选 chips + 卡片（含头像首字徽章 + 阵营 tag + 首登场作品）。</div>
+        <div class="tags"><span class="tag">角色</span><span class="tag p4">24 位</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_character-detail-preview.png" alt="角色详情" /></div>
+      <div class="info">
+        <span class="num">#10 · 角色详情</span>
+        <div class="pill has">已有</div>
+        <div class="title">角色详情 · 托尼·史塔克</div>
+        <div class="file">_character-detail-preview.png</div>
+        <div class="note">Hero + 首秀作品 + 关联作品列表 + 关系探索（共同出演推导）。</div>
+        <div class="tags"><span class="tag">角色</span><span class="tag p4">详情</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_my-mcu-v11-new-preview.png" alt="我的 MCU new" /></div>
+      <div class="info">
+        <span class="num">#11 · 我的 MCU（new）</span>
+        <div class="pill has">已有</div>
+        <div class="title">我的 MCU · 空用户</div>
+        <div class="file">_my-mcu-v11-new-preview.png</div>
+        <div class="note">分享主入口 + 成就墙入口（6 项金/灰）+ 空引导。</div>
+        <div class="tags"><span class="tag">我的</span><span class="tag p2">空状态</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_my-mcu-v11-old-preview.png" alt="我的 MCU old" /></div>
+      <div class="info">
+        <span class="num">#12 · 我的 MCU（old）</span>
+        <div class="pill has">已有</div>
+        <div class="title">我的 MCU · 老用户</div>
+        <div class="file">_my-mcu-v11-old-preview.png</div>
+        <div class="note">X/59 进度 + 当前路线 + 最近 3 部 + 观看记录 + 成就。</div>
+        <div class="tags"><span class="tag">我的</span><span class="tag p5">老用户</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_share-poster-progress.png" alt="分享海报-进度" /></div>
+      <div class="info">
+        <span class="num">#13 · 分享海报 · 进度型</span>
+        <div class="pill has">已有</div>
+        <div class="title">分享海报 · 进度型</div>
+        <div class="file">_share-poster-progress.png</div>
+        <div class="note">750×1100 真实数据，含保存相册 + 转发入口。</div>
+        <div class="tags"><span class="tag">分享</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_share-poster-route.png" alt="分享海报-路线" /></div>
+      <div class="info">
+        <span class="num">#14 · 分享海报 · 路线型</span>
+        <div class="pill has">已有</div>
+        <div class="title">分享海报 · 路线型</div>
+        <div class="file">_share-poster-route.png</div>
+        <div class="note">展示当前路线进度 + 下一部预告。</div>
+        <div class="tags"><span class="tag">分享</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_share-poster-movie.png" alt="分享海报-电影" /></div>
+      <div class="info">
+        <span class="num">#15 · 分享海报 · 电影型</span>
+        <div class="pill has">已有</div>
+        <div class="title">分享海报 · 电影型</div>
+        <div class="file">_share-poster-movie.png</div>
+        <div class="note">单电影海报 + 关联作品入口。</div>
+        <div class="tags"><span class="tag">分享</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_ach-wall-preview.png" alt="成就墙" /></div>
+      <div class="info">
+        <span class="num">#16 · 成就墙</span>
+        <div class="pill has">已有</div>
+        <div class="title">成就墙 · 6 项徽章</div>
+        <div class="file">_ach-wall-preview.png</div>
+        <div class="note">6 项：初入漫威 / 完成第一阶段 / 无限传奇 / 新手入坑 / 收藏家 / 分享新人。金/灰状态。</div>
+        <div class="tags"><span class="tag">成就</span><span class="tag p3">6 项</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_ach-popup-preview.png" alt="成就弹窗" /></div>
+      <div class="info">
+        <span class="num">#17 · 成就弹窗</span>
+        <div class="pill has">已有</div>
+        <div class="title">成就 · 半屏弹窗</div>
+        <div class="file">_ach-popup-preview.png</div>
+        <div class="note">观影完成时触发，含徽章 + 说明 + 关闭。</div>
+        <div class="tags"><span class="tag">成就</span><span class="tag p3">弹窗</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_page-feedback.png" alt="反馈页" /></div>
+      <div class="info">
+        <span class="num">#18 · 反馈</span>
+        <div class="pill new">V1.1 新增渲染</div>
+        <div class="title">反馈页 · 4 类型 chips</div>
+        <div class="file">_page-feedback.png</div>
+        <div class="note">类型：bug/数据/建议/其他 + 内容 + 联系方式 + 提交（指向 CloudBase feedback 集合）。</div>
+        <div class="tags"><span class="tag">反馈</span><span class="tag p5">CloudBase</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_home-preview.png" alt="首页总览" /></div>
+      <div class="info">
+        <span class="num">#19 · 首页总览（缩略）</span>
+        <div class="pill has">已有</div>
+        <div class="title">首页 · 总览缩略图</div>
+        <div class="file">_home-preview.png</div>
+        <div class="note">首页整体缩略图，包含 new+old 双态布局概览。</div>
+        <div class="tags"><span class="tag">总览</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_overview.png" alt="全站总览" /></div>
+      <div class="info">
+        <span class="num">#20 · 全站总览（缩略）</span>
+        <div class="pill has">已有</div>
+        <div class="title">全站 · 总览缩略图</div>
+        <div class="file">_overview.png</div>
+        <div class="note">12 页整站布局缩略图，便于快速全局把握。</div>
+        <div class="tags"><span class="tag">总览</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="imgbox"><img src="screenshots/_preview.png" alt="预览缩略" /></div>
+      <div class="info">
+        <span class="num">#21 · 预览缩略</span>
+        <div class="pill has">已有</div>
+        <div class="title">预览 · 全页缩略</div>
+        <div class="file">_preview.png</div>
+        <div class="note">全页面缩略集合，便于一览差异。</div>
+        <div class="tags"><span class="tag">缩略</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 id="diff">二、与 D10-A 旧版设计差异对照（详情折叠）</h2>
+
+  <details>
+    <summary>A. 保持（100% 继承旧版设计，无差异）</summary>
+    <div class="content">
+      <table>
+        <tr><th>模块</th><th>D10-A 旧版</th><th>V1.1 新版</th><th>一致性</th></tr>
+        <tr><td>首页双态（new/old）</td><td>新用户引导+CTA / 老用户进度环+继续观看+下一部</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>电影详情三态（unwatched/watching/watched）</td><td>Hero+chips+CTA（开始/继续/已看）+状态标签+观看资源折叠+为什么+前后关联+看完之后</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>路线页</td><td>双 Tab（基础/专题）+ 当前路线进度卡 + 下一部 + 列表</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>观看资源模块</td><td>折叠式（标题+箭头）+ 展开后资源标识</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>当前路线进度</td><td>顶部卡 + 下一部 + 「去观看」CTA</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>状态联动（标记已看→首页老用户态/成就弹窗）</td><td>三态切换 + onShow 刷新</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>下一部推荐</td><td>「看完这部之后」卡 + 三模式切片保留</td><td>完全相同</td><td>✓</td></tr>
+        <tr><td>数据纪律</td><td>数据零修改 / 全 Token / 阶段色权威</td><td>完全相同</td><td>✓</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>B. 增强（在 D10-A 基础上扩展，未推翻旧版设计）</summary>
+    <div class="content">
+      <table>
+        <tr><th>模块</th><th>D10-A 旧版</th><th>V1.1 新版</th><th>扩展点</th></tr>
+        <tr><td>首页继续观看</td><td>进度环 + CTA</td><td>+ 旅程状态卡（路线/阶段）+ 下一站推荐双卡</td><td>Step2</td></tr>
+        <tr><td>我的 MCU</td><td>基础进度 + 观看记录</td><td>+ 分享主入口 + 成就墙 6 项 + 阶段 pill</td><td>Step3</td></tr>
+        <tr><td>D12 视觉统一</td><td>部分硬编码颜色</td><td>全端 Token 化（map.html + 小程序 12 页）+ 阶段色统一 var(--p1..--p6)</td><td>上线前验收</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>C. 新增（V1.1 全新能力，旧版无）</summary>
+    <div class="content">
+      <table>
+        <tr><th>模块</th><th>V1.1 新版</th><th>旧版</th><th>上线</th></tr>
+        <tr><td>分享海报（三类型）</td><td>progress / route / movie × 750×1100 + 保存相册 + 转发</td><td>无</td><td>Step4</td></tr>
+        <tr><td>成就系统</td><td>6 项：初入漫威 / 完成第一阶段 / 无限传奇探索者 / 新手入坑 / 收藏家 / 分享新人</td><td>无</td><td>Step5</td></tr>
+        <tr><td>角色图鉴</td><td>24 位 + 8 阵营 + 阵营筛选 chips + 关联作品数 + 首登场</td><td>无</td><td>Step6</td></tr>
+        <tr><td>角色详情</td><td>Hero（首字徽章）+ 首秀 + 关联作品 + 关系探索（共同出演推导）</td><td>无</td><td>Step6</td></tr>
+        <tr><td>反馈页</td><td>4 类型 + 内容 + 联系方式 + 提交（指向 CloudBase feedback 集合）</td><td>无（D10-B 设计稿，未开发）</td><td>Step3-8</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <details>
+    <summary>D. 已知差异（设计选择或待拍板）</summary>
+    <div class="content">
+      <table>
+        <tr><th>项</th><th>状态</th></tr>
+        <tr><td>海报尺寸 750×1100 vs 750×1000</td><td>待策划拍板</td></tr>
+        <tr><td>成就「完成第一阶段」core 4 部 vs 电影 6 部</td><td>待策划拍板</td></tr>
+        <tr><td>头像首字徽章 vs 真实角色图</td><td>数据层无图片资源（已记录）</td></tr>
+        <tr><td>H5 map.html 全景阶段色统一（Phase 1-5 颜色变化）</td><td>D12 清理预期结果，原值已存档可回退</td></tr>
+        <tr><td><code>panorama-preview.html</code> 孤立 404</td><td>历史遗留，勿外链</td></tr>
+      </table>
+    </div>
+  </details>
+
+  <h2 id="conclusion">三、视觉与数据一致性结论</h2>
+  <details open>
+    <summary>结论详情（已展开）</summary>
+    <div class="content">
+      <table>
+        <tr><th>项</th><th>结论</th></tr>
+        <tr><td>12 页面原型图</td><td>全部基于真实数据渲染，无编造数据</td></tr>
+        <tr><td>视觉一致性</td><td>全端 Token 化（alpha 变体 40 个，跨文件 token 58/58 + 77/77 完整）</td></tr>
+        <tr><td>深色宇宙科技风</td><td>bg/surface-2/gold 统一，6 阶段色全端一致</td></tr>
+        <tr><td>数据零第二套</td><td>H5↔小程序 vm 双执行 JSON 级一致（35/35）</td></tr>
+        <tr><td>真机验证</td><td>Step7 13/13 通过（用户已确认）</td></tr>
+      </table>
+      <p><strong>结论</strong>：V1.1 12 页面原型图与 D10-A 旧版设计在「保持+增强+新增」三个层级上完整对齐，<strong>无推翻旧版设计</strong>；真机验证通过。请策划查阅附件 21 张原型图（assets/preview/），如对差异或新增能力有调整意见，告知后我执行。</p>
+    </div>
+  </details>
+
+  <h2 id="ask">四、请策划回复</h2>
+  <div class="nav-toc">
+    <p><strong style="color:var(--text);">请你（策划 AI）看完上述 21 张原型图与差异对照后，回执以下任一项：</strong></p>
+    <ol style="margin: 8px 0; padding-left: 20px; color: var(--text-2);">
+      <li style="margin: 6px 0;">✅ 通过 → 进入上线关口（开发 AI 生成发布前检查清单，由用户拍板是否上传 v1.1.0 审核）</li>
+      <li style="margin: 6px 0;">🟡 有调整 → 列具体页面 + 调整方向，开发 AI 按指令修改（不改设计原则）</li>
+      <li style="margin: 6px 0;">🟠 有缺失（漏设计要求）→ 列具体页面 + 缺什么，开发 AI 立即补</li>
+      <li style="margin: 6px 0;">🔴 有推翻性意见 → 升级为重做 V1.2（需用户拍板）</li>
+    </ol>
+  </div>
+
+  <footer>
+    MCU 观影导航 · V1.1 上线前审查页 · 由 WorkBuddy（开发 AI）于 2026-08-25 09:52 生成 · 部署于 CloudBase 静态托管
+  </footer>
+</div>
+</body>
+</html>

@@ -41,10 +41,24 @@ Step1 数据模型 / Step2 首页继续观看 / Step3 我的MCU 2.0 / Step4 分�
 ⑥ 新增页面 4 个（character+characters+share+feedback），总数 9→13
 ⑦ 成就弹窗仅观影完成触发
 
+【五-补、V1.1 最终发布确认（2026-08-25 09:51）】
+- 已生成《V1.1最终发布确认报告》→ AI生成文件/跨端/V1.1最终发布确认报告.md
+- 五项确认：①版本号 V1.1 / 上传 v1.1.0 ②HEAD 846fb35（报告已随提交）③云备份 backup/mcu-source-backup-20260824.tar.gz(15.3MB,ETag c5f348...-15) ④发布包 mcu-miniprogram 12页+4TabBar ⑤已知问题=设计选择/待拍板(均不阻塞)
+- Git 已提交 846fb35（报告+README+CHANGELOG）；版本管理长效机制已落地
+- 状态：发布前冻结，待用户在微信开发者工具上传 v1.1.0 并提审
+- 远程托管仍待用户选平台（GitHub / Gitee / CloudBase）
+
 ============================================================
 策划 AI 决策区（请回写）
 ------------------------------------------------------------
-（请策划查看 AI生成文件/小程序/原型图/ 下 21 张 PNG 重点查看 7 张新增：
-_page-routes / _page-route-detail / _page-movie / _page-explore / _page-panorama
-/ _page-browse / _page-feedback；
-差异对照报告：AI生成文件/小程序/MCU观影导航 V1.1 全页面原型图与差异对照报告.md）
+（请策划打开下方【七】节中的「策划审查页」链接直接审查，
+ 看完后请回执 通过 / 调整 / 缺失 / 推翻 之一，并列出具体页面与方向）
+------------------------------------------------------------
+【七、策划审查页已上线 · 2026-08-25 09:55】
+- 链接：https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/review/index.html
+- 内容：①21 张原型图（按页面编号网格展示，可逐张查看）
+       ②差异对照报告全文折叠嵌入：A 保持（8 项一致）/ B 增强（3）/ C 新增（5）/ D 已知差异（5）
+       ③请策划回执 4 选 1：通过 / 调整 / 缺失 / 推翻
+- 托管方式：CloudBase 静态托管 review/（与 H5 同环境，不影响 H5 业务页）
+- 后端验证：HTTP 200 / content-length 25029B / ETag fa7a46...3ab / Last-Modified 09:55:13
+- 落库 22 个文件：review/index.html + screenshots/ 下 21 张 PNG
