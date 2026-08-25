@@ -1,16 +1,29 @@
-/* MCU观影导航 V1.2 - 全局样式 / 设计 Token
- * V1.2 变更：统一色板（吸收首页 V1.2 色值）、5级字号、间距体系、三级卡片
+/* MCU观影导航 V1.2-DS - 全局样式 / 设计 Token
+ * 依据：《MCU-V1.2-开发视觉标注》§一/§二（设计 AI 唯一视觉标准）
+ * V1.2 变更：字号/间距/圆角/阴影体系升级 + 功能四色 + surface-0
  * 禁止在页面层写死颜色，一律引用以下 CSS 变量（零 raw hex 泄漏）。
  */
 page {
   /* ── 背景层 ── */
   --bg: #080B12;
+  --surface-0: #0D1119;
   --surface-1: #161D2B;
   --surface-2: #1E2636;
   --surface-3: #2A3447;
 
   /* ── 品牌金 ── */
   --gold: #F2B233;
+
+  /* ── 功能强调色（V1.2 新增） ── */
+  --accent-blue: #4A9EF5;
+  --accent-red: #E85D5D;
+  --accent-purple: #9B7FE8;
+  --accent-blue-a10: rgba(74,158,245,0.10);
+  --accent-blue-a20: rgba(74,158,245,0.20);
+  --accent-red-a10: rgba(232,93,93,0.10);
+  --accent-red-a20: rgba(232,93,93,0.20);
+  --accent-purple-a10: rgba(155,127,232,0.10);
+  --accent-purple-a20: rgba(155,127,232,0.20);
 
   /* ── 六阶段色（仅用于内容标识，不参与 UI 框架） ── */
   --p1: #5B8DEF;
@@ -33,22 +46,35 @@ page {
   --white: #FFFFFF;
   --gold-btn-text: #1A1206;
 
-  /* ── 字号体系（5级制） ── */
-  --fs-display: 48rpx;
-  --fs-display-sm: 40rpx;
-  --fs-title: 34rpx;
+  /* ── 字号体系（5级制，V1.2-DS 升级） ── */
+  --fs-display: 56rpx;
+  --fs-display-sm: 44rpx;
+  --fs-title: 36rpx;
   --fs-body: 28rpx;
   --fs-caption: 24rpx;
-  --fs-mini: 20rpx;
+  --fs-mini: 22rpx;
 
-  /* ── 间距体系 ── */
+  /* ── 间距体系（V1.2-DS 升级） ── */
   --space-xs: 8rpx;
-  --space-sm: 16rpx;
-  --space-md: 24rpx;
-  --space-lg: 32rpx;
-  --space-xl: 48rpx;
-  --space-2xl: 64rpx;
-  --page-x: 32rpx;
+  --space-sm: 20rpx;
+  --space-md: 28rpx;
+  --space-lg: 36rpx;
+  --space-xl: 56rpx;
+  --space-2xl: 72rpx;
+  --page-x: 36rpx;
+
+  /* ── 圆角（5 级，V1.2 新增） ── */
+  --radius-sm: 12rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 20rpx;
+  --radius-xl: 32rpx;
+  --radius-full: 999rpx;
+
+  /* ── 阴影（V1.2 新增） ── */
+  --shadow-card: 0 4rpx 16rpx rgba(0,0,0,0.3);
+  --shadow-hero: 0 8rpx 32rpx rgba(0,0,0,0.4);
+  --glow-gold: 0 8rpx 24rpx rgba(242,178,51,0.12);
+  --glow-gold-strong: 0 12rpx 40rpx rgba(242,178,51,0.20);
 
   /* ── 金色 alpha 变体（基准 rgb 242,178,51） ── */
   --gold-a02: rgba(242,178,51,0.02);
@@ -108,7 +134,7 @@ page {
   line-height: 1.5;
 }
 
-/* —— V1.2 通用布局类（全局可用，页面不重复定义） —— */
+/* —— V1.2-DS 通用布局类（全局可用，页面不重复定义） —— */
 .mcu-page {
   min-height: 100vh;
   box-sizing: border-box;
@@ -120,58 +146,91 @@ page {
   margin-bottom: var(--space-xl);
 }
 
-/* 三级卡片体系 */
+/* 三级卡片体系（V1.2-DS：圆角 Hero32/Content20/Compact16 + 阴影） */
 .mcu-card {
   background: var(--surface-1);
-  border-radius: 24rpx;
+  border-radius: var(--radius-xl);
   padding: var(--space-lg);
   margin-bottom: var(--space-sm);
 }
 .card-hero {
   background: var(--surface-1);
-  border-radius: 24rpx;
+  border-radius: var(--radius-xl);
   padding: var(--space-lg);
+  box-shadow: var(--shadow-hero);
 }
 .card-content {
   background: var(--surface-2);
   border: 1rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-lg);
   padding: var(--space-md);
+  box-shadow: var(--shadow-card);
 }
 .card-compact {
   background: var(--surface-2);
-  border-radius: 12rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-sm) 20rpx;
 }
 
-/* 文字层级 */
+/* 文字层级（V1.2-DS） */
+.mcu-display {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  color: var(--text-main);
+}
 .mcu-title {
   font-size: var(--fs-title);
   font-weight: 600;
   color: var(--text-main);
 }
-
+.mcu-body {
+  font-size: var(--fs-body);
+  color: var(--text-main);
+}
 .mcu-sub {
   font-size: var(--fs-body);
   color: var(--text-sub);
 }
-
+.mcu-caption {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+}
 .mcu-weak {
   font-size: var(--fs-caption);
   color: var(--text-weak);
 }
-
+.mcu-mini {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
 .mcu-gold {
   color: var(--gold);
 }
 
+/* 按钮（V1.2-DS） */
+.mcu-btn-primary {
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  box-shadow: var(--glow-gold);
+}
+.mcu-btn-ghost {
+  color: var(--gold);
+  font-size: var(--fs-body);
+  font-weight: 400;
+}
 .mcu-btn-gold {
   background: var(--gold);
   color: var(--gold-btn-text);
   font-weight: 600;
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: 20rpx 0;
   text-align: center;
+  box-shadow: var(--glow-gold);
 }
 
 .mcu-divider {

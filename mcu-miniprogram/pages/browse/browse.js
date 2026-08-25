@@ -1,4 +1,5 @@
-// 浏览全部 browse - Step3-7-C 恢复
+// 浏览全部 browse · V1.2-DS 视觉校准（左海报 + 右信息）
+// 图片走 visuals.js 单一来源：mcuData.visual(id).poster；缺失时前端 poster-pN 兜底
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 
@@ -16,9 +17,14 @@ Page({
     all.forEach(function (m) {
       const p = m.phase || 0;
       (map[p] = map[p] || []).push({
-        id: m.id, cn: m.cn, en: m.en, phase: m.phase,
+        id: m.id,
+        cn: m.cn,
+        en: m.en,
+        phase: m.phase,
         phaseColor: mcuData.phaseColor(m.phase),
-        status: userState.watchState(m.id)
+        status: userState.watchState(m.id),
+        posterUrl: mcuData.visual(m.id).poster,   // 统一视觉层注入
+        initial: m.cn[0]
       });
     });
     const groups = Object.keys(map).map(function (p) {

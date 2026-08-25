@@ -1,4 +1,7 @@
-/* browse 浏览全部 · V1.2 统一视觉 */
+/* browse 浏览全部 · V1.2-DS 视觉校准
+ * 依据：《MCU-V1.2-开发视觉标注》（字号5档/间距7级/圆角5级/三级卡片）
+ * 纪律：全 Token 引用、零裸 hex、字重仅 400/600/700
+ */
 
 .page-head { padding: var(--space-xl) 0 var(--space-md); }
 .page-title { font-size: var(--fs-display); font-weight: 700; color: var(--text-main); }
@@ -7,19 +10,72 @@
 .phase-group { margin-bottom: var(--space-lg); }
 .group-head { display: flex; align-items: center; margin: var(--space-xs) 0 18rpx; }
 .group-dot { width: 16rpx; height: 16rpx; border-radius: 50%; margin-right: 14rpx; }
-.group-title { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); }
+.group-title { font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
 .group-count { font-size: var(--fs-mini); color: var(--text-weak); margin-left: auto; }
 
+/* 电影行：Content 卡片（20rpx 圆角） */
 .film-list { display: flex; flex-direction: column; gap: var(--space-sm); }
-.film-row { display: flex; align-items: center; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 16rpx; padding: 20rpx; }
+.film-row {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-card);
+}
 .film-row-hover { background: var(--surface-3); }
-.film-letter { width: 64rpx; height: 64rpx; border-radius: 12rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 20rpx; flex-shrink: 0; }
+
+/* 左侧海报缩略图（96×144，2:3）：阶段色渐变兜底 + image 覆盖 */
+.film-poster {
+  position: relative;
+  width: 96rpx;
+  height: 144rpx;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+}
+.film-poster-text {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--white-a50);
+}
+.film-poster-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .film-info { flex: 1; min-width: 0; }
 .film-cn { font-size: var(--fs-body); color: var(--text-main); font-weight: 600; }
-.film-en { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 4rpx; }
-.film-status { font-size: var(--fs-mini); padding: 6rpx 16rpx; border-radius: 20rpx; flex-shrink: 0; }
-.status-unwatched { color: var(--gold); background: var(--gold-a15); }
-.status-watching { color: var(--success); background: var(--success-a15); }
-.status-watched { color: var(--text-weak); background: var(--surface-3); }
+.film-en { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
+.film-phase { font-size: var(--fs-caption); color: var(--text-weak); margin-top: var(--space-xs); }
+
+/* 状态胶囊（radius-full，22rpx） */
+.film-status {
+  font-size: var(--fs-mini);
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  margin-left: var(--space-sm);
+}
+.status-watched   { color: var(--success); background: var(--success-a15); }
+.status-watching  { color: var(--gold);    background: var(--gold-a15); }
+.status-unwatched { color: var(--text-weak); background: var(--surface-3); }
+
+/* 海报兜底：阶段色渐变（仅内容标识，V1.2 纪律） */
+.poster-p0 { background: linear-gradient(135deg, var(--surface-3), var(--surface-2)); }
+.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
+.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
+.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
+.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
+.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
+.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }
 
 .bottom-pad { height: 60rpx; }
