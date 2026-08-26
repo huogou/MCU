@@ -13,7 +13,7 @@ function toFile(p) {
 }
 
 /* 派生（与 explore.js 一致） */
-const SPECIAL = [ ['tony','peter','mentor'],['tony','steve','rival'],['thor','loki','family'],['thor','odin','family'],['steve','bucky','family'],['natasha','clint','family'],['wanda','vision','family'],['tony','thanos','enemy'],['thanos','gamora','family'],['strange','wanda','rival'],['wade','logan','rival'],['tchalla','starlord','rival'] ];
+const SPECIAL = [ ['tony','peter','mentor'],['tony','steve','ally'],['thor','loki','family'],['steve','bucky','family'],['natasha','clint','family'],['wanda','vision','family'],['tony','thanos','enemy'],['thanos','gamora','family'],['strange','wanda','ally'],['wade','logan','rival'],['tchalla','starlord','ally'],['tony','fury','ally'],['tony','tchalla','ally'],['tony','natasha','ally'],['tony','thor','ally'],['steve','tchalla','ally'],['steve','natasha','ally'],['steve','thor','ally'],['tony','clint','ally'] ];
 const sp = {}; SPECIAL.forEach(p => { sp[p[0]+'|'+p[1]] = p[2]; sp[p[1]+'|'+p[0]] = p[2]; });
 const REL = { ally:{label:'盟友',color:'#4A9EF5'}, enemy:{label:'敌人',color:'#E85D5D'}, mentor:{label:'师徒',color:'#F2B233'}, family:{label:'家人',color:'#9B7FE8'}, rival:{label:'对手',color:'#E85D5D',dash:1} };
 const CAMP = { avengers:'red', asgard:'blue', guardians:'purple', wakanda:'gold', shield:'blue', mutant:'purple', villain:'gray', street:'red' };

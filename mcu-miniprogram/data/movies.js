@@ -97,7 +97,7 @@ const MOVIES = [
     mainline: true, starter: true,
     role: '第一阶段的收束点，也是 MCU 商业模式成立的证明：分散的独立电影可以汇成一场集体战役。',
     sf: '洛基入侵地球，尼克·弗瑞召集六位互不对付的英雄组成复仇者联盟。',
-    chars: ['tony', 'steve', 'thor', 'natasha', 'banner', 'clint', 'loki', 'fury'],
+    chars: ['tony', 'steve', 'thor', 'natasha', 'banner', 'clint', 'loki', 'fury', 'thanos'],
     next: {
       mainline: { id: 'winter-soldier', why: '纽约之战让全世界知道了超级英雄的存在，也让神盾局的权力被彻底放大。《冬日战士》正面处理这个后果，是第二阶段质量最高、对主线影响最深的一部。' },
       understand: { id: 'iron-man-3', why: '纽约之战给托尼留下了严重的心理创伤，《钢铁侠3》整部电影都在处理这件事。想理解托尼后来为什么执着于"给地球造一副盔甲"，这部是关键。' }
@@ -185,7 +185,7 @@ const MOVIES = [
     mainline: true, starter: false,
     role: '复仇者的正式解体。它同时完成了三件事：拆散团队、引入蜘蛛侠、引入黑豹——三条后续主线在这一部里同时启动。',
     sf: '一份要求超级英雄接受政府管辖的协议，把复仇者分成了针锋相对的两派。',
-    chars: ['tony', 'steve', 'bucky', 'natasha', 'sam', 'wanda', 'vision', 'scott', 'peter', 'tchalla'],
+    chars: ['tony', 'steve', 'bucky', 'natasha', 'sam', 'wanda', 'vision', 'scott', 'peter', 'tchalla', 'clint'],
     next: {
       mainline: { id: 'infinity-war', why: '内战之后复仇者四分五裂，灭霸恰恰是在他们最散的时候动手的。这个"分裂—被各个击破"的因果，是《无限战争》悲剧性的核心。' },
       understand: { id: 'spider-man-homecoming', why: '托尼在这部里把蜘蛛侠拉进战场，《英雄归来》紧接着回答"这个高中生后来怎么样了"。想搞懂蜘蛛侠和钢铁侠的关系，必须连看。' }

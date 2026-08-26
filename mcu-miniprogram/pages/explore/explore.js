@@ -49,20 +49,29 @@ const FILTERS = [
   { key: 'family', label: '家人' }
 ];
 
-/* ---- 预定义特殊关系基础表（VDS §5.4 示例 8 条 + 已验证补充 4 条；完整 92 条待 GPT） ---- */
+/* ---- 预定义特殊关系基础表（VDS §5.4 + 设计核验表 R-02~R-04 方案 C 修正：3 条改 ally、删 thor-odin 断链、补 7 条跨阵营战友 ally；完整 92 条待 GPT） ---- */
 const SPECIAL_RELATIONS = [
   { from: 'tony',    to: 'peter',   type: 'mentor' },
-  { from: 'tony',    to: 'steve',   type: 'rival' },
+  { from: 'tony',    to: 'steve',   type: 'ally' },      /* R-02: 核心盟友(内战短暂对立终局和解) */
   { from: 'thor',    to: 'loki',    type: 'family' },
-  { from: 'thor',    to: 'odin',    type: 'family' },
+  /* R-03: 删除 thor-odin（odin 不在 CHARACTERS，断链永不生效） */
   { from: 'steve',   to: 'bucky',   type: 'family' },
   { from: 'natasha', to: 'clint',   type: 'family' },
   { from: 'wanda',   to: 'vision',  type: 'family' },
   { from: 'tony',    to: 'thanos',  type: 'enemy' },
   { from: 'thanos',  to: 'gamora',  type: 'family' },
-  { from: 'strange', to: 'wanda',   type: 'rival' },
+  { from: 'strange', to: 'wanda',   type: 'ally' },      /* R-02: 盟友(偶有紧张非对手) */
   { from: 'wade',    to: 'logan',   type: 'rival' },
-  { from: 'tchalla', to: 'starlord',type: 'rival' }
+  { from: 'tchalla', to: 'starlord',type: 'ally' },      /* R-02: 短暂冲突后结盟 */
+  /* R-04 方案 B：补跨阵营战友 ally（设计核验表 2.2 推荐，修正 auto-derived rival 误标） */
+  { from: 'tony',    to: 'fury',    type: 'ally' },
+  { from: 'tony',    to: 'tchalla', type: 'ally' },
+  { from: 'tony',    to: 'natasha', type: 'ally' },
+  { from: 'tony',    to: 'thor',    type: 'ally' },
+  { from: 'steve',   to: 'tchalla', type: 'ally' },
+  { from: 'steve',   to: 'natasha', type: 'ally' },
+  { from: 'steve',   to: 'thor',    type: 'ally' },
+  { from: 'tony',    to: 'clint',   type: 'ally' }      /* 同类误标一并修正（鹰眼=复联战友，共演4部） */
 ];
 const specialMap = {};
 SPECIAL_RELATIONS.forEach(function (p) {

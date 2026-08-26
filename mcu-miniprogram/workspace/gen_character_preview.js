@@ -9,7 +9,7 @@ const { CHARACTERS } = require('../data/characters.js');
 const { TYPE_LABEL } = require('../data/content.js');
 
 const CDN = 'https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com';
-const id = 'tony';
+const id = process.argv[2] || 'tony';   /* 支持 node gen_character_preview.js <charId> */
 const char = mcuData.getChar(id);
 const CAMP_MAP = {
   avengers:'red', guardians:'purple', asgard:'blue', wakanda:'gold',
