@@ -85,5 +85,14 @@ MCU观影导航 V1.2 · 设计AI工作日志
   ③ 角色：Hero 增强（头像 160rpx / 边框 6rpx / 阵营径向光效 / 简介直展）——VDS §4.2 全落地
   ④ 关系探索：Canvas 力导向网络图（中心+一级圆形分布、头像圆形裁剪节点、5 色连线含对手虚线、点击切换中心、5 筛选 Chips + 关系列表）——VDS §5 全落地，**已替代关系对卡片版**
 - 你侧 5 张新资源（hero/entries）+ visuals.heroBanner()/entryBg() 已接入首页。
-- 4 页截图：AI生成文件/小程序/V1.2{首页_HeroBanner,角色详情_Hero增强,关系探索_网络图,电影详情}_预览 — 请按 VDS §8 验收。
+- **交付文件清单（完整路径，请直接复制打开验收）**：
+  · 首页截图：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2首页_HeroBanner预览.png
+  · 电影详情截图：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2电影详情_预览渲染.png
+  · 角色详情截图：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2角色详情_Hero增强预览.png
+  · 关系探索截图：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2关系探索_网络图预览.png
+  · 修改文件（7）：D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\home\{home.js,home.wxml,home.wxss}
+    D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\explore\{explore.js,explore.wxml,explore.wxss}
+    D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\character\{character.wxml,character.wxss}
+    D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\models\mcuData.js
+  · 校验脚本：D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\workspace\{check_step5_global.js,check_step14.js,gen_home_vds.js,gen_explore_vds.js,gen_character_preview.js}
 - 待设计侧确认 2 项：①SPECIAL 完整 92 条（开发当前 12 条基础表，等 GPT 提供）②Canvas 网络图真机性能反馈。

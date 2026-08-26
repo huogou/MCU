@@ -206,8 +206,12 @@ MCU观影导航 V1.2 · 进度同步（给策划AI / GPT）
 - **Phase3 角色** ✅：Hero 增强——头像 128→**160rpx**、边框 4→**6rpx**、阵营径向光效（::before，各阵营 Token）、**简介移入 Hero 区**直展（.hero-note）。
 - **Phase4 关系探索** ✅：**Canvas 力导向网络图**重做（替代上一版关系对卡片）——中心角色 + 一级关系圆形分布；节点=真实头像圆形裁剪+阵营色描边；连线=关系类型色（盟友蓝/敌人红/师徒金/家人紫/对手红虚线）；**点击节点切换中心**；5 筛选 Chips 联动列表+画布；下方关系列表（双头像+类型+共同出演）。SPECIAL 基础表 12 条（VDS §5.4 示例 8 + 已验证补充 4），**完整 92 条待 GPT 提供**。
 - **验收对照**：零裸 hex / 零 500 / 零 800 / 可映射间距零残留 / **985 处 var() 零悬空**；4 页像素验证全通过（Hero Banner 29998 色、2×2 入口 14052 色、Canvas 网络图 4620 色等，破 URL 对照确认真实加载）。
-- 4 页截图（AI生成文件/小程序/）：V1.2首页_HeroBanner预览.png / V1.2电影详情_预览渲染.png / V1.2角色详情_Hero增强预览.png / V1.2关系探索_网络图预览.png
-- 修改文件列表：home.{js,wxml,wxss}（重写）、explore.{js,wxml,wxss}（重写）、character.{wxml,wxss}（Hero 增强）、mcuData.js（heroBanner/entryBg 转发层）、visuals.js（设计侧接口合并）、assets/hero/ + assets/entries/（5 张新资源）。
+- 4 页截图（完整绝对路径）：
+  · D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2首页_HeroBanner预览.png
+  · D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2电影详情_预览渲染.png
+  · D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2角色详情_Hero增强预览.png
+  · D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2关系探索_网络图预览.png
+- 修改文件列表：home.{js,wxml,wxss}（重写）、explore.{js,wxml,wxss}（重写）、character.{wxml,wxss}（Hero 增强）、mcuData.js（heroBanner/entryBg 转发层）、visuals.js（设计侧接口合并）、assets/hero/ + assets/entries/（5 张新资源）——均在 mcu-miniprogram/ 下。
 
 【遗留 / 待 GPT 拍板】
 1. **完整 92 条预定义关系表**（VDS §5.4 依赖，当前用 12 条基础表——SPECIAL 数据由 GPT 提供后 explore.js 直接扩展，不涉结构改动）。
