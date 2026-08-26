@@ -4,9 +4,9 @@
  * 来源：H5 mcu-navigator/data/{posters,stills}.js（唯一可信源，机械适配）
  * 入口：
  *   visual(id)   → { poster, backdrop }      电影海报 + 剧照
- *   avatar(id)   → 角色头像路径（本地）
- *   phase(n)     → 阶段代表图路径（本地），n = 1~6
- *   homeBg()     → 首页背景图路径（本地）
+ *   avatar(id)   → 角色头像路径（CDN）
+ *   phase(n)     → 阶段代表图路径（CDN），n = 1~6
+ *   heroBanner() → Hero Banner 背景（CDN）
  *
  * V1.2 资源接入（2026-08-26）：
  *   - 38 张海报 + 38 张剧照 → CloudBase 静态托管（CDN）
@@ -150,9 +150,6 @@ const phases = {
   6: LOCAL + '/phases/phase-6.jpg'
 };
 
-/* ── 首页背景（本地资源） ── */
-const homeBackground = LOCAL + '/backgrounds/home-bg.jpg';
-
 /* ── Hero Banner（首页沉浸式入口，V1.2 VDS 新增） ── */
 const heroBannerImg = LOCAL + '/hero/hero-banner.jpg';
 
@@ -197,14 +194,6 @@ function phase(n) {
 }
 
 /**
- * 首页背景图
- * @returns {string}
- */
-function homeBg() {
-  return homeBackground;
-}
-
-/**
  * Hero Banner（首页沉浸式入口背景）
  * @returns {string}
  */
@@ -221,4 +210,4 @@ function entryBg(key) {
   return (key && entryBgs[key]) ? entryBgs[key] : null;
 }
 
-module.exports = { visual, avatar, phase, homeBg, heroBanner, entryBg, posters, stills, avatars, phases, entryBgs };
+module.exports = { visual, avatar, phase, heroBanner, entryBg, posters, stills, avatars, phases, entryBgs };

@@ -43,10 +43,16 @@ Page({
       { key: 'topic', label: '专题路线' }
     ],
     current: null,   // 当前路线进度卡
-    list: []         // 当前 Tab 下的路线卡
+    list: [],        // 当前 Tab 下的路线卡
+    phases: []       // 专项⑥：Phase 导航序列（阶段图辅助视觉，纯展示）
   },
 
-  onLoad: function () { this.refresh(); },
+  onLoad: function () {
+    this.phases = [1, 2, 3, 4, 5, 6].map(function (n) {
+      return { n: n, img: mcuData.phase(n) || '' };
+    });
+    this.refresh();
+  },
   onShow: function () { this.refresh(); },
 
   refresh: function () {
@@ -98,7 +104,7 @@ Page({
         return c;
       });
 
-    this.setData({ current: current, list: list });
+    this.setData({ current: current, list: list, phases: this.phases || [] });
   },
 
   switchTab: function (e) {

@@ -82,12 +82,15 @@ function coCount(aId, bId) {
   return fa.filter(function (f) { return setB[f.id]; }).length;
 }
 
-/* 关系类型判定（VDS §5.4）：predefined 优先 → 同阵营=盟友 → 不同阵营=null */
+/* 关系类型判定（VDS §5.4 + GPT 2026-08-26 数据层扩充授权）：
+   predefined 优先 → 同阵营=盟友 → 跨阵营高频共演(≥2部)=对手(rival，竞争非敌对) → 其余 null */
 function relationOf(a, b) {
   const pre = specialMap[a + '|' + b];
   if (pre) return pre;
   const ca = mcuData.getChar(a), cb = mcuData.getChar(b);
-  if (ca && cb && ca.camp === cb.camp) return 'ally';
+  if (!ca || !cb) return null;
+  if (ca.camp === cb.camp) return 'ally';
+  if (coCount(a, b) >= 2) return 'rival';
   return null;
 }
 
@@ -202,9 +205,9 @@ Page({
     if (!center) return;
     const centerCamp = campOf(center.camp);
 
-    /* 背景 */
+    /* 背景（P1-2：与 --bg #080B12 完全一致） */
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#0B0E14';
+    ctx.fillStyle = '#080B12';
     ctx.fillRect(0, 0, W, H);
 
     /* 中心 + 邻居布局：中心居中，邻居绕圆形分布 */

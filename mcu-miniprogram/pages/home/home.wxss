@@ -314,7 +314,7 @@
 .evc-desc {
   font-size: var(--fs-mini);             /* 22rpx */
   color: var(--text-sub);
-  margin-top: 4rpx;
+  margin-top: var(--space-xs);           /* 4→8（P1-4） */
 }
 
 /* ═══ ⑤ 热门角色（横滚） ═══ */

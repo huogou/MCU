@@ -167,12 +167,7 @@ const data = {
     return visuals.avatar(charId);
   },
 
-  /* 首页背景图（V1.2 资源接入：home-bg.jpg 本地） */
-  homeBg: function () {
-    return visuals.homeBg();
-  },
-
-  /* Hero Banner（VDS V2：hero-banner.jpg 本地） */
+  /* Hero Banner（VDS V2：hero-banner.jpg） */
   heroBanner: function () {
     return visuals.heroBanner();
   },

@@ -20,7 +20,7 @@ const CAMP = { avengers:'red', asgard:'blue', guardians:'purple', wakanda:'gold'
 const CAMP_COLOR = { red:'#E85D5D', blue:'#4A9EF5', purple:'#9B7FE8', gold:'#F2B233', gray:'#6B7384' };
 const heroOf = cn => { const p=(cn||'').split(' / '); return p.length>1?p[1].trim():(cn||''); };
 function co(a,b){ const fa=mcuData.filmsOfChar(a),fb=mcuData.filmsOfChar(b); if(!fa.length||!fb.length)return 0; const s={}; fb.forEach(f=>s[f.id]=1); return fa.filter(f=>s[f.id]).length; }
-function relOf(a,b){ const p=sp[a+'|'+b]; if(p)return p; const ca=mcuData.getChar(a),cb=mcuData.getChar(b); if(ca&&cb&&ca.camp===cb.camp)return 'ally'; return null; }
+function relOf(a,b){ const p=sp[a+'|'+b]; if(p)return p; const ca=mcuData.getChar(a),cb=mcuData.getChar(b); if(!ca||!cb)return null; if(ca.camp===cb.camp)return 'ally'; if(co(a,b)>=2)return 'rival'; return null; }
 function relsOf(id){ const out=[]; CHARACTERS.forEach(c=>{ if(c.id===id)return; const t=relOf(id,c.id); if(!t)return; out.push({id:c.id,type:t,shared:co(id,c.id)}); }); out.sort((a,b)=>b.shared-a.shared); return out; }
 
 const CENTER = 'tony';

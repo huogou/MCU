@@ -38,6 +38,38 @@
   font-weight: 600;
 }
 
+/* ══════ Phase 导航序列（专项⑥：阶段图辅助视觉，纯展示） ══════ */
+.phase-strip {
+  width: 100%;
+  white-space: nowrap;
+  padding: var(--space-xs) var(--page-x) 0;
+  box-sizing: border-box;
+}
+.phase-strip-inner {
+  display: inline-flex;
+  gap: var(--space-xs);
+  padding: 4rpx 0;
+}
+.phase-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  flex-shrink: 0;
+}
+.phase-cell-img {
+  width: 96rpx;
+  height: 52rpx;
+  border-radius: var(--radius-sm);
+  border: 1rpx solid var(--surface-3);
+}
+.phase-cell-label {
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: 1rpx;
+}
+
 /* ══════ 当前路线进度 ══════ */
 .section-label {
   font-size: var(--fs-mini);

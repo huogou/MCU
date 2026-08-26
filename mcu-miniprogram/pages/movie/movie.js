@@ -217,8 +217,8 @@ Page({
       posterClass: 'poster-p' + phase,
       posterLetter: (m.cn || '').charAt(0),
       heroBg: (v.backdrop)
-        ? 'background-image: linear-gradient(160deg, ' + hexToRgba(phaseColor, 0.38) + ' 0%, ' + hexToRgba(phaseColor, 0.12) + ' 42%, var(--bg) 100%), url(\"' + v.backdrop + '\"); background-size: cover; background-position: center;'
-        : 'background: linear-gradient(160deg, ' + hexToRgba(phaseColor, 0.08) + ', transparent 50%, var(--bg));',
+        ? 'background-image: linear-gradient(to bottom, ' + hexToRgba(phaseColor, 0.38) + ' 0%, ' + hexToRgba(phaseColor, 0.12) + ' 42%, var(--bg) 100%), url(\"' + v.backdrop + '\"); background-size: cover; background-position: center;'
+        : 'background: linear-gradient(to bottom, ' + hexToRgba(phaseColor, 0.08) + ', transparent 50%, var(--bg));',
       cn: m.cn,
       en: m.en || '',
       phaseText: '第' + cnPhase(phase) + '阶段' + (m.year ? ' · ' + m.year : ''),

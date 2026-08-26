@@ -11,6 +11,16 @@
     </view>
   </view>
 
+  <!-- 专项⑥：Phase 导航序列（阶段图辅助视觉，纯展示不交互，Phase1→6） -->
+  <scroll-view scroll-x class="phase-strip" enable-flex>
+    <view class="phase-strip-inner">
+      <view wx:for="{{phases}}" wx:key="n" class="phase-cell">
+        <image wx:if="{{item.img}}" class="phase-cell-img" src="{{item.img}}" mode="aspectFill" lazy-load="true"/>
+        <view class="phase-cell-label">P{{item.n}}</view>
+      </view>
+    </view>
+  </scroll-view>
+
   <!-- 当前路线进度 -->
   <block wx:if="{{current}}">
     <view class="section-label">当前路线进度</view>
