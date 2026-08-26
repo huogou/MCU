@@ -157,9 +157,19 @@ const data = {
     return (p && p >= 1 && p <= 6) ? PHASE[p] : '#7A8296';
   },
 
-  /* 统一视觉入口：页面只调用 data.visual(id)，不直接读图片 URL（禁硬编码） */
+  /* 统一视觉入口：页面只调用 data.*，不直接读图片 URL（禁硬编码） */
   visual: function (id) {
     return visuals.visual(id);
+  },
+
+  /* 角色头像（V1.2 资源接入：24 张本地，缺失返回 null → 前端 G-19 兜底） */
+  avatar: function (charId) {
+    return visuals.avatar(charId);
+  },
+
+  /* 首页背景图（V1.2 资源接入：home-bg.jpg 本地） */
+  homeBg: function () {
+    return visuals.homeBg();
   },
 
   /* 该角色出现过的作品（由 chars 反查） */

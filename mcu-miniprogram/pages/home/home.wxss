@@ -31,7 +31,16 @@
   border-radius: var(--radius-xl);
   margin-bottom: var(--space-xl);
 }
-/* 顶部「宇宙背景」占位：home-bg.jpg 缺失 → 宇宙渐变占位（G-18 合规） */
+/* 顶部「宇宙背景」：home-bg.jpg 已接入（visuals.homeBg，2026-08-26），
+   铺满整卡并叠渐变罩层保证文字可读；缺失时仍由渐变占位（G-18 合规） */
+.journey-bg-img {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  opacity: 0.85;
+}
 .journey-bg {
   position: absolute;
   top: 0; left: 0; right: 0;

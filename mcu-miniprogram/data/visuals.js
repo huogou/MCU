@@ -2,28 +2,32 @@
  * MCU 宇宙导航（小程序） - 统一视觉资源层
  * ------------------------------------------------------------
  * 来源：H5 mcu-navigator/data/{posters,stills}.js（唯一可信源，机械适配）
- * 单一入口：visual(id) → { poster, backdrop }
- *   - poster   : 竖版海报（2:3），来源 posters 映射
- *   - backdrop : 横版大图（16:9），来源 stills 映射
+ * 入口：
+ *   visual(id)   → { poster, backdrop }      电影海报 + 剧照
+ *   avatar(id)   → 角色头像路径（本地）
+ *   phase(n)     → 阶段代表图路径（本地），n = 1~6
+ *   homeBg()     → 首页背景图路径（本地）
  *
- * V1.2 资源接入（2026-08-25）：
- *   - 38 张海报 + 38 张剧照已按 H5 同名登记，指向 CloudBase 静态托管
- *     （https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/...），
- *     curl 实测 HTTP 200 在线。
- *   - 加载依赖：mp 后台将上述域名加入 downloadFile 合法域名（人工配置一次）。
- *   - 未接入域名前 image 加载失败 → 前端按 design 规则自动兜底
- *     （阶段色渐变 + 首字），不破图。
- *   - 缺失资源（如剧集/未收录海报）返回 null，由前端统一兜底。
+ * V1.2 资源接入（2026-08-26）：
+ *   - 38 张海报 + 38 张剧照 → CloudBase 静态托管（CDN）
+ *   - 24 张角色头像 → 本地 assets/avatars/（待上传 CDN）
+ *   - 1 张首页背景 → 本地 assets/backgrounds/（待上传 CDN）
+ *   - 6 张阶段代表图 → 本地 assets/phases/（待上传 CDN）
+ *   - 本地资源使用相对路径，上传 CDN 后替换为 CDN + 路径即可
  *
  * 设计纪律：
- *   1. 页面只调用 models/mcuData.js 的 visual(id)，禁止把图片 URL 写死在页面。
- *   2. 新增图片：按 H5 同名文件登记后自动生效，不改页面逻辑。
+ *   1. 页面只调用本模块的访问函数，禁止把图片 URL 写死在页面。
+ *   2. 新增图片：按同名登记后自动生效，不改页面逻辑。
+ *   3. 缺失资源返回 null，由前端统一兜底（阶段色渐变 + 首字）。
  * ============================================================ */
 
 /* CloudBase 静态托管根 */
 const CDN = 'https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com';
 
-/* 竖版海报映射（38 部已上映院线电影，与 H5 data/posters.js 同名） */
+/* 本地资源根（上传 CDN 后改为 CDN + '/assets'） */
+const LOCAL = '/assets';
+
+/* ── 竖版海报映射（38 部院线电影） ── */
 const posters = {
   'iron-man':                      CDN + '/assets/posters/iron-man.jpg',
   'incredible-hulk':               CDN + '/assets/posters/incredible-hulk.jpg',
@@ -65,7 +69,7 @@ const posters = {
   'brand-new-day':                 CDN + '/assets/posters/brand-new-day.jpg'
 };
 
-/* 横版剧照映射（38 部，与 H5 data/stills.js 同名） */
+/* ── 横版剧照映射（38 部） ── */
 const stills = {
   'iron-man':                      CDN + '/assets/stills/iron-man.jpg',
   'incredible-hulk':               CDN + '/assets/stills/incredible-hulk.jpg',
@@ -107,6 +111,55 @@ const stills = {
   'brand-new-day':                 CDN + '/assets/stills/brand-new-day.jpg'
 };
 
+/* ── 角色头像映射（24 位，本地资源） ── */
+/* key = characters.js 中的 id */
+const avatars = {
+  'tony':     LOCAL + '/avatars/tony.jpg',
+  'steve':    LOCAL + '/avatars/steve.jpg',
+  'thor':     LOCAL + '/avatars/thor.jpg',
+  'natasha':  LOCAL + '/avatars/natasha.jpg',
+  'banner':   LOCAL + '/avatars/banner.jpg',
+  'clint':    LOCAL + '/avatars/clint.jpg',
+  'loki':     LOCAL + '/avatars/loki.jpg',
+  'fury':     LOCAL + '/avatars/fury.jpg',
+  'bucky':    LOCAL + '/avatars/bucky.jpg',
+  'sam':      LOCAL + '/avatars/sam.jpg',
+  'peter':    LOCAL + '/avatars/peter.jpg',
+  'strange':  LOCAL + '/avatars/strange.jpg',
+  'tchalla':  LOCAL + '/avatars/tchalla.jpg',
+  'wanda':    LOCAL + '/avatars/wanda.jpg',
+  'vision':   LOCAL + '/avatars/vision.jpg',
+  'scott':    LOCAL + '/avatars/scott.jpg',
+  'carol':    LOCAL + '/avatars/carol.jpg',
+  'starlord': LOCAL + '/avatars/starlord.jpg',
+  'gamora':   LOCAL + '/avatars/gamora.jpg',
+  'thanos':   LOCAL + '/avatars/thanos.jpg',
+  'shangchi': LOCAL + '/avatars/shangchi.jpg',
+  'yelena':   LOCAL + '/avatars/yelena.jpg',
+  'wade':     LOCAL + '/avatars/wade.jpg',
+  'logan':    LOCAL + '/avatars/logan.jpg'
+};
+
+/* ── 阶段代表图映射（6 阶段，本地资源） ── */
+const phases = {
+  1: LOCAL + '/phases/phase-1.jpg',
+  2: LOCAL + '/phases/phase-2.jpg',
+  3: LOCAL + '/phases/phase-3.jpg',
+  4: LOCAL + '/phases/phase-4.jpg',
+  5: LOCAL + '/phases/phase-5.jpg',
+  6: LOCAL + '/phases/phase-6.jpg'
+};
+
+/* ── 首页背景（本地资源） ── */
+const homeBackground = LOCAL + '/backgrounds/home-bg.jpg';
+
+/* ── 访问函数 ── */
+
+/**
+ * 电影视觉资源
+ * @param {string} id - 电影 ID（如 'iron-man'）
+ * @returns {{ poster: string|null, backdrop: string|null }}
+ */
 function visual(id) {
   return {
     poster:   (id && posters[id]) ? posters[id] : null,
@@ -114,4 +167,30 @@ function visual(id) {
   };
 }
 
-module.exports = { visual, posters, stills };
+/**
+ * 角色头像
+ * @param {string} id - 角色 ID（如 'tony'）
+ * @returns {string|null}
+ */
+function avatar(id) {
+  return (id && avatars[id]) ? avatars[id] : null;
+}
+
+/**
+ * 阶段代表图
+ * @param {number} n - 阶段编号 1~6
+ * @returns {string|null}
+ */
+function phase(n) {
+  return (n && phases[n]) ? phases[n] : null;
+}
+
+/**
+ * 首页背景图
+ * @returns {string}
+ */
+function homeBg() {
+  return homeBackground;
+}
+
+module.exports = { visual, avatar, phase, homeBg, posters, stills, avatars, phases };

@@ -171,13 +171,13 @@ Page({
           const c = mcuData.getChar(cid);
           if (!c) return null;
           const camp = campCls(c.camp);
-          const av = mcuData.visual('char-' + c.id);
+          const avatar = mcuData.avatar(c.id) || '';   /* V1.2：24 张真实头像；缺失空 → G-19 兜底 */
           const parts = (c.cn || '').split(' / ');
           return {
             id: c.id,
             name: parts.length > 1 ? parts[1] : (parts[0] || ''),
             initial: (c.cn || '').charAt(0),
-            avatar: (av && av.poster) ? av.poster : '',
+            avatar: avatar,
             factionCls: 'fbg-' + camp.cls,
             ringCls: 'fring-' + camp.cls,
             factionLabel: camp.label

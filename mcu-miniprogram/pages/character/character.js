@@ -63,7 +63,7 @@ Page({
 
     const f = factionOf(char.camp);
     const faction = { cls: f.cls, label: f.label, ringCls: 'fring-' + f.cls, factionCls: 'fbg-' + f.cls };
-    const av = mcuData.visual('char-' + char.id);
+    const avatarImg = mcuData.avatar(char.id) || '';   /* V1.2：24 张真实头像；缺失空 → G-19 兜底 */
     const first = mcuData.get(char.first);
     const firstCard = first ? {
       id: first.id, cn: first.cn, en: first.en, phase: first.phase || 1,
@@ -88,14 +88,13 @@ Page({
       };
     });
 
-    /* 关系探索：关联角色 */
+    /* 关系探索：关联角色（真实头像，缺失 G-19 兜底） */
     const related = relatedChars(id).map(function (r) {
       const rf = factionOf(r.camp);
-      const rav = mcuData.visual('char-' + r.id);
       return {
         id: r.id, cn: r.cn, shared: r.shared,
         avatar: (r.cn || '?').charAt(0),
-        avatarImg: (rav && rav.poster) ? rav.poster : '',
+        avatarImg: mcuData.avatar(r.id) || '',
         factionCls: 'fbg-' + rf.cls,
         ringCls: 'fring-' + rf.cls,
         fcCls: 'fc-' + rf.cls
@@ -108,7 +107,7 @@ Page({
       char: {
         id: char.id, cn: char.cn, en: char.en, note: char.note,
         avatar: (char.cn || '?').charAt(0),
-        avatarImg: (av && av.poster) ? av.poster : ''
+        avatarImg: avatarImg
       },
       faction: faction,
       first: firstCard,

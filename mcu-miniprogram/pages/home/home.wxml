@@ -12,6 +12,7 @@
 
   <!-- ═══ ① 旅程进度卡（H-01~H-04） ═══ -->
   <view class="journey-card">
+    <image wx:if="{{homeBg}}" class="journey-bg-img" src="{{homeBg}}" mode="aspectFill" lazy-load="true"/>
     <view class="journey-bg"></view>
     <view class="journey-inner">
       <view class="journey-label">{{progress.journeyLabel}}</view>

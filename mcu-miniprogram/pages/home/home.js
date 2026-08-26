@@ -76,7 +76,8 @@ Page({
     recommend: null,  /* ② 推荐下一部大卡 */
     exploreEntries: [], /* ③ 宇宙入口 3 列 */
     hotChars: [],     /* ④ 热门角色 */
-    recent: []        /* ⑤ 最近观看 */
+    recent: [],       /* ⑤ 最近观看 */
+    homeBg: ''        /* 旅程卡背景（home-bg.jpg，缺失空 → 渐变占位） */
   },
 
   onShow() { this.refresh(); },
@@ -132,20 +133,19 @@ Page({
       cta: hasProgress ? '继续观看' : '开始观看'
     };
 
-    /* ④ 热门角色（头像资源缺失 → poster 空，前端兜底） */
+    /* ④ 热门角色（V1.2 头像资源：visuals.avatar 24 张；缺失返回 null → 前端 G-19 兜底） */
     const hotChars = HOT_CHAR_IDS.map(function (id) {
       const c = mcuData.getChar(id);
       if (!c) return null;
       const heroName = heroOf(c.cn);
       const camp = CAMP_MAP[c.camp] || CAMP_MAP.avengers;
-      const v = mcuData.visual('char-' + id);
       return {
         id: id,
         name: heroName,
         initial: heroName.charAt(0),
         factionCls: camp.cls,
         factionLabel: camp.label,
-        poster: (v && v.poster) ? v.poster : ''
+        poster: mcuData.avatar(id) || ''
       };
     }).filter(Boolean);
 
@@ -169,7 +169,8 @@ Page({
       recommend: recommendCard,
       exploreEntries: EXPLORE_ENTRIES,
       hotChars: hotChars,
-      recent: recent
+      recent: recent,
+      homeBg: mcuData.homeBg() || ''
     });
   },
 
