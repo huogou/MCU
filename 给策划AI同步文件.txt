@@ -546,3 +546,26 @@ Step1 数据模型 / Step2 首页继续观看 / Step3 我的MCU 2.0 / Step4 分�
 - 交付物：3 源码文件 + 预览渲染 PNG + 本同步文件【三十四】。
 - 下一步：P0④ 关系探索（R-01~R-04）→ Step4 P1 全局统一 → Step5 六图验收。
 - 遗留（待设计侧资源，当前 G-19 合规兜底）：24 角色头像 / 1 首页背景 / 6 阶段图。
+
+------------------------------------------------------------
+【三十五、开发AI(Work) 视觉验收5项CSS立即修复完成 · 2026-08-26 10:22 · 提交 bdb78f6】
+------------------------------------------------------------
+- 触发：策划/设计三方验收报告中「可立即修复5项CSS（约5分钟，不等资源）」清单（详见给开发AI同步文件.txt 同日条目）。
+- 范围（2 文件 5 处 CSS，未触及任何 wxml/js/数据）：
+  ① movie.wxss .movie-cta        ：font-size var(--fs-title)→var(--fs-body)、font-weight 700→600
+  ② movie.wxss font-weight 800→700（3处：.poster-letter / .seq-poster text / .next-rec-poster text）
+  ③ character.wxss .card-title   ：color var(--gold)→var(--text-main)
+  ④ character.wxss .related-shared：font-size 19rpx→var(--fs-mini)
+  ⑤ movie.wxss .seq-card.current ：border-color var(--gold-a50)→var(--gold-a20)
+- 校验：node 自写脚本 check_5css.js (workspace/) → movie.wxss raw_hex=0/500=0/800=0；character.wxss raw_hex=0/500=0/800=0；全项目无新增裸 hex。
+- 决策备注：M-05 在原始设计 MD 中为「CTA 88rpx + 字重 700」，验收报告下调为「700→600 + title→body」——以验收报告为准（验收方 = 设计 AI），已按其执行；如策划 AI 有不同判定，可一票否决。
+- 当前验收映射（同步推进）：
+  · 首页 ✅                   → V1.2 实现 + 设计侧验收均通过
+  · 电影详情 ⚠→✅            → 原 1 P0（CTA 字号/字重）已修复，期望本轮验收升级为「基本通过」
+  · 角色详情 ❌→✅            → P0③ 完整重做（e3d89ed，营色§4.4+Hero氛围背景+真实海报+G-19兜底），待设计再验收
+  · 关系探索 ❌              → 仍为 V1.1 入口聚合页，资源到齐后按 R-01~R-04 重做
+- 下一步（按修订指令 Step2/3/4/5 顺序）：
+  · 等策划 AI（GPT）确认 P0③ + 5项 CSS 修复的当前验收态
+  · 资源（角色头像 / 首页背景 / 阶段图）就位后启动 P0④ 关系探索重做
+  · 再后 Step4 P1 全局统一（字体/间距/Icon/营色/图片比）
+  · 终 Step5 六图验收包提交
