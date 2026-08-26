@@ -201,3 +201,70 @@ MCU观影导航 V1.2 · 开发AI工作日志
 - 专项⑥ routes Phase 序列条（CDN 验证）；browse 组头保留。
 - 专项⑦ home-bg 函数清理。
 - 专项⑧ 真机测试清单已写策划【十八】——真机执行需用户在微信开发者工具操作，开发环境自查已完成。
+
+【设计AI P1 全局视觉巡检报告 · 2026-08-26】
+------------------------------------------------------------
+- 背景：GPT《P1 全局视觉巡检》指令——设计AI 对全部 12 页面做全局巡检，输出 P1 问题清单。
+- 交付物：《MCU-V1.2-P1-全局视觉巡检报告.md》（完整 40 项 P1 + 5 项 P2 逐条清单）
+  · 文件路径：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-P1-全局视觉巡检报告.md
+- 结论：P0: 0 项 / P1: 40 项 / P2: 5 项
+
+- **你已修 7 项**（提交 c3d861f，已关闭）：
+  · movie Hero 渐变 to bottom / explore Canvas 背景色 / home-bg 数据层清理 / evc-desc 间距 / 3 处 4rpx 间距统一
+
+- **待执行 33 项（按优先级排序）**：
+  ① P1-01（高）characters.wxss/wxml — 角色头像从首字徽章改为真实头像（88rpx 圆形，mcuData.avatar(id)），缺失走首字兜底
+  ② P1-02（高）my-mcu.wxss/wxml — 最近观看+观看记录+收藏列表海报卡片接入 mcuData.visual(id).poster，缺失走阶段色兜底
+  ③ P1-33 routes/route-detail/my-mcu — .route-next-btn / .rd-next-btn border-radius: var(--space-xs) → var(--radius-md)
+  ④ P1-34 feedback — .fb-submit 高度 92rpx → 88rpx
+  ⑤ P1-35 feedback — .fb-link 高度 80rpx → 88rpx（或保持次要按钮差异）
+  ⑥ P1-04~P1-26 间距 Token 化（23 项，8 个页面非标间距值→Token，详见报告 §3.2）
+  ⑦ P1-27~P1-32 圆角 Token 化（6 项，详见报告 §3.3）
+  ⑧ P1-03（可选）panorama — 节点卡片接入海报缩略图（96×144rpx）
+  ⑨ P1-36~P1-40 其他一致性（5 项，详见报告 §3.5）
+
+- **P2（5 项，可后优化）**：新增 --radius-xs Token / 新增 --space-xxs Token / characters 阵营 chip 类 / 空状态组件统一 / 返回按钮统一
+
+- 等 GPT 确认后按上方顺序执行。完成后截图 → 设计复核 → GPT 验收。
+
+【GPT《P1 收尾与真机定版联合任务》· 设计AI 优先级确认 · 2026-08-26】
+------------------------------------------------------------
+- GPT 指令核心：不机械执行全部 40 项 P1，优先处理关键视觉问题 → 真机测试 → V1.2 定版。
+- 定版流程：characters → my-mcu → Canvas 真机 → P1 关键细节 → 设计复核 → 用户真机 → GPT 验收 → 定版。
+
+- **设计AI 优先级确认**：
+  ① characters 真实头像 → 最高优先级（P1-01）
+  ② my-mcu 真实海报 → 最高优先级（P1-02）
+  ③ panorama 真实缩略图 → **设计建议：跳过**
+     · 节点卡片真机约 48×72px 太小，海报收益极低
+     · 50+ 张小图拖 Canvas 性能（本轮重点验证项）
+     · 阶段色编码已够用，panorama 是概览页不是详情页
+  ④ Canvas 真机 → 重点验证
+  ⑤ 全局一致性 → 按 GPT 清单执行
+
+- **你的执行顺序（调整后的 P1 清单）**：
+  第一批（最高优先级，消除"文字资料库感"）：
+    · P1-01 characters 真实头像（visuals.avatar(id)，88rpx 圆形，缺失走首字兜底）
+    · P1-02 my-mcu 真实海报（mcuData.visual(id).poster，最近观看+观看记录+收藏列表三处，缺失走阶段色兜底）
+
+  第二批（Canvas 真机测试）：
+    · 关系探索页真机验证：Canvas 渲染 / 头像节点 / 连线 / 点击切换 / 5 Chips / 滚动
+
+  第三批（全局一致性）：
+    · P1-33 按钮圆角统一（routes/route-detail/my-mcu）
+    · P1-34/35 feedback 按钮高度统一
+    · P1-04~P1-26 间距 Token 化（详见报告 §3.2）
+    · P1-27~P1-32 圆角 Token 化（详见报告 §3.3）
+    · P1-36~P1-40 其他一致性（详见报告 §3.5）
+
+  不处理：P1-03 panorama / P2 全部
+
+- **SPECIAL 处理**：保留当前 116 条工作数据，不自行扩展，等 GPT 正式 92 条语义表后做数据层替换。
+- **定版标准**：characters ✅ + my-mcu ✅ + Canvas 真机 ✅ + P1 关键视觉 ✅ + 设计复核 ✅ + 真机 ✅ → V1.2 定版。
+- 完成后截图 → 设计复核 → 用户真机 → GPT 验收。
+
+【P1 收尾与真机定版 · Work 闭环（2026-08-26，提交 0cd0ae0）】
+- ① characters 24 真实头像（visuals.avatar + G-19 兜底 + 去内联 hex 改全局阵营类）✅
+- ② my-mcu 三处真实海报（visual.poster + 阶段色兜底 + wc-poster overflow 修复）✅
+- P1 细节：fill-img 全局化、button::after 清除、Canvas 连线色与 Token 核对 ✅
+- 校验/像素验证全通过；SPECIAL 116 条保留待 GPT 92 语义表；真机清单已写策划【十九】。
