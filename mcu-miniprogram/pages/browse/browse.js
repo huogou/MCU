@@ -32,6 +32,7 @@ Page({
         phase: +p,
         title: '第' + p + '阶段',
         color: mcuData.phaseColor(+p),
+        phaseImg: mcuData.phase(+p) || '',   // 专项③：阶段图承接（Phase 导航辅助视觉）
         items: map[p]
       };
     }).sort(function (a, b) { return a.phase - b.phase; });

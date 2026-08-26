@@ -12,6 +12,14 @@
 .group-dot { width: 16rpx; height: 16rpx; border-radius: 50%; margin-right: 14rpx; }
 .group-title { font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
 .group-count { font-size: var(--fs-mini); color: var(--text-weak); margin-left: auto; }
+/* 专项③：阶段图（Phase 导航辅助视觉，56×30rpx 保持 750:400≈1.875 比例） */
+.group-phase-img {
+  width: 56rpx;
+  height: 30rpx;
+  border-radius: var(--radius-sm);
+  margin-left: var(--space-sm);
+  flex-shrink: 0;
+}
 
 /* 电影行：Content 卡片（20rpx 圆角） */
 .film-list { display: flex; flex-direction: column; gap: var(--space-sm); }

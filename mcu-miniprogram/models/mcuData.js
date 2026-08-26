@@ -182,6 +182,11 @@ const data = {
     return visuals.entryBg(key);
   },
 
+  /* 阶段代表图（专项③：Phase 导航辅助视觉，browse 组头等已有场景接入） */
+  phase: function (n) {
+    return visuals.phase(n);
+  },
+
   /* 该角色出现过的作品（由 chars 反查） */
   filmsOfChar: function (charId) {
     return byRelease.filter(function (m) {

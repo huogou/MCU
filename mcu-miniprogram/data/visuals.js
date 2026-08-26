@@ -24,8 +24,8 @@
 /* CloudBase 静态托管根 */
 const CDN = 'https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com';
 
-/* 本地资源根（上传 CDN 后改为 CDN + '/assets'） */
-const LOCAL = '/assets';
+/* 本地资源根（已上传 CDN：2026-08-26 专项②，缩放后 36 文件 ~0.75MB 已托管至 /assets/*） */
+const LOCAL = CDN + '/assets';
 
 /* ── 竖版海报映射（38 部院线电影） ── */
 const posters = {
