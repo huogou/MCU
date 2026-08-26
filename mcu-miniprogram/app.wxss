@@ -238,3 +238,41 @@ page {
   background: var(--surface-3);
   margin: var(--space-lg) 0;
 }
+
+/* —— V1.2-DS 阵营色系统（全局唯一来源，页面不再重复定义，Step4 全局统一） —— */
+/* 文字色 fc-* */
+.fc-red    { color: var(--accent-red); }
+.fc-blue   { color: var(--accent-blue); }
+.fc-purple { color: var(--accent-purple); }
+.fc-gold   { color: var(--gold); }
+.fc-gray   { color: var(--text-weak); }
+
+/* 描边 fring-* */
+.fring-red    { border-color: var(--accent-red-a20); }
+.fring-blue   { border-color: var(--accent-blue-a20); }
+.fring-purple { border-color: var(--accent-purple-a20); }
+.fring-gold   { border-color: var(--gold-a20); }
+.fring-gray   { border-color: var(--surface-3); }
+
+/* 背景渐变 fbg-* */
+.fbg-red    { background: linear-gradient(135deg, var(--accent-red),    var(--accent-red-a60)); }
+.fbg-blue   { background: linear-gradient(135deg, var(--accent-blue),   var(--accent-blue-a60)); }
+.fbg-purple { background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-a60)); }
+.fbg-gold   { background: linear-gradient(135deg, var(--gold),          var(--gold-a60)); }
+.fbg-gray   { background: var(--surface-3); }
+
+/* 胶囊 pill-* */
+.pill-red    { background: var(--accent-red-a10);   color: var(--accent-red); }
+.pill-blue   { background: var(--accent-blue-a10);  color: var(--accent-blue); }
+.pill-purple { background: var(--accent-purple-a10); color: var(--accent-purple); }
+.pill-gold   { background: var(--gold-a10);          color: var(--gold); }
+.pill-gray   { background: var(--surface-3);         color: var(--text-weak); }
+
+/* 海报/头像阶段色兜底（仅内容标识） */
+.poster-p0 { background: linear-gradient(135deg, var(--surface-3), var(--surface-2)); }
+.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
+.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
+.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
+.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
+.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
+.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }

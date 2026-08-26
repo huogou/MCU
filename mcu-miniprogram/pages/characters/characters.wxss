@@ -5,16 +5,16 @@
 .page-sub { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
 
 /* 阵营筛选 chips（横向滚动） */
-.camp-scroll { width: 100%; margin-bottom: 20rpx; white-space: nowrap; }
+.camp-scroll { width: 100%; margin-bottom: var(--space-sm); white-space: nowrap; }
 .camp-row { display: flex; gap: var(--space-sm); padding: 4rpx 0 var(--space-xs); }
-.camp-chip { flex-shrink: 0; font-size: var(--fs-caption); color: var(--text-sub); background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 999rpx; padding: 12rpx 28rpx; }
+.camp-chip { flex-shrink: 0; font-size: var(--fs-caption); color: var(--text-sub); background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-full); padding: 12rpx var(--space-md); }
 .camp-chip-on { color: var(--gold); border-color: var(--gold); background: var(--gold-a10); font-weight: 600; }
 
-.count-line { font-size: var(--fs-mini); color: var(--text-weak); margin: var(--space-xs) 0 20rpx; }
+.count-line { font-size: var(--fs-mini); color: var(--text-weak); margin: var(--space-xs) 0 var(--space-sm); }
 
 /* 角色卡片列表 */
-.char-list { display: flex; flex-direction: column; gap: 20rpx; }
-.char-card { display: flex; align-items: center; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 16rpx; padding: var(--space-md); }
+.char-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.char-card { display: flex; align-items: center; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-md); padding: var(--space-md); }
 .char-card-hover { border-color: var(--gold); background: var(--surface-3); }
 .char-avatar { width: 88rpx; height: 88rpx; border-radius: 50%; border: 2rpx solid; font-size: var(--fs-display-sm); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: var(--space-md); flex-shrink: 0; }
 .char-body { flex: 1; min-width: 0; }
@@ -25,7 +25,7 @@
 .char-en { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 4rpx; }
 .char-note { font-size: var(--fs-body); color: var(--text-sub); margin-top: 12rpx; line-height: 1.5; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .char-meta { display: flex; align-items: center; margin-top: 14rpx; }
-.char-camp { display: inline-block; font-size: var(--fs-mini); padding: 4rpx 14rpx; border-radius: 20rpx; }
+.char-camp { display: inline-block; font-size: var(--fs-mini); padding: 4rpx 14rpx; border-radius: var(--radius-lg); }
 .char-first { font-size: var(--fs-mini); color: var(--text-weak); margin-left: var(--space-sm); }
 .char-arrow { font-size: var(--fs-display-sm); color: var(--text-weak); margin-left: 12rpx; flex-shrink: 0; }
 

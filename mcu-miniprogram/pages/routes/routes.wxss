@@ -49,7 +49,7 @@
   margin: 0 var(--page-x) var(--space-md);
   background: var(--surface-2);
   border: 2rpx solid var(--gold-a20);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   align-items: center;
@@ -101,7 +101,7 @@
 .route-card {
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
 }
 .route-card.current-route {
@@ -133,7 +133,7 @@
   font-size: var(--fs-mini);
   color: var(--text-weak);
   line-height: 1.4;
-  margin-bottom: 20rpx;
+  margin-bottom: var(--space-sm);
 }
 .rc-progress {
   height: 8rpx;

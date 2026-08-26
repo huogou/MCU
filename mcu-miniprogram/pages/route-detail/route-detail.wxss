@@ -16,10 +16,10 @@
 .rd-kind {
   display: inline-block;
   padding: 6rpx 18rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-full);
   font-size: var(--fs-mini);
   font-weight: 600;
-  margin-bottom: 20rpx;
+  margin-bottom: var(--space-sm);
 }
 .rd-kind.basic { color: var(--text-sub); border: 2rpx solid var(--surface-3); background: var(--surface-2); }
 .rd-kind.topic { color: var(--gold); border: 2rpx solid var(--gold-a20); background: var(--gold-a06); }
@@ -34,7 +34,7 @@
   font-size: var(--fs-body);
   color: var(--gold);
   font-weight: 500;
-  margin-bottom: 20rpx;
+  margin-bottom: var(--space-sm);
   line-height: 1.4;
 }
 .rd-desc {
@@ -82,7 +82,7 @@
   padding: 18rpx var(--space-md);
   background: var(--gold-a10);
   border: 2rpx solid var(--gold-a50);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   font-size: var(--fs-caption);
   font-weight: 600;
   color: var(--gold);
@@ -98,7 +98,7 @@
   margin: 0 var(--page-x) var(--space-xs);
   background: var(--surface-2);
   border: 2rpx solid var(--gold-a20);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@
   margin: 0 var(--page-x) var(--space-xs);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   align-items: center;
@@ -148,11 +148,11 @@
 .rd-node {
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   align-items: center;
-  gap: 20rpx;
+  gap: var(--space-sm);
 }
 .rd-node.is-current {
   background: linear-gradient(135deg, var(--gold-a06), var(--surface-2));
@@ -218,7 +218,7 @@
 .rd-status {
   flex-shrink: 0;
   padding: var(--space-xs) 18rpx;
-  border-radius: 999rpx;
+  border-radius: var(--radius-full);
   font-size: var(--fs-mini);
   font-weight: 600;
 }

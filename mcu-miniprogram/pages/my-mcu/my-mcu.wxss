@@ -10,13 +10,7 @@
   padding-bottom: var(--space-2xl);
 }
 
-/* 海报阶段色兜底 */
-.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
-.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
-.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
-.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
-.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
-.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }
+/* 海报阶段色系统已统一至 app.wxss 全局（Step4）*/
 
 /* ══════ ① 顶部用户状态区 ══════ */
 .mcu-hero {
@@ -84,7 +78,7 @@
   margin: 0 var(--page-x) var(--space-xs);
   background: var(--surface-2);
   border: 2rpx solid var(--gold-a20);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   display: flex;
   align-items: center;
@@ -139,13 +133,13 @@
   gap: var(--space-md);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
-  padding: 20rpx var(--space-md);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
 }
 .wc-poster {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 12rpx;
+  border-radius: var(--radius-sm);
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -200,7 +194,7 @@
   flex: 1;
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   padding: var(--space-md);
   position: relative;
   overflow: hidden;
@@ -236,7 +230,7 @@
 /* ══════ 成就墙 ══════ */
 .ach-row {
   display: flex;
-  gap: 20rpx;
+  gap: var(--space-sm);
   padding: 0 var(--page-x);
   white-space: nowrap;
 }
@@ -297,7 +291,7 @@
 /* ══════ 最近观看 ══════ */
 .recent-row {
   display: flex;
-  gap: 20rpx;
+  gap: var(--space-sm);
   padding: 0 var(--page-x);
   white-space: nowrap;
 }
@@ -311,7 +305,7 @@
 .recent-poster {
   width: 168rpx;
   height: 236rpx;
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
   margin-bottom: 10rpx;
   display: flex;
   align-items: center;
@@ -364,7 +358,7 @@
   padding: var(--space-md) var(--space-md);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
 }
 .fb-entry-info { flex: 1; min-width: 0; }
 .fb-entry-title {

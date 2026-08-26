@@ -21,7 +21,7 @@
 .fb-type {
   padding: var(--space-sm) var(--space-md); font-size: var(--fs-body); color: var(--text-sub);
   background: var(--surface-2); border: 2rpx solid var(--surface-3);
-  border-radius: 999rpx;
+  border-radius: var(--radius-full);
 }
 .fb-type.is-active {
   color: var(--gold); border-color: var(--gold);
@@ -32,13 +32,13 @@
   width: 100%; box-sizing: border-box; min-height: 220rpx;
   padding: var(--space-md); font-size: var(--fs-body); color: var(--text-main);
   background: var(--surface-2); border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx; line-height: 1.6;
+  border-radius: var(--radius-md); line-height: 1.6;
 }
 .fb-input {
   width: 100%; box-sizing: border-box; height: 88rpx; padding: 0 var(--space-md);
   font-size: var(--fs-body); color: var(--text-main);
   background: var(--surface-2); border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: var(--radius-md);
 }
 
 .fb-source { margin: var(--space-sm) 4rpx 0; font-size: var(--fs-mini); color: var(--text-weak); }
@@ -46,7 +46,7 @@
 .fb-submit {
   margin-top: var(--space-xl); height: 92rpx; line-height: 92rpx;
   font-size: var(--fs-title); font-weight: 600; color: var(--gold-btn-text);
-  background: var(--gold); border-radius: 16rpx; border: none;
+  background: var(--gold); border-radius: var(--radius-md); border: none;
 }
 .fb-submit.is-loading { opacity: 0.7; }
 .fb-link {

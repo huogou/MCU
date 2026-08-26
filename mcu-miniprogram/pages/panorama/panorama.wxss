@@ -14,12 +14,12 @@
 .phase-tag { font-size: var(--fs-caption); font-weight: 700; color: var(--text-sub); white-space: nowrap; }
 .phase-years { font-size: 18rpx; color: var(--text-weak); margin-top: 4rpx; white-space: nowrap; }
 
-.pano-node { position: absolute; z-index: 3; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 12rpx; display: flex; flex-direction: column; overflow: hidden; }
+.pano-node { position: absolute; z-index: 3; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-sm); display: flex; flex-direction: column; overflow: hidden; }
 .node-main { border-color: var(--gold-a60); }
 .node-upcoming { opacity: 0.6; border-style: dashed; }
 .node-letter { height: 60rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .node-title { flex: 1; font-size: var(--fs-mini); color: var(--text-main); padding: var(--space-xs); line-height: 1.25; display: flex; align-items: center; justify-content: center; text-align: center; }
 
-.legend { display: flex; gap: 40rpx; padding: 20rpx var(--page-x); background: var(--surface-1); border-top: 1rpx solid var(--surface-3); }
+.legend { display: flex; gap: 40rpx; padding: var(--space-sm) var(--page-x); background: var(--surface-1); border-top: 1rpx solid var(--surface-3); }
 .legend-item { display: flex; align-items: center; font-size: var(--fs-mini); color: var(--text-sub); }
 .legend-line { width: 36rpx; height: 6rpx; border-radius: 3rpx; margin-right: 10rpx; }

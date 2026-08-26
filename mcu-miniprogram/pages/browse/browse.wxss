@@ -69,13 +69,6 @@
 .status-watching  { color: var(--gold);    background: var(--gold-a15); }
 .status-unwatched { color: var(--text-weak); background: var(--surface-3); }
 
-/* 海报兜底：阶段色渐变（仅内容标识，V1.2 纪律） */
-.poster-p0 { background: linear-gradient(135deg, var(--surface-3), var(--surface-2)); }
-.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
-.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
-.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
-.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
-.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
-.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }
+/* 海报阶段色系统已统一至 app.wxss 全局（Step4）*/
 
 .bottom-pad { height: 60rpx; }
