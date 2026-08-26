@@ -1,166 +1,162 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=375, initial-scale=1.0" />
-<title>MCU观影导航 V1.2 首页 · 视觉预览（Final 校准版 · 静态还原，非真机截图）</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1">
+<title>MCU观影导航 V1.2 首页 · 视觉还原预览（新结构 H-01~H-18）</title>
 <style>
   :root{
-    --bg:#080B12; --surface-1:#161D2B; --surface-2:#1E2636; --surface-3:#2A3447;
-    --gold:#F2B233; --gold-btn-text:#1A1206;
-    --text-main:#E8ECF4; --text-sub:#8E98AA; --text-weak:#555F73;
-    --p1:#5B8DEF; --p2:#28B487; --p3:#F0A932; --p4:#8B6FE8; --p5:#E8483F; --p6:#C25B8E;
-    --gold-a06:rgba(242,178,51,0.06); --gold-a20:rgba(242,178,51,0.20);
-    --p1-a60:rgba(91,141,239,0.60); --p2-a60:rgba(40,180,135,0.60); --p3-a60:rgba(240,169,50,0.60); --p4-a60:rgba(139,111,232,0.60); --p5-a60:rgba(232,72,63,0.60); --p6-a60:rgba(194,91,142,0.60);
-    --white-a50:rgba(255,255,255,0.5); --white-a60:rgba(255,255,255,0.6);
-    --fs-d:24px; --fs-ds:20px; --fs-t:17px; --fs-b:14px; --fs-c:12px; --fs-m:10px;
-    --s-xs:4px; --s-sm:8px; --s-md:12px; --s-lg:16px; --s-xl:24px; --s-2xl:32px; --page-x:16px;
-    --font:-apple-system,"PingFang SC","Helvetica Neue",Helvetica,sans-serif;
+    --bg:#080B12; --surface-0:#0D1119; --surface-1:#161D2B; --surface-2:#1E2636; --surface-3:#2A3447;
+    --gold:#F2B233; --gold-a10:rgba(242,178,51,.10); --gold-a20:rgba(242,178,51,.20); --gold-a60:rgba(242,178,51,.60); --gold-btn-text:#1A1206;
+    --text-main:#E8ECF4; --text-sub:#A8B0C0; --text-weak:#6B7384;
+    --accent-blue:#4A9EF5; --accent-blue-a10:rgba(74,158,245,.10);
+    --accent-red:#E85D5D; --accent-red-a10:rgba(232,93,93,.10);
+    --accent-purple:#9B7FE8; --accent-purple-a10:rgba(155,127,232,.10);
+    --white-a50:rgba(232,236,244,.5); --white-a60:rgba(232,236,244,.6); --white-a70:rgba(232,236,244,.7);
+    --p1:#5B8DEF;--p1-a60:rgba(91,141,239,.6);--p2:#28B487;--p2-a60:rgba(40,180,135,.6);--p3:#F0A932;--p3-a60:rgba(240,169,50,.6);
+    --p4:#8B6FE8;--p4-a60:rgba(139,111,232,.6);--p5:#E8483F;--p5-a60:rgba(232,72,63,.6);--p6:#C25B8E;--p6-a60:rgba(194,91,142,.6);
+    --shadow-hero:0 8px 32px rgba(0,0,0,.4); --glow-gold:0 8px 24px rgba(242,178,51,.12);
+    --fs-display:56px;--fs-display-sm:44px;--fs-title:36px;--fs-body:28px;--fs-caption:24px;--fs-mini:22px;
+    --space-xs:8px;--space-sm:20px;--space-md:28px;--space-lg:36px;--space-xl:56px;--space-2xl:72px;--page-x:36px;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{background:#000; font-family:var(--font); display:flex; justify-content:center; padding:24px 0;}
-  .phone{width:375px; background:var(--bg); min-height:760px; padding:var(--s-2xl) var(--page-x); color:var(--text-main); font-size:var(--fs-b); line-height:1.5;}
-  .toggle{position:fixed; top:16px; right:16px; z-index:9; background:var(--surface-2); border:1px solid var(--surface-3); color:var(--gold); font-size:12px; padding:8px 12px; border-radius:8px; cursor:pointer;}
-  /* ① brand */
-  .brand{display:flex; align-items:center; margin-bottom:var(--s-xl);}
-  .brand-mark{width:5px; height:32px; border-radius:3px; background:var(--gold); margin-right:10px; flex-shrink:0;}
-  .brand-title{font-size:var(--fs-d); font-weight:700; color:var(--text-main); line-height:1.25;}
-  .brand-sub{font-size:var(--fs-b); color:var(--text-sub); margin-top:3px;}
-  /* card title */
-  .card-title{font-size:var(--fs-t); font-weight:600; color:var(--text-sub); margin-bottom:var(--s-md);}
-  .module-title{font-size:var(--fs-t); font-weight:600; color:var(--text-main); margin-bottom:var(--s-md);}
-  /* ② hero */
-  .continue{background:linear-gradient(135deg,var(--gold-a06),var(--surface-1)); border:2px solid var(--gold-a20); border-radius:12px; padding:16px; margin-bottom:var(--s-xl);}
-  .movie-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
-  .movie-phase{font-size:var(--fs-b); color:var(--text-sub); margin-top:var(--s-xs);}
-  .movie-progress-label{font-size:var(--fs-m); color:var(--text-weak); margin-top:var(--s-sm);}
-  .movie-progress{font-size:var(--fs-c); color:var(--gold); font-weight:400; margin-top:var(--s-xs);}
-  .btn-accent{width:100%; background:var(--gold); color:var(--gold-btn-text); font-size:var(--fs-b); font-weight:600; border-radius:8px; height:44px; line-height:44px; text-align:center; margin-top:var(--s-lg);}
-  /* ③ my route */
-  .myroute{background:var(--surface-2); border:1px solid var(--surface-3); border-radius:8px; padding:12px; margin-bottom:var(--s-xl);}
-  .route-name{font-size:var(--fs-t); font-weight:600; color:var(--text-main);}
-  .route-progress{font-size:var(--fs-c); color:var(--text-weak); margin-top:var(--s-xs);}
-  .route-next{margin-top:var(--s-lg);}
-  .next-label{font-size:var(--fs-m); color:var(--text-weak);}
-  .next-name{font-size:var(--fs-b); font-weight:400; color:var(--gold); margin-top:var(--s-xs);}
-  .btn-ghost{display:inline-block; color:var(--gold); font-size:var(--fs-b); font-weight:400; margin-top:var(--s-lg);}
-  /* ④ explore */
-  .explore-card{display:flex; align-items:center; background:var(--surface-2); border-radius:6px; min-height:36px; padding:10px 12px; margin-bottom:8px;}
-  .explore-ic-wrap{width:24px; height:24px; border-radius:6px; background:var(--surface-1); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .explore-ic{font-size:14px; line-height:1; color:var(--gold);}
-  .explore-title{font-size:var(--fs-b); font-weight:400; color:var(--text-main); margin-left:10px;}
-  .explore-arrow{margin-left:auto; font-size:var(--fs-c); color:var(--text-weak);}
-  .explore-hint{margin-bottom:var(--s-xl);}
-  /* ⑤ hot chars */
-  .char-scroll{display:flex; gap:8px; margin-bottom:var(--s-xl); overflow-x:auto;}
-  .char-card{flex-shrink:0; width:78px; background:var(--surface-2); border-radius:6px; padding:10px 6px; display:flex; flex-direction:column; align-items:center;}
-  .char-avatar{width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:var(--fs-ds); font-weight:700; color:var(--white-a60); margin-bottom:var(--s-sm);}
-  .char-name{font-size:var(--fs-b); color:var(--text-main); font-weight:400;}
-  .char-count{font-size:var(--fs-c); color:var(--text-weak); margin-top:3px;}
-  .char-story{font-size:var(--fs-c); color:var(--gold); font-weight:400; margin-top:6px;}
-  /* ⑥ recent */
-  .recent-scroll{display:flex; gap:12px; margin-bottom:var(--s-2xl); overflow-x:auto;}
-  .recent-item{flex-shrink:0; width:60px; display:flex; flex-direction:column; align-items:center;}
-  .recent-poster{width:60px; height:80px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:var(--fs-d); font-weight:700; color:var(--white-a50);}
-  .recent-name{font-size:var(--fs-c); color:var(--text-sub); margin-top:6px; width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;}
-  .p1{background:linear-gradient(135deg,var(--p1),var(--p1-a60));}
-  .p2{background:linear-gradient(135deg,var(--p2),var(--p2-a60));}
-  .p3{background:linear-gradient(135deg,var(--p3),var(--p3-a60));}
-  .p4{background:linear-gradient(135deg,var(--p4),var(--p4-a60));}
-  .p5{background:linear-gradient(135deg,var(--p5),var(--p5-a60));}
-  .p6{background:linear-gradient(135deg,var(--p6),var(--p6-a60));}
-  .note{font-size:11px; color:var(--text-weak); text-align:center; margin-top:16px; line-height:1.6;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#000;display:flex;justify-content:center;padding:20px 0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
+  .phone{width:375px;background:var(--bg);padding:var(--space-2xl) var(--page-x);min-height:1400px;}
+  .section{margin-bottom:var(--space-xl);}
+  .module-title{font-size:var(--fs-title);font-weight:600;color:var(--text-main);margin-bottom:var(--space-md);}
+  /* ① 旅程进度卡 */
+  .journey-card{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--surface-0),var(--surface-1));border:1px solid var(--surface-3);border-radius:32px;margin-bottom:var(--space-xl);}
+  .journey-bg{position:absolute;top:0;left:0;right:0;height:200px;background:radial-gradient(140px 90px at 18% 28%,var(--gold-a10),transparent 70%),radial-gradient(180px 110px at 82% 18%,var(--accent-blue-a10),transparent 70%),linear-gradient(180deg,var(--surface-0),transparent);opacity:.9;pointer-events:none;}
+  .journey-inner{position:relative;padding:36px;}
+  .journey-label{font-size:var(--fs-caption);font-weight:400;color:var(--text-sub);letter-spacing:2px;}
+  .journey-num{font-size:var(--fs-display);font-weight:700;color:var(--gold);line-height:1.2;margin-top:12px;}
+  .journey-phase{font-size:var(--fs-caption);font-weight:400;color:var(--text-weak);margin-top:8px;}
+  .journey-movie{display:flex;align-items:center;margin-top:var(--space-lg);}
+  .jm-poster{width:120px;height:180px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background-size:cover;background-position:center;}
+  .jm-poster span{font-size:var(--fs-display-sm);font-weight:700;color:var(--white-a60);}
+  .jm-info{min-width:0;margin-left:var(--space-md);}
+  .jm-name{font-size:var(--fs-body);font-weight:600;color:var(--text-main);}
+  .jm-en{font-size:var(--fs-mini);font-weight:400;color:var(--text-sub);margin-top:4px;}
+  .jm-phase{font-size:var(--fs-mini);font-weight:400;color:var(--text-weak);margin-top:4px;}
+  .jm-status{display:inline-block;font-size:var(--fs-mini);font-weight:600;color:var(--gold);background:var(--gold-a10);padding:4px 12px;border-radius:999px;margin-top:var(--space-sm);}
+  /* ② 推荐大卡 */
+  .rec-card{background:var(--surface-1);border-radius:32px;overflow:hidden;box-shadow:var(--shadow-hero);margin-bottom:var(--space-xl);}
+  .rec-poster-wrap{position:relative;width:100%;height:360px;}
+  .rec-poster{width:100%;height:360px;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;}
+  .rec-poster span{font-size:var(--fs-display);font-weight:700;color:var(--white-a50);}
+  .rec-poster-mask{position:absolute;left:0;right:0;bottom:0;height:200px;background:linear-gradient(to top,var(--surface-1),transparent);pointer-events:none;}
+  .rec-body{padding:var(--space-md);}
+  .rec-tag{font-size:var(--fs-mini);font-weight:600;color:var(--gold);letter-spacing:2px;}
+  .rec-phase{float:right;font-size:var(--fs-mini);font-weight:400;color:var(--text-weak);}
+  .rec-name{font-size:var(--fs-title);font-weight:700;color:var(--text-main);margin-top:8px;}
+  .rec-sub{font-size:var(--fs-caption);font-weight:400;color:var(--text-sub);margin-top:4px;}
+  .rec-reason{font-size:var(--fs-caption);font-weight:400;color:var(--text-sub);line-height:1.5;margin-top:var(--space-sm);}
+  .btn-accent{width:100%;background:var(--gold);color:var(--gold-btn-text);font-size:var(--fs-body);font-weight:600;border-radius:16px;height:88px;line-height:88px;text-align:center;margin-top:var(--space-lg);box-shadow:var(--glow-gold);}
+  /* ③ 宇宙入口 3列 */
+  .exp-row{display:flex;gap:16px;}
+  .exp-card{flex:1;height:200px;border-radius:20px;overflow:hidden;position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:20px;}
+  .exp-blue{background:linear-gradient(135deg,var(--accent-blue-a10),var(--surface-2));}
+  .exp-red{background:linear-gradient(135deg,var(--accent-red-a10),var(--surface-2));}
+  .exp-purple{background:linear-gradient(135deg,var(--accent-purple-a10),var(--surface-2));}
+  .exp-ic{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:40px;line-height:1;color:var(--gold);}
+  .exp-title{font-size:var(--fs-caption);font-weight:600;color:var(--text-main);}
+  /* ④ 热门角色 */
+  .char-scroll{width:100%;overflow-x:auto;white-space:nowrap;}
+  .char-row{display:flex;}
+  .char-card{flex-shrink:0;width:168px;display:flex;flex-direction:column;align-items:center;background:var(--surface-2);border-radius:16px;padding:24px 16px;margin-right:var(--space-sm);}
+  .char-avatar{width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid transparent;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;}
+  .char-initial{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:var(--fs-display-sm);font-weight:700;color:var(--white-a70);}
+  .char-name{font-size:var(--fs-body);font-weight:600;color:var(--text-main);margin-top:16px;}
+  .char-faction{font-size:var(--fs-mini);font-weight:400;margin-top:6px;}
+  /* ⑤ 最近观看 */
+  .recent-scroll{width:100%;overflow-x:auto;white-space:nowrap;}
+  .recent-row{display:flex;}
+  .recent-item{flex-shrink:0;width:120px;display:inline-flex;flex-direction:column;align-items:center;margin-right:24px;}
+  .recent-poster{width:120px;height:160px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;}
+  .recent-poster span{font-size:var(--fs-display);font-weight:700;color:var(--white-a50);}
+  .recent-name{font-size:var(--fs-caption);font-weight:400;color:var(--text-sub);margin-top:12px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* 阵营色 */
+  .fc-red{color:var(--accent-red);}.fc-blue{color:var(--accent-blue);}.fc-purple{color:var(--accent-purple);}.fc-gold{color:var(--gold);}
+  .fring-red{border-color:var(--accent-red-a10);}.fring-blue{border-color:var(--accent-blue-a10);}.fring-purple{border-color:var(--accent-purple-a10);}.fring-gold{border-color:var(--gold-a20);}
+  .fbg-red{background:linear-gradient(135deg,var(--accent-red),rgba(232,93,93,.6));}.fbg-blue{background:linear-gradient(135deg,var(--accent-blue),rgba(74,158,245,.6));}.fbg-purple{background:linear-gradient(135deg,var(--accent-purple),rgba(155,127,232,.6));}.fbg-gold{background:linear-gradient(135deg,var(--gold),rgba(242,178,51,.6));}
+  .poster-p1{background:linear-gradient(135deg,var(--p1),var(--p1-a60));}.poster-p2{background:linear-gradient(135deg,var(--p2),var(--p2-a60));}.poster-p3{background:linear-gradient(135deg,var(--p3),var(--p3-a60));}.poster-p4{background:linear-gradient(135deg,var(--p4),var(--p4-a60));}.poster-p5{background:linear-gradient(135deg,var(--p5),var(--p5-a60));}.poster-p6{background:linear-gradient(135deg,var(--p6),var(--p6-a60));}
+  .note{color:var(--text-weak);font-size:13px;text-align:center;margin-top:24px;line-height:1.6;}
+  .CDN{display:none;}
 </style>
 </head>
 <body>
-<button class="toggle" onclick="toggleState()">切换：新人态 / 老用户态</button>
-<div class="phone" id="screen">
-
-  <!-- ① 品牌入口 -->
-  <div class="brand">
-    <div class="brand-mark"></div>
-    <div class="brand-text">
-      <div class="brand-title">MCU观影导航</div>
-      <div class="brand-sub">你的漫威宇宙旅程</div>
+<div class="phone" id="phone">
+  <!-- ① 旅程进度卡（老用户态示例：已看 18/59，当前钢铁侠） -->
+  <div class="journey-card">
+    <div class="journey-bg"></div>
+    <div class="journey-inner">
+      <div class="journey-label">我的 MCU 旅程</div>
+      <div class="journey-num">18 / 59</div>
+      <div class="journey-phase">Phase 1 · 无限传奇</div>
+      <div class="journey-movie">
+        <div class="jm-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/iron-man.jpg')"></div>
+        <div class="jm-info">
+          <div class="jm-name">钢铁侠</div>
+          <div class="jm-en">Iron Man</div>
+          <div class="jm-phase">Phase 1 · 2008</div>
+          <div class="jm-status">当前观看</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ② 继续观看 Hero -->
-  <div class="continue">
-    <div class="card-title">继续观看</div>
-    <div class="continue-body">
-      <div class="movie-name" id="cName">从钢铁侠开始</div>
-      <div class="movie-phase" id="cPhase">Phase 1</div>
-      <div class="movie-progress-label" id="cLabel" style="display:none">当前观看进度</div>
-      <div class="movie-progress" id="cProg" style="display:none">已看 12 / 59</div>
-      <div class="btn-accent" id="cBtn">开始观看</div>
+  <!-- ② 推荐下一部大卡 -->
+  <div class="rec-card">
+    <div class="rec-poster-wrap">
+      <div class="rec-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/avengers.jpg')"></div>
+      <div class="rec-poster-mask"></div>
+    </div>
+    <div class="rec-body">
+      <div class="rec-tag">推荐下一部<span class="rec-phase">Phase 1 · 无限传奇</span></div>
+      <div class="rec-name">复仇者联盟</div>
+      <div class="rec-sub">Phase 1 · 2012</div>
+      <div class="rec-reason">上一部留下的悬念，从这里继续</div>
+      <div class="btn-accent">继续观看</div>
     </div>
   </div>
 
-  <!-- ③ 我的路线 -->
-  <div class="myroute">
-    <div class="card-title">我的路线</div>
-    <div class="route-info">
-      <div class="route-name">新手入坑</div>
-      <div class="route-progress">已完成 12 / 59 部</div>
+  <!-- ③ 宇宙入口 3 列 -->
+  <div class="section">
+    <div class="module-title">宇宙入口</div>
+    <div class="exp-row">
+      <div class="exp-card exp-blue"><div class="exp-ic">◷</div><div class="exp-title">宇宙时间线</div></div>
+      <div class="exp-card exp-red"><div class="exp-ic">✦</div><div class="exp-title">角色图鉴</div></div>
+      <div class="exp-card exp-purple"><div class="exp-ic">⬡</div><div class="exp-title">关系探索</div></div>
     </div>
-    <div class="route-next">
-      <div class="next-label">下一部推荐</div>
-      <div class="next-name">奇异博士</div>
-    </div>
-    <div class="btn-ghost">继续路线</div>
   </div>
 
-  <!-- ④ 宇宙探索 -->
-  <div class="explore-hint">
-    <div class="module-title">宇宙探索</div>
-    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">◷</div></div><div class="explore-title">时间线</div><div class="explore-arrow">›</div></div>
-    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">✦</div></div><div class="explore-title">角色关系</div><div class="explore-arrow">›</div></div>
-    <div class="explore-card"><div class="explore-ic-wrap"><div class="explore-ic">◈</div></div><div class="explore-title">阵营探索</div><div class="explore-arrow">›</div></div>
-  </div>
-
-  <!-- ⑤ 热门角色 -->
-  <div>
+  <!-- ④ 热门角色（头像走阵营色兜底，待真实头像接入） -->
+  <div class="section">
     <div class="module-title">热门角色</div>
     <div class="char-scroll">
-      <div class="char-card"><div class="char-avatar p1">钢</div><div class="char-name">钢铁侠</div><div class="char-count">关联 26 部作品</div><div class="char-story">查看故事线 ›</div></div>
-      <div class="char-card"><div class="char-avatar p1">美</div><div class="char-name">美国队长</div><div class="char-count">关联 24 部作品</div><div class="char-story">查看故事线 ›</div></div>
-      <div class="char-card"><div class="char-avatar p1">雷</div><div class="char-name">雷神</div><div class="char-count">关联 22 部作品</div><div class="char-story">查看故事线 ›</div></div>
-      <div class="char-card"><div class="char-avatar p3">蜘</div><div class="char-name">蜘蛛侠</div><div class="char-count">关联 18 部作品</div><div class="char-story">查看故事线 ›</div></div>
+      <div class="char-row">
+        <div class="char-card"><div class="char-avatar fring-red" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/iron-man.jpg')"></div><div class="char-name">钢铁侠</div><div class="char-faction fc-red">复仇者</div></div>
+        <div class="char-card"><div class="char-avatar fring-red"><div class="char-initial fbg-red">美</div></div><div class="char-name">美国队长</div><div class="char-faction fc-red">复仇者</div></div>
+        <div class="char-card"><div class="char-avatar fring-blue"><div class="char-initial fbg-blue">雷</div></div><div class="char-name">雷神</div><div class="char-faction fc-blue">阿斯加德</div></div>
+        <div class="char-card"><div class="char-avatar fring-red"><div class="char-initial fbg-red">蜘</div></div><div class="char-name">蜘蛛侠</div><div class="char-faction fc-red">复仇者</div></div>
+      </div>
     </div>
   </div>
 
-  <!-- ⑥ 最近观看 -->
-  <div>
+  <!-- ⑤ 最近观看 -->
+  <div class="section">
     <div class="module-title">最近观看</div>
     <div class="recent-scroll">
-      <div class="recent-item"><div class="recent-poster p1">钢</div><div class="recent-name">钢铁侠</div></div>
-      <div class="recent-item"><div class="recent-poster p2">浩</div><div class="recent-name">无敌浩克</div></div>
-      <div class="recent-item"><div class="recent-poster p2">钢</div><div class="recent-name">钢铁侠2</div></div>
-      <div class="recent-item"><div class="recent-poster p2">雷</div><div class="recent-name">雷神</div></div>
-      <div class="recent-item"><div class="recent-poster p3">复</div><div class="recent-name">复仇者联盟</div></div>
-      <div class="recent-item"><div class="recent-poster p3">钢</div><div class="recent-name">钢铁侠3</div></div>
+      <div class="recent-row">
+        <div class="recent-item"><div class="recent-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/iron-man.jpg')"></div><div class="recent-name">钢铁侠</div></div>
+        <div class="recent-item"><div class="recent-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/captain-america-first-avenger.jpg')"></div><div class="recent-name">美国队长</div></div>
+        <div class="recent-item"><div class="recent-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/thor.jpg')"></div><div class="recent-name">雷神</div></div>
+        <div class="recent-item"><div class="recent-poster" style="background-image:url('https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com/assets/posters/guardians.jpg')"></div><div class="recent-name">银河护卫队</div></div>
+      </div>
     </div>
   </div>
 
-  <div class="note">本预览为 Final 校准版静态还原（同一组 V1.2 Token + Final 布局，含设计验收 P0/P1 校准），用于布局/配色核验。<br>正式验收需你在微信开发者工具编译 mcu-miniprogram/ 截取真机首页。</div>
+  <div class="note">首页 V1.2 视觉还原预览（新结构 H-01~H-18）。电影海报为 H5 已上线真实图；<br>角色头像暂用阵营色+首字合规兜底（待 24 张真实头像接入）。非真机截图，仅供布局/配色核验。</div>
 </div>
-
-<script>
-let returning = false;
-function toggleState(){
-  returning = !returning;
-  document.getElementById('cName').textContent = returning ? '复仇者联盟' : '从钢铁侠开始';
-  document.getElementById('cPhase').textContent = returning ? 'Phase 3 · 无限传奇' : 'Phase 1';
-  document.getElementById('cLabel').style.display = returning ? 'block' : 'none';
-  document.getElementById('cProg').style.display = returning ? 'block' : 'none';
-  document.getElementById('cBtn').textContent = returning ? '继续观看' : '开始观看';
-}
-(function(){
-  var q = new URLSearchParams(location.search);
-  if (q.get('state') === 'returning') toggleState();
-  if (q.get('clean') === '1') document.querySelector('.toggle').style.display = 'none';
-})();
-</script>
 </body>
 </html>

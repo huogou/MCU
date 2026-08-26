@@ -1,211 +1,203 @@
 /* ============================================================
- * 首页 home（Tab1）· V1.2 重构（严格按《V1.2 产品视觉重构》规范）
+ * 首页 home（Tab1）· V1.2 视觉还原（按《MCU-V1.2视觉验收清单》H-01~H-18）
  * ------------------------------------------------------------
- * 固定结构（与 home.wxml 对齐，禁止删除模块）：
- *   ① 品牌区域 → ② 继续观看卡 → ③ 我的路线 → ④ 宇宙探索入口
- *   → ⑤ 热门角色 → ⑥ 最近观看 → Tab
- * 约束：不新增功能 / 不改数据结构 / 不改跳转逻辑 / 不自行设计（按规范执行）。
- * 双态：仅「继续观看卡」内容随 hasProgress 变化
- *   - 新人：从钢铁侠开始 / Phase 1 / 开始观看 / movieId=iron-man
- *   - 老用户：当前观看进度(已看 X/59) / 下一部电影(recommend.next) / 继续观看
- * 数据：全部来自 models（单一可信源），不引入第二套数据；
- *       热门角色 hotChars 取 4 位（tony/steve/thor/peter），关联作品数
- *       由 mcuData.charAppearances 反查；阶段色 avatar 取角色首登场作品 phase。
- * 我的路线：取当前路线（current_route→saved_routes→ROUTES，默认 newcomer），
- *       完成进度 = 路线 items 中已看数量；下一部推荐 = 路线内首个未看 item。
- * 跳转目标（与既有页面一致，不新增/不改）：
- *   继续观看/我的路线下一部/最近观看 → 电影详情
- *   时间线 → 全景页；角色关系 → 探索 Tab；阵营探索 → 角色图鉴
- *   热门角色 → 角色详情（查看故事线）
+ * 结构（与《页面视觉升级方案》§2.3 一致，5 模块）：
+ *   ① 旅程进度卡 → ② 推荐下一部大卡 → ③ 宇宙入口 3 列
+ *   → ④ 热门角色横滚 → ⑤ 最近观看横滚
+ * 数据纪律：全部来自 models（单一可信源），不引入第二套数据；
+ *   仅重构本页视图模型（Page.data 装配），底层数据模型不动。
+ * 图片：统一经 mcuData.visual(id) 取 poster/backdrop；
+ *   角色头像(24张)/首页背景(1张)当前无资源 → 返回 null → 前端合规兜底
+ *   （阶段色渐变+首字 / 宇宙渐变占位），不破图（G-18/G-19）。
+ * 跳转目标与既有页面一致，不新增/不改：
+ *   旅程当前电影/推荐/最近观看 → 电影详情；宇宙入口 → 时间线/角色图鉴/关系探索；
+ *   热门角色 → 角色详情。
  * ============================================================ */
 
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 const recommend = require('../../models/recommend.js');
 
-/* 传奇标签映射（saga 数据取值：infinity / multiverse） */
+/* 传奇标签映射（saga 取值：infinity / multiverse） */
 const SAGA_LABEL = { infinity: '无限传奇', multiverse: '多元宇宙' };
 
-/* 最近看过最多展示数量 */
+/* 最近观看最多展示 */
 const RECENT_MAX = 6;
 
-/* 首页热门角色（4 位：与《V1.2》示例一致；id 用于「查看故事线」跳转角色详情） */
+/* 首页热门角色（4 位，与《V1.2》示例一致；id 用于跳转角色详情） */
 const HOT_CHAR_IDS = ['tony', 'steve', 'thor', 'peter'];
 
-/* 宇宙探索入口（统一入口行式；glyph 为统一字型标记，非混用图标库） */
+/* 阵营 → 颜色 class + 中文标签（依据验收清单 C-04：复仇者红/阿斯加德蓝/银护紫/瓦坎达金） */
+const CAMP_MAP = {
+  avengers:  { cls: 'red',    label: '复仇者' },
+  asgard:    { cls: 'blue',   label: '阿斯加德' },
+  guardians: { cls: 'purple', label: '银河护卫队' },
+  wakanda:   { cls: 'gold',   label: '瓦坎达' },
+  shield:    { cls: 'blue',   label: '神盾局' }
+};
+
+/* 宇宙入口 3 列（依据 §2.3③：时间线蓝 / 角色图鉴红 / 关系探索紫） */
 const EXPLORE_ENTRIES = [
-  { key: 'timeline', title: '时间线', desc: '宇宙全景时间线', glyph: '◷' },
-  { key: 'relation', title: '角色关系', desc: '角色关系图谱', glyph: '✦' },
-  { key: 'camp',     title: '阵营探索', desc: '阵营与势力',   glyph: '◈' }
+  { key: 'timeline',   title: '宇宙时间线', glyph: '◷', bg: 'exp-blue' },
+  { key: 'characters', title: '角色图鉴',   glyph: '✦', bg: 'exp-red' },
+  { key: 'relation',   title: '关系探索',   glyph: '⬡', bg: 'exp-purple' }
 ];
 
-/* 从角色 cn（'托尼·斯塔克 / 钢铁侠'）提取英雄名（'/' 之后部分） */
+/* 从角色 cn（'托尼·斯塔克 / 钢铁侠'）提取英雄名（'/' 之后） */
 function heroOf(cn) {
   if (!cn) return '';
   const parts = cn.split('/');
   return (parts.length > 1 ? parts[1] : cn).trim();
 }
 
+/* 电影视图模型：取 poster/backdrop（缺失为 null，前端走兜底） */
+function movieVM(id) {
+  const m = mcuData.get(id);
+  if (!m) return null;
+  const v = mcuData.visual(id);
+  const phaseNo = m.phase || 1;
+  const saga = SAGA_LABEL[m.saga] || '';
+  return {
+    id: m.id,
+    poster: (v && v.poster) ? v.poster : null,
+    backdrop: (v && v.backdrop) ? v.backdrop : null,
+    name: m.cn,
+    enName: m.en || '',
+    phaseText: 'Phase ' + phaseNo + (saga ? ' · ' + saga : ''),
+    year: m.year ? String(m.year) : '',
+    initial: m.cn.charAt(0),
+    phase: phaseNo
+  };
+}
+
 Page({
   data: {
-    continueCard: null,   /* 双态卡：新用户 / 老用户 */
-    myRoute: null,        /* 我的路线 */
-    exploreEntries: [],   /* 宇宙探索入口 */
-    hotChars: [],         /* 热门角色（故事入口） */
-    recent: []            /* 最近观看 */
+    progress: null,    /* ① 旅程进度卡 */
+    recommend: null,  /* ② 推荐下一部大卡 */
+    exploreEntries: [], /* ③ 宇宙入口 3 列 */
+    hotChars: [],     /* ④ 热门角色 */
+    recent: []        /* ⑤ 最近观看 */
   },
 
-  onShow() {
-    this.refresh();
-  },
+  onShow() { this.refresh(); },
 
-  /* ---- 数据装配 ---- */
+  /* ---- 数据装配（仅本页视图模型） ---- */
   refresh() {
     const count = userState.count();
     const total = mcuData.all.length;
     const hasProgress = count > 0;
-
-    this.setData({
-      continueCard: this.buildContinueCard(hasProgress, count, total),
-      myRoute: this.buildMyRoute(),
-      exploreEntries: EXPLORE_ENTRIES,
-      hotChars: this.buildHotChars(),
-      recent: this.buildRecent()
-    });
-  },
-
-  /* ② 继续观看卡（双态） */
-  buildContinueCard(hasProgress, count, total) {
-    const newUser = {
-      mainText: '从钢铁侠开始',
-      phaseText: 'Phase 1',
-      progressLabel: '',
-      progressText: '',
-      buttonText: '开始观看',
-      movieId: 'iron-man'
-    };
-    if (!hasProgress) return newUser;
-
-    /* 老用户：下一部电影 = recommend.next（主线优先），复用 V1.1「下一站推荐」既有逻辑 */
-    const latest = userState.latest();
-    const rec = latest ? recommend.next(latest.id, 'mainline') : null;
-    const c = (rec && rec.content) ? rec.content : latest;
-    if (!c) return newUser;
-
-    const phaseNo = c.phase || 1;
-    const saga = SAGA_LABEL[c.saga] || '';
-    return {
-      mainText: c.cn,
-      phaseText: 'Phase ' + phaseNo + (saga ? ' · ' + saga : ''),
-      progressLabel: '当前观看进度',
-      progressText: '已看 ' + count + ' / ' + total,
-      buttonText: '继续观看',
-      movieId: c.id
-    };
-  },
-
-  /* ③ 我的路线（当前路线 + 完成进度 + 路线内下一部推荐） */
-  buildMyRoute() {
     const state = userState.getState();
-    const routeId = this.resolveCurrentRouteId(state);
-    const route = mcuData.routeById(routeId) || mcuData.routeById('newcomer');
-    const items = (route && route.items) || [];
     const watched = state.watched || {};
+    const latest = userState.latest();
 
-    let done = 0;
-    items.forEach(function (id) { if (watched[id]) done++; });
-
-    let nextId = null;
-    for (let i = 0; i < items.length; i++) {
-      if (!watched[items[i]]) { nextId = items[i]; break; }
-    }
-    let nextName = '已看完当前路线';
-    if (nextId) {
-      const nm = mcuData.get(nextId);
-      if (nm) nextName = nm.cn;
-    }
-
-    return {
-      name: route ? route.name : '新手入坑',
-      progressText: '已完成 ' + done + ' / ' + items.length + ' 部',
-      nextName: nextName,
-      nextId: nextId
+    /* ① 旅程进度卡 */
+    const currentId = (hasProgress && latest) ? latest.id : 'iron-man';
+    const cur = movieVM(currentId);
+    const isCurrent = !watched[currentId];
+    const progress = {
+      count: count,
+      total: total,
+      journeyLabel: '我的 MCU 旅程',
+      phaseText: hasProgress ? cur.phaseText : 'Phase 1 · 无限传奇',
+      movie: {
+        id: cur.id,
+        poster: cur.poster,
+        name: cur.name,
+        enName: cur.enName,
+        phaseText: cur.phaseText,
+        year: cur.year,
+        initial: cur.initial,
+        phase: cur.phase,
+        statusLabel: isCurrent ? '当前观看' : '已观看',
+        statusCls: isCurrent ? 'st-current' : 'st-done'
+      }
     };
-  },
 
-  /* 当前路线解析：saved_routes 中 id === current_route 的项取其 routeId（默认 newcomer） */
-  resolveCurrentRouteId(state) {
-    const cur = state.current_route;
-    const saved = state.saved_routes || [];
-    for (let i = 0; i < saved.length; i++) {
-      if (saved[i].id === cur) return saved[i].routeId;
+    /* ② 推荐下一部 */
+    let recMovie = movieVM('iron-man');
+    if (hasProgress && latest) {
+      const r = recommend.next(latest.id, 'mainline');
+      if (r && r.content) recMovie = movieVM(r.content.id);
     }
-    return 'newcomer';
-  },
+    const recommendCard = {
+      id: recMovie.id,
+      poster: recMovie.poster,
+      initial: recMovie.initial,
+      phase: recMovie.phase,
+      tag: '推荐下一部',
+      phaseLabel: recMovie.phaseText,
+      name: recMovie.name,
+      subInfo: recMovie.year ? ('Phase ' + recMovie.phase + ' · ' + recMovie.year) : recMovie.phaseText,
+      reason: hasProgress ? '上一部留下的悬念，从这里继续' : 'MCU 的起点，一切从这里开始',
+      cta: hasProgress ? '继续观看' : '开始观看'
+    };
 
-  /* ⑤ 热门角色（4 位；关联作品数反查，阶段色取首次登场作品 phase） */
-  buildHotChars() {
-    return HOT_CHAR_IDS.map(function (id) {
+    /* ④ 热门角色（头像资源缺失 → poster 空，前端兜底） */
+    const hotChars = HOT_CHAR_IDS.map(function (id) {
       const c = mcuData.getChar(id);
       if (!c) return null;
       const heroName = heroOf(c.cn);
-      const firstMovie = mcuData.get(c.first);
-      const phase = (firstMovie && firstMovie.phase) ? firstMovie.phase : 1;
+      const camp = CAMP_MAP[c.camp] || CAMP_MAP.avengers;
+      const v = mcuData.visual('char-' + id);
       return {
         id: id,
         name: heroName,
         initial: heroName.charAt(0),
-        phase: phase,
-        count: mcuData.charAppearances(id).count
+        factionCls: camp.cls,
+        factionLabel: camp.label,
+        poster: (v && v.poster) ? v.poster : ''
       };
     }).filter(Boolean);
-  },
 
-  /* ⑥ 最近观看（按观看时间倒序取最近 6 部） */
-  buildRecent() {
-    const state = userState.getState();
-    const watched = state.watched || {};
-    const ids = Object.keys(watched).sort(function (a, b) { return watched[b] - watched[a]; });
-    return ids.slice(0, RECENT_MAX).map(function (id) {
+    /* ⑤ 最近观看（按观看时间倒序取最近 6 部） */
+    const recentIds = Object.keys(watched).sort(function (a, b) { return watched[b] - watched[a]; });
+    const recent = recentIds.slice(0, RECENT_MAX).map(function (id) {
       const m = mcuData.get(id);
       if (!m) return null;
+      const v = mcuData.visual(id);
       return {
-        id: m.id,
+        id: id,
         name: m.cn,
         initial: m.cn.charAt(0),
+        poster: (v && v.poster) ? v.poster : '',
         phase: m.phase || 1
       };
     }).filter(Boolean);
+
+    this.setData({
+      progress: progress,
+      recommend: recommendCard,
+      exploreEntries: EXPLORE_ENTRIES,
+      hotChars: hotChars,
+      recent: recent
+    });
   },
 
   /* ---- 交互（跳转目标与旧版一致，不新增/不改） ---- */
 
-  /* 继续观看卡 → 电影详情 */
+  /* 推荐/继续 → 电影详情 */
   goContinue(e) {
     const id = e.currentTarget.dataset.id;
-    if (!id) return;
-    wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
+    if (id) wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
   },
 
-  /* 我的路线「继续路线」/ 最近观看 → 电影详情 */
+  /* 最近观看 → 电影详情 */
   goMovie(e) {
     const id = e.currentTarget.dataset.id;
-    if (!id) return;
-    wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
+    if (id) wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
   },
 
-  /* 宇宙探索入口 → 对应页面 */
+  /* 宇宙入口 → 对应页面 */
   goExplore(e) {
     const key = e.currentTarget.dataset.key;
     if (key === 'timeline') wx.navigateTo({ url: '/pages/panorama/panorama' });
+    else if (key === 'characters') wx.navigateTo({ url: '/pages/characters/characters' });
     else if (key === 'relation') wx.switchTab({ url: '/pages/explore/explore' });
-    else if (key === 'camp') wx.navigateTo({ url: '/pages/characters/characters' });
   },
 
-  /* 热门角色 → 角色详情（查看故事线） */
+  /* 热门角色 → 角色详情 */
   goChar(e) {
     const id = e.currentTarget.dataset.id;
-    if (!id) return;
-    wx.navigateTo({ url: '/pages/character/character?id=' + id });
+    if (id) wx.navigateTo({ url: '/pages/character/character?id=' + id });
   }
 });
