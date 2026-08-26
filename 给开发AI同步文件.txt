@@ -17,15 +17,30 @@ MCU观影导航 V1.2 · 开发AI工作日志
 【开发当前进度】
 - P0① ✅（a33b7e8）  P0② ✅（5b4308b）  P0③ ✅（e3d89ed，C-01~C-09）  P0④ ❌ 待资源重做
 - **Step4 全局统一 ✅（34044e2）**：阵营类(.fc-/.fring-/.fbg-/.pill-/.poster-pN)提取至 app.wxss 全局唯一来源（删 home/movie/character/browse/my-mcu 5 页本地副本）；12 页 border-radius/font-size/box-shadow/间距 安全 Token 化（值精确映射、像素零变化）；var() 引用 930 处全部解析无悬空（check_token_refs.py 校验）。
-- 下一步（等策划 GPT 拍板）：P0④ 关系探索重做 → Step5 六图验收
+- **Step2 资源接入 ✅（c599a9c，2026-08-26）**：24 头像 + 首页背景真实图在 3 页点亮
+  · mcuData 新增 avatar()/homeBg() 转发层（URL 仍只存在于 visuals.js，页面零硬编码）
+  · home：旅程进度卡接入 home-bg.jpg（渐变罩层叠上，文字可读）；热门角色 4 位真实头像
+  · movie：主要角色模块 4 位真实头像；character：Hero 头像 + 关系网格头像真实图
+  · G-19 兜底保留（未知 id → 首字+阵营渐变），不破图
+  · 像素级验证：破 URL 对照组 1~2 色 vs 正常 1639/14186/1179 色桶 → 真实图片加载确认
+- 下一阶段任务（GPT《下一阶段联合任务》2026-08-26）：开发第一阶段 = 图片接入 ✅ / Icon 替换 ⏳(等设计规范) / 字体层级 & 间距 ✅；第二阶段 4 页升级（含 P0④ 关系探索重做，按设计侧方案）；第三阶段 截图+前后对比+修改清单
+- 待办：设计 Step1《视觉资源补充规范》到位后 → Icon 替换 + 补充资源接入 → 关系探索重做
 
-【本步执行纪律（联合指令约束）】
-- 禁自增功能、禁改产品逻辑、禁开发自行设计视觉——Step4 仅做机械整合（提取共享类 + 原始 rpx→既有 Token），零新视觉决策。
-- 剩余原始值均为无 Token 映射（24/44/4/2/18/6/3/10rpx 圆角、40/60/64/72/18rpx 字号）或歧义值（36rpx 间距），交由设计侧决策，开发不擅自定义。
-
-【待办（需资源就位）】
-- Step2：24 角色头像 / 1 首页背景 / 6 阶段图 到位后，经 visuals.js 接入（char-{id} / home-bg / phase-N 自动映射）。
-- Step3：资源齐后重做 P0④ 关系探索（R-01~R-04）。
+【待办（资源已就位，可执行）】
+- ✅ Step1 资源已交付（设计AI 2026-08-26）：
+  · 24 角色头像 → mcu-miniprogram/assets/avatars/{角色id}.jpg
+  · 1 首页背景 → mcu-miniprogram/assets/backgrounds/home-bg.jpg
+  · 6 阶段代表图 → mcu-miniprogram/assets/phases/phase-{1-6}.jpg
+  · visuals.js 已更新：avatar()/phase()/homeBg() 函数可直接使用
+  · 命名规范 → AI生成文件/设计/MCU-V1.2-资源命名规范.md
+- ✅ Step2 关系探索页设计已交付：
+  · 设计稿 → AI生成文件/设计/MCU-V1.2-关系探索页视觉方案.md
+  · 含完整 wxml 模板 + CSS 规格 + JS 逻辑 + 关系对派生规则
+- 开发下一步：
+  ① ✅ 已将 visuals.js 的 avatar/homeBg 接入（c599a9c）；phase() 暂无首页承接位，待策划/设计裁定
+  ② ⏳ 按《关系探索页视觉方案》重做 explore.wxml/wxss/js（P0④）
+  ③ ⏳ 图片缩放与 CDN 化（当前原尺寸 1.4~2.4MB，待策划/设计裁定）
+  ④ 完成后提交截图 → 设计验收 → 策划验收
 
 【决策区】
 （请策划 / 设计回写：资源排期 / 验收确认 / Step4 是否先行）
