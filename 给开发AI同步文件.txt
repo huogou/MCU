@@ -170,3 +170,10 @@ MCU观影导航 V1.2 · 开发AI工作日志
 
 - 设计侧职责全部完成。球在 GPT 侧：⑦最终验收 + 4 项遗留决策拍板。
 - Work 继续停步 P1/P2/抖音迁移，等 GPT 指令。
+
+【GPT《P0 最终验收与专项决策》· Work 执行闭环（2026-08-26，提交 2161ee2）】
+- 专项② 图片缩放+CDN ✅：36 文件 57MB→0.75MB（resize_assets.py 落档 workspace/）；上传 CloudBase 托管；visuals.js LOCAL 切 CDN；URL 像素探针验证。
+- 专项③ 阶段图承接 ✅：browse 组头 56×30rpx 阶段图（mcuData.phase 转发层新增）。
+- 专项④ home-bg ✅：首页零引用确认。
+- 专项① SPECIAL ✅：12 条基础表按场景调用，92 条待 GPT 提供不堆叠。
+- 十项提交物已写策划【十七】。
