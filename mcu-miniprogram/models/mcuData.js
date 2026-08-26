@@ -172,6 +172,16 @@ const data = {
     return visuals.homeBg();
   },
 
+  /* Hero Banner（VDS V2：hero-banner.jpg 本地） */
+  heroBanner: function () {
+    return visuals.heroBanner();
+  },
+
+  /* 入口卡片背景（VDS V2：2×2 视觉卡片，key=watch/timeline/characters/relationships） */
+  entryBg: function (key) {
+    return visuals.entryBg(key);
+  },
+
   /* 该角色出现过的作品（由 chars 反查） */
   filmsOfChar: function (charId) {
     return byRelease.filter(function (m) {

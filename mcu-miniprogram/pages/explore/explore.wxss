@@ -1,10 +1,9 @@
 /* ============================================================
- * explore 关系探索（Tab3）· V1.2 完整重做（P0④）
- * ------------------------------------------------------------
- * 依据：《MCU-V1.2-关系探索页视觉方案》§3 / §6.3
- * 颜色一律 var()（阵营色走全局 .fc-/.fbg-/.fring-/.pill- 类，
- *   关系类型色为本页 .rel-* 功能色类，全部 Token 引用，零裸 hex）
- * 字号 5 档（56/36/28/24/22）/ 圆角 Token / 间距 --space-*
+ * explore 关系探索（Tab3）· V1.2 视觉系统落地（按 VDS V2 §5）
+ * 结构：头部 → 筛选 Chips → Canvas 网络图 → 关系列表
+ * 颜色一律 var()（关系类型色 .rel-* 功能色类，Token 引用，零裸 hex）
+ * 字号 5 档 / 圆角 Token / 间距 --space-*
+ * 阵营色 / 海报阶段色系统统一在 app.wxss 全局
  * ============================================================ */
 
 .explore-page {
@@ -12,9 +11,10 @@
   box-sizing: border-box;
   min-height: 100vh;
   background: var(--bg);
+  padding-bottom: var(--space-2xl);
 }
 
-/* —— 页面头部（§3.1） —— */
+/* —— 页面头部（VDS §5.2） —— */
 .page-head {
   padding: var(--space-xl) 0 var(--space-md);
 }
@@ -24,63 +24,13 @@
   color: var(--text-main);
 }
 .page-sub {
-  font-size: var(--fs-body);             /* 28rpx */
+  font-size: var(--fs-caption);          /* 24rpx */
   font-weight: 400;
   color: var(--text-sub);
   margin-top: var(--space-xs);
 }
 
-/* —— 入口区 2 列横排（§3.2） —— */
-.entry-row {
-  display: flex;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xl);
-}
-.entry-card {
-  flex: 1;
-  height: 120rpx;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  background: var(--surface-2);
-  border: 1rpx solid var(--surface-3);
-  border-radius: var(--radius-lg);       /* 20rpx */
-  padding: 0 var(--space-sm);
-  box-sizing: border-box;
-}
-.entry-hover { background: var(--surface-3); }
-.entry-icon {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--fs-display-sm);       /* 44rpx */
-  flex-shrink: 0;
-}
-.icon-pano { background: var(--gold-a10); color: var(--gold); }
-.icon-char { background: var(--p4-a15);  color: var(--p4); }
-.entry-body { flex: 1; min-width: 0; }
-.entry-name {
-  font-size: var(--fs-body);             /* 28rpx */
-  font-weight: 600;
-  color: var(--text-main);
-}
-.entry-desc {
-  font-size: var(--fs-mini);             /* 22rpx */
-  font-weight: 400;
-  color: var(--text-sub);
-  margin-top: var(--space-xs);
-}
-.entry-arrow {
-  font-size: var(--fs-display-sm);
-  color: var(--text-weak);
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-/* —— 筛选 Chips（§3.3） —— */
+/* —— 筛选 Chips（VDS §5.5） —— */
 .filter-row {
   width: 100%;
   white-space: nowrap;
@@ -99,7 +49,7 @@
   padding: 0 var(--space-md);
   border-radius: var(--radius-full);
   font-size: var(--fs-caption);          /* 24rpx */
-  font-weight: 400;
+  font-weight: 600;
   color: var(--text-sub);
   background: var(--surface-2);
   border: 1rpx solid var(--surface-3);
@@ -110,35 +60,49 @@
   color: var(--gold);
   background: var(--gold-a10);
   border-color: var(--gold);
-  font-weight: 600;
 }
 .chip-hover { opacity: 0.85; }
 
-/* —— 关系对卡片（§3.4 核心组件） —— */
-.pair-list {
+/* —— Canvas 关系网络图（VDS §5.3） —— */
+.canvas-wrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1rpx solid var(--surface-3);
+  background: var(--bg);
+  margin-bottom: var(--space-xl);
+}
+.relation-canvas {
+  width: 750rpx;
+  height: 600rpx;
+  display: block;
+}
+
+/* —— 关系列表（VDS §5.6 卡片式） —— */
+.section-label {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 1rpx;
+}
+.relation-list {
   display: flex;
   flex-direction: column;
 }
-.pair-card {
+.relation-card {
   background: var(--surface-2);
   border: 1rpx solid var(--surface-3);
   border-radius: var(--radius-lg);       /* 20rpx */
   padding: var(--space-md);              /* 28rpx */
   margin-bottom: var(--space-sm);
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
 }
-.pair-card-hover { border-color: var(--gold); }
-
-/* 角色列（左右各 35%，中间关系区 30%） */
-.pair-char {
-  width: 35%;
+.rel-card-hover { border-color: var(--gold); }
+.rel-main {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
-.pair-avatar {
+.rel-avatar {
   width: 80rpx;
   height: 80rpx;
   border-radius: 50%;
@@ -149,8 +113,8 @@
   justify-content: center;
   background: var(--surface-3);
 }
-.pair-avatar-img { width: 100%; height: 100%; }
-.pair-avatar-fallback {
+.fill-img { width: 100%; height: 100%; display: block; }
+.rel-fallback {
   width: 100%;
   height: 100%;
   display: flex;
@@ -160,71 +124,57 @@
   font-weight: 600;
   color: var(--white-a70);
 }
-.pair-name {
-  font-size: var(--fs-body);             /* 28rpx */
-  font-weight: 600;
-  color: var(--text-main);
-  margin-top: var(--space-xs);
-  text-align: center;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.pair-en {
-  font-size: var(--fs-mini);             /* 22rpx */
-  font-weight: 400;
-  color: var(--text-sub);
-  margin-top: 4rpx;
-  text-align: center;
-  max-width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.pair-camp {
-  font-size: var(--fs-mini);             /* 22rpx */
-  margin-top: var(--space-xs);
-  border-radius: var(--radius-full);
-}
-
-/* 中间关系区（连线 + 类型标签） */
-.pair-relation {
-  width: 30%;
-  height: 80rpx;
+.rel-line {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 6rpx;
+  padding: 0 var(--space-sm);
+  position: relative;
 }
-.pair-line {
-  flex: 1;
+.rel-line::before {
+  content: '';
+  position: absolute;
+  left: var(--space-sm); right: var(--space-sm);
   height: 1rpx;
   background: var(--surface-3);
 }
-.pair-type {
+.rel-type {
+  position: relative;
   font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 600;
   padding: 0 var(--space-xs);
+  background: var(--surface-2);
   white-space: nowrap;
 }
-/* 关系类型功能色（方案 §3.3 / §5.2，Token 引用） */
+/* 关系类型功能色（VDS §5.3，Token 引用） */
 .rel-ally   { color: var(--accent-blue); }
 .rel-enemy  { color: var(--accent-red); }
 .rel-mentor { color: var(--gold); }
 .rel-family { color: var(--accent-purple); }
 .rel-rival  { color: var(--accent-red); }
 
-/* 共同出演 */
-.pair-footer {
-  width: 100%;
+.rel-info {
   text-align: center;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-xs);
+  border-top: 1rpx solid var(--surface-3);
+}
+.rel-name {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--text-main);
+}
+.rel-name-arrow {
+  color: var(--text-weak);
+  font-weight: 400;
+  margin: 0 var(--space-xs);
+}
+.rel-shared {
   font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 400;
   color: var(--text-weak);
-  padding-top: var(--space-xs);
   margin-top: var(--space-xs);
-  border-top: 1rpx solid var(--surface-3);
 }
 
 .bottom-pad { height: 60rpx; }

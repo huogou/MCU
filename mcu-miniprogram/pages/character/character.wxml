@@ -9,7 +9,7 @@
 </view>
 
 <view class="mcu-page" wx:else>
-  <!-- Hero 区：阵营色氛围 + 真实头像（缺图 G-19 兜底） -->
+  <!-- Hero 区（VDS §4.2 增强）：阵营氛围光效 + 真实头像 160rpx + 简介直展 -->
   <view class="hero hero-{{faction.cls}}">
     <view class="hero-avatar {{faction.ringCls}} {{faction.factionCls}}">
       <image wx:if="{{char.avatarImg}}" class="fill-img" src="{{char.avatarImg}}" mode="aspectFill" />
@@ -21,12 +21,7 @@
       <view class="hero-camp pill-{{faction.cls}}">{{faction.label}}</view>
       <view class="hero-count">{{films.length}} 部关联作品</view>
     </view>
-  </view>
-
-  <!-- 基础信息 -->
-  <view class="card">
-    <view class="card-title">角色简介</view>
-    <view class="char-note">{{char.note}}</view>
+    <view class="hero-note">{{char.note}}</view>
   </view>
 
   <!-- 首次出现作品 -->

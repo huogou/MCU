@@ -1,17 +1,15 @@
 /* ============================================================
- * 首页 home（Tab1）· V1.2 视觉还原（按《MCU-V1.2视觉验收清单》H-01~H-18）
+ * 首页 home（Tab1）· V1.2 视觉系统落地（按《MCU-V1.2-Visual-Design-System》VDS V2）
  * ------------------------------------------------------------
- * 结构（与《页面视觉升级方案》§2.3 一致，5 模块）：
- *   ① 旅程进度卡 → ② 推荐下一部大卡 → ③ 宇宙入口 3 列
+ * 结构（VDS §2.1，5 模块）：
+ *   ① Hero Banner（新增，hero-banner.jpg + 迷你旅程条）
+ *   → ② 旅程/推荐卡（简化：去背景图，紧凑电影推荐）
+ *   → ③ 功能入口 2×2 视觉卡片（开始观看/时间线/角色图鉴/关系探索）
  *   → ④ 热门角色横滚 → ⑤ 最近观看横滚
- * 数据纪律：全部来自 models（单一可信源），不引入第二套数据；
- *   仅重构本页视图模型（Page.data 装配），底层数据模型不动。
- * 图片：统一经 mcuData.visual(id) 取 poster/backdrop；
- *   角色头像(24张)/首页背景(1张)当前无资源 → 返回 null → 前端合规兜底
- *   （阶段色渐变+首字 / 宇宙渐变占位），不破图（G-18/G-19）。
- * 跳转目标与既有页面一致，不新增/不改：
- *   旅程当前电影/推荐/最近观看 → 电影详情；宇宙入口 → 时间线/角色图鉴/关系探索；
- *   热门角色 → 角色详情。
+ * 数据纪律：全部来自 models（单一可信源），仅装配本页视图模型；
+ *   图片 URL 只存在于 visuals.js（经 mcuData 转发层访问，禁硬编码）。
+ * 跳转：入口 4 卡路由对齐实际页面（watch→routes(Tab)、timeline→panorama、
+ *   characters→characters、relationships→explore(Tab)）。
  * ============================================================ */
 
 const mcuData = require('../../models/mcuData.js');
@@ -24,10 +22,10 @@ const SAGA_LABEL = { infinity: '无限传奇', multiverse: '多元宇宙' };
 /* 最近观看最多展示 */
 const RECENT_MAX = 6;
 
-/* 首页热门角色（4 位，与《V1.2》示例一致；id 用于跳转角色详情） */
+/* 首页热门角色（4 位；id 用于跳转角色详情） */
 const HOT_CHAR_IDS = ['tony', 'steve', 'thor', 'peter'];
 
-/* 阵营 → 颜色 class + 中文标签（依据验收清单 C-04：复仇者红/阿斯加德蓝/银护紫/瓦坎达金） */
+/* 阵营 → 颜色 class + 中文标签（设计 §4.4） */
 const CAMP_MAP = {
   avengers:  { cls: 'red',    label: '复仇者' },
   asgard:    { cls: 'blue',   label: '阿斯加德' },
@@ -36,11 +34,12 @@ const CAMP_MAP = {
   shield:    { cls: 'blue',   label: '神盾局' }
 };
 
-/* 宇宙入口 3 列（依据 §2.3③：时间线蓝 / 角色图鉴红 / 关系探索紫） */
-const EXPLORE_ENTRIES = [
-  { key: 'timeline',   title: '宇宙时间线', glyph: '◷', bg: 'exp-blue' },
-  { key: 'characters', title: '角色图鉴',   glyph: '✦', bg: 'exp-red' },
-  { key: 'relation',   title: '关系探索',   glyph: '⬡', bg: 'exp-purple' }
+/* 功能入口 2×2 视觉卡片（VDS §2.3，4 张；key 驱动跳转分流 + visuals.entryBg 取背景） */
+const ENTRY_CARDS = [
+  { key: 'watch',         title: '开始观看',  desc: '38 部 · 按序排列', icon: '▶', route: '/pages/routes/routes' },
+  { key: 'timeline',      title: '宇宙时间线', desc: '6 阶段 · 脉络清晰', icon: '◷', route: '/pages/panorama/panorama' },
+  { key: 'characters',    title: '角色图鉴',  desc: '24 位 · 阵营关系', icon: '✦', route: '/pages/characters/characters' },
+  { key: 'relationships', title: '关系探索',  desc: '92 条 · 网络图谱', icon: '⬡', route: '/pages/explore/explore' }
 ];
 
 /* 从角色 cn（'托尼·斯塔克 / 钢铁侠'）提取英雄名（'/' 之后） */
@@ -72,12 +71,14 @@ function movieVM(id) {
 
 Page({
   data: {
-    progress: null,    /* ① 旅程进度卡 */
+    heroBanner: '',   /* ① Hero Banner 背景（hero-banner.jpg） */
+    heroMeta: '',     /* Hero 副标题文案（59 部 · 24 角色 · 6 阶段） */
+    progressPercent: 0, /* Hero 迷你旅程条进度 */
+    progress: null,   /* ② 旅程/推荐卡 */
     recommend: null,  /* ② 推荐下一部大卡 */
-    exploreEntries: [], /* ③ 宇宙入口 3 列 */
+    entryCards: [],   /* ③ 功能入口 2×2 */
     hotChars: [],     /* ④ 热门角色 */
-    recent: [],       /* ⑤ 最近观看 */
-    homeBg: ''        /* 旅程卡背景（home-bg.jpg，缺失空 → 渐变占位） */
+    recent: []        /* ⑤ 最近观看 */
   },
 
   onShow() { this.refresh(); },
@@ -91,7 +92,11 @@ Page({
     const watched = state.watched || {};
     const latest = userState.latest();
 
-    /* ① 旅程进度卡 */
+    /* ① Hero Banner（VDS §2.2）+ 迷你旅程条 */
+    const heroBanner = mcuData.heroBanner() || '';
+    const progressPercent = total > 0 ? Math.min(100, Math.round(count / total * 100)) : 0;
+
+    /* ② 旅程/推荐卡（VDS §2.2：Hero 吸收进度信息，旅程卡简化为当前电影推荐） */
     const currentId = (hasProgress && latest) ? latest.id : 'iron-man';
     const cur = movieVM(currentId);
     const isCurrent = !watched[currentId];
@@ -133,7 +138,19 @@ Page({
       cta: hasProgress ? '继续观看' : '开始观看'
     };
 
-    /* ④ 热门角色（V1.2 头像资源：visuals.avatar 24 张；缺失返回 null → 前端 G-19 兜底） */
+    /* ③ 功能入口 2×2（VDS §2.3：bg 经 visuals.entryBg） */
+    const entryCards = ENTRY_CARDS.map(function (e) {
+      return {
+        key: e.key,
+        title: e.title,
+        desc: e.desc,
+        icon: e.icon,
+        route: e.route,
+        bg: mcuData.entryBg(e.key) || ''
+      };
+    });
+
+    /* ④ 热门角色（24 张真实头像；缺失 G-19 兜底） */
     const hotChars = HOT_CHAR_IDS.map(function (id) {
       const c = mcuData.getChar(id);
       if (!c) return null;
@@ -164,17 +181,20 @@ Page({
       };
     }).filter(Boolean);
 
+    /* Hero 副标题（VDS §2.2 文案：总作品动态取，24 角色 / 6 阶段为数据常量） */
     this.setData({
+      heroBanner: heroBanner,
+      heroMeta: total + ' 部 · 24 角色 · 6 阶段',
+      progressPercent: progressPercent,
       progress: progress,
       recommend: recommendCard,
-      exploreEntries: EXPLORE_ENTRIES,
+      entryCards: entryCards,
       hotChars: hotChars,
-      recent: recent,
-      homeBg: mcuData.homeBg() || ''
+      recent: recent
     });
   },
 
-  /* ---- 交互（跳转目标与旧版一致，不新增/不改） ---- */
+  /* ---- 交互 ---- */
 
   /* 推荐/继续 → 电影详情 */
   goContinue(e) {
@@ -188,12 +208,18 @@ Page({
     if (id) wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
   },
 
-  /* 宇宙入口 → 对应页面 */
-  goExplore(e) {
+  /* Hero 迷你旅程条 → 路线页（Tab） */
+  goJourney() {
+    wx.switchTab({ url: '/pages/routes/routes' });
+  },
+
+  /* 功能入口 2×2 → 对应页面（路由对齐实际页面；Tab 页用 switchTab） */
+  onEntryTap(e) {
     const key = e.currentTarget.dataset.key;
-    if (key === 'timeline') wx.navigateTo({ url: '/pages/panorama/panorama' });
+    if (key === 'watch') wx.switchTab({ url: '/pages/routes/routes' });
+    else if (key === 'timeline') wx.navigateTo({ url: '/pages/panorama/panorama' });
     else if (key === 'characters') wx.navigateTo({ url: '/pages/characters/characters' });
-    else if (key === 'relation') wx.switchTab({ url: '/pages/explore/explore' });
+    else if (key === 'relationships') wx.switchTab({ url: '/pages/explore/explore' });
   },
 
   /* 热门角色 → 角色详情 */

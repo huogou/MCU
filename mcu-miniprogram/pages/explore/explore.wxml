@@ -1,36 +1,15 @@
-<!-- 关系探索 explore（Tab3）· V1.2 完整重做（P0④）
-     依据：《MCU-V1.2-关系探索页视觉方案》
-     结构：页面头部 → 入口区(2列) → 筛选Chips → 关系对卡片列表
-     纪律：零裸 hex（阵营/关系色一律全局类）、数据零改动、跳转保留 -->
+<!-- 关系探索 explore（Tab3）· V1.2 视觉系统落地（按 VDS V2 §5）
+     结构：页面头部 → 筛选 Chips → Canvas 关系网络图 → 关系列表
+     交互：点击 Canvas 节点切换中心角色；Chips 单选过滤 -->
 <view class="mcu-page explore-page">
 
-  <!-- 页面头部（方案 §3.1：56rpx/700 + 28rpx/400） -->
+  <!-- 页面头部（VDS §5.2：56rpx/700 标题 + 副标题） -->
   <view class="page-head">
     <view class="page-title">关系探索</view>
-    <view class="page-sub">MCU 角色关系网络</view>
+    <view class="page-sub">以 {{centerName || '角色'}} 为中心 · 点击节点切换探索</view>
   </view>
 
-  <!-- 入口区：2 列横排（方案 §3.2） -->
-  <view class="entry-row">
-    <view class="entry-card" bindtap="goPano" hover-class="entry-hover" hover-stay-time="80">
-      <view class="entry-icon icon-pano">◇</view>
-      <view class="entry-body">
-        <view class="entry-name">宇宙全景图</view>
-        <view class="entry-desc">一图看尽主线脉络</view>
-      </view>
-      <view class="entry-arrow">›</view>
-    </view>
-    <view class="entry-card" bindtap="goCharacters" hover-class="entry-hover" hover-stay-time="80">
-      <view class="entry-icon icon-char">✦</view>
-      <view class="entry-body">
-        <view class="entry-name">角色图鉴</view>
-        <view class="entry-desc">{{totalChars}} 位角色</view>
-      </view>
-      <view class="entry-arrow">›</view>
-    </view>
-  </view>
-
-  <!-- 关系类型筛选 Chips（方案 §3.3，横向滚动单选） -->
+  <!-- 关系类型筛选 Chips（VDS §5.5，5 种单选） -->
   <scroll-view scroll-x class="filter-row" enable-flex>
     <view class="filter-inner">
       <view wx:for="{{filters}}" wx:key="key"
@@ -41,41 +20,33 @@
     </view>
   </scroll-view>
 
-  <!-- 关系对卡片列表（方案 §3.4 核心组件） -->
-  <view class="pair-list">
-    <view wx:for="{{pairs}}" wx:key="key" class="pair-card" hover-class="pair-card-hover" hover-stay-time="80">
+  <!-- Canvas 关系网络图（VDS §5.3） -->
+  <view class="canvas-wrap">
+    <canvas type="2d" id="relCanvas" class="relation-canvas" bindtap="onCanvasTap"></canvas>
+  </view>
 
-      <!-- 左角色（点击跳其详情） -->
-      <view class="pair-char" data-id="{{item.fromId}}" bindtap="goCharacter">
-        <view class="pair-avatar fring-{{item.fromCampCls}}">
-          <image wx:if="{{item.fromAvatar}}" class="pair-avatar-img" src="{{item.fromAvatar}}" mode="aspectFill" lazy-load="true"/>
-          <view wx:else class="pair-avatar-fallback fbg-{{item.fromCampCls}}">{{item.fromFirst}}</view>
+  <!-- 关系列表（VDS §5.6 卡片式，随筛选联动） -->
+  <view class="section-label">关系（{{relations.length}}）</view>
+  <view class="relation-list">
+    <view wx:for="{{relations}}" wx:key="id" class="relation-card"
+          data-id="{{item.id}}" bindtap="goCharacter" hover-class="rel-card-hover" hover-stay-time="80">
+      <view class="rel-main">
+        <view class="rel-avatar fring-{{centerCls}}">
+          <image wx:if="{{centerAvatar}}" class="fill-img" src="{{centerAvatar}}" mode="aspectFill" lazy-load="true"/>
+          <view wx:else class="rel-fallback fbg-{{centerCls}}">{{centerFirst}}</view>
         </view>
-        <view class="pair-name">{{item.fromCn}}</view>
-        <view class="pair-en">{{item.fromEn}}</view>
-        <view class="pair-camp pill-{{item.fromCampCls}}">{{item.fromCampLabel}}</view>
-      </view>
-
-      <!-- 关系类型（中间：连线 + 类型标签，方案 §3.4） -->
-      <view class="pair-relation">
-        <view class="pair-line"></view>
-        <view class="pair-type {{item.relCls}}">{{item.relLabel}}</view>
-        <view class="pair-line"></view>
-      </view>
-
-      <!-- 右角色（点击跳其详情） -->
-      <view class="pair-char" data-id="{{item.toId}}" bindtap="goCharacter">
-        <view class="pair-avatar fring-{{item.toCampCls}}">
-          <image wx:if="{{item.toAvatar}}" class="pair-avatar-img" src="{{item.toAvatar}}" mode="aspectFill" lazy-load="true"/>
-          <view wx:else class="pair-avatar-fallback fbg-{{item.toCampCls}}">{{item.toFirst}}</view>
+        <view class="rel-line">
+          <view class="rel-type rel-{{item.type}}">{{item.typeLabel}}</view>
         </view>
-        <view class="pair-name">{{item.toCn}}</view>
-        <view class="pair-en">{{item.toEn}}</view>
-        <view class="pair-camp pill-{{item.toCampCls}}">{{item.toCampLabel}}</view>
+        <view class="rel-avatar fring-{{item.campCls}}">
+          <image wx:if="{{item.avatar}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true"/>
+          <view wx:else class="rel-fallback fbg-{{item.campCls}}">{{item.first}}</view>
+        </view>
       </view>
-
-      <!-- 共同出演 -->
-      <view class="pair-footer">共同出演 {{item.coCount}} 部</view>
+      <view class="rel-info">
+        <view class="rel-name">{{centerName}} <text class="rel-name-arrow">↔</text> {{item.name}}</view>
+        <view class="rel-shared">{{item.typeLabel}} · 共同出演 {{item.shared}} 部</view>
+      </view>
     </view>
   </view>
 

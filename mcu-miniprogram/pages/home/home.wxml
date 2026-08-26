@@ -1,23 +1,33 @@
-<!-- 首页 home（Tab1）· V1.2 视觉还原（按《MCU-V1.2视觉验收清单》H-01~H-18）
-     结构（自上而下，禁止删除模块）：
-       ① 旅程进度卡 → ② 推荐下一部大卡 → ③ 宇宙入口 3 列
+<!-- 首页 home（Tab1）· V1.2 视觉系统落地（按《MCU-V1.2-Visual-Design-System》VDS V2 §2）
+     结构（VDS §2.1 / §2.4，5 模块）：
+       ① Hero Banner（满宽沉浸）→ ② 旅程/推荐卡（简化）→ ③ 功能入口 2×2
        → ④ 热门角色(横滚) → ⑤ 最近观看(横滚)
-     约束：不新增功能 / 不改数据模型 / 不自行设计（按验收清单执行）
-     双态：仅「旅程进度卡 / 推荐下一部」内容随 hasProgress 变化
-       - 新人：进度 0/59 / 推荐钢铁侠
-       - 老用户：已看 X/59 / 推荐下一部未看
-     图片：海报经 mcuData.visual(id) 取；角色头像/首页背景无资源 → 阶段色+首字 / 宇宙渐变 兜底
-     图标：宇宙入口暂用 Unicode 占位（◷✦⬡，设计系统 §5.2.3 许可），待 SVG 替换 -->
+     约束：不新增功能 / 不改数据模型 / 不自行设计（严格按 VDS 执行）
+     图片：经 mcuData 转发层取（URL 只存在于 visuals.js）；缺失走合规兜底
+     跳转：watch→routes(Tab) / timeline→panorama / characters→角色图鉴 / relationships→explore(Tab) -->
 <view class="mcu-page home-page">
 
-  <!-- ═══ ① 旅程进度卡（H-01~H-04） ═══ -->
+  <!-- ═══ ① Hero Banner（VDS §2.2，新增） ═══ -->
+  <view class="hero-banner">
+    <image wx:if="{{heroBanner}}" class="hero-banner-bg" src="{{heroBanner}}" mode="aspectFill" lazy-load="true"/>
+    <view class="hero-banner-overlay"></view>
+    <view class="hero-banner-content">
+      <view class="hero-banner-tag">MCU 宇宙入口</view>
+      <view class="hero-banner-title">探索无限传奇</view>
+      <view class="hero-banner-sub">{{heroMeta}}</view>
+      <view class="hero-journey-bar" bindtap="goJourney" hover-class="hero-journey-hover" hover-stay-time="60">
+        <view class="hero-journey-progress">
+          <view class="hero-journey-fill" style="width:{{progressPercent}}%"></view>
+        </view>
+        <view class="hero-journey-text">{{progress.count}}/{{progress.total}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ -->
   <view class="journey-card">
-    <image wx:if="{{homeBg}}" class="journey-bg-img" src="{{homeBg}}" mode="aspectFill" lazy-load="true"/>
-    <view class="journey-bg"></view>
     <view class="journey-inner">
-      <view class="journey-label">{{progress.journeyLabel}}</view>
-      <view class="journey-num">{{progress.count}} / {{progress.total}}</view>
-      <view class="journey-phase">{{progress.phaseText}}</view>
+      <view class="journey-label">{{progress.journeyLabel}} · {{progress.phaseText}}</view>
       <view class="journey-movie">
         <image wx:if="{{progress.movie.poster}}" class="jm-poster" src="{{progress.movie.poster}}" mode="aspectFill" lazy-load="true"/>
         <view wx:else class="jm-poster poster-p{{progress.movie.phase}}"><text>{{progress.movie.initial}}</text></view>
@@ -25,13 +35,13 @@
           <view class="jm-name">{{progress.movie.name}}</view>
           <view wx:if="{{progress.movie.enName}}" class="jm-en">{{progress.movie.enName}}</view>
           <view class="jm-phase">{{progress.movie.phaseText}}<text wx:if="{{progress.movie.year}}"> · {{progress.movie.year}}</text></view>
-          <view class="jm-status {{progress.movie.statusCls}}">{{progress.movie.statusLabel}}</view>
         </view>
+        <view class="jm-cta" data-id="{{progress.movie.id}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{progress.movie.statusLabel}}</view>
       </view>
     </view>
   </view>
 
-  <!-- ═══ ② 推荐下一部大卡（H-05~H-08） ═══ -->
+  <!-- ═══ ③ 推荐下一部大卡（保持） ═══ -->
   <view class="rec-card">
     <view class="rec-poster-wrap">
       <image wx:if="{{recommend.poster}}" class="rec-poster" src="{{recommend.poster}}" mode="aspectFill" lazy-load="true"/>
@@ -47,19 +57,24 @@
     </view>
   </view>
 
-  <!-- ═══ ③ 宇宙入口 3 列（H-09~H-11） ═══ -->
+  <!-- ═══ ④ 功能入口 2×2 视觉卡片（VDS §2.3 重设计） ═══ -->
   <view class="section">
     <view class="module-title">宇宙入口</view>
-    <view class="exp-row">
-      <view class="exp-card {{item.bg}}" wx:for="{{exploreEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goExplore" hover-class="exp-hover" hover-stay-time="80">
-        <!-- 入口图标：设计§2.3 内联 SVG（wxss data-URI 方式，小程序不支持 wxml 内联 svg 标签）；key 驱动 -->
-        <view class="exp-ic exp-ic-{{item.key}}"></view>
-        <view class="exp-title">{{item.title}}</view>
+    <view class="entry-grid">
+      <view class="entry-visual-card" wx:for="{{entryCards}}" wx:key="key"
+            data-key="{{item.key}}" bindtap="onEntryTap" hover-class="evc-hover" hover-stay-time="80">
+        <image wx:if="{{item.bg}}" class="evc-bg" src="{{item.bg}}" mode="aspectFill" lazy-load="true"/>
+        <view class="evc-overlay"></view>
+        <view class="evc-content">
+          <view class="evc-icon">{{item.icon}}</view>
+          <view class="evc-title">{{item.title}}</view>
+          <view class="evc-desc">{{item.desc}}</view>
+        </view>
       </view>
     </view>
   </view>
 
-  <!-- ═══ ④ 热门角色（横滚）（H-12~H-13） ═══ -->
+  <!-- ═══ ⑤ 热门角色（横滚）（保持） ═══ -->
   <view class="section">
     <view class="module-title">热门角色</view>
     <scroll-view class="char-scroll" scroll-x enable-flex>
@@ -76,7 +91,7 @@
     </scroll-view>
   </view>
 
-  <!-- ═══ ⑤ 最近观看（横滚）（H-14~H-15） ═══ -->
+  <!-- ═══ ⑥ 最近观看（横滚）（保持） ═══ -->
   <view class="section">
     <view class="module-title">最近观看</view>
     <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>

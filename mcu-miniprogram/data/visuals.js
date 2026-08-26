@@ -153,6 +153,17 @@ const phases = {
 /* ── 首页背景（本地资源） ── */
 const homeBackground = LOCAL + '/backgrounds/home-bg.jpg';
 
+/* ── Hero Banner（首页沉浸式入口，V1.2 VDS 新增） ── */
+const heroBannerImg = LOCAL + '/hero/hero-banner.jpg';
+
+/* ── 功能入口卡片背景（4 张，V1.2 VDS 新增） ── */
+const entryBgs = {
+  watch:       LOCAL + '/entries/entry-watch.jpg',
+  timeline:    LOCAL + '/entries/entry-timeline.jpg',
+  characters:  LOCAL + '/entries/entry-characters.jpg',
+  relationships: LOCAL + '/entries/entry-relationships.jpg'
+};
+
 /* ── 访问函数 ── */
 
 /**
@@ -193,4 +204,21 @@ function homeBg() {
   return homeBackground;
 }
 
-module.exports = { visual, avatar, phase, homeBg, posters, stills, avatars, phases };
+/**
+ * Hero Banner（首页沉浸式入口背景）
+ * @returns {string}
+ */
+function heroBanner() {
+  return heroBannerImg;
+}
+
+/**
+ * 功能入口卡片背景
+ * @param {string} key - watch / timeline / characters / relationships
+ * @returns {string|null}
+ */
+function entryBg(key) {
+  return (key && entryBgs[key]) ? entryBgs[key] : null;
+}
+
+module.exports = { visual, avatar, phase, homeBg, heroBanner, entryBg, posters, stills, avatars, phases, entryBgs };

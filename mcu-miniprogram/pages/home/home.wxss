@@ -1,17 +1,19 @@
-/* 首页 home（Tab1）· V1.2 视觉还原样式（按《MCU-V1.2视觉验收清单》H-01~H-18）
- * 依据：《页面视觉升级方案》§2.3 + 《开发视觉标注》
- * 颜色一律 var()，组件规则零裸 hex；字号 5 级、圆角 5 级、卡片 3 级。
- * 模块间距 --space-xl(56) / 标题下距 --space-md(28) / 页边距 --page-x(36)。
+/* 首页 home（Tab1）· V1.2 视觉系统落地样式（按《MCU-V1.2-Visual-Design-System》VDS V2 §2）
+ * 结构：① Hero Banner(满宽沉浸) → ② 旅程/推荐卡(简化) → ③ 推荐下一部大卡
+ *       → ④ 功能入口 2×2 → ⑤ 热门角色横滚 → ⑥ 最近观看横滚
+ * 颜色一律 var()（零裸 hex）；字号 5 档；圆角 Token；间距 --space-*
+ * 阵营色 / 海报阶段色系统统一在 app.wxss 全局（Step4 提取）
  */
 
 .home-page {
-  padding: var(--space-2xl) var(--page-x);   /* 顶/底 var(--space-2xl)，左右 36rpx */
+  padding: 0 var(--page-x);               /* 顶部留白由 Hero Banner 承担（满宽突破） */
   min-height: 100vh;
   box-sizing: border-box;
   background: var(--bg);
+  padding-bottom: var(--space-2xl);
 }
 
-.section { margin-bottom: var(--space-xl); }
+.section { margin-top: var(--space-xl); }
 .section:last-child { margin-bottom: 0; }
 
 /* 模块标题（36rpx/600/main，下距 28rpx） */
@@ -22,67 +24,110 @@
   margin-bottom: var(--space-md);
 }
 
-/* —— ① 旅程进度卡（H-01~H-04） —— */
-.journey-card {
+/* ═══ ① Hero Banner（VDS §2.2） ═══ */
+.hero-banner {
   position: relative;
+  width: auto;
+  height: 420rpx;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--surface-0), var(--surface-1));
-  border: 1rpx solid var(--surface-3);
-  border-radius: var(--radius-xl);
-  margin-bottom: var(--space-xl);
+  margin: 0 calc(-1 * var(--page-x));     /* 满宽突破页边距 */
 }
-/* 顶部「宇宙背景」：home-bg.jpg 已接入（visuals.homeBg，2026-08-26），
-   铺满整卡并叠渐变罩层保证文字可读；缺失时仍由渐变占位（G-18 合规） */
-.journey-bg-img {
+.hero-banner-bg {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-xl);
-  opacity: 0.85;
 }
-.journey-bg {
+.hero-banner-overlay {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 200rpx;
-  background:
-    radial-gradient(140rpx 90rpx at 18% 28%, var(--gold-a10), transparent 70%),
-    radial-gradient(180rpx 110rpx at 82% 18%, var(--accent-blue-a10), transparent 70%),
-    linear-gradient(180deg, var(--surface-0), transparent);
-  opacity: 0.9;
-  pointer-events: none;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,11,18,0.2) 0%,
+    rgba(8,11,18,0.1) 40%,
+    rgba(8,11,18,0.7) 80%,
+    var(--bg) 100%
+  );
+}
+.hero-banner-content {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--page-x) var(--space-lg);
+}
+.hero-banner-tag {
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 4rpx;
+  margin-bottom: var(--space-xs);
+}
+.hero-banner-title {
+  font-size: var(--fs-display);          /* 56rpx */
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+.hero-banner-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+/* 迷你旅程条 */
+.hero-journey-bar {
+  display: flex;
+  align-items: center;
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-full);
+  padding: var(--space-xs) var(--space-sm);
+  margin-top: var(--space-md);
+}
+.hero-journey-hover { opacity: 0.9; }
+.hero-journey-progress {
+  flex: 1;
+  height: 6rpx;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  margin-right: var(--space-sm);
+  overflow: hidden;
+}
+.hero-journey-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: var(--radius-full);
+}
+.hero-journey-text {
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ */
+.journey-card {
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 .journey-inner {
-  position: relative;
-  padding: 36rpx;
+  padding: var(--space-md);
 }
 .journey-label {
   font-size: var(--fs-caption);          /* 24rpx */
   font-weight: 400;
   color: var(--text-sub);
   letter-spacing: 2rpx;
-}
-.journey-num {
-  font-size: var(--fs-display);          /* 56rpx */
-  font-weight: 700;
-  color: var(--gold);
-  line-height: 1.2;
-  margin-top: 12rpx;
-}
-.journey-phase {
-  font-size: var(--fs-caption);          /* 24rpx */
-  font-weight: 400;
-  color: var(--text-weak);
-  margin-top: var(--space-xs);
+  margin-bottom: var(--space-sm);
 }
 .journey-movie {
   display: flex;
   align-items: center;
-  margin-top: var(--space-lg);
 }
 .jm-poster {
-  width: 120rpx;
-  height: 180rpx;
+  width: 88rpx;
+  height: 132rpx;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
   display: flex;
@@ -95,7 +140,7 @@
   font-weight: 700;
   color: var(--white-a60);
 }
-.jm-info { min-width: 0; margin-left: var(--space-md); }
+.jm-info { flex: 1; min-width: 0; margin-left: var(--space-md); }
 .jm-name {
   font-size: var(--fs-body);             /* 28rpx */
   font-weight: 600;
@@ -105,30 +150,26 @@
   font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 400;
   color: var(--text-sub);
-  margin-top: var(--space-xs);           /* 4→8 */
+  margin-top: var(--space-xs);
 }
 .jm-phase {
   font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 400;
   color: var(--text-weak);
-  margin-top: var(--space-xs);           /* 4→8 */
+  margin-top: var(--space-xs);
 }
-.jm-status {
-  display: inline-block;
-  font-size: var(--fs-mini);             /* 22rpx */
+.jm-cta {
+  flex-shrink: 0;
+  font-size: var(--fs-mini);
   font-weight: 600;
   color: var(--gold);
   background: var(--gold-a10);
-  padding: 4rpx 12rpx;
+  padding: 10rpx var(--space-md);
   border-radius: var(--radius-full);
-  margin-top: var(--space-sm);
-}
-.jm-status.st-done {
-  color: var(--text-weak);
-  background: var(--surface-3);
+  margin-left: var(--space-sm);
 }
 
-/* —— ② 推荐下一部大卡（H-05~H-08） —— */
+/* ═══ ③ 推荐下一部大卡（保持） ═══ */
 .rec-card {
   background: var(--surface-1);
   border-radius: var(--radius-xl);
@@ -176,7 +217,7 @@
 }
 .rec-name {
   font-size: var(--fs-title);            /* 36rpx */
-  font-weight: 600;                      /* 700→600（Title 级规范字重，P1-6） */
+  font-weight: 600;
   color: var(--text-main);
   margin-top: var(--space-xs);
 }
@@ -184,7 +225,7 @@
   font-size: var(--fs-caption);          /* 24rpx */
   font-weight: 400;
   color: var(--text-sub);
-  margin-top: var(--space-xs);           /* 4→8 */
+  margin-top: var(--space-xs);
 }
 .rec-reason {
   font-size: var(--fs-caption);          /* 24rpx */
@@ -198,7 +239,7 @@
   overflow: hidden;
 }
 
-/* 强调按钮（全页唯一金色实心，H-07/H-18） */
+/* 强调按钮（全页唯一金色实心） */
 .btn-accent {
   width: 100%;
   box-sizing: border-box;
@@ -215,53 +256,68 @@
 }
 .btn-hover { opacity: 0.85; }
 
-/* —— ③ 宇宙入口 3 列（H-09~H-11） —— */
-.exp-row {
+/* ═══ ④ 功能入口 2×2 视觉卡片（VDS §2.3 重设计） ═══ */
+.entry-grid {
   display: flex;
-  gap: var(--space-sm);                  /* 16→20 */
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
-.exp-card {
-  flex: 1;
-  height: 200rpx;
+.entry-visual-card {
+  width: calc((100% - var(--space-sm)) / 2);
+  height: 240rpx;
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
+}
+.evc-hover { opacity: 0.9; }
+.evc-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+.evc-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(8,11,18,0.75) 0%,
+    rgba(8,11,18,0.45) 100%
+  );
+}
+.evc-content {
+  position: relative;
+  height: 100%;
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--space-sm);
-  box-sizing: border-box;
+  justify-content: flex-end;
 }
-.exp-blue   { background: linear-gradient(135deg, var(--accent-blue-a10),   var(--surface-2)); }
-.exp-red    { background: linear-gradient(135deg, var(--accent-red-a10),    var(--surface-2)); }
-.exp-purple { background: linear-gradient(135deg, var(--accent-purple-a10), var(--surface-2)); }
-/* 入口图标：设计 §2.3 内联 SVG（线性 1.5 描边 / --gold / 48rpx 容器）。
-   小程序 wxml 不支持 <svg> 标签，用 wxss data-URI 背景承载（URL 编码，零外部文件）。
-   色值为 --gold 权威值，属 SVG 图片内容（非 CSS 颜色声明）。 */
-.exp-ic {
-  width: 48rpx;
-  height: 48rpx;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100% 100%;
+.evc-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: var(--radius-md);
+  background: var(--gold-a15);
+  color: var(--gold);
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
 }
-.exp-ic-timeline {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2B233' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpolyline points='12 7 12 12 15.5 14'/%3E%3C/svg%3E");
+.evc-title {
+  font-size: var(--fs-title);            /* 36rpx */
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
 }
-.exp-ic-characters {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2B233' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8.5' r='2.8'/%3E%3Cpath d='M3.8 19.2c.7-2.9 2.6-4.6 5.2-4.6s4.5 1.7 5.2 4.6'/%3E%3Ccircle cx='16.5' cy='9.5' r='2.1'/%3E%3Cpath d='M15.4 14.9c1.7.2 3.2 1.3 4.1 3.6'/%3E%3C/svg%3E");
+.evc-desc {
+  font-size: var(--fs-mini);             /* 22rpx */
+  color: var(--text-sub);
+  margin-top: 4rpx;
 }
-.exp-ic-relation {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F2B233' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='5.5' cy='12' r='2'/%3E%3Ccircle cx='18.5' cy='5.5' r='2'/%3E%3Ccircle cx='18.5' cy='18.5' r='2'/%3E%3Cline x1='7.2' y1='10.7' x2='16.6' y2='6.6'/%3E%3Cline x1='7.2' y1='13.3' x2='16.6' y2='17.4'/%3E%3C/svg%3E");
-}
-.exp-title {
-  font-size: var(--fs-caption);          /* 24rpx */
-  font-weight: 600;
-  color: var(--text-main);
-}
-.exp-hover { border: 1rpx solid var(--gold-a20); }
 
-/* —— ④ 热门角色（横滚）（H-12~H-13） —— */
+/* ═══ ⑤ 热门角色（横滚） ═══ */
 .char-scroll {
   width: 100%;
   white-space: nowrap;
@@ -278,7 +334,7 @@
   align-items: center;
   background: var(--surface-2);
   border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-xs);   /* 24 16→20 8 */
+  padding: var(--space-sm) var(--space-xs);
   box-sizing: border-box;
   margin-right: var(--space-sm);
 }
@@ -307,16 +363,16 @@
   font-size: var(--fs-body);             /* 28rpx */
   font-weight: 600;
   color: var(--text-main);
-  margin-top: var(--space-sm);           /* 16→20 */
+  margin-top: var(--space-sm);
 }
 .char-faction {
   font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 400;
-  margin-top: var(--space-xs);           /* 6→8 */
+  margin-top: var(--space-xs);
 }
 .char-hover { border: 1rpx solid var(--gold-a20); }
 
-/* —— ⑤ 最近观看（横滚）（H-14~H-15） —— */
+/* ═══ ⑥ 最近观看（横滚） ═══ */
 .recent-scroll {
   width: 100%;
   white-space: nowrap;
@@ -331,7 +387,7 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  margin-right: var(--space-sm);         /* 24→20 */
+  margin-right: var(--space-sm);
 }
 .recent-poster {
   width: 120rpx;
@@ -352,7 +408,7 @@
   font-size: var(--fs-caption);          /* 24rpx */
   font-weight: 400;
   color: var(--text-sub);
-  margin-top: var(--space-xs);           /* 12→8 */
+  margin-top: var(--space-xs);
   max-width: 120rpx;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -368,4 +424,4 @@
   text-align: center;
 }
 
-/* 阵营色 / 海报阶段色系统已统一至 app.wxss 全局（Step4 全局统一）*/
+/* 阵营色 / 海报阶段色系统统一至 app.wxss 全局（Step4 全局统一） */

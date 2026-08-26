@@ -69,12 +69,13 @@ body{width:375px;background:#080B12;color:#E8ECF4;font-family:-apple-system,"Pin
 .hero-purple{background:linear-gradient(160deg,rgba(155,127,232,0.10),#161D2B 65%);}
 .hero-gold{background:linear-gradient(160deg,rgba(242,178,51,0.04),#161D2B 65%);}
 .hero-gray{background:#161D2B;}
-.hero-avatar{width:64px;height:64px;border-radius:50%;border:2px solid transparent;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:rgba(255,255,255,0.6);}
-.hero-cn{font-size:22px;font-weight:700;color:#E8ECF4;margin-top:14px;line-height:1.3;}
-.hero-en{font-size:12px;color:#8E98AA;margin-top:4px;}
+.hero-avatar{width:80px;height:80px;border-radius:50%;border:3px solid transparent;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:rgba(255,255,255,0.6);}
+.hero-cn{font-size:22px;font-weight:700;color:#E8ECF4;margin-top:28px;line-height:1.3;}
+.hero-en{font-size:12px;color:#8E98AA;margin-top:8px;}
 .hero-meta{display:flex;align-items:center;gap:10px;margin-top:10px;}
 .hero-camp{font-size:11px;font-weight:600;padding:3px 10px;border-radius:999px;}
 .hero-count{font-size:11px;color:#555F73;}
+.hero-note{font-size:14px;color:#A8B0C0;line-height:1.7;margin-top:28px;text-align:left;max-width:300px;}
 .card{background:#1E2636;border:1px solid #2A3447;border-radius:10px;padding:14px;margin-bottom:14px;}
 .card-title{font-size:14px;font-weight:600;color:#F2B233;margin-bottom:10px;letter-spacing:1px;}
 .char-note{font-size:14px;color:#8E98AA;line-height:1.7;}
@@ -184,8 +185,8 @@ const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${css}</st
       <div class="hero-camp pill-${faction.cls}">${faction.label}</div>
       <div class="hero-count">${films.length} 部关联作品</div>
     </div>
+    <div class="hero-note">${char.note}</div>
   </div>
-  <div class="card"><div class="card-title">角色简介</div><div class="char-note">${char.note}</div></div>
   ${firstHtml}
   ${filmsHtml}
   ${relatedHtml}
