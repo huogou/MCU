@@ -315,7 +315,7 @@
 }
 .recent-letter {
   font-size: var(--fs-display-sm);
-  font-weight: 800;
+  font-weight: 700;   /* 800→700（全局字重统一，Step5） */
   color: var(--white-a70);
 }
 .recent-badge {

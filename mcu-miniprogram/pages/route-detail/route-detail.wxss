@@ -33,7 +33,7 @@
 .rd-tagline {
   font-size: var(--fs-body);
   color: var(--gold);
-  font-weight: 500;
+  font-weight: 400;   /* 500→400（全局字重统一，Step5） */
   margin-bottom: var(--space-sm);
   line-height: 1.4;
 }
@@ -55,7 +55,7 @@
 }
 .rd-watched {
   font-size: var(--fs-display-sm);
-  font-weight: 800;
+  font-weight: 700;   /* 800→700（全局字重统一，Step5） */
   color: var(--gold);
 }
 .rd-total {

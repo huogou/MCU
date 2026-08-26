@@ -52,7 +52,8 @@
     <view class="module-title">宇宙入口</view>
     <view class="exp-row">
       <view class="exp-card {{item.bg}}" wx:for="{{exploreEntries}}" wx:key="key" data-key="{{item.key}}" bindtap="goExplore" hover-class="exp-hover" hover-stay-time="80">
-        <view class="exp-ic">{{item.glyph}}</view>
+        <!-- 入口图标：设计§2.3 内联 SVG（wxss data-URI 方式，小程序不支持 wxml 内联 svg 标签）；key 驱动 -->
+        <view class="exp-ic exp-ic-{{item.key}}"></view>
         <view class="exp-title">{{item.title}}</view>
       </view>
     </view>

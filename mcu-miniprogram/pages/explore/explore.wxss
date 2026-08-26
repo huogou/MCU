@@ -1,27 +1,230 @@
-/* explore 关系探索（Tab3）· V1.2 统一视觉 */
+/* ============================================================
+ * explore 关系探索（Tab3）· V1.2 完整重做（P0④）
+ * ------------------------------------------------------------
+ * 依据：《MCU-V1.2-关系探索页视觉方案》§3 / §6.3
+ * 颜色一律 var()（阵营色走全局 .fc-/.fbg-/.fring-/.pill- 类，
+ *   关系类型色为本页 .rel-* 功能色类，全部 Token 引用，零裸 hex）
+ * 字号 5 档（56/36/28/24/22）/ 圆角 Token / 间距 --space-*
+ * ============================================================ */
 
-.page-head { padding: var(--space-xl) 0 var(--space-md); }
-.page-title { font-size: var(--fs-display); font-weight: 700; color: var(--text-main); }
-.page-sub { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
+.explore-page {
+  padding: 0 var(--page-x);
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: var(--bg);
+}
 
-.entry-card { display: flex; align-items: center; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-md); padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-md); }
-.entry-card-hover { background: var(--surface-3); }
-.entry-icon { width: var(--space-2xl); height: var(--space-2xl); border-radius: 18rpx; background: var(--gold-a15); color: var(--gold); font-size: var(--fs-display-sm); display: flex; align-items: center; justify-content: center; margin-right: var(--space-md); flex-shrink: 0; }
-/* 角色图鉴入口：紫色系图标底色，与全景图金色入口区分 */
-.icon-char { background: var(--p4-a15); color: var(--p4); }
+/* —— 页面头部（§3.1） —— */
+.page-head {
+  padding: var(--space-xl) 0 var(--space-md);
+}
+.page-title {
+  font-size: var(--fs-display);          /* 56rpx */
+  font-weight: 700;
+  color: var(--text-main);
+}
+.page-sub {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+
+/* —— 入口区 2 列横排（§3.2） —— */
+.entry-row {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+.entry-card {
+  flex: 1;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);       /* 20rpx */
+  padding: 0 var(--space-sm);
+  box-sizing: border-box;
+}
+.entry-hover { background: var(--surface-3); }
+.entry-icon {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-display-sm);       /* 44rpx */
+  flex-shrink: 0;
+}
+.icon-pano { background: var(--gold-a10); color: var(--gold); }
+.icon-char { background: var(--p4-a15);  color: var(--p4); }
 .entry-body { flex: 1; min-width: 0; }
-.entry-name { font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
-.entry-desc { font-size: var(--fs-caption); color: var(--text-sub); margin-top: 6rpx; }
-.entry-arrow { font-size: var(--fs-display-sm); color: var(--text-weak); line-height: 1; }
+.entry-name {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--text-main);
+}
+.entry-desc {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+.entry-arrow {
+  font-size: var(--fs-display-sm);
+  color: var(--text-weak);
+  line-height: 1;
+  flex-shrink: 0;
+}
 
-.section-label { font-size: var(--fs-body); font-weight: 600; color: var(--gold); margin: var(--space-md) 0 var(--space-sm); letter-spacing: 1rpx; }
+/* —— 筛选 Chips（§3.3） —— */
+.filter-row {
+  width: 100%;
+  white-space: nowrap;
+  margin-bottom: var(--space-md);
+}
+.filter-inner {
+  display: inline-flex;
+  gap: var(--space-xs);
+  padding: 4rpx 0;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56rpx;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--fs-caption);          /* 24rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.chip-active {
+  color: var(--gold);
+  background: var(--gold-a10);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+.chip-hover { opacity: 0.85; }
 
-.char-grid { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
-.char-card { width: calc((100% - 40rpx) / 3); background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-md); padding: var(--space-sm); box-sizing: border-box; }
-.char-card-hover { border-color: var(--gold); background: var(--surface-3); }
-.char-camp { display: inline-block; font-size: var(--fs-mini); padding: 4rpx 14rpx; border-radius: var(--radius-lg); margin-bottom: 12rpx; }
-.char-cn { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); line-height: 1.3; }
-.char-en { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 6rpx; }
-.char-first { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 10rpx; }
+/* —— 关系对卡片（§3.4 核心组件） —— */
+.pair-list {
+  display: flex;
+  flex-direction: column;
+}
+.pair-card {
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);       /* 20rpx */
+  padding: var(--space-md);              /* 28rpx */
+  margin-bottom: var(--space-sm);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.pair-card-hover { border-color: var(--gold); }
+
+/* 角色列（左右各 35%，中间关系区 30%） */
+.pair-char {
+  width: 35%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pair-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  border: 2rpx solid transparent;        /* 阵营色由 fring-* 覆盖 */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-3);
+}
+.pair-avatar-img { width: 100%; height: 100%; }
+.pair-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-title);            /* 36rpx 首字 */
+  font-weight: 600;
+  color: var(--white-a70);
+}
+.pair-name {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: var(--space-xs);
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pair-en {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: 4rpx;
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pair-camp {
+  font-size: var(--fs-mini);             /* 22rpx */
+  margin-top: var(--space-xs);
+  border-radius: var(--radius-full);
+}
+
+/* 中间关系区（连线 + 类型标签） */
+.pair-relation {
+  width: 30%;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6rpx;
+}
+.pair-line {
+  flex: 1;
+  height: 1rpx;
+  background: var(--surface-3);
+}
+.pair-type {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 600;
+  padding: 0 var(--space-xs);
+  white-space: nowrap;
+}
+/* 关系类型功能色（方案 §3.3 / §5.2，Token 引用） */
+.rel-ally   { color: var(--accent-blue); }
+.rel-enemy  { color: var(--accent-red); }
+.rel-mentor { color: var(--gold); }
+.rel-family { color: var(--accent-purple); }
+.rel-rival  { color: var(--accent-red); }
+
+/* 共同出演 */
+.pair-footer {
+  width: 100%;
+  text-align: center;
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-weak);
+  padding-top: var(--space-xs);
+  margin-top: var(--space-xs);
+  border-top: 1rpx solid var(--surface-3);
+}
 
 .bottom-pad { height: 60rpx; }

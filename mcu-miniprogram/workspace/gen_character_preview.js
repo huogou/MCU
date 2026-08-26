@@ -17,7 +17,8 @@ const CAMP_MAP = {
 };
 function factionOf(camp){ return { cls: CAMP_MAP[camp]||'gray', label: camp||'' }; }
 
-const av = mcuData.visual('char-' + char.id);
+/* 头像：V1.2 已接 24 张真实头像（visuals.avatar）；缺失空 → 首字兜底 */
+const avatarImg = mcuData.avatar(char.id) || '';
 const first = mcuData.get(char.first);
 const firstCard = {
   cn: first.cn, en: first.en, phase: first.phase||1,
@@ -48,6 +49,7 @@ const related = rel.slice(0,6).map(function(r){
   const f = factionOf(r.camp);
   return {
     cn:r.cn, shared:r.shared, avatar:(r.cn||'?').charAt(0),
+    avatarImg: mcuData.avatar(r.id) || '',
     ringCls:'fring-'+f.cls, factionCls:'fbg-'+f.cls, fcCls:'fc-'+f.cls,
     pillCls:'pill-'+f.cls
   };
@@ -86,7 +88,7 @@ body{width:375px;background:#080B12;color:#E8ECF4;font-family:-apple-system,"Pin
 .film-info{flex:1;min-width:0;}
 .film-cn{font-size:14px;color:#E8ECF4;font-weight:600;}
 .film-en{font-size:11px;color:#8E98AA;margin-top:2px;}
-.phase-tag{font-size:11px;color:#555F73;border:1px solid #2A3447;border-radius:5px;padding:3px 7px;flex-shrink:0;}
+.phase-tag{font-size:11px;color:#555F73;border:1px solid #2A3447;border-radius:6px;padding:4px 7px;flex-shrink:0;}
 .film-status{font-size:11px;padding:3px 8px;border-radius:10px;flex-shrink:0;}
 .status-unwatched{color:#F2B233;background:rgba(242,178,51,0.15);}
 .status-watching{color:#3FB98A;background:rgba(63,185,138,0.15);}
@@ -96,8 +98,8 @@ body{width:375px;background:#080B12;color:#E8ECF4;font-family:-apple-system,"Pin
 .related-item{width:calc((100% - 20px) / 3);background:#161D2B;border:1px solid #2A3447;border-radius:8px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;text-align:center;}
 .related-avatar{width:40px;height:40px;border-radius:50%;border:2px solid transparent;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:rgba(255,255,255,0.6);}
 .related-avatar .poster-fallback{font-size:18px;}
-.related-cn{font-size:12px;font-weight:600;color:#E8ECF4;margin-top:7px;line-height:1.3;}
-.related-shared{font-size:9.5px;color:#555F73;margin-top:3px;}
+.related-cn{font-size:12px;font-weight:600;color:#E8ECF4;margin-top:10px;line-height:1.3;}
+.related-shared{font-size:9.5px;color:#555F73;margin-top:4px;}
 /* 阵营色 */
 .fc-red{color:#E85D5D;}.fc-blue{color:#4A9EF5;}.fc-purple{color:#9B7FE8;}.fc-gold{color:#F2B233;}.fc-gray{color:#555F73;}
 .fring-red{border-color:rgba(232,93,93,0.20);}.fring-blue{border-color:rgba(74,158,245,0.20);}.fring-purple{border-color:rgba(155,127,232,0.20);}.fring-gold{border-color:rgba(242,178,51,0.20);}.fring-gray{border-color:#2A3447;}
@@ -158,15 +160,17 @@ const relatedHtml = `
   <div class="related-grid">
     ${related.map(function(r){ return `
     <div class="related-item">
-      <div class="related-avatar ${r.ringCls} ${r.factionCls}"><span class="poster-fallback">${r.avatar}</span></div>
+      <div class="related-avatar ${r.ringCls} ${r.factionCls}">
+        ${r.avatarImg ? '<img class="fill-img" src="file:///D:/SEO/%E5%8F%91%E6%8C%A5%E4%BD%99%E7%83%AD/%E6%BC%AB%E5%A8%81%E7%94%B5%E5%BD%B1%E5%AE%87%E5%AE%99%E5%AF%BC%E8%88%AA/mcu-miniprogram' + r.avatarImg + '"/>' : '<span class="poster-fallback">' + r.avatar + '</span>'}
+      </div>
       <div class="related-cn">${r.cn}</div>
       <div class="related-shared">共同出演 ${r.shared} 部</div>
     </div>`; }).join('')}
   </div>
 </div>`;
 
-const heroAvatar = av && av.poster
-  ? '<img class="fill-img" src="'+av.poster+'"/>'
+const heroAvatar = avatarImg
+  ? '<img class="fill-img" src="file:///D:/SEO/%E5%8F%91%E6%8C%A5%E4%BD%99%E7%83%AD/%E6%BC%AB%E5%A8%81%E7%94%B5%E5%BD%B1%E5%AE%87%E5%AE%99%E5%AF%BC%E8%88%AA/mcu-miniprogram' + avatarImg + '"/>'
   : '<span class="poster-fallback">'+ (char.cn||'?').charAt(0) +'</span>';
 
 const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${css}</style></head>

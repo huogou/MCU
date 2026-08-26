@@ -127,7 +127,7 @@
   font-size: var(--fs-caption);
   color: var(--gold);
   margin-bottom: var(--space-xs);
-  font-weight: 500;
+  font-weight: 400;   /* 500→400（全局字重统一，Step5） */
 }
 .rc-for {
   font-size: var(--fs-mini);
