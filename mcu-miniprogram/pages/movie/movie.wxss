@@ -46,6 +46,8 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
+  background-size: cover;
+  background-position: center;
 }
 .poster {
   width: 220rpx;
@@ -97,7 +99,7 @@
   color: var(--text-weak);
 }
 .hero-title {
-  font-size: var(--fs-display-sm);
+  font-size: var(--fs-title);
   font-weight: 700;
   color: var(--text-main);
   line-height: 1.3;
@@ -160,7 +162,7 @@
 }
 .movie-cta {
   width: 100%;
-  padding: var(--space-md) 0;
+  height: 88rpx;
   font-size: var(--fs-title);
   font-weight: 700;
   border: none;
@@ -171,7 +173,7 @@
   gap: var(--space-sm);
   box-sizing: border-box;
 }
-.movie-cta.primary { background: var(--gold); color: var(--gold-btn-text); }
+.movie-cta.primary { background: var(--gold); color: var(--gold-btn-text); box-shadow: var(--glow-gold); }
 .movie-cta.done {
   background: var(--surface-3);
   color: var(--text-weak);
@@ -267,13 +269,13 @@
   margin: 0 var(--page-x) var(--space-lg);
   background: var(--surface-2);
   border: 2rpx solid var(--surface-3);
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   padding: var(--space-md);
 }
 .why-label {
   font-size: var(--fs-caption);
   font-weight: 600;
-  color: var(--gold);
+  color: var(--accent-blue);
   margin-bottom: 12rpx;
 }
 .why-ctx {
@@ -287,6 +289,79 @@
   color: var(--text-sub);
   line-height: 1.7;
 }
+
+/* ══════ ④-2 主要角色（M-08/M-09 新增） ══════ */
+.cast-section {
+  margin: 0 var(--page-x) var(--space-lg);
+}
+.cast-row {
+  display: flex;
+  gap: var(--space-md);
+}
+.cast-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface-2);
+  border: 2rpx solid var(--surface-3);
+  border-radius: 16rpx;
+  padding: 20rpx 12rpx;
+  box-sizing: border-box;
+}
+.cast-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3rpx solid transparent;        /* 由 fring-* 覆盖阵营色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cast-initial {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-body);             /* 28rpx 首字 */
+  font-weight: 700;
+  color: var(--white-a70);
+}
+.cast-name {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: 12rpx;
+  text-align: center;
+}
+.cast-faction {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  margin-top: 4rpx;
+  text-align: center;
+}
+.cast-hover { border-color: var(--gold-a20); }
+
+/* —— 阵营色（与设计 §4.4 一致：红=复仇者/街头 蓝=阿斯加德/神盾 紫=银护/变种人 金=瓦坎达 灰=反派） —— */
+.fc-red    { color: var(--accent-red); }
+.fc-blue   { color: var(--accent-blue); }
+.fc-purple { color: var(--accent-purple); }
+.fc-gold   { color: var(--gold); }
+.fc-gray   { color: var(--text-weak); }
+
+.fring-red    { border-color: var(--accent-red-a20); }
+.fring-blue   { border-color: var(--accent-blue-a20); }
+.fring-purple { border-color: var(--accent-purple-a20); }
+.fring-gold   { border-color: var(--gold-a20); }
+.fring-gray   { border-color: var(--surface-3); }
+
+.fbg-red    { background: linear-gradient(135deg, var(--accent-red),    var(--accent-red-a60)); }
+.fbg-blue   { background: linear-gradient(135deg, var(--accent-blue),   var(--accent-blue-a60)); }
+.fbg-purple { background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-a60)); }
+.fbg-gold   { background: linear-gradient(135deg, var(--gold),          var(--gold-a60)); }
+.fbg-gray   { background: var(--surface-3); }
 
 /* ══════ ⑤ 前后关联 ══════ */
 .sequence-section {
@@ -325,7 +400,7 @@
 }
 .seq-poster {
   width: 80rpx;
-  height: 116rpx;
+  height: 120rpx;
   border-radius: 12rpx;
   overflow: hidden;
   display: flex;
@@ -336,6 +411,12 @@
   font-size: var(--fs-body);
   font-weight: 800;
   color: var(--white-a50);
+}
+/* 图片填满容器（前后关联 / 下一部 / 角色头像统一） */
+.fill-img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 .seq-name {
   font-size: var(--fs-mini);

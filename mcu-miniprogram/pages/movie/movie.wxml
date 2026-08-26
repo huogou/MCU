@@ -78,12 +78,30 @@
       <text class="why-text">{{why.text}}</text>
     </view>
 
+    <!-- ④-2 主要角色（M-08/M-09 新增） -->
+    <view wx:if="{{mainChars.length}}" class="cast-section">
+      <view class="sequence-label">主要角色</view>
+      <view class="cast-row">
+        <view wx:for="{{mainChars}}" wx:key="id" class="cast-card" data-id="{{item.id}}" bindtap="onGoChar">
+          <view class="cast-avatar {{item.ringCls}} {{item.factionCls}}">
+            <image wx:if="{{item.avatar}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" />
+            <text wx:else class="cast-initial">{{item.initial}}</text>
+          </view>
+          <view class="cast-name">{{item.name}}</view>
+          <view class="cast-faction {{item.factionCls}}">{{item.factionLabel}}</view>
+        </view>
+      </view>
+    </view>
+
     <!-- ⑤ 前后关联（上映序） -->
     <view class="sequence-section">
       <view class="sequence-label">观影位置</view>
       <view class="sequence-row">
         <view wx:if="{{seqPrev}}" class="seq-card" data-id="{{seqPrev.id}}" bindtap="onGoMovie">
-          <view class="seq-poster {{seqPrev.posterClass}}"><text>{{seqPrev.letter}}</text></view>
+          <view class="seq-poster {{seqPrev.posterClass}}">
+            <image wx:if="{{seqPrev.poster}}" class="fill-img" src="{{seqPrev.poster}}" mode="aspectFill" />
+            <text wx:else>{{seqPrev.letter}}</text>
+          </view>
           <view class="seq-name">{{seqPrev.cn}}</view>
           <view class="seq-role">{{seqPrev.roleLabel}}</view>
         </view>
@@ -92,7 +110,10 @@
         <view class="seq-arrow"><view class="chevron-right"></view></view>
 
         <view class="seq-card current">
-          <view class="seq-poster {{seqCur.posterClass}}"><text>{{seqCur.letter}}</text></view>
+          <view class="seq-poster {{seqCur.posterClass}}">
+            <image wx:if="{{seqCur.poster}}" class="fill-img" src="{{seqCur.poster}}" mode="aspectFill" />
+            <text wx:else>{{seqCur.letter}}</text>
+          </view>
           <view class="seq-name">{{seqCur.cn}}</view>
           <view class="seq-role">{{seqCur.roleLabel}}</view>
         </view>
@@ -100,7 +121,10 @@
         <view class="seq-arrow"><view class="chevron-right"></view></view>
 
         <view wx:if="{{seqNext}}" class="seq-card" data-id="{{seqNext.id}}" bindtap="onGoMovie">
-          <view class="seq-poster {{seqNext.posterClass}}"><text>{{seqNext.letter}}</text></view>
+          <view class="seq-poster {{seqNext.posterClass}}">
+            <image wx:if="{{seqNext.poster}}" class="fill-img" src="{{seqNext.poster}}" mode="aspectFill" />
+            <text wx:else>{{seqNext.letter}}</text>
+          </view>
           <view class="seq-name">{{seqNext.cn}}</view>
           <view class="seq-role">{{seqNext.roleLabel}}</view>
         </view>
@@ -115,7 +139,10 @@
         <text>{{mark.text}}</text>
       </view>
       <view wx:if="{{nextRec}}" class="next-rec" data-id="{{nextRec.id}}" bindtap="onGoMovie">
-        <view class="next-rec-poster {{nextRec.posterClass}}"><text>{{nextRec.letter}}</text></view>
+        <view class="next-rec-poster {{nextRec.posterClass}}">
+            <image wx:if="{{nextRec.poster}}" class="fill-img" src="{{nextRec.poster}}" mode="aspectFill" />
+            <text wx:else>{{nextRec.letter}}</text>
+          </view>
         <view class="next-rec-info">
           <view class="next-rec-label">{{nextRec.label}}</view>
           <view class="next-rec-title">{{nextRec.cn}}</view>

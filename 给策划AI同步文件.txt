@@ -484,3 +484,22 @@ Step1 数据模型 / Step2 首页继续观看 / Step3 我的MCU 2.0 / Step4 分�
 - 交付（Step5 ①③）：首页代码 + 预览(HTML/PNG) + 《V1.2首页_资源列表.md》。②④截图待真机。
 - 设计 AI app 状态（重要）：此前用户称 app 图标消失；经核查 AppData/Roaming/QoderWork CN/ 数据完好、仅快捷方式丢失、且有待装修复包 pending/QoderWorkCN-Setup-User-x64.exe → app 未卸载，可恢复。Step3 缺的 24 头像/1 背景/6 阶段图需设计侧产出，建议恢复 app 后由设计 AI 补齐。
 - 下一步：继续 P0② 电影详情（M-01~M-11，海报可用、角色头像兜底）→ P0③角色详情 → P0④关系探索 → Step4 P1 → Step5 全量截图验收。
+
+------------------------------------------------------------
+【三十二、开发AI(Work) P0② 电影详情视觉资产补齐完成 · 2026-08-26】
+------------------------------------------------------------
+- P0② 电影详情已完成（M-01~M-11 全满足），重构 movie.{wxml,wxss,js}：
+  · M-01 Hero 背景接入 backdrop 场景图（visuals.js stills，38 张 HTTP 200）+ 阶段色渐变叠加；CSS 背景图失败自动回退渐变（G-18 合规、无破图）。
+  · M-02 海报 220×320 / r16 / gold-a20 描边（已就绪）。
+  · M-03 片名 36/700（由 --fs-display-sm 44 改 --fs-title 36）。
+  · M-04 状态色（未看金/已看灰，已就绪）。
+  · M-05 CTA 88rpx + --glow-gold（全页唯一金色实心）。
+  · M-06 理由卡圆角 16→20rpx。
+  · M-07 推荐理由标签 gold → --accent-blue（蓝色=信息性）。
+  · M-08/M-09 新增「主要角色」模块：content.chars 取前 4 位，80rpx 圆形头像，真实头像优先（visual('char-'+id) 前向兼容，设计侧接入即生效），缺图 G-19 阵营渐变+首字兜底；点击跳角色详情。
+  · M-10 前后关联 3 列等宽、海报 80×120rpx，已接真实海报（posterCard 增 poster 字段），当前卡高亮 gold-a10/a20。
+  · M-11 标记已看绿色描边（已就绪）。
+- 验证：node --check OK；movie.wxss 零裸 hex / 零 500 字重；wxml {{ }} 括号 75/75 对齐；预览渲染 375×1127，Hero 背景场景图(2882 色桶)/真实序列海报(407)/金色 CTA(43)/阵营渐变头像(492) 全部加载。
+- 数据纪律：JS 仅改本页视图模型（posterCard/nextRec 增 poster、新增 mainChars、heroBg 接 backdrop、CAMP_MAP 阵营映射），models/data 零改动；角色头像走兜底因 visuals.js 暂无 char 映射（设计侧 24 头像接入后自动生效）。
+- 交付（Step5 ④）：电影详情预览(HTML/PNG) 已生成于 AI生成文件/小程序/。
+- 下一步：P0③ 角色详情（C-01~C-09，头像/背景兜底）→ P0④ 关系探索（R-01~R-04）→ Step4 P1 → Step5 全量截图验收。

@@ -25,6 +25,19 @@ const achievements = require('../../models/achievements.js');
 /* 传奇标签映射（saga 数据取值：infinity / multiverse） */
 const SAGA_LABEL = { infinity: '无限传奇', multiverse: '多元宇宙传奇' };
 
+/* 阵营 → 视觉类（兜底渐变/描边，与设计 §4.4 一致；gray=反派/未定义） */
+const CAMP_MAP = {
+  avengers: { cls: 'red',    label: '复仇者' },
+  asgard:   { cls: 'blue',   label: '阿斯加德' },
+  guardians:{ cls: 'purple', label: '银河护卫队' },
+  wakanda:  { cls: 'gold',   label: '瓦坎达' },
+  shield:   { cls: 'blue',   label: '神盾局' },
+  mutant:   { cls: 'purple', label: '变种人' },
+  villain:  { cls: 'gray',   label: '反派' },
+  street:   { cls: 'red',    label: '街头英雄' }
+};
+function campCls(camp) { return CAMP_MAP[camp] || { cls: 'gray', label: camp || '' }; }
+
 /* 中文阶段数字（1-6） */
 function cnPhase(n) {
   return ['一', '二', '三', '四', '五', '六'][n - 1] || String(n);
@@ -43,9 +56,11 @@ function hexToRgba(hex, a) {
 /* 构建海报卡描述符（用于 Hero / 前后关联 / 下一部推荐） */
 function posterCard(m, roleLabel, isCurrent) {
   if (!m) return null;
+  const v = mcuData.visual(m.id);
   return {
     id: m.id,
     cn: m.cn,
+    poster: (v && v.poster) ? v.poster : '',
     posterClass: 'poster-p' + (m.phase || 1),
     letter: (m.cn || '').charAt(0),
     phase: m.phase || 1,
@@ -86,6 +101,9 @@ Page({
     seqPrev: null,
     seqCur: null,
     seqNext: null,
+
+    /* 主要角色（M-08/M-09） */
+    mainChars: [],
 
     /* 看完之后 */
     mark: { marked: false, text: '标记为已观看' },
@@ -147,6 +165,26 @@ Page({
     /* 为什么现在看（role + 路线上下文） */
     const why = this.buildWhy(m);
 
+    /* 主要角色（M-08/M-09：content.chars 前 4 位；真实头像优先，缺图 G-19 兜底） */
+    const mainChars = (m.chars && m.chars.length)
+      ? m.chars.slice(0, 4).map(function (cid) {
+          const c = mcuData.getChar(cid);
+          if (!c) return null;
+          const camp = campCls(c.camp);
+          const av = mcuData.visual('char-' + c.id);
+          const parts = (c.cn || '').split(' / ');
+          return {
+            id: c.id,
+            name: parts.length > 1 ? parts[1] : (parts[0] || ''),
+            initial: (c.cn || '').charAt(0),
+            avatar: (av && av.poster) ? av.poster : '',
+            factionCls: 'fbg-' + camp.cls,
+            ringCls: 'fring-' + camp.cls,
+            factionLabel: camp.label
+          };
+        }).filter(Boolean)
+      : [];
+
     /* 前后关联（PANO_CONN 权威连接图，mainline 优先 + 上映序最接近） */
     const nb = mcuData.panoNeighbors(id);
     const prev = nb.prev;
@@ -159,14 +197,18 @@ Page({
     const mark = this.buildMark(state);
     const nx = recommend.next(id, 'mainline');
     const nextRec = nx && nx.content
-      ? {
-          id: nx.content.id,
-          cn: nx.content.cn,
-          posterClass: 'poster-p' + (nx.content.phase || 1),
-          letter: (nx.content.cn || '').charAt(0),
-          label: state === 'watched' ? '继续看下一部' : '看完这部之后',
-          why: nx.why
-        }
+      ? (function () {
+          const vx = mcuData.visual(nx.content.id);
+          return {
+            id: nx.content.id,
+            cn: nx.content.cn,
+            poster: (vx && vx.poster) ? vx.poster : '',
+            posterClass: 'poster-p' + (nx.content.phase || 1),
+            letter: (nx.content.cn || '').charAt(0),
+            label: state === 'watched' ? '继续看下一部' : '看完这部之后',
+            why: nx.why
+          };
+        })()
       : null;
 
     this.setData({
@@ -174,7 +216,9 @@ Page({
       posterImg: v.poster || '',
       posterClass: 'poster-p' + phase,
       posterLetter: (m.cn || '').charAt(0),
-      heroBg: 'background: linear-gradient(160deg, ' + hexToRgba(phaseColor, 0.08) + ', transparent 50%, var(--bg));',
+      heroBg: (v.backdrop)
+        ? 'background-image: linear-gradient(160deg, ' + hexToRgba(phaseColor, 0.38) + ' 0%, ' + hexToRgba(phaseColor, 0.12) + ' 42%, var(--bg) 100%), url(\"' + v.backdrop + '\"); background-size: cover; background-position: center;'
+        : 'background: linear-gradient(160deg, ' + hexToRgba(phaseColor, 0.08) + ', transparent 50%, var(--bg));',
       cn: m.cn,
       en: m.en || '',
       phaseText: '第' + cnPhase(phase) + '阶段' + (m.year ? ' · ' + m.year : ''),
@@ -184,6 +228,7 @@ Page({
       cta: cta,
       resource: resource,
       why: why,
+      mainChars: mainChars,
       seqPrev: seqPrev,
       seqCur: seqCur,
       seqNext: seqNext,
@@ -286,5 +331,12 @@ Page({
     const id = e.currentTarget.dataset.id;
     if (!id || id === this.data.id) return;
     wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
+  },
+
+  /* 主要角色 → 跳转角色详情 */
+  onGoChar(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    wx.navigateTo({ url: '/pages/character/character?id=' + id });
   }
 });
