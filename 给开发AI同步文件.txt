@@ -268,3 +268,28 @@ MCU观影导航 V1.2 · 开发AI工作日志
 - ② my-mcu 三处真实海报（visual.poster + 阶段色兜底 + wc-poster overflow 修复）✅
 - P1 细节：fill-img 全局化、button::after 清除、Canvas 连线色与 Token 核对 ✅
 - 校验/像素验证全通过；SPECIAL 116 条保留待 GPT 92 语义表；真机清单已写策划【十九】。
+
+【视觉资源真实性专项复核 · Work 数据层核查报告（只读，零代码改动 · 2026-08-26）】
+--- 核查 1：角色头像映射 ✅ ---
+- visuals.avatars 24 个 key 与 characters.js 24 个角色 id 完全一一对应（缺 0 / 多 0）
+- URL = CDN/assets/avatars/{id}.jpg（LOCAL=CDN+'/assets'），上轮已上传+像素验证真实加载
+- ⚠️ 注：**图片"内容"是否对应正确演员/版本**（如 peter 是 MCU 荷兰弟版非其他版本）属设计 AI Step1 核验范围——开发侧只能保证"文件→id 映射正确"，不能保证"图→角色"正确（设计侧产图）。
+
+--- 核查 2：电影海报映射 ⚠️ 有缺口 ---
+- CONTENT 59 部 vs posters 38 张 vs stills 38 张
+- **21 部无海报/剧照**：5 one-shot（consultant/thor-hammer/item-47/agent-carter/all-hail-the-king）+ 16 剧集/短片（wandavision/falcon-winter-soldier/loki/what-if/hawkeye/moon-knight/ms-marvel/she-hulk/werewolf-by-night/gotg-holiday-special/secret-invasion/echo/agatha-all-along/daredevil-born-again/ironheart/wonder-man）
+- 无多余 key（posters 无 CONTENT 外键）→ 映射本身干净，缺口=资源未产
+- 角色首次出现(first)作品海报全覆盖 ✅（角色的 first 均为院线电影）
+- 影响：browse 按阶段列表 21 部走阶段色+首字兜底；my-mcu 观看剧集时无真实海报
+
+--- 核查 3：关系数据 ⚠️ 结构性误判（GPT 质疑属实） ---
+- SPECIAL 12 条来源 = **VDS §5.4 设计稿示例**（非开发自创），含 4 条 rival：tony↔steve / strange↔wanda / wade↔logan / tchalla↔starlord
+- **派生规则误判**（上轮专项⑤ GPT 授权"同阵营盟友+跨阵营高频共演"，开发已标注边界）：跨阵营共演≥2 一律标 rival →
+  tony 中心 18 条中 **5 条复联战友被标"对手"**：natasha 共演5❌ / thor 共演4❌ / clint 共演3❌ / fury 共演3❌ / tchalla 共演2⚠️
+- 根因：MCU 高频共演恰恰多是战友（复联成员跨阵营），"跨阵营高频=对手"规则结构性不成立
+- tony 中心清单（18 条）：SPECIAL 3（peter师徒/steve对手⚠️/thanos敌人）+ 同阵营盟友 10 + 跨阵营误判对手 5
+- **修正方案待 GPT 拍板**（开发不擅自改）：A=GPT 提供 92 条正式语义表整体替换；B=调整派生规则（高频共演且非 villain → ally，rival 仅 villain/语义表）；C=SPECIAL 表先补齐 5 对战友
+
+--- 核查 4：节点/连线视觉一一对应 ---
+- explore.js 数据装配：nodes/edges 全部由 centerId + relationsOf() 派生，无硬编码；连线从中心→节点，无孤立线
+- Canvas 绘制坐标缓存 _nodePos 与点击命中一致；"红圈区域视觉问题"（中心周围空白/节点偏移）属渲染表现层，待设计 AI 在核验表中给出具体判定
