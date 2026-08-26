@@ -10,10 +10,23 @@
 // ============================================================ */
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
-const { CHARACTERS, CAMPS } = require('../../data/characters.js');
+const { CHARACTERS } = require('../../data/characters.js');
 const { TYPE_LABEL } = require('../../data/content.js');
 
 const RELATED_LIMIT = 6;
+
+/* 阵营 → 视觉类（严格按设计 §4.4，拒绝 CAMPS 旧 hex；gray=反派/未定义） */
+const CAMP_MAP = {
+  avengers: { cls: 'red',    label: '复仇者' },
+  guardians:{ cls: 'purple', label: '银河护卫队' },
+  asgard:   { cls: 'blue',   label: '阿斯加德' },
+  wakanda:  { cls: 'gold',   label: '瓦坎达' },
+  shield:   { cls: 'blue',   label: '神盾局' },
+  mutant:   { cls: 'purple', label: '变种人' },
+  villain:  { cls: 'gray',   label: '反派' },
+  street:   { cls: 'red',    label: '街头英雄' }
+};
+function factionOf(camp) { return CAMP_MAP[camp] || { cls: 'gray', label: camp || '未知阵营' }; }
 
 /* 关联角色推导：共同出演作品数降序，取前 N（排除自身） */
 function relatedChars(id) {
@@ -33,7 +46,7 @@ Page({
   data: {
     notFound: false,
     char: null,
-    camp: null,
+    faction: null,
     first: null,
     films: [],
     related: []
@@ -48,21 +61,28 @@ Page({
       return;
     }
 
-    const camp = CAMPS[char.camp] || { label: '未知阵营', color: '#7A8296' };
+    const f = factionOf(char.camp);
+    const faction = { cls: f.cls, label: f.label, ringCls: 'fring-' + f.cls, factionCls: 'fbg-' + f.cls };
+    const av = mcuData.visual('char-' + char.id);
     const first = mcuData.get(char.first);
     const firstCard = first ? {
       id: first.id, cn: first.cn, en: first.en, phase: first.phase || 1,
       phaseColor: mcuData.phaseColor(first.phase),
       letter: (first.cn || '?').charAt(0),
+      poster: (mcuData.visual(first.id).poster) || '',
+      posterClass: 'poster-p' + (first.phase || 1),
       typeLabel: TYPE_LABEL[first.type] || ''
     } : null;
 
     /* 关联作品（上映序，含观看状态） */
     const films = mcuData.filmsOfChar(id).map(function (m) {
+      const v = mcuData.visual(m.id);
       return {
         id: m.id, cn: m.cn, en: m.en, phase: m.phase || 1,
         phaseColor: mcuData.phaseColor(m.phase),
         letter: (m.cn || '?').charAt(0),
+        poster: (v && v.poster) ? v.poster : '',
+        posterClass: 'poster-p' + (m.phase || 1),
         typeLabel: TYPE_LABEL[m.type] || '',
         status: userState.watchState(m.id)
       };
@@ -70,10 +90,15 @@ Page({
 
     /* 关系探索：关联角色 */
     const related = relatedChars(id).map(function (r) {
+      const rf = factionOf(r.camp);
+      const rav = mcuData.visual('char-' + r.id);
       return {
-        id: r.id, cn: r.cn, camp: r.camp, shared: r.shared,
+        id: r.id, cn: r.cn, shared: r.shared,
         avatar: (r.cn || '?').charAt(0),
-        campColor: (CAMPS[r.camp] || {}).color || '#7A8296'
+        avatarImg: (rav && rav.poster) ? rav.poster : '',
+        factionCls: 'fbg-' + rf.cls,
+        ringCls: 'fring-' + rf.cls,
+        fcCls: 'fc-' + rf.cls
       };
     });
 
@@ -81,9 +106,11 @@ Page({
     this.setData({
       notFound: false,
       char: {
-        id: char.id, cn: char.cn, en: char.en, note: char.note, avatar: (char.cn || '?').charAt(0)
+        id: char.id, cn: char.cn, en: char.en, note: char.note,
+        avatar: (char.cn || '?').charAt(0),
+        avatarImg: (av && av.poster) ? av.poster : ''
       },
-      camp: camp,
+      faction: faction,
       first: firstCard,
       films: films,
       related: related

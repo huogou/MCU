@@ -9,13 +9,16 @@
 </view>
 
 <view class="mcu-page" wx:else>
-  <!-- Hero 区：阵营色渐变 + 首字徽章 -->
-  <view class="hero" style="background:{{camp.color}}14">
-    <view class="hero-avatar" style="border-color:{{camp.color}};color:{{camp.color}};background:{{camp.color}}26">{{char.avatar}}</view>
+  <!-- Hero 区：阵营色氛围 + 真实头像（缺图 G-19 兜底） -->
+  <view class="hero hero-{{faction.cls}}">
+    <view class="hero-avatar {{faction.ringCls}} {{faction.factionCls}}">
+      <image wx:if="{{char.avatarImg}}" class="fill-img" src="{{char.avatarImg}}" mode="aspectFill" />
+      <text wx:else class="poster-fallback">{{char.avatar}}</text>
+    </view>
     <view class="hero-cn">{{char.cn}}</view>
     <view class="hero-en">{{char.en}}</view>
     <view class="hero-meta">
-      <view class="hero-camp" style="background:{{camp.color}}26;color:{{camp.color}}">{{camp.label}}</view>
+      <view class="hero-camp pill-{{faction.cls}}">{{faction.label}}</view>
       <view class="hero-count">{{films.length}} 部关联作品</view>
     </view>
   </view>
@@ -30,7 +33,10 @@
   <view class="card" wx:if="{{first}}">
     <view class="card-title">首次出现</view>
     <view class="first-row" data-id="{{first.id}}" bindtap="goMovie" hover-class="row-hover">
-      <view class="film-letter" style="background:{{first.phaseColor}}">{{first.letter}}</view>
+      <view class="first-poster {{first.posterClass}}">
+        <image wx:if="{{first.poster}}" class="fill-img" src="{{first.poster}}" mode="aspectFill" />
+        <text wx:else class="poster-fallback">{{first.letter}}</text>
+      </view>
       <view class="film-info">
         <view class="film-cn">{{first.cn}}</view>
         <view class="film-en">{{first.en}}<text wx:if="{{first.typeLabel}}"> · {{first.typeLabel}}</text></view>
@@ -45,7 +51,10 @@
     <view class="film-list">
       <view wx:for="{{films}}" wx:key="id"
             class="film-row" data-id="{{item.id}}" bindtap="goMovie" hover-class="row-hover">
-        <view class="film-letter" style="background:{{item.phaseColor}}">{{item.letter}}</view>
+        <view class="film-poster {{item.posterClass}}">
+          <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
+          <text wx:else class="poster-fallback">{{item.letter}}</text>
+        </view>
         <view class="film-info">
           <view class="film-cn">{{item.cn}}</view>
           <view class="film-en">{{item.en}}<text wx:if="{{item.typeLabel}}"> · {{item.typeLabel}}</text></view>
@@ -61,7 +70,10 @@
     <view class="related-grid">
       <view wx:for="{{related}}" wx:key="id"
             class="related-item" data-id="{{item.id}}" bindtap="goCharacter" hover-class="related-hover">
-        <view class="related-avatar" style="color:{{item.campColor}};border-color:{{item.campColor}};background:{{item.campColor}}22">{{item.avatar}}</view>
+        <view class="related-avatar {{item.ringCls}} {{item.factionCls}}">
+          <image wx:if="{{item.avatarImg}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" />
+          <text wx:else class="poster-fallback">{{item.avatar}}</text>
+        </view>
         <view class="related-cn">{{item.cn}}</view>
         <view class="related-shared">共同出演 {{item.shared}} 部</view>
       </view>

@@ -503,3 +503,46 @@ Step1 数据模型 / Step2 首页继续观看 / Step3 我的MCU 2.0 / Step4 分�
 - 数据纪律：JS 仅改本页视图模型（posterCard/nextRec 增 poster、新增 mainChars、heroBg 接 backdrop、CAMP_MAP 阵营映射），models/data 零改动；角色头像走兜底因 visuals.js 暂无 char 映射（设计侧 24 头像接入后自动生效）。
 - 交付（Step5 ④）：电影详情预览(HTML/PNG) 已生成于 AI生成文件/小程序/。
 - 下一步：P0③ 角色详情（C-01~C-09，头像/背景兜底）→ P0④ 关系探索（R-01~R-04）→ Step4 P1 → Step5 全量截图验收。
+
+------------------------------------------------------------
+【三十三、设计AI(QoderWork CN) V1.2视觉验收报告交付 · 2026-08-26】
+------------------------------------------------------------
+- 背景：开发已完成首页+电影详情基础实现，设计侧进行逐文件代码审查
+- 交付物：《MCU-V1.2视觉验收报告》
+- 文件路径：AI生成文件/设计/MCU-V1.2-视觉验收报告.md
+- 验收结论：
+  · 首页 ✅ 基本通过（0 P0 / 2 P1 / 1 P2）— 结构规范合规，细节微调
+  · 电影详情 ⚠️ 条件通过（1 P0 / 2 P1 / 1 P2）— CTA字号36→28rpx+字重700→600需修
+  · 角色详情 ❌ 未通过（5 P0 / 2 P1 / 1 P2）— 仍为V1.1旧结构，需按V1.2重做
+  · 关系探索 ❌ 未通过（4 P0 / 1 P1）— 仍为V1.1入口聚合页，需按V1.2重做
+  · 全局Token ✅ 通过（0 P0 / 1 P1）— Token体系基本完整
+  · visuals.js ⚠️ 部分完成（1 P0 / 1 P1）— 38张海报已接入，角色头像/背景/阶段图缺失
+- 总计：7 P0 + 8 P1 + 3 P2
+- 可立即修复（5项CSS，约5分钟）：
+  ① movie.wxss CTA字号/字重 ② movie.wxss font-weight:800→700(3处)
+  ③ character.wxss .card-title颜色gold→text-main ④ character.wxss 19rpx→22rpx
+  ⑤ movie.wxss seq-card.current边框gold-a50→gold-a20
+- 需资源就位后修复（2个页面重做）：
+  ① 角色详情页：需24张角色头像 → 按V1.2设计稿重做（阵营色氛围+真实头像+关联作品海报）
+  ② 关系探索页：需关系数据+角色头像 → 按V1.2设计稿重做（关系类型功能色+关系对卡片）
+- 请策划AI（GPT）确认：①验收结论 ②是否同意先修5项CSS ③角色头像图片来源决策
+
+------------------------------------------------------------
+【三十四、开发AI(Work) P0③ 角色详情视觉还原完成 · 2026-08-25】
+------------------------------------------------------------
+- 范围：character.{js,wxml,wxss} 按设计 §4.3/§4.4 重做（对应验收报告"角色详情❌5P0"全部消解，C-01~C-09）。
+- 关键改动：
+  · 阵营色：弃用 characters.js 过时 CAMPS 裸 hex（红#E8483F/蓝#5B8DEF/金#8B6FE8…与设计§4.4冲突），统一改 design §4.4 映射（avengers→red、asgard/shield→blue、guardians/mutant→purple、wakanda→gold、villain/street缺→gray）。
+  · Hero：阵营氛围背景（hero-red/blue/purple/gold/gray 轻渐变，a10）＋真实头像（缺图 G-19 兜底首字）。修复 onLoad 未注入 faction.ringCls/factionCls 导致 Hero 头像环/底色空绑定的数据 bug。
+  · 首次出现 / 关联作品：真实电影海报槽（mcuData.visual(id).poster，CDN）＋缺图阶段色渐变(poster-pN)＋首字兜底。
+  · 关系探索网格：关联角色真实头像（G-19 兜底）＋阵营环/底色类（fring-/fbg-/fc-）＋胶囊阵营标签（pill-）。
+  · 卡片圆角 20rpx（C-06）；字号/间距/状态色全部引用 app.wxss Token，零裸 hex。
+- 数据纪律：只读 mcuData（getChar/filmsOfChar/visual/get/phaseColor）；角色头像走 visuals.js（当前无 char- 映射，G-19 兜底，设计侧接入 char-{id} 后自动生效）；未改动任何数据。
+- 校验（像素级，非肉眼看图）：
+  · node --check character.js 通过；Grep 零裸 hex / 零 font-weight:500；
+  · wxml 括号 48/48 平衡；无 {{camp 旧绑定残留（仅 hero-camp 类名，合规）；
+  · Headless Chrome 渲染成品 339×1522（AI生成文件/小程序/V1.2角色详情_预览渲染.png）；
+  · 颜色桶探针：真实海报带 > 破坏URL对照（strip16 189 vs 134；strip17 170 vs 139）⇒ 确认 CDN 真实海报加载；Hero/关系头像合规兜底（首字＋阵营渐变）。
+- 交付物：3 源码文件 + 预览渲染 PNG + 本同步文件【三十四】。
+- 下一步：P0④ 关系探索（R-01~R-04）→ Step4 P1 全局统一 → Step5 六图验收。
+- 遗留（待设计侧资源，当前 G-19 合规兜底）：24 角色头像 / 1 首页背景 / 6 阶段图。

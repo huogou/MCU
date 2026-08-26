@@ -1,23 +1,45 @@
-/* 角色详情 character · V1.2 统一视觉 */
+/* 角色详情 character · V1.2 统一视觉（C-01~C-09）
+ * 颜色全部引用 app.wxss Token（零裸 hex）；图标纯 CSS 绘制。
+ * 阵营色严格按设计 §4.4（红=复仇者/街头 蓝=阿斯加德/神盾 紫=银护/变种人 金=瓦坎达 灰=反派）。
+ */
 
 /* —— Hero 区 —— */
-.hero { padding: var(--space-xl) 0 var(--space-xl); display: flex; flex-direction: column; align-items: center; text-align: center; }
-.hero-avatar { width: 128rpx; height: 128rpx; border-radius: 50%; border: 4rpx solid; font-size: 60rpx; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.hero {
+  padding: var(--space-xl) 0 var(--space-xl);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+/* 阵营氛围背景（设计 §4.3，a10 轻氛围，无图时优雅降级） */
+.hero-red    { background: linear-gradient(160deg, var(--accent-red-a10),    var(--surface-1) 65%); }
+.hero-blue   { background: linear-gradient(160deg, var(--accent-blue-a10),   var(--surface-1) 65%); }
+.hero-purple { background: linear-gradient(160deg, var(--accent-purple-a10), var(--surface-1) 65%); }
+.hero-gold   { background: linear-gradient(160deg, var(--gold-a04),           var(--surface-1) 65%); }
+.hero-gray   { background: var(--surface-1); }
+
+.hero-avatar {
+  width: 128rpx; height: 128rpx; border-radius: 50%;
+  border: 4rpx solid transparent; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
 .hero-cn { font-size: var(--fs-display-sm); font-weight: 700; color: var(--text-main); margin-top: var(--space-md); line-height: 1.3; }
 .hero-en { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
 .hero-meta { display: flex; align-items: center; gap: var(--space-sm); margin-top: 20rpx; }
-.hero-camp { font-size: var(--fs-mini); padding: 6rpx 20rpx; border-radius: 999rpx; }
+.hero-camp { font-size: var(--fs-mini); font-weight: 600; padding: 6rpx 20rpx; border-radius: 999rpx; }
 .hero-count { font-size: var(--fs-mini); color: var(--text-weak); }
 
-/* —— 通用卡片 —— */
-.card { background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 16rpx; padding: var(--space-md); margin-bottom: var(--space-md); }
+/* —— 通用卡片（C-06：r20） —— */
+.card { background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: 20rpx; padding: var(--space-md); margin-bottom: var(--space-md); }
 .card-title { font-size: var(--fs-body); font-weight: 600; color: var(--gold); margin-bottom: 20rpx; letter-spacing: 1rpx; }
 .char-note { font-size: var(--fs-body); color: var(--text-sub); line-height: 1.7; }
 
 /* —— 首次出现 / 关联作品 行 —— */
 .first-row, .film-row { display: flex; align-items: center; }
 .row-hover { opacity: 0.7; }
-.film-letter { width: 72rpx; height: 72rpx; border-radius: 14rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 20rpx; flex-shrink: 0; }
+.first-poster { width: 120rpx; height: 180rpx; border-radius: 12rpx; overflow: hidden; margin-right: 20rpx; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1rpx solid var(--surface-3); }
+.film-poster { width: 80rpx; height: 120rpx; border-radius: 12rpx; overflow: hidden; margin-right: 20rpx; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1rpx solid var(--surface-3); }
+.poster-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--white-a60); }
+.first-poster .poster-fallback { font-size: var(--fs-display-sm); }
+.film-poster .poster-fallback { font-size: var(--fs-body); }
+.fill-img { width: 100%; height: 100%; display: block; }
 .film-info { flex: 1; min-width: 0; }
 .film-cn { font-size: var(--fs-body); color: var(--text-main); font-weight: 600; }
 .film-en { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 4rpx; }
@@ -34,9 +56,35 @@
 .related-grid { display: flex; flex-wrap: wrap; gap: 20rpx; }
 .related-item { width: calc((100% - 40rpx) / 3); background: var(--surface-1); border: 1rpx solid var(--surface-3); border-radius: 16rpx; padding: var(--space-md) 12rpx; display: flex; flex-direction: column; align-items: center; text-align: center; box-sizing: border-box; }
 .related-hover { border-color: var(--gold); }
-.related-avatar { width: 80rpx; height: 80rpx; border-radius: 50%; border: 2rpx solid; font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.related-avatar { width: 80rpx; height: 80rpx; border-radius: 50%; border: 3rpx solid transparent; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.related-avatar .poster-fallback { font-size: var(--fs-title); }
 .related-cn { font-size: var(--fs-caption); font-weight: 600; color: var(--text-main); margin-top: 14rpx; line-height: 1.3; }
 .related-shared { font-size: 19rpx; color: var(--text-weak); margin-top: 6rpx; }
+
+/* —— 阵营色（设计 §4.4） —— */
+.fc-red { color: var(--accent-red); } .fc-blue { color: var(--accent-blue); }
+.fc-purple { color: var(--accent-purple); } .fc-gold { color: var(--gold); } .fc-gray { color: var(--text-weak); }
+.fring-red { border-color: var(--accent-red-a20); } .fring-blue { border-color: var(--accent-blue-a20); }
+.fring-purple { border-color: var(--accent-purple-a20); } .fring-gold { border-color: var(--gold-a20); } .fring-gray { border-color: var(--surface-3); }
+.fbg-red { background: linear-gradient(135deg, var(--accent-red), var(--accent-red-a60)); }
+.fbg-blue { background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-a60)); }
+.fbg-purple { background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-a60)); }
+.fbg-gold { background: linear-gradient(135deg, var(--gold), var(--gold-a60)); }
+.fbg-gray { background: var(--surface-3); }
+/* 阵营胶囊（轻氛围） */
+.pill-red { background: var(--accent-red-a10); color: var(--accent-red); }
+.pill-blue { background: var(--accent-blue-a10); color: var(--accent-blue); }
+.pill-purple { background: var(--accent-purple-a10); color: var(--accent-purple); }
+.pill-gold { background: var(--gold-a10); color: var(--gold); }
+.pill-gray { background: var(--surface-3); color: var(--text-weak); }
+
+/* —— 海报阶段色兜底（仅内容标识） —— */
+.poster-p1 { background: linear-gradient(135deg, var(--p1), var(--p1-a60)); }
+.poster-p2 { background: linear-gradient(135deg, var(--p2), var(--p2-a60)); }
+.poster-p3 { background: linear-gradient(135deg, var(--p3), var(--p3-a60)); }
+.poster-p4 { background: linear-gradient(135deg, var(--p4), var(--p4-a60)); }
+.poster-p5 { background: linear-gradient(135deg, var(--p5), var(--p5-a60)); }
+.poster-p6 { background: linear-gradient(135deg, var(--p6), var(--p6-a60)); }
 
 /* —— 数据不存在兜底 —— */
 .notfound-page { display: flex; flex-direction: column; align-items: center; padding-top: 200rpx; }
