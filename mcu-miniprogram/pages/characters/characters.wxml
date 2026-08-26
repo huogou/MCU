@@ -10,11 +10,10 @@
     <view class="camp-row">
       <view class="camp-chip {{activeCamp==='all'?'camp-chip-on':''}}"
             data-camp="all" bindtap="tapCamp">全部</view>
-      <view wx:for="{{campKeys}}" wx:key="*this"
-            class="camp-chip {{activeCamp===item?'camp-chip-on':''}}"
-            style="color:{{activeCamp===item?camps[item].color:''}}"
-            data-camp="{{item}}" bindtap="tapCamp">
-        {{camps[item].label}}
+      <view wx:for="{{campChips}}" wx:key="key"
+            class="camp-chip {{activeCamp===item.key?'camp-chip-on':''}}"
+            data-camp="{{item.key}}" bindtap="tapCamp">
+        {{item.label}}
       </view>
     </view>
   </scroll-view>
@@ -25,8 +24,11 @@
   <view class="char-list">
     <view wx:for="{{filtered}}" wx:key="id"
           class="char-card" data-id="{{item.id}}" bindtap="goCharacter" hover-class="char-card-hover">
-      <!-- 首字徽章（阵营色） -->
-      <view class="char-avatar" style="background:{{camps[item.camp].color}}22;border-color:{{camps[item.camp].color}}66;color:{{camps[item.camp].color}}">{{item.avatar}}</view>
+      <!-- 真实头像（visuals.avatar，G-19 缺图首字徽章兜底） -->
+      <view class="char-avatar fring-{{item.factionCls}} fbg-{{item.factionCls}} fc-{{item.factionCls}}">
+        <image wx:if="{{item.avatarImg}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" />
+        <text wx:else>{{item.avatar}}</text>
+      </view>
       <view class="char-body">
         <view class="char-top">
           <view class="char-cn">{{item.cn}}</view>
@@ -35,7 +37,7 @@
         <view class="char-en">{{item.en}}</view>
         <view class="char-note">{{item.note}}</view>
         <view class="char-meta">
-          <view class="char-camp" style="background:{{camps[item.camp].color}}22;color:{{camps[item.camp].color}}">{{camps[item.camp].label}}</view>
+          <view class="char-camp pill-{{item.factionCls}}">{{item.factionLabel}}</view>
           <view class="char-first">首登场 · {{item.firstCn}}</view>
         </view>
       </view>

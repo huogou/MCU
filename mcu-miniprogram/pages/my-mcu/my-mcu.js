@@ -34,13 +34,16 @@ function subOf(m) {
   return s || 'MCU 作品';
 }
 
-/* CONTENT 节点 → 列表卡片描述符（统一用 cn 作为主显示名，与 movie 页一致） */
+/* CONTENT 节点 → 列表卡片描述符（统一用 cn 作为主显示名，与 movie 页一致）
+   poster：真实电影海报（mcuData.visual(id).poster，CDN）；缺图空 → 前端阶段色+首字兜底 */
 function toCard(m) {
   if (!m) return null;
+  const v = mcuData.visual(m.id);
   return {
     id: m.id,
     cn: m.cn,
     letter: (m.cn || '').charAt(0),
+    poster: (v && v.poster) ? v.poster : '',
     en: m.en || '',
     phase: m.phase || 1,
     type: m.type,
@@ -90,7 +93,9 @@ Page({
     var recentList = [];
     seenIds.slice(0, RECENT_MAX).forEach(function (id) {
       var m = mcuData.get(id);
-      if (m) recentList.push({ id: m.id, cn: m.cn, letter: (m.cn || '').charAt(0), phase: m.phase || 1 });
+      if (!m) return;
+      var v = mcuData.visual(id);
+      recentList.push({ id: m.id, cn: m.cn, letter: (m.cn || '').charAt(0), poster: (v && v.poster) ? v.poster : '', phase: m.phase || 1 });
     });
 
     /* 收藏列表 */

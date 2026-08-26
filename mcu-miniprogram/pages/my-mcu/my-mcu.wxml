@@ -58,8 +58,9 @@
   <block wx:if="{{recentList.length}}">
     <scroll-view class="recent-row" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="recent-item" wx:for="{{recentList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
-        <view class="recent-poster poster-p{{item.phase}}">
-          <text class="recent-letter">{{item.letter}}</text>
+        <view class="recent-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
+          <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
+          <text wx:else class="recent-letter">{{item.letter}}</text>
           <view class="recent-badge">已看</view>
         </view>
         <view class="recent-name">{{item.cn}}</view>
@@ -73,7 +74,10 @@
   <view class="card-list">
     <block wx:if="{{watchedList.length}}">
       <view class="work-card" wx:for="{{watchedList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
-        <view class="wc-poster poster-p{{item.phase}}">{{item.letter}}</view>
+        <view class="wc-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
+          <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
+          <text wx:else>{{item.letter}}</text>
+        </view>
         <view class="wc-info">
           <view class="wc-name">{{item.cn}}</view>
           <view class="wc-sub">{{item.en}} · {{item.phaseText}} · {{item.typeLabel}}</view>
@@ -89,7 +93,10 @@
   <view class="card-list">
     <block wx:if="{{hasFav}}">
       <view class="work-card" wx:for="{{favList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
-        <view class="wc-poster poster-p{{item.phase}}">{{item.letter}}</view>
+        <view class="wc-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
+          <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
+          <text wx:else>{{item.letter}}</text>
+        </view>
         <view class="wc-info">
           <view class="wc-name">{{item.cn}}</view>
           <view class="wc-sub">{{item.en}} · {{item.phaseText}} · {{item.typeLabel}}</view>

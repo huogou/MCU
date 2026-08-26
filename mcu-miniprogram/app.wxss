@@ -239,6 +239,12 @@ page {
   margin: var(--space-lg) 0;
 }
 
+/* 图片填充（全局唯一来源，V1.2 P1 收尾：从 movie/character/explore 页提取） */
+.fill-img { width: 100%; height: 100%; display: block; }
+
+/* 清除微信 button 默认伪元素边框（P1 收尾：禁默认组件样式残留） */
+button::after { border: none; }
+
 /* —— V1.2-DS 阵营色系统（全局唯一来源，页面不再重复定义，Step4 全局统一） —— */
 /* 文字色 fc-* */
 .fc-red    { color: var(--accent-red); }
