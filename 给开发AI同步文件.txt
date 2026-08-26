@@ -109,3 +109,13 @@ MCU观影导航 V1.2 · 开发AI工作日志
 - 截图：AI生成文件/小程序/V1.2{首页_视觉升级,电影详情,角色详情,关系探索}_预览渲染.png
 - **VDS V2 处理立场**：设计侧 VDS V2（Hero Banner/2×2入口/Canvas 网络图）标注"待 GPT 确认 6 项后方可执行"——开发**未擅自切换**未确认方案；当前实现为 V1.2-R2 版（关系探索=关系对卡片版，非 Canvas 版）。若 GPT 确认 VDS V2，开发按 Phase 1~5 增量执行（Phase1~3 CSS 修正与本轮一致，Phase4 关系探索从卡片版升级 Canvas 版）。
 - 遗留：①跨阵营"对手"误判（SPECIAL 表可扩展）②图片缩放 CDN 化 ③阶段图承接位 ④VDS V2 6 项决策——均待 GPT 拍板。
+
+【Work 执行记录 · GPT《视觉系统落地》VDS V2 四阶段完成（2026-08-26，提交 e83d9fd）】
+- GPT 指令 = VDS V2 拍板确认，严格按《MCU-V1.2-Visual-Design-System.md》执行，禁止自行设计。
+- Phase1 首页：Hero Banner（hero-banner.jpg 满宽 420rpx + overlay + 迷你旅程条）+ 旅程卡简化（紧凑推荐）+ 入口 3列→2×2 视觉卡片（4 张 entry 背景 + CSS 图标，路由对齐：watch→routes Tab / timeline→panorama / relationships→explore Tab）。
+- Phase2 电影：核对通过（Hero stills 背景 + 阶段渐变已在 P0② 接入，等效 VDS §3.2），无改动。
+- Phase3 角色：Hero 增强（头像 160rpx / 边框 6rpx / 阵营径向光效 ::before / 简介直展 .hero-note）。
+- Phase4 关系探索：Canvas 力导向网络图重做（中心+一级圆形分布；头像圆形裁剪节点+阵营描边；5 色关系连线含对手虚线；点击节点切换中心；5 筛选 Chips 联动画布+列表；SPECIAL 12 条基础表，92 条待 GPT）。
+- 校验：12 页零裸hex/零500/零800/间距零残留；985 var() 零悬空；4 页像素验证全通过（破 URL 对照）。
+- 截图：AI生成文件/小程序/V1.2{首页_HeroBanner,角色详情_Hero增强,关系探索_网络图,电影详情}_预览。
+- 下一步（等 GPT）：①92 条 SPECIAL 表 ②图片缩放 CDN 化 ③Canvas 真机性能 ④home-bg 去向（my-mcu 页）。
