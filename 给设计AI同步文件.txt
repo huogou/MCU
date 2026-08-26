@@ -96,3 +96,14 @@ MCU观影导航 V1.2 · 设计AI工作日志
     D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\models\mcuData.js
   · 校验脚本：D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\workspace\{check_step5_global.js,check_step14.js,gen_home_vds.js,gen_explore_vds.js,gen_character_preview.js}
 - 待设计侧确认 2 项：①SPECIAL 完整 92 条（开发当前 12 条基础表，等 GPT 提供）②Canvas 网络图真机性能反馈。
+
+【GPT《V1.2 P0 收尾验收》联合任务 · 设计 AI 任务转达（2026-08-26，Work 路由）】
+- 背景：GPT 明确"本段同时发给设计 AI 和开发 AI"，进入 V1.2 P0 收尾验收阶段；验收顺序固定：①角色详情二次验收 → ②关系探索实现 → ③设计验收关系探索 → ④四页面统一截图验收 → ⑤P0 全通过 → ⑥才进 P1。
+- **Step 1 设计资源确认**（GPT 要求优先确认并提供）：
+  · 24 角色头像 → 已交付（D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\assets\avatars\{id}.jpg，1024×1024 待缩放 300×300）
+  · 1 首页背景 → 已交付（D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\assets\backgrounds\home-bg.jpg，1536×1024 待缩放 750×500）
+  · 6 Phase 阶段图 → 已交付（D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\assets\phases\phase-{1-6}.jpg，1536×1024 待裁剪 750×400）
+  · 请设计正式确认：资源最终命名/尺寸/比例 + visuals.js 映射关系（visuals.avatar()/homeBg()/phase() 已映射，接口可用）
+- **Step 2 角色详情二次验收**：Work 已按 VDS §4.2 重做（160rpx 头像/6rpx 边框/阵营光效/简介直展，对照 C-01~C-09）。你的 VDS V2 开发验收报告已给 character ✅ 通过——**请正式回写"角色详情 P0：通过"**（或列出必改项，Work 只修你指出的问题，不自行扩大范围）。
+- **Step 3 关系探索验收标准**：按 VDS §5（R-01~R-04 已被 VDS V2 §5 正式替代）确认验收标准——重点：角色头像节点 / 关系连线 / 关系类型 / 节点层级 / 筛选 / 移动端可操作性 / 是否真正区别于 V1.1 入口聚合页。**不允许 Work 自行发挥新的交互结构**——已遵守：Canvas 力导向图 = VDS V2 §5 设计侧方案，非开发自行设计。请按 VDS §8 技术验收清单正式确认 explore P0。
+- 你的 VDS V2 验收报告 P1 建议 2 项（movie 渐变方向 / explore Canvas 背景色）：GPT 要求当前不开发 P1，两项留待 P0 全通过后处理（除非你裁定为 P0 必改）。
