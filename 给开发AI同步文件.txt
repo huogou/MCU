@@ -293,3 +293,29 @@ MCU观影导航 V1.2 · 开发AI工作日志
 --- 核查 4：节点/连线视觉一一对应 ---
 - explore.js 数据装配：nodes/edges 全部由 centerId + relationsOf() 派生，无硬编码；连线从中心→节点，无孤立线
 - Canvas 绘制坐标缓存 _nodePos 与点击命中一致；"红圈区域视觉问题"（中心周围空白/节点偏移）属渲染表现层，待设计 AI 在核验表中给出具体判定
+
+【设计AI《视觉资源真实性核验表》· 待你执行（2026-08-26）】
+------------------------------------------------------------
+- 核验表完整路径：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-视觉资源真实性核验表.md
+- 设计AI 逐张核验 24 头像 + 审计关系数据 + 检查数据一致性，结论如下：
+
+**必须修复（阻塞定版）5 项**：
+  R-01 peter.jpg 重新生成 → 当前为儿童版蜘蛛侠，需 Tom Holland MCU 版（青少年/青年面孔，红蓝战衣）
+  R-02 SPECIAL 表 3 条类型修正 → tony-steve/strange-wanda/tchalla-starlord 从 rival 改为 ally
+  R-03 删除 thor-odin 条目 → odin 不在 CHARACTERS 中，此条永不生效
+  R-04 修正跨阵营 rival 推导规则 → 设计推荐方案 B+C（高频共演且非 villain→ally + 补充关键 ally 条目）
+  R-05 thanos avengers chars 补充 → characters.js first='avengers' 但 avengers chars 不含 thanos
+
+**建议修复（不阻塞定版）4 项**：
+  R-06 steve.jpg 重新生成 → 面部与 Chris Evans 相似度低
+  R-07 clint chars 补充 → winter-soldier/civil-war 缺少 clint
+  R-08 tchalla wakanda-forever 补充 → chars 为空
+  R-09 空 chars 电影补充 → eternals/wakanda-forever/fantastic-four
+
+**等 GPT 确认**：关系修正方案选型（A/B/C）→ 你按确认方案执行 → 重截图 5 页 → 设计二次验收。
+
+【视觉资源核验修正 · Work 闭环（2026-08-26，提交 a259078）】
+- SPECIAL 19 条：3 改 ally + 删 thor-odin + 补 8 战友 ally；tony 中心 18 条零误标（派生验证）
+- movies.js：avengers+thanos / civil-war+clint；winter-soldier 不加（鹰眼未出场，事实优先）；wakanda-forever 不加 tchalla（已故，待 GPT 裁定）；eternals/fantastic-four 空=正确（无 24 表角色）
+- peter/steve 头像：设计替换 + 开发压缩 300²/13-17KB + CDN 覆盖（visuals.js 零改动）
+- 5 张截图已重渲染（含蜘蛛侠 Tom Holland 版）

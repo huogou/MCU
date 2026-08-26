@@ -568,3 +568,86 @@ MCU观影导航 V1.2 · 进度同步（给策划AI / GPT）
 - 截图红圈视觉问题属渲染表现层，待设计 AI 在《视觉资源真实性核验表》给出具体判定
 
 【下一步按 GPT 固定顺序】设计 AI 核验头像海报 → 角色→演员→作品→关系 → 关系探索数据视觉 → 提交核验表 → **GPT 确认（含 ③ 修正方案选型）** → Work 统一替换（visuals.js/头像/海报/关系数据）→ 重截图 5 页 → 设计二次验收 → GPT 最终确认 → 再回 P1 收尾真机定版。
+
+------------------------------------------------------------
+【二十一、设计AI《视觉资源真实性核验表》· 2026-08-26】
+------------------------------------------------------------
+- 交付物：《MCU-V1.2-视觉资源真实性核验表.md》
+  · 文件路径：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-视觉资源真实性核验表.md
+
+- **角色头像核验（24 张，逐张视觉核验）**：
+  · 22/24 可接受（tony/thor/natasha/banner/clint/loki/fury/bucky/sam/strange/tchalla/wanda/vision/scott/carol/starlord/gamora/thanos/shangchi/yelena/wade/logan）
+  · **❌ peter.jpg 必须更换** — 当前为儿童版蜘蛛侠，非 Tom Holland MCU 版
+  · **️ steve.jpg 建议更换** — 面部与 Chris Evans 相似度低，偏通用帅哥脸
+
+- **关系数据核验（同意 Work 分析，补充设计判断）**：
+  · SPECIAL 表 12 条中 3 条类型错误：tony-steve/strange-wanda/tchalla-starlord 应为 ally
+  · 1 条断链：thor-odin（odin 不在角色表），建议删除
+  · 跨阵营共演≥2=rival 规则本身有缺陷，同意 Work 的 3 方案分析
+  · **设计推荐方案 B+C 组合**：调整派生规则（高频共演且非 villain→ally）+ 补充关键 ally 条目
+
+- **数据一致性核验**：
+  · D-01 thanos first='avengers' 但 avengers chars 不含 thanos → 需补充
+  · D-02 odin 不在角色表 → 删除 SPECIAL 中 thor-odin
+  · D-03 clint 缺少 winter-soldier/civil-war → 需补充
+  · D-04 eternals/wakanda-forever/fantastic-four chars 为空 → 需补充
+  · D-05 tchalla 缺少 wakanda-forever → 需补充
+
+- **电影海报核验**：38 张文件名与电影 ID 1:1 对应，映射结构正确。图像内容为 AI 生成风格图（非官方海报）。
+
+- **必须修复（阻塞定版）5 项**：
+  R-01 peter.jpg 重新生成（Tom Holland MCU 版）
+  R-02 SPECIAL 表 3 条类型修正（rival→ally）
+  R-03 删除 thor-odin 断链条目
+  R-04 修正跨阵营 rival 推导规则
+  R-05 thanos avengers chars 补充
+
+- **建议修复（不阻塞）4 项**：steve.jpg 重生成 / clint chars 补充 / tchalla wakanda-forever 补充 / 空 chars 电影补充
+
+- **已知限制**：38 海报 + 38 剧照 + 6 阶段图 + 5 张背景/入口图均为 AI 生成，非官方素材。文件名映射正确，图像为风格化创作。
+
+- 请 GPT 确认核验表 + 选择关系修正方案（A/B/C）→ Work 执行。
+
+------------------------------------------------------------
+【二十二、设计AI Step1 头像修正完成 · 2026-08-26】
+------------------------------------------------------------
+- 按 GPT《视觉资源真实性核验后修正联合任务》Step1 执行：
+  · peter.jpg ✅ 已替换 — Tom Holland MCU 版蜘蛛侠（青少年面孔、红蓝战衣、蜘蛛 emblem）
+  · steve.jpg ✅ 已替换 — Chris Evans MCU 版美国队长（方下巴、蓝眼、蓝色战衣+星形徽章+盾牌）
+- 24 头像最终复核：24/24 全部可接受 ✅
+- 文件路径：mcu-miniprogram/assets/avatars/{peter,steve}.jpg（已落盘，待 Work 上传 CDN 或本地引用）
+- 设计侧 Step1~2 已完成。等 Work 完成数据一致性修正（Step4）+ 方案 C 关系修正（Step3）→ 设计二次验收（Step6）。
+
+------------------------------------------------------------
+【二十一、视觉资源核验修正落地 · R-01~R-07 · 2026-08-26（提交 a259078）】
+------------------------------------------------------------
+**R-01/R-06 头像替换 ✅**（设计产出 + 开发压缩上传）
+- peter.jpg：儿童版 → **Tom Holland MCU 版**（设计已替换，开发压缩 300×300/13KB 并上传 CDN 覆盖）
+- steve.jpg：→ **Chris Evans MCU 版**（同上，17KB）
+- 设计复核 24/24 全部可接受；开发侧 visuals.js 零改动（同名覆盖自动生效）
+
+**R-02/R-03/R-04 关系数据修正 ✅**（explore.js SPECIAL，19 条）
+- 3 条类型错误改 ally：tony↔steve / strange↔wanda / tchalla↔starlord
+- 删除 thor↔odin（odin 不在角色表，断链）
+- 补 8 条跨阵营战友 ally（设计核验表 2.2 方案 B 推荐 7 条 + 同类误标 tony↔clint）
+- **验证：tony 中心 18 条零误标**（美队/黑寡妇/雷神/鹰眼/弗瑞/黑豹全盟友蓝线，蜘蛛侠师徒金线，灭霸敌人红线）
+
+**R-05/R-07 数据一致性修正 ✅**（movies.js）
+- avengers chars + thanos（首次出场=avengers 彩蛋，与 chars 一致）
+- civil-war chars + clint（鹰眼内战机场大战出场）
+- **未加 winter-soldier→clint**：MCU 事实鹰眼未在《美队2》出场（设计 D-03 此处建议有误，以事实为准）
+
+**R-08/R-09 数据完整性（含判定说明）**
+- wakanda-forever：**未加 tchalla**——特查拉已故（演员 2020 辞世，电影 2022），列为"关联作品"有误导性，保守不补，待 GPT 裁定
+- eternals / fantastic-four chars 为空：**属正确事实**——24 角色表无对应角色（永恒族/神奇四侠非 24 角色），非数据错误，不强行填充
+
+**海报**：本轮未大改（GPT 指示下专项处理），38 张 ID/名称一一对应已核验
+
+**5 张截图（完整路径）**：
+- D:/SEO/发挥余热/漫威电影宇宙导航/AI生成文件/小程序/V1.2首页_热门角色预览.png
+- D:/SEO/发挥余热/漫威电影宇宙导航/AI生成文件/小程序/V1.2钢铁侠_角色详情预览.png
+- D:/SEO/发挥余热/漫威电影宇宙导航/AI生成文件/小程序/V1.2蜘蛛侠_角色详情预览.png
+- D:/SEO/发挥余热/漫威电影宇宙导航/AI生成文件/小程序/V1.2角色图鉴_真实头像预览.png
+- D:/SEO/发挥余热/漫威电影宇宙导航/AI生成文件/小程序/V1.2关系探索_网络图预览.png（tony 中心 18 条全对版）
+
+【待 GPT】确认本轮修正 → 设计 AI 第二轮视觉复核（热门角色/角色图鉴/角色详情/关系探索）→ 截图验收 → 回 P1 收尾真机定版。
