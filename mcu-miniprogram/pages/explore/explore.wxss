@@ -1,9 +1,7 @@
 /* ============================================================
- * explore 关系探索（Tab3）· V1.2 视觉系统落地（按 VDS V2 §5）
- * 结构：头部 → 筛选 Chips → Canvas 网络图 → 关系列表
+ * explore 关系探索（Tab3）· V1.2 + V3 真机适配（混合视图）
  * 颜色一律 var()（关系类型色 .rel-* 功能色类，Token 引用，零裸 hex）
- * 字号 5 档 / 圆角 Token / 间距 --space-*
- * 阵营色 / 海报阶段色系统统一在 app.wxss 全局
+ * 字号 / 圆角 / 间距 全 Token 化
  * ============================================================ */
 
 .explore-page {
@@ -14,27 +12,64 @@
   padding-bottom: var(--space-2xl);
 }
 
-/* —— 页面头部（VDS §5.2） —— */
+/* —— 页面头部 —— */
 .page-head {
   padding: var(--space-xl) 0 var(--space-md);
 }
 .page-title {
-  font-size: var(--fs-display);          /* 56rpx */
+  font-size: var(--fs-display);
   font-weight: 700;
   color: var(--text-main);
 }
 .page-sub {
-  font-size: var(--fs-caption);          /* 24rpx */
+  font-size: var(--fs-caption);
   font-weight: 400;
   color: var(--text-sub);
   margin-top: var(--space-xs);
 }
 
-/* —— 筛选 Chips（VDS §5.5） —— */
-.filter-row {
-  width: 100%;
-  white-space: nowrap;
+/* —— 中心角色卡片（V3 §5.2） —— */
+.center-card {
+  display: flex;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);
   margin-bottom: var(--space-md);
+}
+.center-avatar {
+  width: 88rpx; height: 88rpx;
+  border-radius: 50%;
+  border: 2rpx solid transparent;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-3);
+}
+.center-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--white-a70);
+}
+.center-meta { flex: 1; margin-left: var(--space-md); min-width: 0; }
+.center-name { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); }
+.center-camp { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 2rpx; }
+.center-hint { font-size: var(--fs-mini); color: var(--gold); flex-shrink: 0; margin-left: var(--space-sm); }
+
+/* —— 工具栏：筛选 + 视图切换 —— */
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  gap: var(--space-sm);
+}
+.filter-row {
+  flex: 1;
+  white-space: nowrap;
+  min-width: 0;
 }
 .filter-inner {
   display: inline-flex;
@@ -48,7 +83,7 @@
   height: 56rpx;
   padding: 0 var(--space-md);
   border-radius: var(--radius-full);
-  font-size: var(--fs-caption);          /* 24rpx */
+  font-size: var(--fs-caption);
   font-weight: 600;
   color: var(--text-sub);
   background: var(--surface-2);
@@ -63,23 +98,29 @@
 }
 .chip-hover { opacity: 0.85; }
 
-/* —— Canvas 关系网络图（VDS §5.3） —— */
-.canvas-wrap {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+.view-toggle {
+  display: inline-flex;
+  background: var(--surface-1);
   border: 1rpx solid var(--surface-3);
-  background: var(--bg);
-  margin-bottom: var(--space-xl);
+  border-radius: var(--radius-full);
+  padding: 4rpx;
+  flex-shrink: 0;
 }
-.relation-canvas {
-  width: 750rpx;
-  height: 600rpx;
-  display: block;
+.vt-btn {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--text-sub);
+  padding: 8rpx 22rpx;
+  border-radius: var(--radius-full);
+}
+.vt-active {
+  color: var(--gold-btn-text);
+  background: var(--gold);
 }
 
-/* —— 关系列表（VDS §5.6 卡片式） —— */
+/* —— 关系列表（V3 列表视图） —— */
 .section-label {
-  font-size: var(--fs-body);             /* 28rpx */
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--gold);
   margin-bottom: var(--space-sm);
@@ -90,90 +131,142 @@
   flex-direction: column;
 }
 .relation-card {
+  display: flex;
+  align-items: center;
   background: var(--surface-2);
   border: 1rpx solid var(--surface-3);
-  border-radius: var(--radius-lg);       /* 20rpx */
-  padding: var(--space-md);              /* 28rpx */
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
   margin-bottom: var(--space-sm);
 }
 .rel-card-hover { border-color: var(--gold); }
-.rel-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 .rel-avatar {
-  width: 80rpx;
-  height: 80rpx;
+  width: 80rpx; height: 80rpx;
   border-radius: 50%;
-  border: 2rpx solid transparent;        /* 阵营色由 fring-* 覆盖 */
+  border: 2rpx solid transparent;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   background: var(--surface-3);
+  flex-shrink: 0;
 }
 .rel-fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--fs-title);            /* 36rpx 首字 */
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-title);
   font-weight: 600;
   color: var(--white-a70);
 }
-.rel-line {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 var(--space-sm);
-  position: relative;
+.rel-info { flex: 1; margin-left: var(--space-md); min-width: 0; }
+.rel-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.rel-line::before {
-  content: '';
-  position: absolute;
-  left: var(--space-sm); right: var(--space-sm);
-  height: 1rpx;
-  background: var(--surface-3);
+.rel-shared {
+  font-size: var(--fs-mini);
+  font-weight: 400;
+  color: var(--text-weak);
+  margin-top: var(--space-xs);
 }
 .rel-type {
-  position: relative;
-  font-size: var(--fs-mini);             /* 22rpx */
   font-weight: 600;
-  padding: 0 var(--space-xs);
-  background: var(--surface-2);
-  white-space: nowrap;
+  padding: 0 6rpx;
 }
-/* 关系类型功能色（VDS §5.3，Token 引用） */
 .rel-ally   { color: var(--accent-blue); }
 .rel-enemy  { color: var(--accent-red); }
 .rel-mentor { color: var(--gold); }
 .rel-family { color: var(--accent-purple); }
 .rel-rival  { color: var(--accent-red); }
+.rel-arrow { color: var(--text-weak); font-size: var(--fs-title); margin-left: var(--space-sm); flex-shrink: 0; }
+.rel-empty { font-size: var(--fs-mini); color: var(--text-weak); text-align: center; padding: var(--space-lg) 0; }
 
-.rel-info {
-  text-align: center;
-  margin-top: var(--space-sm);
-  padding-top: var(--space-xs);
-  border-top: 1rpx solid var(--surface-3);
+/* —— 网络视图 Canvas —— */
+.canvas-wrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1rpx solid var(--surface-3);
+  background: var(--bg);
+  margin-bottom: var(--space-xl);
+  position: relative;
 }
-.rel-name {
-  font-size: var(--fs-body);             /* 28rpx */
+.relation-canvas {
+  width: 750rpx;
+  height: 600rpx;
+  display: block;
+}
+.canvas-loading {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  background: var(--bg);
+  z-index: 2;
+}
+
+/* —— 24 角色选择 bottom-sheet —— */
+.sheet-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: var(--bg-a70);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+}
+.sheet-panel {
+  width: 100%;
+  background: var(--surface-1);
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+  padding: var(--space-md) var(--page-x) var(--space-xl);
+  box-sizing: border-box;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0 var(--space-md);
+}
+.sheet-title { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); }
+.sheet-close { font-size: var(--fs-title); color: var(--text-sub); padding: 0 var(--space-xs); }
+.sheet-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  max-height: 56vh;
+}
+.sheet-item {
+  width: calc((100% - 5 * var(--space-sm)) / 4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sheet-avatar {
+  width: 96rpx; height: 96rpx;
+  border-radius: 50%;
+  border: 2rpx solid transparent;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-3);
+}
+.sheet-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-title);
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--white-a70);
 }
-.rel-name-arrow {
-  color: var(--text-weak);
-  font-weight: 400;
-  margin: 0 var(--space-xs);
-}
-.rel-shared {
-  font-size: var(--fs-mini);             /* 22rpx */
-  font-weight: 400;
-  color: var(--text-weak);
-  margin-top: var(--space-xs);
+.sheet-name {
+  font-size: 20rpx;
+  color: var(--text-sub);
+  margin-top: 8rpx;
+  text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  width: 100%;
 }
 
 .bottom-pad { height: 60rpx; }

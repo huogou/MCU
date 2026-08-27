@@ -1,25 +1,108 @@
-/* panorama 宇宙全景图 · V1.2 统一视觉，全 Token 化 */
+/* panorama 宇宙全景图 · V1.2 VDS 纵向时间轴，全 Token 化 */
 .pano-page { display: flex; flex-direction: column; height: 100vh; background: var(--bg); }
 
 .page-head { padding: var(--space-lg) var(--page-x) var(--space-sm); }
 .page-title { font-size: var(--fs-display-sm); font-weight: 700; color: var(--text-main); }
 .page-sub { font-size: var(--fs-mini); color: var(--text-sub); margin-top: 6rpx; }
 
-.pano-scroll { flex: 1; }
-.pano-map { position: relative; background: var(--surface-1); }
+.pano-timeline { flex: 1; padding: 0 var(--page-x) var(--space-2xl); box-sizing: border-box; }
 
-.pano-canvas { position: absolute; left: 0; top: 0; z-index: 1; }
+.phase-group { margin-bottom: var(--space-xl); }
 
-.phase-col { position: absolute; top: 0; border-left: 1rpx solid var(--surface-3); padding: var(--space-sm) 14rpx; box-sizing: border-box; z-index: 2; }
-.phase-tag { font-size: var(--fs-caption); font-weight: 700; color: var(--text-sub); white-space: nowrap; }
-.phase-years { font-size: 18rpx; color: var(--text-weak); margin-top: 4rpx; white-space: nowrap; }
+.phase-header {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--surface-1);
+  border-left: 6rpx solid var(--gold);
+  border-radius: var(--radius-md);
+}
+.phase-number {
+  width: 48rpx; height: 48rpx;
+  border-radius: var(--radius-full);
+  color: var(--white);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+}
+.phase-meta { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.phase-name { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); }
+.phase-years { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 2rpx; }
+.phase-count { font-size: var(--fs-caption); color: var(--gold); font-weight: 600; flex-shrink: 0; }
 
-.pano-node { position: absolute; z-index: 3; background: var(--surface-2); border: 1rpx solid var(--surface-3); border-radius: var(--radius-sm); display: flex; flex-direction: column; overflow: hidden; }
-.node-main { border-color: var(--gold-a60); }
-.node-upcoming { opacity: 0.6; border-style: dashed; }
-.node-letter { height: 60rpx; color: var(--white); font-size: var(--fs-title); font-weight: 700; display: flex; align-items: center; justify-content: center; }
-.node-title { flex: 1; font-size: var(--fs-mini); color: var(--text-main); padding: var(--space-xs); line-height: 1.25; display: flex; align-items: center; justify-content: center; text-align: center; }
+.movie-list { display: flex; flex-direction: column; gap: var(--space-sm); }
 
-.legend { display: flex; gap: 40rpx; padding: var(--space-sm) var(--page-x); background: var(--surface-1); border-top: 1rpx solid var(--surface-3); }
-.legend-item { display: flex; align-items: center; font-size: var(--fs-mini); color: var(--text-sub); }
-.legend-line { width: 36rpx; height: 6rpx; border-radius: 3rpx; margin-right: 10rpx; }
+.movie-card {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm);
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);
+}
+.movie-card.is-seen { opacity: 0.75; }
+.movie-card.is-upcoming { opacity: 0.6; border-style: dashed; }
+
+.poster-wrap {
+  position: relative;
+  width: 96rpx; height: 132rpx;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--surface-3);
+}
+.poster-img { width: 100%; height: 100%; }
+.poster-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--white);
+  font-size: var(--fs-title);
+  font-weight: 700;
+}
+.seen-badge {
+  position: absolute;
+  top: 4rpx; right: 4rpx;
+  width: 32rpx; height: 32rpx;
+  border-radius: var(--radius-full);
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: 20rpx;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.movie-info { flex: 1; margin-left: var(--space-md); min-width: 0; }
+.movie-cn { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.movie-en { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 2rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.movie-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8rpx; margin-top: var(--space-xs); }
+.movie-year { font-size: var(--fs-mini); color: var(--text-sub); }
+.phase-tag-pill {
+  font-size: 18rpx;
+  padding: 2rpx 10rpx;
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-full);
+}
+.tag-mainline {
+  font-size: 18rpx;
+  padding: 2rpx 10rpx;
+  border-radius: var(--radius-full);
+  background: var(--gold-a10);
+  color: var(--gold);
+}
+.tag-starter {
+  font-size: 18rpx;
+  padding: 2rpx 10rpx;
+  border-radius: var(--radius-full);
+  background: var(--p2-a15, var(--surface-3));
+  color: var(--p2, var(--text-sub));
+}
+
+.movie-arrow { color: var(--text-weak); font-size: var(--fs-title); margin-left: var(--space-sm); flex-shrink: 0; }
+
+.upcoming-section { margin-top: var(--space-xl); }
+.upcoming-title { font-size: var(--fs-body); font-weight: 700; color: var(--text-main); margin-bottom: var(--space-md); padding-left: var(--space-sm); }
+
+.pano-foot { margin-top: var(--space-xl); font-size: var(--fs-mini); color: var(--text-weak); text-align: center; }

@@ -96,6 +96,32 @@ MCU观影导航 V1.2 · 开发AI工作日志
   应先执行修正（16处间距 + 2处圆角 + 字重），再按 VDS V2 做新增/重设计
 - 待 GPT 确认 6 项决策后方可全面执行（见策划同步文件【十一】）
 
+============================================================
+【Work 执行记录 · V3 真机适配专项 · Step 4-6 实现 · 2026-08-26】
+------------------------------------------------------------
+一、触发：GPT「@MCU-V1.2-真机适配专项设计方案.md 这个是设计阅读后做完的」＝ V3 终版已交付，绿灯启动实现。
+二、已交付（V3 §1/§2/§3 三页改造，数据纪律全程零改动）：
+  [panorama 全景图] 纵向 Phase 时间轴重写（panorama.js/wxml/wxss）
+    · 按 6 阶段分组 · 每组「X/Y 已看」· 电影卡含真实海报(visuals.visual)/年份(节点year||CONTENT.date)/Phase 标签/主线·入门标签/已看金色✓(opacity .75)
+    · 待映(avengers-5/6)独立「即将上映」区，不跳转
+    · 删除全部 Canvas/drawLines/onReady，onPosterError 首字兜底；PANO_MOVIES/mcuData/visuals 零改动
+  [explore 关系探索] 混合视图改造（explore.js/wxml/wxss）
+    · 默认「列表视图」：关系卡片列表（头像+名+类型色+共同出演数），移动端友好
+    · 「网络视图」高级入口：view-toggle 切换，首次进入懒加载 Canvas（canvasReady 门控 loading）
+    · 中心角色卡片：点击弹出 24 角色选择（自定义 bottom-sheet；微信原生 ActionSheet 限 6 项，故以等价底部弹层实现 §5.2 意图）
+    · 保留全部 Canvas 代码（drawGraph/paint/paintNode/avatarImage/onCanvasTap/_nodePos）；setCenter 仅在 network 视图重绘
+  [share 分享海报] 视觉升级（share.js，shareData 零改动）
+    · drawCosmicBg（渐变+60 星点+金色光带）、drawBrandShield（品牌盾徽）
+    · 真实海报/头像异步加载：_collectImages→createImage→pending 计数→就绪(或 2.6s 安全超时)后绘制；缺失走阶段色+首字兜底
+    · progress 加「最近观看」3 海报；route 加前 5 缩略海报(未看 alpha .4)；movie 用真实海报+前4角色头像组
+三、语法校验：panorama.js / explore.js / share.js 均 node --check 通过。
+四、待办（交给 GPT）：真机截图验收三页——
+    · 宇宙全景图截图（纵向阶段+已看状态+海报）
+    · 关系探索截图（列表视图默认 + 网络视图切换）
+    · 分享海报截图（progress/route/movie 三种）
+  验收通过即 V1.2 定版。
+============================================================
+
 【决策区】
 （请策划 / 设计回写：VDS V2 确认 / 6 项决策 / 执行排期）
 

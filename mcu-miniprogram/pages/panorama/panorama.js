@@ -1,106 +1,96 @@
-// 宇宙全景图 panorama（子页，由 explore 进入） - Step3-7-C 恢复
-const { PANO_MOVIES, PANO_CONN, PHASE_COLS, LAYOUT } = require('../../models/pano.js');
+// 宇宙全景图 panorama（V1.2 纵向 Phase 时间轴） - V3 真机适配专项
+// 数据纪律：PANO_MOVIES / mcuData / visuals / userState 全部零改动，仅在本页派生视图。
+const PANO_MOVIES = require('../../models/pano.js').PANO_MOVIES;
 const mcuData = require('../../models/mcuData.js');
+const visuals = require('../../data/visuals.js');
+const userState = require('../../models/userState.js');
 
-const SCALE = 0.6;     // 设计坐标 → 显示像素（1:1.67 缩放，适配移动端横滚）
-const CARD_W = 96;     // 节点卡宽（px）
-const CARD_H = 144;    // 节点卡高（px）
+/* 阶段元信息（标题 + 年份区间），与 pano.js PHASE_COLS 同源，仅用于纵向展示 */
+const PHASE_META = [
+  { phase: 1, title: '第一阶段', years: '2008 – 2012' },
+  { phase: 2, title: '第二阶段', years: '2013 – 2015' },
+  { phase: 3, title: '第三阶段', years: '2016 – 2019' },
+  { phase: 4, title: '第四阶段', years: '2021 – 2022' },
+  { phase: 5, title: '第五阶段', years: '2023 – 2025' },
+  { phase: 6, title: '第六阶段', years: '2025 –' }
+];
 
-function topOf(cls) {
-  if (cls.indexOf('support-above') >= 0) return LAYOUT.supportAboveTop;
-  if (cls.indexOf('support-below') >= 0) return LAYOUT.supportBelowTop;
-  return LAYOUT.mainlineTop;
+/* 节点所属阶段：待映固定归 6；其余取内容真实 phase 字段 */
+function phaseOfNode(n) {
+  if (n.upcoming) return 6;
+  const c = mcuData.get(n.id);
+  return (c && c.phase) ? c.phase : 0;
 }
 
 Page({
   data: {
-    mapW: Math.round(LAYOUT.canvasW * SCALE),
-    mapH: Math.round(LAYOUT.canvasH * SCALE),
-    canvasW: Math.round(LAYOUT.canvasW * SCALE),
-    canvasH: Math.round(LAYOUT.canvasH * SCALE),
-    cardW: CARD_W,
-    cardH: CARD_H,
-    nodes: [],
-    phases: []
+    phaseGroups: [],
+    upcoming: [],
+    _posterErr: {}
   },
 
   onLoad: function () {
-    const byId = {};
-    PANO_MOVIES.forEach(function (n) { byId[n.id] = n; });
-    const nodes = PANO_MOVIES.map(function (n) {
+    const groupsMap = {};
+    const order = [];
+    const upcoming = [];
+
+    // PANO_MOVIES 已按上映序排列，单次遍历即可保持阶段内上映序
+    PANO_MOVIES.forEach(function (n) {
+      const ph = phaseOfNode(n);
       const c = mcuData.get(n.id);
-      const isMain = n.cls.indexOf('mainline') >= 0;
-      const phase = c ? c.phase : (n.upcoming ? 6 : 0);
       const title = n.upcoming ? n.title : (c ? c.cn : n.id);
-      return {
+      const en = c ? c.en : '';
+      const year = n.year || (c && c.date ? c.date.slice(0, 4) : '');
+      const item = {
         id: n.id,
-        left: Math.round(n.left * SCALE),
-        top: Math.round(topOf(n.cls) * SCALE),
-        cls: n.cls,
-        main: isMain,
+        cn: title,
+        en: en,
+        year: year,
+        phase: ph,
+        poster: visuals.visual(n.id).poster,
+        mainline: c ? !!c.mainline : false,
+        starter: c ? !!c.starter : false,
+        seen: userState.isSeen(n.id),
+        firstChar: (title || '?')[0],
         upcoming: !!n.upcoming,
-        title: title,
-        letter: (title || '?')[0],
-        phaseColor: mcuData.phaseColor(phase)
+        phaseColor: mcuData.phaseColor(ph)
+      };
+      if (n.upcoming) { upcoming.push(item); return; }
+      if (!groupsMap[ph]) { groupsMap[ph] = []; order.push(ph); }
+      groupsMap[ph].push(item);
+    });
+
+    const groups = order.map(function (ph) {
+      const meta = PHASE_META.filter(function (m) { return m.phase === ph; })[0];
+      const items = groupsMap[ph];
+      const watched = items.filter(function (m) { return m.seen; }).length;
+      return {
+        phase: ph,
+        title: meta ? meta.title : ('第' + ph + '阶段'),
+        years: meta ? meta.years : '',
+        color: mcuData.phaseColor(ph),
+        count: items.length,
+        watched: watched,
+        movies: items
       };
     });
-    const phases = PHASE_COLS.map(function (p) {
-      return { phase: p.phase, left: Math.round(p.left * SCALE), title: p.title, years: p.years };
-    });
-    this._byId = byId;
-    this.setData({ nodes: nodes, phases: phases });
+
+    this.setData({ phaseGroups: groups, upcoming: upcoming });
   },
 
-  onReady: function () {
-    this.drawLines();
-  },
-
-  drawLines: function () {
-    const self = this;
-    const q = wx.createSelectorQuery();
-    q.select('#panoCanvas').fields({ node: true, size: true }).exec(function (res) {
-      if (!res || !res[0] || !res[0].node) return;
-      const canvas = res[0].node;
-      const ctx = canvas.getContext('2d');
-      const info = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync());
-      const dpr = info.pixelRatio || 2;
-      const W = self.data.canvasW, H = self.data.canvasH;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      ctx.scale(dpr, dpr);
-      ctx.clearRect(0, 0, W, H);
-
-      // 主线金色轨道（视觉基准线）
-      const gt = Math.round(LAYOUT.mainlineTop * SCALE);
-      ctx.strokeStyle = 'rgba(233,169,59,0.16)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(0, gt);
-      ctx.lineTo(W, gt);
-      ctx.stroke();
-
-      // 连线路（mainline 金 / support 蓝 / cross 紫）
-      PANO_CONN.forEach(function (edge) {
-        const a = self._byId[edge[0]], b = self._byId[edge[1]];
-        if (!a || !b) return;
-        const type = edge[2];
-        let color = 'rgba(122,130,150,0.35)';
-        if (type === 'mainline') color = 'rgba(233,169,59,0.7)';
-        else if (type === 'support') color = 'rgba(91,141,239,0.45)';
-        else if (type === 'cross') color = 'rgba(139,111,232,0.45)';
-        ctx.strokeStyle = color;
-        ctx.lineWidth = type === 'mainline' ? 2.6 : 1.4;
-        ctx.beginPath();
-        ctx.moveTo(a.left * SCALE + CARD_W / 2, topOf(a.cls) * SCALE + CARD_H / 2);
-        ctx.lineTo(b.left * SCALE + CARD_W / 2, topOf(b.cls) * SCALE + CARD_H / 2);
-        ctx.stroke();
-      });
-    });
+  /* 海报加载失败 → 标记该 id 走首字兜底（不重复 setData） */
+  onPosterError: function (e) {
+    const id = e.currentTarget.dataset.id;
+    const err = this.data._posterErr;
+    if (err[id]) return;
+    err[id] = true;
+    this.setData({ _posterErr: err });
   },
 
   goMovie: function (e) {
     const id = e.currentTarget.dataset.id;
-    if (this._byId[id] && this._byId[id].upcoming) return; // 待映卡片不跳转
+    const node = PANO_MOVIES.filter(function (n) { return n.id === id; })[0];
+    if (node && node.upcoming) return; // 待映卡片不跳转
     wx.navigateTo({ url: '/pages/movie/movie?id=' + id });
   }
 });

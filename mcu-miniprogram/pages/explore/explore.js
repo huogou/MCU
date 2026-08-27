@@ -1,17 +1,17 @@
 /* ============================================================
  * 关系探索 explore（Tab3）· V1.2 视觉系统落地（按《MCU-V1.2-Visual-Design-System》VDS V2 §5）
  * ------------------------------------------------------------
- * 定位：从"入口聚合页/关系对卡片"→「MCU 角色关系网络探索」
- * 核心：Canvas 2D 力导向网络图（中心角色 + 一级关系圆形分布）
- *   + 5 筛选 Chips + 下方关系列表（卡片式）
- * 交互：点击节点切换中心角色，重新布局
+ * V3 真机适配（2026-08-26）：混合视图改造
+ *   - 默认「列表视图」：关系卡片列表（移动端友好，不依赖 Canvas）
+ *   - 「网络视图」高级入口：点击右上「网络」切换，懒加载 Canvas 力导向图
+ *   - 中心角色卡片：点击弹出 24 角色选择（自定义 bottom-sheet，因微信原生
+ *     ActionSheet itemList 上限 6 项，无法容纳 24，故以等价底部弹层实现 §5.2 意图）
+ *   - Canvas 全部代码原样保留（drawGraph/paint/paintNode/avatarImage/onCanvasTap/_nodePos）
  *
  * 数据纪律（铁律）：
  *   - CHARACTERS / RELATIONS / CAMPS 数据模型零改动
- *   - 关系对视图层派生：预定义 SPECIAL 优先 → 同阵营=盟友 → 跨阵营不自动连线（VDS §5.4）
+ *   - 关系对视图层派生：预定义 SPECIAL 优先 → 同阵营=盟友 → 跨阵营不自动连线
  *   - 角色头像经 visuals.avatar(id)（缺失 null → Canvas 内阵营渐变+首字兜底）
- *   - 连线颜色经 Token 定义（.rel-* 类），零裸 hex
- *   - SPECIAL 基础表 12 条（VDS §5.4 示例 8 + 已验证补充 4）；完整 92 条待 GPT 提供，不编造
  * ============================================================ */
 
 const mcuData = require('../../models/mcuData.js');
@@ -31,7 +31,7 @@ const CAMP_MAP = {
 };
 function campOf(camp) { return CAMP_MAP[camp] || { cls: 'gray', label: camp || '' }; }
 
-/* ---- 关系类型 → 标签 + 画布色（VDS §5.3：盟友蓝/敌人红/师徒金/家人紫/对手红虚线） ---- */
+/* ---- 关系类型 → 标签 + 画布色（VDS §5.3） ---- */
 const REL_TYPE_MAP = {
   ally:   { label: '盟友', color: '#4A9EF5' },
   enemy:  { label: '敌人', color: '#E85D5D' },
@@ -49,21 +49,19 @@ const FILTERS = [
   { key: 'family', label: '家人' }
 ];
 
-/* ---- 预定义特殊关系基础表（VDS §5.4 + 设计核验表 R-02~R-04 方案 C 修正：3 条改 ally、删 thor-odin 断链、补 7 条跨阵营战友 ally；完整 92 条待 GPT） ---- */
+/* ---- 预定义特殊关系基础表（VDS §5.4 + 设计核验表 R-02~R-04 修正） ---- */
 const SPECIAL_RELATIONS = [
   { from: 'tony',    to: 'peter',   type: 'mentor' },
-  { from: 'tony',    to: 'steve',   type: 'ally' },      /* R-02: 核心盟友(内战短暂对立终局和解) */
+  { from: 'tony',    to: 'steve',   type: 'ally' },
   { from: 'thor',    to: 'loki',    type: 'family' },
-  /* R-03: 删除 thor-odin（odin 不在 CHARACTERS，断链永不生效） */
   { from: 'steve',   to: 'bucky',   type: 'family' },
   { from: 'natasha', to: 'clint',   type: 'family' },
   { from: 'wanda',   to: 'vision',  type: 'family' },
   { from: 'tony',    to: 'thanos',  type: 'enemy' },
   { from: 'thanos',  to: 'gamora',  type: 'family' },
-  { from: 'strange', to: 'wanda',   type: 'ally' },      /* R-02: 盟友(偶有紧张非对手) */
+  { from: 'strange', to: 'wanda',   type: 'ally' },
   { from: 'wade',    to: 'logan',   type: 'rival' },
-  { from: 'tchalla', to: 'starlord',type: 'ally' },      /* R-02: 短暂冲突后结盟 */
-  /* R-04 方案 B：补跨阵营战友 ally（设计核验表 2.2 推荐，修正 auto-derived rival 误标） */
+  { from: 'tchalla', to: 'starlord',type: 'ally' },
   { from: 'tony',    to: 'fury',    type: 'ally' },
   { from: 'tony',    to: 'tchalla', type: 'ally' },
   { from: 'tony',    to: 'natasha', type: 'ally' },
@@ -71,7 +69,7 @@ const SPECIAL_RELATIONS = [
   { from: 'steve',   to: 'tchalla', type: 'ally' },
   { from: 'steve',   to: 'natasha', type: 'ally' },
   { from: 'steve',   to: 'thor',    type: 'ally' },
-  { from: 'tony',    to: 'clint',   type: 'ally' }      /* 同类误标一并修正（鹰眼=复联战友，共演4部） */
+  { from: 'tony',    to: 'clint',   type: 'ally' }
 ];
 const specialMap = {};
 SPECIAL_RELATIONS.forEach(function (p) {
@@ -81,7 +79,6 @@ SPECIAL_RELATIONS.forEach(function (p) {
 
 /* ---- 派生工具 ---- */
 
-/* 共同出演数：两角色同时出现的作品数（经 mcuData.filmsOfChar 只读反查） */
 function coCount(aId, bId) {
   const fa = mcuData.filmsOfChar(aId);
   const fb = mcuData.filmsOfChar(bId);
@@ -91,8 +88,6 @@ function coCount(aId, bId) {
   return fa.filter(function (f) { return setB[f.id]; }).length;
 }
 
-/* 关系类型判定（VDS §5.4 + GPT 2026-08-26 数据层扩充授权）：
-   predefined 优先 → 同阵营=盟友 → 跨阵营高频共演(≥2部)=对手(rival，竞争非敌对) → 其余 null */
 function relationOf(a, b) {
   const pre = specialMap[a + '|' + b];
   if (pre) return pre;
@@ -103,7 +98,6 @@ function relationOf(a, b) {
   return null;
 }
 
-/* 某角色的全部关系边（含类型），按共演数降序 */
 function relationsOfChar(id) {
   const out = [];
   CHARACTERS.forEach(function (c) {
@@ -127,20 +121,41 @@ Page({
   data: {
     filters: FILTERS,
     activeFilter: 'all',
+    viewMode: 'list',          // V3：默认列表视图
+    canvasReady: false,        // 网络视图 Canvas 是否已完成首绘（控制 loading）
     centerId: 'tony',
     centerName: '',
-    relations: [],   /* 当前筛选后的关系列表（视图层） */
+    centerCampLabel: '',
+    relations: [],
+    chars: [],                 // 24 角色选择列表（自定义 bottom-sheet）
+    showCharSheet: false,
     totalChars: CHARACTERS.length
   },
 
-  /* 节点坐标缓存（点击命中用，paint 时写入） */
   _nodePos: {},
 
   onLoad: function () {
+    this._buildChars();
     this.setCenter('tony');
   },
 
-  /* 设置中心角色：装配数据 + 画布重绘 */
+  /* 构建 24 角色选择列表（仅一次） */
+  _buildChars: function () {
+    const list = CHARACTERS.map(function (c) {
+      const name = heroOf(c.cn);
+      const cCamp = campOf(c.camp);
+      return {
+        id: c.id,
+        name: name,
+        first: name.charAt(0),
+        avatar: visuals.avatar(c.id) || '',
+        campCls: cCamp.cls
+      };
+    });
+    this.setData({ chars: list });
+  },
+
+  /* 设置中心角色：装配数据；仅在网络视图下重绘画布 */
   setCenter: function (id) {
     const c = mcuData.getChar(id);
     if (!c) return;
@@ -152,20 +167,22 @@ Page({
     this.setData({
       centerId: id,
       centerName: centerName,
+      centerCampLabel: cCamp.label,
       centerAvatar: visuals.avatar(id) || '',
       centerCls: cCamp.cls,
       centerFirst: centerName.charAt(0),
-      relations: filtered
+      relations: filtered,
+      showCharSheet: false
     });
-    this.drawGraph();
+    if (this.data.viewMode === 'network') this.drawGraph();
   },
 
-  /* 筛选（VDS §5.5）：chips 单选，过滤列表并重绘画布 */
+  /* 筛选（VDS §5.5）：chips 单选，过滤列表；网络视图下同步重绘 */
   onFilter: function (e) {
     const key = e.currentTarget.dataset.key || 'all';
     const filtered = this.applyFilter(key);
     this.setData({ activeFilter: key, relations: filtered });
-    this.drawGraph();
+    if (this.data.viewMode === 'network') this.drawGraph();
   },
 
   applyFilter: function (key) {
@@ -189,7 +206,35 @@ Page({
     }).filter(Boolean);
   },
 
-  /* ---- Canvas 网络图（VDS §5.3） ---- */
+  /* 视图切换：列表 ↔ 网络（V3 §2）。首次进入网络视图懒加载 Canvas */
+  toggleView: function (e) {
+    const mode = (e && e.currentTarget.dataset && e.currentTarget.dataset.mode) ||
+      (this.data.viewMode === 'list' ? 'network' : 'list');
+    if (mode === this.data.viewMode) return;
+    this.setData({ viewMode: mode });
+    if (mode === 'network') {
+      const that = this;
+      // Canvas 节点需在视图挂载后存在；setTimeout 让 wx:if 渲染完成
+      setTimeout(function () { that.drawGraph(); }, 100);
+    }
+  },
+
+  /* 中心角色卡片点击 → 弹出 24 角色选择（自定义 bottom-sheet，等价 §5.2 ActionSheet） */
+  onCenterTap: function () {
+    this.setData({ showCharSheet: true });
+  },
+  closeCharSheet: function () {
+    this.setData({ showCharSheet: false });
+  },
+  pickChar: function (e) {
+    const id = e.currentTarget.dataset.id;
+    if (id) this.setCenter(id);
+  },
+
+  /* 占位：底部弹层内部点击不冒泡到 mask（避免误关） */
+  noop: function () {},
+
+  /* ---- Canvas 网络图（VDS §5.3，原样保留） ---- */
   drawGraph: function () {
     const that = this;
     wx.createSelectorQuery().in(this)
@@ -199,13 +244,14 @@ Page({
         if (!res || !res[0] || !res[0].node) return;
         const canvas = res[0].node;
         const ctx = canvas.getContext('2d');
-        const W = res[0].width;   /* px（rpx÷2） */
+        const W = res[0].width;
         const H = res[0].height;
         const dpr = wx.getSystemInfoSync().pixelRatio || 2;
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx.scale(dpr, dpr);
         that.paint(ctx, W, H, canvas);
+        that.setData({ canvasReady: true });
       });
   },
 
@@ -214,18 +260,15 @@ Page({
     if (!center) return;
     const centerCamp = campOf(center.camp);
 
-    /* 背景（P1-2：与 --bg #080B12 完全一致） */
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#080B12';
     ctx.fillRect(0, 0, W, H);
 
-    /* 中心 + 邻居布局：中心居中，邻居绕圆形分布 */
     const cx = W / 2, cy = H / 2;
-    const R = Math.min(W, H) * 0.32;          /* 布局半径 */
-    const rels = this.allRels.slice(0, 10);   /* 一级关系最多 10 个 */
+    const R = Math.min(W, H) * 0.32;
+    const rels = this.allRels.slice(0, 10);
     const nodes = [];
 
-    /* 连线（先画，位于头像下层） */
     rels.forEach(function (r, i) {
       const angle = -Math.PI / 2 + (i / rels.length) * Math.PI * 2;
       const nx = cx + Math.cos(angle) * R;
@@ -239,12 +282,10 @@ Page({
       if (rel.dash) ctx.setLineDash([4, 4]); else ctx.setLineDash([]);
       ctx.stroke();
       ctx.setLineDash([]);
-      /* 节点坐标缓存（点击命中用） */
       this._nodePos[r.id] = { x: nx, y: ny };
       nodes.push({ id: r.id, x: nx, y: ny, r: 22, rel: r.type });
-    }, this);   /* thisArg 必传：否则回调内 this 为 undefined → 写 _nodePos 抛 TypeError → paint 中断，Canvas 只剩背景色（表现为"关系图空白"） */
+    }, this);
 
-    /* 中心节点 + 邻居节点（头像 + 阵营边框 + 标签） */
     this.paintNode(ctx, cx, cy, 30, center, centerCamp, true, canvas);
     const that = this;
     nodes.forEach(function (n) {
@@ -253,7 +294,6 @@ Page({
       that.paintNode(ctx, n.x, n.y, 22, c, campOf(c.camp), false, canvas);
     });
 
-    /* 中心标签 */
     ctx.fillStyle = '#E8ECF4';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'center';
@@ -263,7 +303,6 @@ Page({
   paintNode: function (ctx, x, y, r, char, camp, isCenter, canvas) {
     const img = this.avatarImage(char.id, canvas);
     if (img && img.loaded) {
-      /* 圆形裁剪头像 */
       ctx.save();
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -271,7 +310,6 @@ Page({
       ctx.drawImage(img.obj, x - r, y - r, r * 2, r * 2);
       ctx.restore();
     } else {
-      /* 兜底：阵营渐变圆 + 首字（G-19 合规） */
       const grad = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
       grad.addColorStop(0, this.campColor(camp.cls));
       grad.addColorStop(1, this.campColorAlpha(camp.cls));
@@ -286,14 +324,12 @@ Page({
       ctx.fillText(heroOf(char.cn).charAt(0), x, y + 1);
       ctx.textBaseline = 'alphabetic';
     }
-    /* 阵营色描边（中心 4rpx=2px 粗） */
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.strokeStyle = this.campColor(camp.cls);
     ctx.lineWidth = isCenter ? 3 : 2;
     ctx.stroke();
 
-    /* 非中心节点标签 */
     if (!isCenter) {
       ctx.fillStyle = 'rgba(232,236,244,0.9)';
       ctx.font = '11px sans-serif';
@@ -302,7 +338,6 @@ Page({
     }
   },
 
-  /* 头像 Image 缓存（canvas.createImage 加载一次复用） */
   avatarImage: function (id, canvas) {
     if (!this._imgCache) this._imgCache = {};
     if (this._imgCache[id]) return this._imgCache[id];
@@ -313,8 +348,7 @@ Page({
       img.onload = function () {
         rec.loaded = true;
         rec.obj = img;
-        /* 加载完成后重绘（若仍有引用中心则刷新画布） */
-        if (this && this.centerId) this.drawGraph();
+        if (this && this.centerId && this.data.viewMode === 'network') this.drawGraph();
       }.bind(this);
       img.src = url;
       rec.obj = img;
@@ -323,7 +357,6 @@ Page({
     return rec;
   },
 
-  /* 阵营色（Canvas 用，仅绘制层；与全局 .fc-* 类 Token 权威值一致） */
   campColor: function (cls) {
     const map = { red: '#E85D5D', blue: '#4A9EF5', purple: '#9B7FE8', gold: '#F2B233', gray: '#6B7384' };
     return map[cls] || '#6B7384';
@@ -333,7 +366,6 @@ Page({
     return map[cls] || 'rgba(107,115,132,0.6)';
   },
 
-  /* 点击节点 → 切换中心（VDS §5.3 交互） */
   onCanvasTap: function (e) {
     const x = e.detail.x, y = e.detail.y;
     const rels = this.allRels.slice(0, 10);
@@ -348,14 +380,11 @@ Page({
     }
   },
 
-
-  /* 关系列表点击 → 角色详情 */
   goCharacter: function (e) {
     const id = e.currentTarget.dataset.id;
     if (id) wx.navigateTo({ url: "/pages/character/character?id=" + id });
   },
 
-  /* 头像远程 URL 加载失败兜底（CDN/网络异常时自动降级到阵营渐变+首字徽章，G-19） */
   onImgError: function (e) {
     const id = e.currentTarget.dataset.id;
     if (!id) return;

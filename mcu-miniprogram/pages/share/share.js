@@ -1,5 +1,5 @@
 /* ============================================================
- * 分享海报 share（V1.1 Step4）
+ * 分享海报 share（V1.1 Step4 + V3 真机适配 §3）
  * ------------------------------------------------------------
  * 功能：
  *   - 三类型海报 canvas 2d 生成：progress（观影进度）/ route（路线）/ movie（电影）
@@ -10,13 +10,18 @@
  *   - progress：userState（count/59 + latest.phase + current_route）
  *   - route：mcuData.routeById(id) + expandRoute 进度
  *   - movie：mcuData.get(id) + panoNeighbors（在 MCU 中的位置）
- * 铁律：只读现有数据，不改 CONTENT/ROUTES/RELATIONS/CHARACTERS/PANO
+ * 铁律：只读现有数据，不改 CONTENT/ROUTES/RELATIONS/CHARACTERS/PANO/shareData
  * canvas 无法读取 CSS 变量 → 颜色为 Token 权威值直写（技术必要，非规范违反）
+ * V3 §3 视觉升级：
+ *   - 宇宙渐变背景 + 星点 + 金色光带（drawCosmicBg）
+ *   - 品牌盾徽（drawBrandShield）
+ *   - 真实海报/头像异步加载（createImage + pending 计数，drawPoster/drawAvatarImg）
  * ============================================================ */
 
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 const shareData = require('../../models/shareData.js');
+const visuals = require('../../data/visuals.js');
 
 /* ---- Token 权威色值 V1.2（与 app.wxss 一致，canvas 直写） ---- */
 const C = {
@@ -41,7 +46,21 @@ function phaseColor(p) {
   return (p && p >= 1 && p <= 6) ? C.p[p - 1] : '#7A8296';
 }
 
-/* 文本按最大宽度换行，超 maxLines 截断加省略号 */
+/* 海报兜底工厂（按电影首字 + 阶段色），避免闭包捕获循环变量 */
+function posterFallback(m) {
+  return function (c, x, y, w, h) {
+    c.fillStyle = phaseColor(m.phase);
+    c.fillRect(x, y, w, h);
+    c.fillStyle = 'rgba(255,255,255,0.7)';
+    c.font = '800 ' + Math.round(h * 0.28) + 'px sans-serif';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText((m.cn || '影').charAt(0), x + w / 2, y + h / 2);
+    c.textBaseline = 'alphabetic';
+  };
+}
+
+/* ---- 文本换行 ---- */
 function wrapText(ctx, text, maxWidth, maxLines) {
   const lines = [];
   const chars = String(text || '').split('');
@@ -65,22 +84,25 @@ function wrapText(ctx, text, maxWidth, maxLines) {
   return lines;
 }
 
+function heroOf(cn) {
+  if (!cn) return '';
+  const parts = cn.split(' / ');
+  return (parts.length > 1 ? parts[1] : cn).trim();
+}
+
 Page({
   data: {
     type: 'progress',
     typeLabel: '',
-    /* progress */
     count: 0,
     total: 59,
     phaseText: '',
     routeName: '',
     routePct: 0,
-    /* route */
     routeTagline: '',
     routeDescLines: [],
     routeWatched: 0,
     routeTotal: 0,
-    /* movie */
     movieCn: '',
     movieEn: '',
     movieRole: '',
@@ -107,13 +129,11 @@ Page({
     return this.prepareProgress();
   },
 
-  /* 类型1：观影进度（已看/59 + 当前阶段 + 当前路线） */
   prepareProgress: function () {
     var count = userState.count();
-    var total = mcuData.all.length; /* 59，与首页/我的MCU 同口径 */
+    var total = mcuData.all.length;
     var latest = userState.latest();
     var phaseNo = latest ? (latest.phase || 1) : 1;
-    /* 当前路线（与首页旅程卡同口径） */
     var curSavedId = userState.getCurrentRoute();
     var routeId = 'newcomer';
     if (curSavedId) {
@@ -141,7 +161,6 @@ Page({
     };
   },
 
-  /* 类型2：路线分享（路线名 + 特点 + 进度 + 推荐描述） */
   prepareRoute: function (id) {
     var route = mcuData.routeById(id || 'newcomer') || mcuData.routeById('newcomer');
     if (!route) return {};
@@ -160,7 +179,6 @@ Page({
     };
   },
 
-  /* 类型3：电影分享（名称 + 海报 + 简介 + 在 MCU 中的位置） */
   prepareMovie: function (id) {
     var m = mcuData.get(id);
     if (!m) return {};
@@ -184,12 +202,20 @@ Page({
     };
   },
 
-  /* 描述行预分段（canvas 绘制时二次换行） */
   _slimLines: function (text, max) {
     return text ? text.slice(0, max) : '';
   },
 
-  /* ---- canvas 绘制 ---- */
+  /* ---- 最近观看（进度海报用，取已看时间最晚 3 部） ---- */
+  _recentMovies: function () {
+    var st = (userState.getState().watched) || {};
+    var ids = Object.keys(st);
+    var list = ids.map(function (i) { return mcuData.get(i); }).filter(Boolean);
+    list.sort(function (a, b) { return (st[b.id] || 0) - (st[a.id] || 0); });
+    return list.slice(0, 3);
+  },
+
+  /* ---- canvas 初始化：先预载图片，再绘制（pending 计数，R5） ---- */
   initCanvas: function () {
     var that = this;
     var query = wx.createSelectorQuery().in(this);
@@ -205,40 +231,147 @@ Page({
       ctx.scale(dpr, dpr);
       that._canvas = canvas;
       that._ctx = ctx;
-      that.draw(ctx, W, H);
+      that._imgCache = {};
+      that._loadImagesThen(function () { that.draw(ctx, W, H); });
     });
   },
 
+  /* 收集当前类型所需图片（海报/头像）并预载，全部就绪（或超时）后回调 */
+  _loadImagesThen: function (cb) {
+    var that = this;
+    var imgs = this._collectImages();
+    if (!imgs.length) { cb(); return; }
+    var pending = imgs.length;
+    var settled = false;
+    var finish = function () {
+      if (settled) return;
+      pending--;
+      if (pending <= 0) { settled = true; cb(); }
+    };
+    /* 安全超时：CDN 异常时 2.6s 后仍绘制（缺失图走兜底） */
+    setTimeout(function () { if (!settled) { settled = true; cb(); } }, 2600);
+    imgs.forEach(function (it) {
+      if (!it.url) { that._imgCache[it.key] = null; finish(); return; }
+      var img = that._canvas.createImage();
+      img.onload = function () { that._imgCache[it.key] = img; finish(); };
+      img.onerror = function () { that._imgCache[it.key] = null; finish(); };
+      img.src = it.url;
+    });
+  },
+
+  _collectImages: function () {
+    var t = this.data.type;
+    var list = [];
+    if (t === 'progress') {
+      this._recentMovies().forEach(function (m) {
+        var p = visuals.visual(m.id).poster;
+        if (p) list.push({ key: 'poster-' + m.id, url: p });
+      });
+    } else if (t === 'route') {
+      var route = mcuData.routeById(this.data.id || 'newcomer');
+      if (route) {
+        mcuData.expandRoute(route).slice(0, 5).forEach(function (m) {
+          if (!m) return;
+          var p = visuals.visual(m.id).poster;
+          if (p) list.push({ key: 'poster-' + m.id, url: p });
+        });
+      }
+    } else if (t === 'movie') {
+      var m = mcuData.get(this.data.id);
+      if (m) {
+        var pm = visuals.visual(m.id).poster;
+        if (pm) list.push({ key: 'movie-' + m.id, url: pm });
+        (m.chars || []).slice(0, 4).forEach(function (cid) {
+          var a = visuals.avatar(cid);
+          if (a) list.push({ key: 'avatar-' + cid, url: a });
+        });
+      }
+    }
+    return list;
+  },
+
+  /* ---- 绘制 ---- */
   draw: function (ctx, W, H) {
-    /* 底 */
-    ctx.fillStyle = C.bg;
-    ctx.fillRect(0, 0, W, H);
-    /* 品牌栏 */
+    this.drawCosmicBg(ctx, W, H);
     this.drawBrand(ctx, W);
-    /* 类型分支 */
     var t = this.data.type;
     if (t === 'route') this.drawRoute(ctx, W, H);
     else if (t === 'movie') this.drawMovie(ctx, W, H);
     else this.drawProgress(ctx, W, H);
-    /* 底部 slogan + 小程序码占位 */
     this.drawFooter(ctx, W, H);
   },
 
+  /* 宇宙背景：渐变 + 约 60 颗种子星点 + 金色对角光带 */
+  drawCosmicBg: function (ctx, W, H) {
+    var g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0A0F1C');
+    g.addColorStop(0.55, C.bg);
+    g.addColorStop(1, '#0B0E14');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    var seed = 20260826;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (var i = 0; i < 60; i++) {
+      var sx = rnd() * W;
+      var sy = rnd() * H;
+      var sr = rnd() * 1.4 + 0.4;
+      ctx.globalAlpha = 0.3 + rnd() * 0.6;
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.save();
+    ctx.globalAlpha = 0.06;
+    ctx.fillStyle = C.gold;
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(-0.4);
+    ctx.fillRect(-W, -260, W * 2, 120);
+    ctx.fillRect(-W, 140, W * 2, 70);
+    ctx.restore();
+  },
+
+  /* 品牌盾徽（顶部居中） */
+  drawBrandShield: function (ctx, x, y, size) {
+    ctx.save();
+    var w = size, h = size * 1.1;
+    ctx.beginPath();
+    ctx.moveTo(x + w / 2, y);
+    ctx.lineTo(x + w, y + h * 0.32);
+    ctx.lineTo(x + w * 0.82, y + h);
+    ctx.lineTo(x + w / 2, y + h * 0.84);
+    ctx.lineTo(x + w * 0.18, y + h);
+    ctx.lineTo(x, y + h * 0.32);
+    ctx.closePath();
+    var g = ctx.createLinearGradient(x, y, x, y + h);
+    g.addColorStop(0, C.gold);
+    g.addColorStop(1, 'rgba(242,178,51,0.5)');
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.fillStyle = '#0B0E14';
+    ctx.font = '700 ' + Math.round(size * 0.5) + 'px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('M', x + w / 2, y + h * 0.52);
+    ctx.textBaseline = 'alphabetic';
+    ctx.restore();
+  },
+
   drawBrand: function (ctx, W) {
+    this.drawBrandShield(ctx, W / 2 - 30, 26, 60);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = C.gold;
     ctx.font = '600 24px sans-serif';
-    ctx.fillText(shareData.brand, W / 2, 70);
-    /* 装饰线 */
+    ctx.fillText(shareData.brand, W / 2, 124);
     ctx.fillStyle = 'rgba(233,169,59,0.35)';
-    ctx.fillRect(140, 96, W - 280, 1.5);
+    ctx.fillRect(140, 152, W - 280, 1.5);
   },
 
   drawFooter: function (ctx, W, H) {
     var t = this.data.type;
     var slogan = shareData.template(t) ? shareData.template(t).slogan : '';
-    /* 小程序码占位（surface-3 方块） */
     var size = 78;
     var x = (W - size) / 2;
     var y = H - 250;
@@ -249,37 +382,81 @@ Page({
     ctx.textAlign = 'center';
     ctx.fillText('MCU', W / 2, y + size / 2 - 6);
     ctx.fillText('扫码进入', W / 2, y + size / 2 + 14);
-    /* slogan */
     ctx.fillStyle = C.textWeak;
     ctx.font = '22px sans-serif';
     ctx.fillText(slogan, W / 2, H - 120);
+  },
+
+  /* 圆角矩形路径 */
+  _roundRectPath: function (ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  },
+
+  /* 海报：圆角裁切真实图；缺失走兜底 */
+  drawPoster: function (ctx, key, x, y, w, h, radius, fallbackFn) {
+    var img = this._imgCache[key];
+    this._roundRectPath(ctx, x, y, w, h, radius);
+    ctx.save();
+    ctx.clip();
+    if (img) ctx.drawImage(img, x, y, w, h);
+    ctx.restore();
+    if (!img && fallbackFn) fallbackFn(ctx, x, y, w, h);
+  },
+
+  /* 头像：圆形裁切真实图；缺失走兜底 */
+  drawAvatarImg: function (ctx, key, x, y, r, firstChar) {
+    var img = this._imgCache[key];
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (img) {
+      ctx.clip();
+      ctx.drawImage(img, x - r, y - r, r * 2, r * 2);
+    } else {
+      ctx.clip();
+      ctx.fillStyle = C.surface3;
+      ctx.fillRect(x - r, y - r, r * 2, r * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.font = '600 ' + Math.round(r) + 'px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(firstChar, x, y + 1);
+      ctx.textBaseline = 'alphabetic';
+    }
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   },
 
   drawProgress: function (ctx, W, H) {
     var d = this.data;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    /* 标题 */
     ctx.fillStyle = C.textMain;
     ctx.font = '700 40px sans-serif';
-    ctx.fillText('我的 MCU 旅程', W / 2, 168);
+    ctx.fillText('我的 MCU 旅程', W / 2, 192);
     ctx.fillStyle = C.textSub;
     ctx.font = '22px sans-serif';
-    ctx.fillText('已完成', W / 2, 226);
-    /* 大数字 count / total */
+    ctx.fillText('已完成', W / 2, 240);
     ctx.textAlign = 'right';
     ctx.fillStyle = C.gold;
     ctx.font = '700 108px sans-serif';
-    ctx.fillText(String(d.count), W / 2 - 8, 330);
+    ctx.fillText(String(d.count), W / 2 - 8, 344);
     ctx.textAlign = 'left';
     ctx.fillStyle = C.textSub;
     ctx.font = '600 44px sans-serif';
-    ctx.fillText('/ ' + d.total, W / 2 + 6, 336);
-    /* 阶段 pill */
-    var pillW = 260;
-    var pillH = 52;
-    var px = (W - pillW) / 2;
-    var py = 410;
+    ctx.fillText('/ ' + d.total, W / 2 + 6, 350);
+    var pillW = 260, pillH = 52;
+    var px = (W - pillW) / 2, py = 424;
     ctx.fillStyle = 'rgba(233,169,59,0.12)';
     ctx.fillRect(px, py, pillW, pillH);
     ctx.strokeStyle = 'rgba(233,169,59,0.4)';
@@ -289,21 +466,35 @@ Page({
     ctx.font = '600 24px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(d.phaseText, W / 2, py + pillH / 2);
-    /* 当前路线 + 进度条 */
     ctx.fillStyle = C.textWeak;
     ctx.font = '20px sans-serif';
-    ctx.fillText('当前路线', W / 2, 520);
+    ctx.fillText('当前路线', W / 2, 524);
     ctx.fillStyle = C.textMain;
     ctx.font = '600 28px sans-serif';
-    ctx.fillText(d.routeName, W / 2, 566);
-    var barW = 400;
-    var barX = (W - barW) / 2;
-    var barY = 596;
+    ctx.fillText(d.routeName, W / 2, 562);
+    var barW = 400, barX = (W - barW) / 2, barY = 596;
     ctx.fillStyle = C.surface3;
     ctx.fillRect(barX, barY, barW, 10);
     if (d.routePct > 0) {
       ctx.fillStyle = C.gold;
       ctx.fillRect(barX, barY, barW * Math.min(1, d.routePct / 100), 10);
+    }
+
+    /* 最近观看海报（V3 §3） */
+    var recents = this._recentMovies();
+    if (recents.length) {
+      ctx.fillStyle = C.textWeak;
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('最近观看', W / 2, 644);
+      var pw = 120, ph = 160, gap = 30;
+      var totalW = recents.length * pw + (recents.length - 1) * gap;
+      var sx = (W - totalW) / 2;
+      for (var i = 0; i < recents.length; i++) {
+        var m = recents[i];
+        var pxx = sx + i * (pw + gap);
+        this.drawPoster(ctx, 'poster-' + m.id, pxx, 668, pw, ph, 12, posterFallback(m));
+      }
     }
   },
 
@@ -313,33 +504,46 @@ Page({
     ctx.textBaseline = 'middle';
     ctx.fillStyle = C.textMain;
     ctx.font = '700 40px sans-serif';
-    ctx.fillText('我在走这条路线', W / 2, 168);
-    /* 路线名 */
+    ctx.fillText('我在走这条路线', W / 2, 188);
     ctx.fillStyle = C.textMain;
     ctx.font = '700 46px sans-serif';
-    ctx.fillText(d.routeName, W / 2, 280);
-    /* tagline */
+    var rname = d.routeName.length > 12 ? d.routeName.slice(0, 12) + '…' : d.routeName;
+    ctx.fillText(rname, W / 2, 256);
     ctx.fillStyle = C.gold;
     ctx.font = '24px sans-serif';
-    ctx.fillText(d.routeTagline, W / 2, 342);
-    /* 进度 */
+    ctx.fillText(d.routeTagline, W / 2, 308);
     ctx.fillStyle = C.textSub;
     ctx.font = '26px sans-serif';
-    ctx.fillText('已看 ' + d.routeWatched + ' / ' + d.routeTotal + ' 部', W / 2, 406);
-    var barW = 400;
-    var barX = (W - barW) / 2;
-    var barY = 440;
+    ctx.fillText('已看 ' + d.routeWatched + ' / ' + d.routeTotal + ' 部', W / 2, 362);
+    var barW = 400, barX = (W - barW) / 2, barY = 392;
     ctx.fillStyle = C.surface3;
     ctx.fillRect(barX, barY, barW, 10);
     if (d.routePct > 0) {
       ctx.fillStyle = C.gold;
       ctx.fillRect(barX, barY, barW * Math.min(1, d.routePct / 100), 10);
     }
+
+    /* 前 5 部缩略海报（未看 alpha 0.4，V3 §3） */
+    var route = mcuData.routeById(this.data.id || 'newcomer');
+    if (route) {
+      var items = mcuData.expandRoute(route).slice(0, 5);
+      var tw = 100, th = 140, tgap = 16;
+      var tw2 = items.length * tw + (items.length - 1) * tgap;
+      var tx = (W - tw2) / 2;
+      var ty = 430;
+      for (var k = 0; k < items.length; k++) {
+        var mm = items[k];
+        if (!mm) continue;
+        var seen = userState.isSeen(mm.id);
+        var tpx = tx + k * (tw + tgap);
+        if (!seen) ctx.globalAlpha = 0.4;
+        this.drawPoster(ctx, 'poster-' + mm.id, tpx, ty, tw, th, 10, posterFallback(mm));
+        ctx.globalAlpha = 1;
+      }
+    }
+
     /* 描述卡 */
-    var cardX = 90;
-    var cardY = 500;
-    var cardW = W - 180;
-    var cardH = 290;
+    var cardX = 90, cardY = 600, cardW = W - 180, cardH = 230;
     ctx.fillStyle = C.surface1;
     ctx.fillRect(cardX, cardY, cardW, cardH);
     ctx.strokeStyle = 'rgba(255,255,255,0.08)';
@@ -358,30 +562,29 @@ Page({
 
   drawMovie: function (ctx, W, H) {
     var d = this.data;
-    /* 标题 */
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = C.textMain;
     ctx.font = '700 38px sans-serif';
     var title = d.movieCn.length > 14 ? d.movieCn.slice(0, 14) + '…' : d.movieCn;
-    ctx.fillText(title, W / 2, 158);
+    ctx.fillText(title, W / 2, 196);
     if (d.movieEn) {
       ctx.fillStyle = C.textSub;
       ctx.font = '22px sans-serif';
-      ctx.fillText(d.movieEn, W / 2, 208);
+      ctx.fillText(d.movieEn, W / 2, 244);
     }
-    /* 海报区（左 180×270 阶段色） */
-    var px = 90;
-    var py = 290;
-    var pc = phaseColor(d.moviePhase);
-    ctx.fillStyle = pc;
-    ctx.globalAlpha = 0.85;
-    ctx.fillRect(px, py, 180, 270);
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.font = '800 72px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText((d.movieCn || '影').charAt(0), px + 90, py + 135);
+
+    /* 真实海报（V3 §3） */
+    var px = 90, py = 290, pw = 180, ph = 270;
+    this.drawPoster(ctx, 'movie-' + this.data.id, px, py, pw, ph, 14, function (c, x, y, w, h) {
+      c.fillStyle = phaseColor(d.moviePhase);
+      c.fillRect(x, y, w, h);
+      c.fillStyle = 'rgba(255,255,255,0.7)';
+      c.font = '800 72px sans-serif';
+      c.textAlign = 'center';
+      c.fillText((d.movieCn || '影').charAt(0), x + w / 2, y + h / 2);
+    });
+
     /* 右侧信息 */
     ctx.textAlign = 'left';
     ctx.fillStyle = C.gold;
@@ -395,22 +598,48 @@ Page({
       ctx.fillText(roleLines[i], px + 220, ry);
       ry += 38;
     }
-    /* 在 MCU 中的位置 */
     ctx.fillStyle = C.textWeak;
     ctx.font = '20px sans-serif';
-    ctx.fillText('在 MCU 中的位置', px + 220, 600);
+    ctx.fillText('在 MCU 中的位置', px + 220, 560);
     ctx.fillStyle = C.textMain;
     ctx.font = '600 24px sans-serif';
-    ctx.textAlign = 'left';
     var posLines = wrapText(ctx, d.moviePosText, W - 90 - 220 - 40, 2);
-    var pyy = 636;
+    var pyy = 596;
     for (var j = 0; j < posLines.length; j++) {
       ctx.fillText(posLines[j], px + 220, pyy);
       pyy += 36;
     }
+
+    /* 前 4 角色头像组（V3 §3） */
+    var m = mcuData.get(this.data.id);
+    if (m && m.chars && m.chars.length) {
+      var chars = m.chars.slice(0, 4);
+      ctx.fillStyle = C.textWeak;
+      ctx.font = '20px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('主要角色', px, 690);
+      var r = 42, agap = 28;
+      var totalW = chars.length * (r * 2) + (chars.length - 1) * agap;
+      var ax = px;
+      for (var c = 0; c < chars.length; c++) {
+        var cid = chars[c];
+        var cc = mcuData.getChar(cid);
+        var first = cc ? heroOf(cc.cn).charAt(0) : '?';
+        var cx = ax + c * (r * 2 + agap) + r;
+        var cy = 760;
+        this.drawAvatarImg(ctx, 'avatar-' + cid, cx, cy, r, first);
+        if (cc) {
+          ctx.fillStyle = C.textSub;
+          ctx.font = '18px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(heroOf(cc.cn), cx, cy + r + 22);
+          ctx.textAlign = 'left';
+        }
+      }
+    }
   },
 
-  /* ---- 保存到相册（授权处理） ---- */
+  /* ---- 保存到相册 ---- */
   savePoster: function () {
     var that = this;
     if (!this._canvas) {
@@ -447,7 +676,7 @@ Page({
     });
   },
 
-  /* ---- 转发（微信惯例：onShareAppMessage 触发即记录） ---- */
+  /* ---- 转发 ---- */
   onShareAppMessage: function () {
     var t = this.data.type;
     var id = this.data.id || '';

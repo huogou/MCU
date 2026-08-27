@@ -1,54 +1,84 @@
-<!-- 关系探索 explore（Tab3）· V1.2 视觉系统落地（按 VDS V2 §5）
-     结构：页面头部 → 筛选 Chips → Canvas 关系网络图 → 关系列表
-     交互：点击 Canvas 节点切换中心角色；Chips 单选过滤 -->
+<!-- 关系探索 explore（Tab3）· V3 真机适配：列表视图默认 + 网络视图高级入口 -->
 <view class="mcu-page explore-page">
 
-  <!-- 页面头部（VDS §5.2：56rpx/700 标题 + 副标题） -->
+  <!-- 页面头部 -->
   <view class="page-head">
     <view class="page-title">关系探索</view>
-    <view class="page-sub">以 {{centerName || '角色'}} 为中心 · 点击节点切换探索</view>
+    <view class="page-sub">以角色为中心 · 探索 MCU 关系网络</view>
   </view>
 
-  <!-- 关系类型筛选 Chips（VDS §5.5，5 种单选） -->
-  <scroll-view scroll-x class="filter-row" enable-flex>
-    <view class="filter-inner">
-      <view wx:for="{{filters}}" wx:key="key"
-            class="chip {{activeFilter == item.key ? 'chip-active' : ''}}"
-            data-key="{{item.key}}" bindtap="onFilter" hover-class="chip-hover" hover-stay-time="60">
-        {{item.label}}
-      </view>
+  <!-- 中心角色卡片（点击切换，V3 §5.2） -->
+  <view class="center-card fring-{{centerCls}}" bindtap="onCenterTap">
+    <view class="center-avatar fring-{{centerCls}}">
+      <image wx:if="{{centerAvatar}}" class="fill-img" src="{{centerAvatar}}" mode="aspectFill" lazy-load="true"/>
+      <view wx:else class="center-fallback fbg-{{centerCls}}">{{centerFirst}}</view>
     </view>
-  </scroll-view>
+    <view class="center-meta">
+      <view class="center-name">{{centerName}}</view>
+      <view class="center-camp">{{centerCampLabel}}</view>
+    </view>
+    <view class="center-hint">点击切换角色 ›</view>
+  </view>
 
-  <!-- Canvas 关系网络图（VDS §5.3） -->
-  <view class="canvas-wrap">
+  <!-- 工具栏：筛选 Chips + 视图切换 -->
+  <view class="toolbar-row">
+    <scroll-view scroll-x class="filter-row" enable-flex>
+      <view class="filter-inner">
+        <view wx:for="{{filters}}" wx:key="key"
+              class="chip {{activeFilter == item.key ? 'chip-active' : ''}}"
+              data-key="{{item.key}}" bindtap="onFilter" hover-class="chip-hover" hover-stay-time="60">
+          {{item.label}}
+        </view>
+      </view>
+    </scroll-view>
+    <view class="view-toggle">
+      <view class="vt-btn {{viewMode == 'list' ? 'vt-active' : ''}}" data-mode="list" bindtap="toggleView">列表</view>
+      <view class="vt-btn {{viewMode == 'network' ? 'vt-active' : ''}}" data-mode="network" bindtap="toggleView">网络</view>
+    </view>
+  </view>
+
+  <!-- 列表视图（默认） -->
+  <view wx:if="{{viewMode == 'list'}}" class="section-label">关系（{{relations.length}}）</view>
+  <view wx:if="{{viewMode == 'list'}}" class="relation-list">
+    <view wx:for="{{relations}}" wx:key="id" class="relation-card"
+          data-id="{{item.id}}" bindtap="goCharacter" hover-class="rel-card-hover" hover-stay-time="80">
+      <view class="rel-avatar fring-{{item.campCls}}">
+        <image wx:if="{{item.avatar && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true" binderror="onImgError" data-id="{{item.id}}" />
+        <view wx:else class="rel-fallback fbg-{{item.campCls}}">{{item.first}}</view>
+      </view>
+      <view class="rel-info">
+        <view class="rel-name">{{item.name}}</view>
+        <view class="rel-shared"><text class="rel-type rel-{{item.type}}">{{item.typeLabel}}</text> · 共同出演 {{item.shared}} 部</view>
+      </view>
+      <view class="rel-arrow">›</view>
+    </view>
+    <view wx:if="{{relations.length === 0}}" class="rel-empty">该筛选下暂无关系</view>
+  </view>
+
+  <!-- 网络视图（高级，懒加载 Canvas） -->
+  <view wx:if="{{viewMode == 'network'}}" class="canvas-wrap">
+    <view wx:if="{{!canvasReady}}" class="canvas-loading">关系网络生成中…</view>
     <canvas type="2d" id="relCanvas" class="relation-canvas" bindtap="onCanvasTap"></canvas>
   </view>
 
-  <!-- 关系列表（VDS §5.6 卡片式，随筛选联动） -->
-  <view class="section-label">关系（{{relations.length}}）</view>
-  <view class="relation-list">
-    <view wx:for="{{relations}}" wx:key="id" class="relation-card"
-          data-id="{{item.id}}" bindtap="goCharacter" hover-class="rel-card-hover" hover-stay-time="80">
-      <view class="rel-main">
-        <view class="rel-avatar fring-{{centerCls}}">
-          <image wx:if="{{centerAvatar}}" class="fill-img" src="{{centerAvatar}}" mode="aspectFill" lazy-load="true"/>
-          <view wx:else class="rel-fallback fbg-{{centerCls}}">{{centerFirst}}</view>
-        </view>
-        <view class="rel-line">
-          <view class="rel-type rel-{{item.type}}">{{item.typeLabel}}</view>
-        </view>
-        <view class="rel-avatar fring-{{item.campCls}}">
-          <image wx:if="{{item.avatar && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true" binderror="onImgError" data-id="{{item.id}}" />
-          <view wx:else class="rel-fallback fbg-{{item.campCls}}">{{item.first}}</view>
-        </view>
+  <view class="bottom-pad"></view>
+
+  <!-- 24 角色选择（自定义 bottom-sheet，等价 §5.2 ActionSheet） -->
+  <view wx:if="{{showCharSheet}}" class="sheet-mask" bindtap="closeCharSheet">
+    <view class="sheet-panel" catchtap="noop">
+      <view class="sheet-head">
+        <view class="sheet-title">选择中心角色</view>
+        <view class="sheet-close" bindtap="closeCharSheet">✕</view>
       </view>
-      <view class="rel-info">
-        <view class="rel-name">{{centerName}} <text class="rel-name-arrow">↔</text> {{item.name}}</view>
-        <view class="rel-shared">{{item.typeLabel}} · 共同出演 {{item.shared}} 部</view>
-      </view>
+      <scroll-view scroll-y class="sheet-grid">
+        <view wx:for="{{chars}}" wx:key="id" class="sheet-item" data-id="{{item.id}}" bindtap="pickChar">
+          <view class="sheet-avatar fring-{{item.campCls}}">
+            <image wx:if="{{item.avatar}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true"/>
+            <view wx:else class="sheet-fallback fbg-{{item.campCls}}">{{item.first}}</view>
+          </view>
+          <view class="sheet-name">{{item.name}}</view>
+        </view>
+      </scroll-view>
     </view>
   </view>
-
-  <view class="bottom-pad"></view>
 </view>
