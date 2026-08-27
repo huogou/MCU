@@ -114,7 +114,7 @@
       <view class="fb-entry-title">我要吐槽</view>
       <view class="fb-entry-sub">发现问题？顺手反馈，帮我们把导航做更准</view>
     </view>
-    <view class="fb-entry-arrow">&rsaquo;</view>
+    <view class="fb-entry-arrow">›</view>
   </view>
 
   <view class="mcu-bottom-space"></view>
