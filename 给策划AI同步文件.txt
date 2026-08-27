@@ -985,3 +985,27 @@ GPT 下发「MCU V1.2 设计专项修订任务（真机验收问题修复）」7
 - 备注：作为后续微信小程序 / 抖音小程序迁移基准版本（抖音迁移需 wx→tt API 适配，非直接可用）。
 - 待 GPT / 用户下一步指令。
 ============================================================
+
+【V1.2.1 审核反馈修复 · 2026-08-27 14:45 删除我要吐槽联系方式字段】
+------------------------------------------------------------
+- 审核反馈：「小程序涉及收集、存储用户身份信息，平台暂不支持该功能」→ 删除反馈页联系方式入口。
+- 修改（提交 4a37343，3 文件，+5/-42）：
+  mcu-miniprogram/pages/feedback/feedback.wxml（删联系方式模块 + 来源页面展示行）
+  mcu-miniprogram/pages/feedback/feedback.wxss（删 .fb-input / .fb-source）
+  mcu-miniprogram/pages/feedback/feedback.js（删 contact/source/channel 数据与 onContact/onLoad；
+    提交载荷收敛为 feedbackType/content/createdAt 最小字段）
+- 布局：反馈类型 → 说点什么 → 提交按钮（无空白残留）。
+- 全局复查：小程序无 contact/wechat/email/phone/mobile/userInfo/getUserProfile 采集入口（0）。
+- 残留项待决策：① H5 assets/js/app.js:1455 反馈记录含 contact:''（H5 零改动铁律，不属微信审核范围）② 云集合历史文档可能含 contact（建议后台评估清理）③ 本地兜底队列旧结构（仅云端不可达时存在，无碍审核）。
+- 分支：master 已含修复（d522b2f）；release/v1.2.0 仍冻结于 23e62ce，重新提交审核版本时按需更新。
+- 待用户真机预览截图 → 下一步审核提交。
+============================================================
+
+【V1.2.1 居中修复 · 2026-08-27 14:56 feedback 按钮居中】
+------------------------------------------------------------
+- 反馈：用户预览发现「提交吐槽」按钮文字未居中（WeChat <button> 默认 text-align: left + padding）。
+- 修复（提交 64c6825）：pages/feedback/feedback.wxss 中 .fb-submit / .fb-link 显式补 text-align: center; padding: 0;
+- 排查：pages/share/share.wxss 的 .action-btn 已有 text-align: center，无需调整。
+- 全量 <button> 排查：仅 feedback / share 两处使用，其余页面无 <button>。
+- 待用户真机/开发者工具重编确认。
+============================================================
