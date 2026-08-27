@@ -2,7 +2,8 @@
 // 数据单一源：与 H5 共用 CloudBase feedback 集合（env 同 app.js globalData.envId）
 // 治理铁律：不建复杂后台 / 不新增账号体系 / 最小必要字段 / 不暴露技术错误
 // 提交优先级：wx.cloud 写入 feedback 集合（与 H5 同一集合）→ 失败兜底本地队列（不丢反馈）
-// 字段与 H5 assets/js/app.js:1239 严格对齐，禁第二套结构。
+// V1.2.1 审核合规：删除联系方式等身份信息字段，提交仅保留最小必要字段
+//（feedbackType/content/createdAt，字段名与集合既有约定一致；H5 侧仍沿用其自身结构，NoSQL 异构文档允许）。
 
 const TYPES = [
   { key: 'sequence',   label: '观影顺序问题' },
@@ -21,20 +22,9 @@ Page({
     types: TYPES,
     activeType: '',
     content: '',
-    contact: '',
-    source: '',
-    channel: '',
     submitting: false,
     done: false,
     fail: false
-  },
-
-  onLoad: function (query) {
-    // from=来源页面（my-mcu 等）；channel=投放渠道（douyin/xiaohongshu/...，为 H5 来源统计预留）
-    this.setData({
-      source: (query && query.from) || 'unknown',
-      channel: (query && query.channel) || ''
-    });
   },
 
   selectType: function (e) {
@@ -45,10 +35,6 @@ Page({
     this.setData({ content: e.detail.value });
   },
 
-  onContact: function (e) {
-    this.setData({ contact: e.detail.value });
-  },
-
   submit: function () {
     var t = this.data.activeType;
     var c = (this.data.content || '').trim();
@@ -57,19 +43,11 @@ Page({
     if (this.data.submitting) return;
     this.setData({ submitting: true, fail: false });
 
+    /* 审核合规：仅提交最小必要字段，不采集任何用户身份信息（联系方式/来源/渠道均不收集） */
     var record = {
       feedbackType: t,
       content: c,
-      contact: (this.data.contact || '').trim(),
-      page: this.data.source || 'unknown',
-      movieId: '',
-      routeId: '',
-      exploreId: '',
-      contextName: '',
-      platform: 'miniprogram',
-      channel: this.data.channel || '',
-      createdAt: new Date().toISOString(),
-      status: 'new'
+      createdAt: new Date().toISOString()
     };
 
     var self = this;
@@ -119,7 +97,7 @@ Page({
 
   goAgain: function () {
     this.setData({
-      done: false, activeType: '', content: '', contact: '',
+      done: false, activeType: '', content: '',
       submitting: false, fail: false
     });
   },

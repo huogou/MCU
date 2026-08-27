@@ -22,13 +22,6 @@
     <textarea class="fb-textarea" placeholder="例如：钢铁侠的观看顺序标错了 / 某部电影译名不对…"
               value="{{content}}" bindinput="onContent" maxlength="500"></textarea>
 
-    <!-- 联系方式（选填） -->
-    <view class="section-label">联系方式（选填）</view>
-    <input class="fb-input" placeholder="微信 / 邮箱，方便我们回访"
-           value="{{contact}}" bindinput="onContact" maxlength="60" />
-
-    <view class="fb-source">来源页面：{{source}}</view>
-
     <button class="fb-submit {{submitting ? 'is-loading' : ''}}" bindtap="submit" disabled="{{submitting}}">
       {{submitting ? '提交中…' : '提交吐槽'}}
     </button>

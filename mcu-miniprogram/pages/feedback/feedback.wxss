@@ -34,14 +34,6 @@
   background: var(--surface-2); border: 2rpx solid var(--surface-3);
   border-radius: var(--radius-md); line-height: 1.6;
 }
-.fb-input {
-  width: 100%; box-sizing: border-box; height: 88rpx; padding: 0 var(--space-md);
-  font-size: var(--fs-body); color: var(--text-main);
-  background: var(--surface-2); border: 2rpx solid var(--surface-3);
-  border-radius: var(--radius-md);
-}
-
-.fb-source { margin: var(--space-sm) 4rpx 0; font-size: var(--fs-mini); color: var(--text-weak); }
 
 .fb-submit {
   margin-top: var(--space-xl); height: 92rpx; line-height: 92rpx;
