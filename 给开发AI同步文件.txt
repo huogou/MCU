@@ -408,3 +408,124 @@ MCU观影导航 V1.2 · 开发AI工作日志
   · 关系探索：用户能看到「角色之间是什么关系」
   · 分享海报：用户愿意保存并分享到朋友圈/小红书
 - **不扩展**：本轮「完成后停止，不继续扩展功能，提交 GPT 验收」。
+
+【设计AI Step1-3 已交付 · 等你 Step4-6 · 2026-08-27】
+------------------------------------------------------------
+- 设计方案文档（请仔细阅读后执行）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-真机适配专项设计方案.md
+
+**Step 4｜panorama 纵向时间轴重构（P1 · 改动最大）**
+- 完全重写 panorama.wxml / panorama.wxss / panorama.js
+- 当前水平 3400×720 布局全部替换为 Phase 分区纵向列表
+- 文档 §1.3 含完整 wxml 结构、§1.7 含关键 wxss、§1.5 含 js 数据组装逻辑
+- pano.js 模型零改动，只使用 PANO_MOVIES 按 Phase 分组
+- 不再需要 Canvas 连线（删除 drawLines 相关代码）
+- 海报 URL 通过 visuals.visual(id).poster 获取
+- 电影中英文名通过 mcuData.get(id) 获取
+- 海报加载失败兜底：Phase 色渐变 + 电影名首字
+
+**Step 5｜explore Canvas 空白修复 + 视觉增强（P0 修复 + P2 增强）**
+- 关键修复：drawGraph() 中 Canvas 尺寸改用 sysInfo.windowWidth 计算
+- 增加 _canvasReady 标记 + _pendingDraw 延迟机制
+- 视觉增强（增量）：背景星点 + 连线关系标签 + 中心光晕/阵营标签
+- 文档 §2.2 含完整修复方案 + 视觉增强代码片段
+- wxml 结构不变，wxss 增加 min-height 兜底
+
+**Step 6｜share 海报视觉升级（P2）**
+- 改动集中在 share.js 的 Canvas 绘制逻辑
+- 新增宇宙背景函数 drawCosmicBg()
+- 新增通用图片加载函数 drawImage()（canvas.createImage + onload 异步）
+- progress：新增最近 3 部电影海报
+- route：新增路线前 5 部缩略海报
+- movie：改用真实海报 + 新增角色头像组
+- 需引入 visuals.js：`const visuals = require('../../data/visuals.js');`
+- shareData.js 零改动
+- wxml/wxss 基本不变
+
+**数据纪律**：不修改 CHARACTERS / MOVIES / PANO_MOVIES / PANO_CONN / visuals.js / mcuData.js。
+
+**优先级**：Step 5（P0 Canvas 修复）→ Step 4（P1 panorama 重构）→ Step 6（P2 share 升级）
+
+**完成后**：提交 → 等策划真机截图验收 → V1.2 定版。
+
+【V2 修订版 · 重要变更 · 请以本版为准 · 2026-08-27】
+------------------------------------------------------------
+- 策划反馈后设计方案已修订为 V2，请以下列变更为准：
+- 文档路径（已覆盖更新）：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-真机适配专项设计方案.md
+
+**重大变更：explore 页面**
+- V1 方案（Canvas 网络图）已废弃
+- V2 方案：改为纯 WXML 卡片列表（零 Canvas）
+  · 顶部：中心角色大头像 + 名称 + 阵营（点击 ActionSheet 切换）
+  · 下方：关系角色卡片列表（头像 + 角色名 + 关系类型 + 共同出演数）
+  · 保留：筛选 Chips / 关系数据逻辑 / goCharacter 跳转 / onImgError 兜底
+  · 删除：drawGraph / paint / paintNode / avatarImage / onCanvasTap / Canvas 相关全部代码
+- 文档 §2 含完整 wxml 结构 + wxss 样式 + JS 变更清单
+
+**panorama 增加已观看状态**
+- 每张电影卡片新增 userState.isSeen(id) 读取
+- 已观看：opacity 0.75 + 海报右上角金色 ✓ 标记
+- Phase 标题显示"已看/总数"计数
+- 需引入 userState：`const userState = require('../../models/userState.js');`
+
+**优先级调整**：
+- P1 explore 卡片列表重构（消除 Canvas 空白风险）
+- P1 panorama 纵向时间轴 + 已观看状态
+- P2 share 宇宙背景 + 真实图片
+
+**数据纪律不变**：不修改 CHARACTERS / MOVIES / PANO_MOVIES / PANO_CONN / visuals.js / mcuData.js。
+
+【V3 终版 · 请以本版为准 · 2026-08-27】
+------------------------------------------------------------
+- 策划最终验收修正后，设计方案已修订为 V3 终版
+- 文档路径（已覆盖更新）：D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\MCU-V1.2-真机适配专项设计方案.md
+
+**V3 与 V2 的差异（仅 explore 页面）**：
+- V2：完全删除 Canvas，纯卡片列表
+- V3：保留 Canvas，但默认显示卡片列表；新增"列表/网络"视图切换按钮
+  · 新增 data.viewMode（'list'|'network'，默认 'list'）
+  · 新增 data.canvasReady（Canvas 是否已绘制）
+  · 新增 toggleView() 方法（切换视图，首次切到网络时初始化 Canvas）
+  · 保留全部现有 Canvas 代码（drawGraph/paint/paintNode/avatarImage/onCanvasTap）
+  · setCenter() 增加判断：网络视图下切换中心角色需重绘 Canvas
+  · wxml 增加视图切换按钮 + wx:if 条件渲染列表/网络视图
+
+**开发执行清单**：
+1. panorama：完全重写 wxml/wxss/js（纵向时间轴 + 已观看状态）
+2. explore：改造现有 wxml/wxss/js（增加卡片列表 + 视图切换 + 保留 Canvas）
+3. share：改造 share.js Canvas 绘制（宇宙背景 + 真实图片 + 品牌升级）
+4. 不改数据结构（CHARACTERS/MOVIES/PANO_MOVIES/visuals.js/mcuData.js 零改动）
+5. 真机测试 → 提交三页截图
+
+**验收提交**：宇宙全景图截图 + 关系探索截图 + 分享海报截图
+
+============================================================
+【Work 执行记录 · V1.2 最终视觉验收修正任务 · 2026-08-27】
+------------------------------------------------------------
+一、已完成（在 GPT「等待设计确认」指令下，仅做缺陷修复与就绪核查，未启动 V3 实现）：
+1. 关系探索「中间空白」根因定位 + 修复（explore.js:245）
+   - 根因：paint() 内 rels.forEach(function(){ this._nodePos[r.id]=... }) 回调缺 thisArg
+     → 回调内 this=undefined → 写 _nodePos 抛 TypeError → paint 中断
+     → Canvas 仅剩 fillRect('#080B12') 背景色 = 视觉「空白区域」；且 _nodePos 未填充，onCanvasTap 节点命中永久失效
+   - 修复：}, this);  （node --check 通过 + Node 复现验证：修复前抛 TypeError / 修复后正常）
+   - 该修复是 V3「网络视图」生效的前置条件（V3 要求保留全部 Canvas 代码）
+2. 三页数据/资源就绪核查（只读，workspace/audit_v12_visual_readiness.js + audit_v12_relation_counts.js）
+   - panorama：PANO_MOVIES 40 / PANO_CONN 41 / PHASE_COLS 6；海报 38/40（2 待映走占位）；年份 40/40 可覆盖（见 R4 兜底）
+   - explore：CHARACTERS 24 / 头像 24/24；关系边 122 条；每角色关系 1~18（tony/steve 18，wade/logan 1）
+   - share：heroBanner/entryBg/phase/poster 全部 CDN 可取
+   - 与 设计 V3 §0（24 头像✅ / 19 SPECIAL 关系✅）完全一致，已交叉验证
+
+二、风险登记（提交 GPT 决策 / 设计补充规格）：
+- R1 关系探索空白 = 已修复（见上），前置条件就绪
+- R2【需 GPT 决策】设计 V3 §5.2「点击中心角色可切换（ActionSheet 列出 24 角色）」
+     当前 explore 切换中心角色仅 Canvas 点击（onCanvasTap→setCenter，explore.js:345），列表视图下无切换入口。
+     ActionSheet 属新增组件，与 GPT「本轮完成后停止，不继续扩展功能」存在张力。
+     → 建议：改为「点击关系卡片即切换中心」（复用现有 setCenter，零新增组件），严守不扩展功能。请 GPT 确认采用 ActionSheet 还是卡片切换。
+- R3【需设计补充】关系稀疏角色（wade/logan 各 1 条、loki/gamora 各 2 条）列表仅 1~2 张卡片，视觉偏空但非空白风险。请设计补充「最少关系数」列表状态样式。
+- R4【已澄清·非阻塞】年份口径：38 部取自 CONTENT[id].date，2 部待映(avengers-5/6)取自节点自带 year。实现按 `node.year || content[id].date.slice(0,4)` 兜底，40/40 全覆盖。注：早前审计曾误报 avengers-5/6 缺年份（只查了 content.date），结论已修正。
+- R5【Work 自处理】share 异步导出需 pending 计数器（多图 createImage 并发），实现时处理，无视觉变更。
+- R6【提示】设计 V3 §4 仍列「P0 头像 CDN 修复」，该问题已于 d6c33de 修复并真机验证，属过期条目。
+
+三、当前状态：等待 GPT 确认 V3（含 R2 决策、R3 设计补充）后，再启动 Step 4-6
+     （panorama 重写 / explore 混合改造 / share 升级）。未擅自实现。
+============================================================

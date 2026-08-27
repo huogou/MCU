@@ -242,7 +242,7 @@ Page({
       /* 节点坐标缓存（点击命中用） */
       this._nodePos[r.id] = { x: nx, y: ny };
       nodes.push({ id: r.id, x: nx, y: ny, r: 22, rel: r.type });
-    });
+    }, this);   /* thisArg 必传：否则回调内 this 为 undefined → 写 _nodePos 抛 TypeError → paint 中断，Canvas 只剩背景色（表现为"关系图空白"） */
 
     /* 中心节点 + 邻居节点（头像 + 阵营边框 + 标签） */
     this.paintNode(ctx, cx, cy, 30, center, centerCamp, true, canvas);
