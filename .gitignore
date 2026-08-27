@@ -14,3 +14,6 @@ mcu-miniprogram/assets/preview/_*.png
 mcu-miniprogram/assets/preview/_*.svg
 mcu-miniprogram/assets/icons/tab/_*.png
 mcu-miniprogram/assets/icons/tab/_*.svg
+
+# 发布备份压缩包（构建产物；服务器备份见 CloudBase 云存储 backup/）
+backup/*.zip
