@@ -39,7 +39,7 @@
           <view class="rel-type rel-{{item.type}}">{{item.typeLabel}}</view>
         </view>
         <view class="rel-avatar fring-{{item.campCls}}">
-          <image wx:if="{{item.avatar}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true"/>
+          <image wx:if="{{item.avatar && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" lazy-load="true" binderror="onImgError" data-id="{{item.id}}" />
           <view wx:else class="rel-fallback fbg-{{item.campCls}}">{{item.first}}</view>
         </view>
       </view>

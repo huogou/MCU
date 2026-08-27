@@ -24,9 +24,9 @@
   <view class="char-list">
     <view wx:for="{{filtered}}" wx:key="id"
           class="char-card" data-id="{{item.id}}" bindtap="goCharacter" hover-class="char-card-hover">
-      <!-- 真实头像（visuals.avatar，G-19 缺图首字徽章兜底） -->
+      <!-- 真实头像（visuals.avatar，G-19 缺图/加载失败首字徽章兜底） -->
       <view class="char-avatar fring-{{item.factionCls}} fbg-{{item.factionCls}} fc-{{item.factionCls}}">
-        <image wx:if="{{item.avatarImg}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" />
+        <image wx:if="{{item.avatarImg && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" binderror="onImgError" data-id="{{item.id}}" />
         <text wx:else>{{item.avatar}}</text>
       </view>
       <view class="char-body">

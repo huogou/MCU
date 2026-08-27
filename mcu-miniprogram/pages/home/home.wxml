@@ -81,7 +81,7 @@
       <view class="char-row">
         <view class="char-card" wx:for="{{hotChars}}" wx:key="id" data-id="{{item.id}}" bindtap="goChar" hover-class="char-hover" hover-stay-time="80">
           <view class="char-avatar fring-{{item.factionCls}}">
-            <image wx:if="{{item.poster}}" class="char-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true"/>
+            <image wx:if="{{item.poster && !_imgErr[item.id]}}" class="char-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true" binderror="onImgError" data-id="{{item.id}}" />
             <text wx:else class="char-initial fbg-{{item.factionCls}}">{{item.initial}}</text>
           </view>
           <view class="char-name">{{item.name}}</view>

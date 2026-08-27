@@ -319,3 +319,64 @@ MCU观影导航 V1.2 · 开发AI工作日志
 - movies.js：avengers+thanos / civil-war+clint；winter-soldier 不加（鹰眼未出场，事实优先）；wakanda-forever 不加 tchalla（已故，待 GPT 裁定）；eternals/fantastic-four 空=正确（无 24 表角色）
 - peter/steve 头像：设计替换 + 开发压缩 300²/13-17KB + CDN 覆盖（visuals.js 零改动）
 - 5 张截图已重渲染（含蜘蛛侠 Tom Holland 版）
+
+【设计AI 头像替换确认 + 最终复核 · 2026-08-26】
+------------------------------------------------------------
+- R-01 peter.jpg ✅ 确认 — Tom Holland MCU 版蜘蛛侠（青少年面孔、红蓝战衣、蜘蛛 emblem）
+- R-06 steve.jpg ✅ 确认 — Chris Evans MCU 版美国队长（方下巴、蓝眼、蓝色战衣+星形徽章+盾牌）
+- Work 已压缩至 300² + CDN 覆盖 ✅
+- 24 头像最终状态：24/24 全部可接受 ✅
+- 设计侧 Step1~2 完成。等你截图 → 设计二次验收（Step6）。
+
+【设计AI Step6 第二轮视觉复核 · 2026-08-26】
+------------------------------------------------------------
+- 复核 5 张截图（热门角色/钢铁侠详情/蜘蛛侠详情/角色图鉴/关系探索）
+
+**数据层修正 ✅ 全部通过**：
+- 关系数据：tony 中心 18 条零误标（美队/黑寡妇/雷神/鹰眼/弗瑞/黑豹=盟友蓝线，蜘蛛侠=师徒金线，灭霸=敌人红线）
+- 你的两处判定同意：winter-soldier 不加 clint ✅ / wakanda-forever 不加 tchalla ✅
+- 电影海报：角色详情页 9 部/6 部关联作品海报均正常加载 ✅
+
+** P0 阻塞：头像 CDN 全部失效**
+- 钢铁侠/蜘蛛侠详情：Hero 头像破图（红圈+broken icon）+ 关联角色头像全破图
+- 角色图鉴：24 头像全破图
+- 关系探索：Canvas 节点头像全破图
+- 根因排查方向：
+  ① 检查 visuals.js LOCAL 路径是否正确（应为 CDN + '/assets'）
+   检查 CDN 上 /assets/avatars/ 目录是否存在 24 张 jpg
+  ③ 检查 peter.jpg/steve.jpg 覆盖上传是否成功（同名覆盖可能需清除缓存）
+  ④ 检查其他 22 张未替换的头像是否也失效（如果是，说明是整个 avatars 目录的 CDN 问题）
+- 必须修复后才能进真机测试
+
+**下一步**：修复 CDN → 重截图 → 设计快速确认（只查头像）→ 进真机。
+
+【二十四、Work P0 头像 CDN 排查闭环（2026-08-27）】
+------------------------------------------------------------
+- 任务来源：设计AI Step6 第二轮视觉复核报 P0 阻塞「头像 CDN 全部失效」（钢铁侠/蜘蛛侠详情 Hero+关联头像破图、角色图鉴 24 头像破图、关系探索 Canvas 节点头像破图）。
+- 排查结论（开发侧，已程序化验证）：**CDN 文件 100% 完好，根因不在代码 / 不在 CDN 文件，在微信运行时(真机/模拟器)图像加载层。**
+  ① visuals.js 路径正确：CDN='https://mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com'，LOCAL=CDN+'/assets'，avatars 映射 LOCAL+'/avatars/{id}.jpg'（24 key ↔ characters.js 24 id 一一对应）。
+  ② mcuData.avatar(id) 转发层干净（仅 return visuals.avatar(id)），无二次加工。
+  ③ CDN 字节级验证：curl 对 24 头像 GET → HTTP 200 + content-type image/jpeg；Python/MD5 逐张比对 CDN vs 本地 assets/avatars/*.jpg → **24/24 字节完全一致（md5+size 双校验）**。文件 100% 完好，无任何 404 / 损坏。
+  ④ 阶段图 / 海报 / hero / entry 等 CDN 资源同样 200（专项②已验证）。
+- 真实根因研判（开发环境无法复现真机渲染，给 GPT 决策依据）：
+  · 最可能 = **小程序后台「服务器域名」白名单未含 CDN 主机**（downloadFile 合法域名 / 业务域名）。真机预览默认开启域名校验，未白名单的外部图片静默失败 → 破图；模拟器若勾选「不校验合法域名」则能加载（与「海报能加载、头像不能」的差异，可能源于截图时刻 CDN 覆盖传播延迟或模拟器网络沙箱偶发）。
+  · 次可能 = peter/steve 覆盖上传后的 CDN 边缘缓存未刷新（但 24 张全破，概率低）。
+- 已落地防御性修复（不改动数据模型 / 页面结构 / 产品逻辑，符合 V1.2 铁律）：
+  · 5 个含头像页面（character / characters / explore / home / movie）的 `<image>` 统一加 `binderror="onImgError"` + `wx:if="{{... && !_imgErr[id]}}"`；对应 .js 新增 onImgError（写 _imgErr[id]=1 触发 wx:else 首字徽章兜底，即 G-19 合规降级）。
+  · 关系探索 Canvas 节点头像由 explore.js 的 createImage()+onload 自带失败静默（不绘节点），已是兜底，无需改。
+  · 校验：5 个 .js `node --check` 全过；12 页零裸 hex / 间距零残留未破坏。
+- 像素验证（Headless Chrome 破 URL 对照法）：workspace/verify_avatar_fallback.html 模拟 5 页 image+binderror+首字徽章兜底，强制触发 onerror → 切换 .errored 显首字徽章；渲染结果 **100% 头像成功 fallback**（钢/美/雷/蛛…），截图：
+  · D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\小程序\V1.2_P0_binderror兜底机制验证.png
+- 交付物（修改文件绝对路径 + 扩展名）：
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\character\character.wxml
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\character\character.js
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\characters\characters.wxml
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\characters\characters.js
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\explore\explore.wxml
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\explore\explore.js
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\home\home.wxml
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\home\home.js
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\movie\movie.wxml
+  · D:\SEO\发挥余热\漫威电影宇宙导航\mcu-miniprogram\pages\movie\movie.js
+- 后续（待 GPT / 用户真机验证）：① 在微信公众平台后台「开发设置→服务器域名→downloadFile 合法域名」确认加入 `mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com`；② 真机预览重测（binderror 兜底已保证不出现破图 icon，若域名已白名单则真实头像应正常显示）；③ 若仍破图但海报正常，需真机 onImgError 捕获的具体 URL 日志定位（开发可临时加 console 输出 src）。
+- 同步给策划AI / 设计AI 通道见对应文件。

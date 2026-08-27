@@ -84,7 +84,7 @@
       <view class="cast-row">
         <view wx:for="{{mainChars}}" wx:key="id" class="cast-card" data-id="{{item.id}}" bindtap="onGoChar">
           <view class="cast-avatar {{item.ringCls}} {{item.factionCls}}">
-            <image wx:if="{{item.avatar}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" />
+            <image wx:if="{{item.avatar && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatar}}" mode="aspectFill" binderror="onImgError" data-id="{{item.id}}" />
             <text wx:else class="cast-initial">{{item.initial}}</text>
           </view>
           <view class="cast-name">{{item.name}}</view>

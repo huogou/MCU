@@ -127,5 +127,15 @@ Page({
 
   goBack: function () {
     wx.navigateBack();
+  },
+
+  /* 头像远程 URL 加载失败兜底（CDN/网络异常时自动降级到首字徽章，G-19） */
+  onImgError: function (e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    const map = this.data._imgErr || {};
+    if (map[id]) return;
+    map[id] = 1;
+    this.setData({ _imgErr: map });
   }
 });

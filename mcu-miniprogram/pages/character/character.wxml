@@ -12,7 +12,7 @@
   <!-- Hero 区（VDS §4.2 增强）：阵营氛围光效 + 真实头像 160rpx + 简介直展 -->
   <view class="hero hero-{{faction.cls}}">
     <view class="hero-avatar {{faction.ringCls}} {{faction.factionCls}}">
-      <image wx:if="{{char.avatarImg}}" class="fill-img" src="{{char.avatarImg}}" mode="aspectFill" />
+      <image wx:if="{{char.avatarImg && !_imgErr[char.id]}}" class="fill-img" src="{{char.avatarImg}}" mode="aspectFill" binderror="onImgError" data-id="{{char.id}}" />
       <text wx:else class="poster-fallback">{{char.avatar}}</text>
     </view>
     <view class="hero-cn">{{char.cn}}</view>
@@ -66,7 +66,7 @@
       <view wx:for="{{related}}" wx:key="id"
             class="related-item" data-id="{{item.id}}" bindtap="goCharacter" hover-class="related-hover">
         <view class="related-avatar {{item.ringCls}} {{item.factionCls}}">
-          <image wx:if="{{item.avatarImg}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" />
+          <image wx:if="{{item.avatarImg && !_imgErr[item.id]}}" class="fill-img" src="{{item.avatarImg}}" mode="aspectFill" binderror="onImgError" data-id="{{item.id}}" />
           <text wx:else class="poster-fallback">{{item.avatar}}</text>
         </view>
         <view class="related-cn">{{item.cn}}</view>
