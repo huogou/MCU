@@ -39,12 +39,14 @@
   margin-top: var(--space-xl); height: 92rpx; line-height: 92rpx;
   font-size: var(--fs-title); font-weight: 600; color: var(--gold-btn-text);
   background: var(--gold); border-radius: var(--radius-md); border: none;
+  text-align: center; padding: 0;
 }
 .fb-submit.is-loading { opacity: 0.7; }
 .fb-link {
   margin-top: var(--space-sm); height: 80rpx; line-height: 80rpx;
   font-size: var(--fs-body); color: var(--text-sub);
   background: transparent; border: none;
+  text-align: center; padding: 0;
 }
 
 /* 结果态 */
