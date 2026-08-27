@@ -164,11 +164,6 @@ const achievements = {
   pendingDesc: function (id) {
     const a = ACHIEVEMENTS.find(function (x) { return x.id === id; });
     return a ? a.desc : '';
-  },
-
-  /* 仅测试/调试用 */
-  _reset: function () {
-    try { wx.removeStorageSync(KEY); } catch (e) {}
   }
 };
 

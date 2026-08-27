@@ -10,8 +10,8 @@
  *   - 全部来自 models（mcuData / userState / recommend）与 data/*.js（单一可信源），
  *     不引入第二套数据；「为什么现在看」用 CONTENT.role（已在数据内，回答"为何重要"），
  *     路线上下文来自 routes.js。
- *   - resources 层当前为空（项目方未提供链接），资源模块按结构渲染占位，
- *     不填链接、不开发下载。
+ *   - 资源模块为合规说明（V1.2 上线准备：仅声明"不提供播放/下载"，无任何资源链接/下载入口；
+ *     data/resources.js 层当前为空，保持不填链接、不开发下载）。
  *   - 阶段色 / 海报兜底严格引用 data/visuals.js 与 models/mcuData.phaseColor，
  *     颜色零 raw hex（hero-bg 渐变用 JS 由阶段 hex 转 rgba，技术必要）。
  * ============================================================ */
@@ -19,7 +19,6 @@
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 const recommend = require('../../models/recommend.js');
-const resources = require('../../data/resources.js');
 const achievements = require('../../models/achievements.js');
 
 /* 传奇标签映射（saga 数据取值：infinity / multiverse） */
@@ -90,8 +89,8 @@ Page({
     status: { cls: 'unwatched', text: '未观看', ico: 'circle' },
     cta: { state: 'unwatched', cls: 'primary', text: '开始观看' },
 
-    /* 资源模块 */
-    resource: { exists: false, title: '观看资源', sub: '想看时，资源会在这里', pending: true },
+    /* 资源模块（V1.2 合规：固定为观看说明，不提供播放/下载入口） */
+    resource: { exists: false, title: '观看说明', sub: '本工具仅整理观看顺序，不提供播放与下载', pending: false },
     resourceExpanded: false,
 
     /* 为什么现在看 */
@@ -156,11 +155,8 @@ Page({
     const status = this.buildStatus(state);
     const cta = this.buildCta(state);
 
-    /* 资源模块 */
-    const res = resources.get(id);
-    const resource = res
-      ? { exists: true, title: res.title || m.cn, sub: '已为你准备好观影资源', pending: false }
-      : { exists: false, title: '观看资源', sub: '想看时，资源会在这里', pending: true };
+    /* 资源模块（V1.2 合规：固定为观看说明，不提供播放/下载入口） */
+    const resource = { exists: false, title: '观看说明', sub: '本工具仅整理观看顺序，不提供播放与下载', pending: false };
 
     /* 为什么现在看（role + 路线上下文） */
     const why = this.buildWhy(m);
@@ -276,7 +272,7 @@ Page({
       wx.showToast({ title: '已加入正在观看', icon: 'none' });
       this.refresh();
     } else if (this._state === 'watching') {
-      /* 继续观看：展开资源模块（无播放器，资源入口在此） */
+      /* 继续观看：滚动到观看说明区（无播放器、无资源入口） */
       this.setData({ resourceExpanded: true });
     }
     /* watched：done 态，无操作 */
@@ -313,17 +309,9 @@ Page({
     wx.navigateTo({ url: '/pages/share/share?type=progress' });
   },
 
+  /* 观看说明模块折叠/展开（V1.2 合规版：无播放/下载入口） */
   onToggleResource() {
     this.setData({ resourceExpanded: !this.data.resourceExpanded });
-  },
-
-  onResourceOpen() {
-    if (this.data.resource && this.data.resource.exists) {
-      /* 链接由项目方提供后在此打开；当前均为 pending，提示整理中 */
-      wx.showToast({ title: '资源整理中，敬请期待', icon: 'none' });
-    } else {
-      wx.showToast({ title: '资源整理中，敬请期待', icon: 'none' });
-    }
   },
 
   /* 前后关联 / 下一部 → 跳转该片详情 */

@@ -1,0 +1,38 @@
+/* 关于 about · V1.2 审核页通用样式（复用 app.wxss 令牌） */
+.legal {
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-xl);
+}
+.legal-title {
+  font-size: var(--fs-display-sm);
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: var(--space-lg);
+}
+.legal-h {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: var(--space-sm);
+}
+.legal-p {
+  font-size: var(--fs-body);
+  color: var(--text-main);
+  line-height: 1.7;
+}
+.legal-note {
+  font-size: var(--fs-caption);
+  color: var(--text-weak);
+  margin-top: var(--space-xs);
+}
+.legal-foot {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  margin-top: var(--space-xl);
+  line-height: 1.7;
+}
+.legal-update {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  margin-top: var(--space-sm);
+}

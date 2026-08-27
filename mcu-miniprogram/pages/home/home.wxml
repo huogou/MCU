@@ -17,7 +17,7 @@
       <view class="hero-banner-sub">{{heroMeta}}</view>
       <view class="hero-journey-bar" bindtap="goJourney" hover-class="hero-journey-hover" hover-stay-time="60">
         <view class="hero-journey-progress">
-          <view class="hero-journey-fill" style="width:{{progressPercent}}%"></view>
+          <view class="hero-journey-fill" style="width:{{progressPercent}}%;"></view>
         </view>
         <view class="hero-journey-text">{{progress.count}}/{{progress.total}}</view>
       </view>

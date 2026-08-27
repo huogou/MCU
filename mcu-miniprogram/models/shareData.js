@@ -93,11 +93,6 @@ const shareData = {
   /* 读统计（成就系统 sharer-1 判定用 total） */
   getStats: function () {
     return readState();
-  },
-
-  /* 仅测试/调试用 */
-  _reset: function () {
-    try { wx.removeStorageSync(KEY); } catch (e) {}
   }
 };
 

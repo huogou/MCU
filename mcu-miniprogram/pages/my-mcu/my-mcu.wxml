@@ -14,7 +14,7 @@
     </view>
     <view class="mcu-explore-tip">已探索作品</view>
     <view class="mcu-progress">
-      <view class="mcu-progress-bar" style="width:{{percent}}%"></view>
+      <view class="mcu-progress-bar" style="width:{{percent}}%;"></view>
     </view>
     <view class="mcu-progress-tip">整体进度 {{percent}}% · 已看 {{explored}} 部</view>
   </view>
@@ -47,7 +47,7 @@
       <view class="rn-title">{{current.name}}</view>
       <view class="rn-sub">{{current.watched}} / {{current.total}} 部 · 下一部 {{current.nextName}}</view>
       <view class="rn-progress">
-        <view class="rn-progress-bar" style="width:{{current.percent}}%"></view>
+        <view class="rn-progress-bar" style="width:{{current.percent}}%;"></view>
       </view>
     </view>
     <view class="route-next-btn {{current.nextId ? '' : 'is-disabled'}}">继续观看</view>
@@ -115,6 +115,32 @@
       <view class="fb-entry-sub">发现问题？顺手反馈，帮我们把导航做更准</view>
     </view>
     <view class="fb-entry-arrow">›</view>
+  </view>
+
+  <!-- ⑧ 法律与说明（V1.2 上线准备：审核必备页入口） -->
+  <view class="section-label">法律与说明</view>
+  <view class="legal-list">
+    <view class="fb-entry" data-key="agreement" bindtap="goLegal">
+      <view class="fb-entry-info">
+        <view class="fb-entry-title">用户协议</view>
+        <view class="fb-entry-sub">服务说明与使用规则</view>
+      </view>
+      <view class="fb-entry-arrow">›</view>
+    </view>
+    <view class="fb-entry" data-key="privacy" bindtap="goLegal">
+      <view class="fb-entry-info">
+        <view class="fb-entry-title">隐私保护政策</view>
+        <view class="fb-entry-sub">数据收集与权限说明</view>
+      </view>
+      <view class="fb-entry-arrow">›</view>
+    </view>
+    <view class="fb-entry" data-key="about" bindtap="goLegal">
+      <view class="fb-entry-info">
+        <view class="fb-entry-title">关于</view>
+        <view class="fb-entry-sub">产品介绍与版本</view>
+      </view>
+      <view class="fb-entry-arrow">›</view>
+    </view>
   </view>
 
   <view class="mcu-bottom-space"></view>

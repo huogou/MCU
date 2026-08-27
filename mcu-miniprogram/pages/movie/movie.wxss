@@ -188,17 +188,6 @@
   align-items: center;
   gap: var(--space-sm);
 }
-.resource-icon {
-  width: 64rpx;
-  height: 64rpx;
-  background: var(--gold-a10);
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--gold);
-}
 .resource-info { flex: 1; min-width: 0; }
 .resource-title {
   font-size: var(--fs-body);
@@ -232,30 +221,10 @@
 .resource-module.expanded .resource-body {
   display: block;
 }
-.resource-pending {
+.resource-note {
   font-size: var(--fs-mini);
-  color: var(--text-weak);
-  opacity: 0.7;
-}
-.resource-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) 0;
-}
-.ri-label {
-  flex: 1;
-  font-size: var(--fs-caption);
   color: var(--text-sub);
-}
-.ri-btn {
-  padding: 12rpx var(--space-md);
-  background: var(--gold-a10);
-  color: var(--gold);
-  font-size: var(--fs-caption);
-  font-weight: 600;
-  border: 2rpx solid var(--gold-a15);
-  border-radius: var(--space-xs);
+  line-height: 1.6;
 }
 
 /* ══════ ④ 为什么现在看 ══════ */
@@ -336,7 +305,6 @@
   margin-top: var(--space-xs);           /* 4→8（P1 间距统一） */
   text-align: center;
 }
-.cast-hover { border-color: var(--gold-a20); }
 
 /* 阵营色系统已统一至 app.wxss 全局（Step4）*/
 

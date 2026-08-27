@@ -46,7 +46,7 @@
       <view class="rc-tag">{{item.tagline}}</view>
       <view class="rc-for">{{item.forWho}}</view>
       <view class="rc-progress">
-        <view class="bar" style="width:{{item.percent}}%;background:var(--success)"></view>
+        <view class="bar" style="width:{{item.percent}}%;background:var(--success);"></view>
       </view>
     </view>
   </view>

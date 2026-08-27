@@ -26,7 +26,7 @@
       </view>
       <view class="hero-info">
         <view class="hero-phase">
-          <view class="hero-phase-dot" style="background:{{phaseDot}}"></view>
+          <view class="hero-phase-dot" style="background:{{phaseDot}};"></view>
           <text class="hero-phase-text">{{phaseText}}</text>
         </view>
         <view class="hero-title">{{cn}}</view>
@@ -50,12 +50,9 @@
       </view>
     </view>
 
-    <!-- ③ 观看资源 -->
+    <!-- ③ 观看说明（V1.2 合规：本工具不提供播放/下载，仅作观看顺序参考） -->
     <view class="resource-module {{resourceExpanded ? 'expanded' : ''}}">
       <view class="resource-header" bindtap="onToggleResource">
-        <view class="resource-icon">
-          <view class="ico ico-play"></view>
-        </view>
         <view class="resource-info">
           <view class="resource-title">{{resource.title}}</view>
           <view class="resource-sub">{{resource.sub}}</view>
@@ -63,11 +60,7 @@
         <view class="resource-arrow"></view>
       </view>
       <view class="resource-body">
-        <view wx:if="{{resource.pending}}" class="resource-pending">观影资源正在整理中，敬请期待</view>
-        <view wx:else class="resource-item">
-          <text class="ri-label">高清在线观看</text>
-          <view class="ri-btn" bindtap="onResourceOpen">打开资源</view>
-        </view>
+        <view class="resource-note">本小程序仅整理漫威电影的观看顺序与路线，不提供任何影视在线观看、下载或播放服务。</view>
       </view>
     </view>
 

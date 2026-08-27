@@ -206,5 +206,16 @@ Page({
   /* 反馈入口（Step3-8）：从个人页跳转，携带来源页 my-mcu 供来源统计 */
   goFeedback: function () {
     wx.navigateTo({ url: '/pages/feedback/feedback?from=my-mcu' });
+  },
+
+  /* 法律与说明入口（V1.2 上线准备）：跳转协议 / 隐私 / 关于页 */
+  goLegal: function (e) {
+    var key = e.currentTarget.dataset.key;
+    var map = {
+      agreement: '/pages/agreement/agreement',
+      privacy: '/pages/privacy/privacy',
+      about: '/pages/about/about'
+    };
+    if (map[key]) wx.navigateTo({ url: map[key] });
   }
 });

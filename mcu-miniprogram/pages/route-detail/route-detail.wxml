@@ -21,7 +21,7 @@
           <text class="rd-watched">{{watched}}</text>
           <text class="rd-total"> / {{total}} 部</text>
         </view>
-        <view class="rd-bar"><view class="rd-bar-fill" style="width:{{percent}}%"></view></view>
+        <view class="rd-bar"><view class="rd-bar-fill" style="width:{{percent}}%;"></view></view>
       </view>
 
       <view wx:if="{{isCurrent && currentText}}" class="rd-current-banner">{{currentText}}</view>
@@ -52,7 +52,7 @@
           <view class="rd-node-title">{{item.cn}}</view>
           <view class="rd-node-en">{{item.en}}</view>
           <view class="rd-node-meta">
-            <view class="rd-phase-dot" style="background:{{item.phaseColor}}"></view>
+            <view class="rd-phase-dot" style="background:{{item.phaseColor}};"></view>
             <text class="rd-phase-text">{{item.phase}}</text>
             <text class="rd-type">· {{item.typeLabel}}</text>
           </view>

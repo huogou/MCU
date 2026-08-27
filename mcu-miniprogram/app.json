@@ -11,7 +11,10 @@
     "pages/browse/browse",
     "pages/my-mcu/my-mcu",
     "pages/feedback/feedback",
-    "pages/share/share"
+    "pages/share/share",
+    "pages/about/about",
+    "pages/agreement/agreement",
+    "pages/privacy/privacy"
   ],
   "window": {
     "navigationBarBackgroundColor": "#080B12",

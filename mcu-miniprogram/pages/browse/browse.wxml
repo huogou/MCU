@@ -8,7 +8,7 @@
 
   <view wx:for="{{groups}}" wx:key="phase" class="phase-group">
     <view class="group-head">
-      <view class="group-dot" style="background:{{item.color}}"></view>
+      <view class="group-dot" style="background:{{item.color}};"></view>
       <view class="group-title">{{item.title}}</view>
       <view class="group-count">{{item.items.length}} 部</view>
       <!-- 专项③：阶段图承接（Phase 导航辅助视觉，保持 750:400 比例小图） -->
