@@ -627,4 +627,49 @@ GPT 修订任务 7 项逐项核查 V3 终版代码实现状态：
   · 视觉规范严格延续 MCU 现有深色宇宙主题，色值通过 CSS 自定义属性管理。
   · 环境检测逻辑：MicroMessenger→微信优先 / BytedanceWebView→抖音优先 / 其他+宽屏→PC双卡 / 其他+窄屏→手机纵向。
 - 状态：策划已确认，等待 Work（开发AI）落实 H5 双入口改造。抖音二维码到位后仅需替换图片。
+
+【H5 双小程序入口 · 开发落实完成 · 2026-08-28 15:10 · 提交 6054aa4】
+------------------------------------------------------------
+- 改动文件（相对路径）：
+  · mcu-navigator/assets/js/app.js（+165/-46）
+  · mcu-navigator/assets/css/style.css（+225/-11）
+  · workspace/ua_test.js（新增，UA 检测 10 例）
+  · workspace/mp_entry_smoke.js（新增，弹窗渲染冒烟 60 断言）
+
+- 实现要点：
+  · ui._detectEnv 新增 douyin 分支（BytedanceWebView / Douyin / Aweme）。
+  · 修正判定顺序：先 App 内嵌（微信/抖音）→ 再桌面 → 最后手机浏览器。
+    原因：Android UA 含 "Linux"，原顺序会把「安卓微信/安卓抖音」误判为 desktop。
+    此为原代码既有缺陷，本次一并修复。
+  · 弹窗改为双平台 5 状态：PC 双卡等权重 / 手机纵向卡 / 微信环境优先 / 抖音环境优先 / 二维码降级。
+    平台平级：非环境态下微信与抖音完全等权重；仅 UA 环境感知时对应平台优先。
+  · 新增 ui.MP_PLATFORMS 单一配置源（name/desc/qr/icon），二维码与图标均从此读取。
+  · 环境态支持「其他平台」切换按钮（data-mp-switch），点击切到另一平台二维码。
+  · 六档 mpEntry 变体（compact/inline/card/module/pano/foot）全部保持完好，
+    均通过 data-mp-title 事件委托接入新弹窗，无需逐档修改。
+
+- 二维码处理：
+  · 微信：沿用 assets/miniprogram/qrcode.png（真实二维码，已存在）。
+  · 抖音：MP_PLATFORMS.douyin.qr 留空，走 QR_SVG 占位。
+    ★ 抖音小程序上线后，只需把该文件路径填入 ui.MP_PLATFORMS.douyin.qr，
+      无需改动任何布局或交互逻辑。
+
+- 样式：
+  · 弹窗由原白底卡片改为深色宇宙主题（策划批准），沿用现有 CSS 变量。
+  · :root 新增品牌变量：--wechat-brand #07C160 / --douyin-brand #FE2C55 /
+    --douyin-cyan #25F4EE / --qr-bg #FFFFFF，仅新增不替换既有 token。
+  · 移除已废弃的 V1.3 环境引导条样式（.mp-modal-env / qr-pulse），避免与新版并存。
+
+- 自测结果：
+  · node --check app.js 通过。
+  · UA 检测 10/10 通过（含 Android 微信、Android 抖音两个原误判用例）。
+  · 弹窗渲染冒烟 60/60 通过（4 种环境 × 结构断言 + 六档变体）。
+  · 复跑命令：node workspace/ua_test.js ; node workspace/mp_entry_smoke.js
+
+- 遗留 / 待确认：
+  ① 抖音二维码待上线后替换（改一处配置即可，见上）。
+  ② 现有「打开微信小程序」等文案在双平台语境下是否需要调整为「打开小程序」，待策划裁定。
+  ③ 弹窗由白底改深色，需策划/设计确认视觉可接受（原型为深色，按原型执行）。
+  ④ 未在真机（微信/抖音 App 内）实测，建议用户在微信与抖音 App 内各打开一次 H5 验证。
+- 状态：开发完成，待策划验收。
 ============================================================
