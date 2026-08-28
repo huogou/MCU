@@ -1,0 +1,257 @@
+================================================================
+MCU 观影导航｜微信→抖音小程序迁移  Step 1：建立独立迁移工程
+执行方：开发 AI（Work）｜日期：2026-08-28
+状态：工程准备完成，未启动 API 迁移，等待 GPT 下达 Step 2
+================================================================
+
+【执行摘要】
+本阶段严格遵循"最高原则"与"只做工程准备、不改代码"约束：
+- 微信正式版 V1.2.1 源码零改动，作为只读基线。
+- 独立抖音迁移目录 MCU-miniapp-douyin/ 已建立并与微信版物理隔离。
+- 已用无工作树副作用的 Git 底层命令建立 wechat-production（只读基线）与 douyin-migration（开发版）双分支，并将抖音基线完整提交（commit 7b6b78f，可回退）。
+- 完成 11 类微信平台依赖全量扫描（仅统计标记，未修改任何文件）。
+- 本阶段唯一目标（安全、可回退、隔离的抖音迁移基线）已达成。
+
+----------------------------------------------------------------
+① 新建立的抖音工程目录结构
+----------------------------------------------------------------
+路径：D:\SEO\发挥余热\漫威电影宇宙导航\MCU-miniapp-douyin\
+（151 个文件，与微信版 mcu-miniprogram/ 字节级一致，关键文件 md5 已校验）
+
+MCU-miniapp-douyin/
+├── app.js / app.json / app.wxss          # 全局逻辑/配置/样式
+├── project.config.json                   # 微信配置（迁移阶段需重建为抖音版）
+├── sitemap.json                          # 微信索引配置
+├── pages/  (15 页，与微信版一致)
+│   ├── home / routes / route-detail / movie / explore
+│   ├── panorama / characters / character / browse / my-mcu
+│   ├── feedback / share / about / agreement / privacy
+├── data/   (11 模块静态数据：movies/series/special/short/content/
+│           relations/characters/routes/constants/resources/visuals)
+├── models/ (6 模型：userState/mcuData/recommend/pano/achievements/shareData)
+├── utils/  (check-home-conformance.js / render-tab-icons.js)
+└── assets/ (achievements/avatars/backgrounds/entries/hero/icons/phases/preview)
+          共 67 个本地图片（36 jpg + 31 png）
+
+说明：复制时已排除微信专属开发脚本（workspace/ 40 个、workspace-*.js 10 个）
+与微信私有配置 project.private.config.json（1 个），因其不属于运行时代码、
+且抖音侧无意义。
+
+----------------------------------------------------------------
+② 微信正式版与抖音迁移版的隔离方式
+----------------------------------------------------------------
+隔离采用"物理目录 + Git 双分支"双层隔离：
+
+[物理隔离]
+- 微信版：mcu-miniprogram/（202 文件）—— 全程未读改写、未删除、未覆盖。
+- 抖音版：MCU-miniapp-douyin/（151 文件）—— 所有抖音适配只在此目录进行。
+- 二者并列于项目根目录，路径无交叉；抖音版不引用微信版任何文件。
+
+[Git 隔离]
+- wechat-production 分支：冻结于 baf309b（V1.2.1 HEAD），只读基线，
+  约定永不向其提交。
+- douyin-migration 分支：从 baf309b 切出，抖音基线已提交于此
+  （7b6b78f），后续所有迁移修改均在此分支提交，可逐次回退。
+- 二者同源于 baf309b，形成清晰的"基线→迁移"分叉。
+
+[纵深备份]
+- backup/mcu-miniprogram-wechat-baseline-20260827/ 仍保留完整微信基线副本，
+  作为 Git 之外的第二重保险。
+
+----------------------------------------------------------------
+③ Git 当前分支 / commit 情况
+----------------------------------------------------------------
+当前 HEAD：master（本任务未切换，保持原状）
+工作树状态：存在若干根目录文件的未提交删除（见第⑦节披露），
+            与微信小程序源码无关、非本任务造成、本任务未触碰。
+
+分支列表：
+  * master               → baf309b（当前所在，含未提交根目录删除）
+    release/v1.2.0       → 历史发布分支
+    wechat-production    → baf309b（【只读基线】微信正式版）
+    douyin-migration     → 7b6b78f（【开发版】抖音迁移基线，含 151 文件）
+
+标签列表：
+    v1.2.0-release          （微信 V1.2.0 发布归档）
+    wechat-v1.2.1-baseline  （此前建立的微信迁移基线标签）
+
+关键提交：
+  7b6b78f  chore(douyin): 建立抖音迁移基线（微信 V1.2.1 完整副本，目录隔离）
+  baf309b  文档：同步 V1.2.1 审核合规修复 + 按钮居中修复至策划通道  ← 基线点
+
+说明：因工作树存在被删的 .gitignore（若 checkout 会触发其恢复并改变
+跟踪规则），本任务使用 git commit-tree 底层命令建分支/提交，
+全程不触碰工作树，根目录删除状态原样保留。
+
+----------------------------------------------------------------
+④ 扫描出的所有微信平台依赖清单（11 类，仅标记）
+----------------------------------------------------------------
+扫描对象：MCU-miniapp-douyin/ 全量文件（151 个）
+说明：wx.storage 仅出现在 userState.js:5 注释中（"H5 localStorage → wx.storage"），
+      非实际调用，已从调用统计剔除。
+
+[1] wx.* API 调用（14 类，共 69 处实际调用）
+  - wx.navigateTo ×23          （页面跳转）
+  - wx.showToast ×10           （轻提示）
+  - wx.cloud ×7                （云开发，见[2]）
+  - wx.setStorageSync ×6       （本地存储写）
+  - wx.getStorageSync ×6       （本地存储读）
+  - wx.switchTab ×3            （Tab 切换）
+  - wx.navigateBack ×3         （返回）
+  - wx.setNavigationBarTitle ×3（导航栏标题）
+  - wx.getSystemInfoSync ×2    （系统信息/pixelRatio，供 Canvas）
+  - wx.createSelectorQuery ×2  （节点查询，供 Canvas）
+  - wx.showModal ×1            （模态框）
+  - wx.saveImageToPhotosAlbum ×1（保存相册）
+  - wx.openSetting ×1          （打开设置页，相册授权）
+  - wx.canvasToTempFilePath ×1  （Canvas 导出临时文件）
+
+[2] wx.cloud（阻断级依赖）
+  - app.js:14-18      wx.cloud 可用性判断 + wx.cloud.init
+  - feedback.js:65    兼容判断 typeof wx.cloud / wx.cloud.database
+  - feedback.js:76    wx.cloud.database().collection('feedback').add(...)
+  → 抖音无云开发能力，feedback 页写库必须重设计（见第⑥节）。
+
+[3] Canvas
+  - explore.wxml:61   <canvas type="2d" id="relCanvas"> 关系图
+  - share.wxml:9      <canvas type="2d" id="posterCanvas"> 海报
+  - explore.js:240    wx.createSelectorQuery().in(this) 取 node
+  - share.js:221      wx.createSelectorQuery().in(this)
+  - share.js:649      wx.canvasToTempFilePath({...}) 导出
+  → 2 处 Canvas 2D，链路明确，抖音需真机验证 canvas 2d 行为一致性。
+
+[4] 分享接口
+  - share.js:680      onShareAppMessage() 返回 {title, path}
+  - share.wxml:17     <button open-type="share">转发给朋友</button>
+  → 仅"转发给朋友"，无 onShareTimeline。
+
+[5] 相册 / 文件接口
+  - share.js:652      wx.saveImageToPhotosAlbum（海报保存）
+  - share.js          wx.openSetting（保存被拒后引导去设置开相册权限）
+  → 无 getImageInfo / getFileSystemManager / saveFile 使用。
+
+[6] 网络请求
+  - 扫描结果：无 wx.request / wx.uploadFile / wx.downloadFile 调用。
+  → 全应用唯一"远端交互"即 wx.cloud.database()（见[2]），
+    即"网络请求"类完全等同于"wx.cloud 依赖"一类。
+
+[7] 页面生命周期（微信特有）
+  - 仅 onShareAppMessage 为微信特有（share.js:680）。
+  - onLoad/onShow/onReady/onHide/onUnload/onPullDownRefresh/
+    onReachBottom 等均为双端通用，迁移无需改动。
+
+[8] WXML / WXSS 平台相关写法
+  - 唯一命中：share.wxml:17  open-type="share"（微信转发按钮）。
+  - 未发现 <web-view>/<map>/<official-account>/<ad>/<open-data>/
+    <live-player>/<camera> 等微信专有组件。
+  - 未发现 env(safe-area-inset-*) 等安全区写法（双端通用能力，
+    缺失意味着无需适配安全区）。
+
+[9] 配置文件（微信特有字段）
+  - app.json:    "style":"v2"（微信样式）、"lazyCodeLoading":"requiredComponents"
+                 （微信按需注入）、"sitemapLocation":"sitemap.json"
+                 → 抖音侧需清理或替换。
+  - project.config.json: "appid":"wx78f00e7f0a5948b7"（微信 AppID，必须替换）、
+                 "projectname":"mcu-miniprogram"、"libVersion":"3.0.0"、
+                 "setting" 整块为微信专属 → 抖音侧需整体重建（Step5 任务1）。
+  - sitemap.json: 微信索引说明文案，抖音机制不同 → 需评估保留/替换。
+
+[10] 自定义组件
+  - 全部 9 个页面 *.json 中 "usingComponents": {} 均为空。
+  - 工程无 components/ 目录。
+  → 无自定义组件需要迁移。
+
+[11] 本地资源
+  - assets/ 共 67 个图片（36 jpg + 31 png），均为本地静态资源，
+    双端通用、迁移无需替换（符合"不替换资源"约束）。
+
+----------------------------------------------------------------
+⑤ 预计需要迁移的 API 清单（含抖音方案与风险）
+----------------------------------------------------------------
+| 微信 API            | 出现在文件/次数        | 抖音方案                  | 风险 |
+|---------------------|------------------------|---------------------------|------|
+| wx.navigateTo       | 23 处（多页）          | tt.navigateTo（同名）      | 低   |
+| wx.navigateBack     | 3 处                   | tt.navigateBack（同名）    | 低   |
+| wx.switchTab        | 3 处                   | tt.switchTab（同名）       | 低   |
+| wx.setNavigationBarTitle | 3 处             | tt.setNavigationBarTitle   | 低   |
+| wx.getStorageSync   | 6 处（4 个模型/页）    | tt.getStorageSync（同名）  | 低   |
+| wx.setStorageSync   | 6 处                   | tt.setStorageSync（同名）  | 低   |
+| wx.showToast        | 10 处                  | tt.showToast（同名）       | 低   |
+| wx.showModal        | 1 处（share.js）       | tt.showModal（同名）       | 低   |
+| wx.getSystemInfoSync| 2 处（canvas pixelRatio）| tt.getSystemInfoSync      | 中*  |
+| wx.createSelectorQuery | 2 处（explore/share）| tt.createSelectorQuery      | 中   |
+| wx.canvasToTempFilePath | 1 处（share.js:649）| tt.canvasToTempFilePath     | 中   |
+| wx.saveImageToPhotosAlbum | 1 处（share.js:652）| tt.saveImageToPhotosAlbum   | 中** |
+| wx.openSetting      | 1 处（share.js 授权）  | tt.openSetting              | 中** |
+| wx.cloud            | 7 处（app.js/feedback.js）| 无对应，需 A/B/C 决策     | 高   |
+
+* getSystemInfoSync 微信已标记弃用，建议顺带改用 tt.getWindowInfo/getDeviceInfo。
+** 相册保存需 tt 的 scope.album 授权与设置页差异，真机验证。
+
+迁移工作量评估：约 69 处 wx.* 调用中，低风险的同名映射占多数；
+真正需要设计决策的仅 wx.cloud（1 类）与 Canvas/分享/相册链路（需真机验证）。
+数据层 data/*.js 与本地存储模型为静态 JS，跨端零改动——这是本迁移最大节省项。
+
+----------------------------------------------------------------
+⑥ 是否发现会阻塞抖音迁移的问题
+----------------------------------------------------------------
+【会阻塞——需 GPT/用户先决策】
+1. wx.cloud 依赖（feedback 页写 CloudBase feedback 集合）
+   抖音无云开发，此功能必须重设计。候选方案（Step5 任务3 已列）：
+   A = tt.request + CloudBase HTTP API（保留与 H5 同集合，功能等价）
+   B = 纯本地存储（不落库，可逆）
+   C = 删除反馈功能
+   → 此为进入"阶段3 代码迁移"的硬前置，未决策前不应改动 feedback 代码。
+
+2. 抖音 AppID 缺失（project.config.json 重建前提）
+   当前 project.config.json 硬编码微信 AppID wx78f00e7f0a5948b7。
+   抖音侧需用户提供抖音小程序 AppID 后才能重建配置并真机调试。
+   → 属配置前置，非代码阻塞，但阻塞"真机验证"。
+
+【中风险——需真机验证，不阻塞规划】
+3. Canvas 2D 行为一致性（explore 关系图 + share 海报导出）。
+4. 分享机制差异（onShareAppMessage + open-type="share" → 抖音分享面板，
+   字段如 title/imageUrl 可能不同）。
+5. 相册保存授权链路（scope.album、openSetting 行为差异）。
+
+【观察项——非阻塞、建议知悉】
+6. 工作树根目录存在未提交删除（.gitignore/README.md/VERSION.md/
+   verify_stats.js/数张 PNG），不在微信小程序源码内、非本任务造成、
+   本任务未触碰。建议后续单独清理，不影响迁移基线。
+
+----------------------------------------------------------------
+⑦ 明确声明：当前微信正式版代码没有被修改
+----------------------------------------------------------------
+本开发 AI 正式声明，并附证据：
+
+1. 微信源码目录 mcu-miniprogram/（202 文件）未被读取改写、未被删除、
+   未被覆盖。git status 显示其内部仅有若干 *新增* 的 preview PNG
+   （untracked，属新增而非修改），无任何既有文件被修改或删除。
+
+2. 已提交的微信基线 HEAD = baf309b 完整无损；wechat-production 分支
+   已冻结于该提交作为只读基线。
+
+3. 本阶段所有产出均为"新增"动作：
+   - 新增独立目录 MCU-miniapp-douyin/（抖音副本）
+   - 新增 Git 分支 wechat-production / douyin-migration 与提交 7b6b78f
+   - 新增备份目录 backup/mcu-miniprogram-wechat-baseline-20260827/
+   以上动作均未对 mcu-miniprogram/ 内任何文件产生写入或删除。
+
+4. 工作树中既存的未提交根目录删除（见第⑥节第6点）发生在本任务之前，
+   与本迁移无关，本任务亦未对其进行任何操作或恢复。
+
+⇒ 结论：微信正式版代码（mcu-miniprogram/）在当前及本阶段全程未被修改。
+
+----------------------------------------------------------------
+待 GPT 决策 / 确认事项（Step 2 前置）
+----------------------------------------------------------------
+1. 反馈方案 A/B/C 选定（阻塞项，见⑥-1）。
+2. 抖音小程序 AppID 提供（见⑥-2）。
+3. 目录命名确认：沿用 MCU-miniapp-douyin/（已隔离且校验一致）或
+   改为字面 douyin-mini-program/（如 GPT 偏好）。
+4. app.json 微信字段（style:"v2"、lazyCodeLoading）迁移期删除 vs 保留。
+5. sitemap.json 抖音版处理（保留/替换/删除）。
+
+================================================================
+下一步：本阶段已停止。等待 GPT 下达 Step 2（API 迁移/配置重建）指令。
+================================================================

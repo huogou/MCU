@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU 双小程序入口 — 交互原型</title>
+<style>
+/* ===== RESET & TOKENS ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080B12;
+  --bg-a70: rgba(8,11,18,0.70);
+  --surface-0: #0D1119;
+  --surface-1: #161D2B;
+  --surface-2: #1E2636;
+  --surface-3: #2A3447;
+  --gold: #F2B233;
+  --gold-a10: rgba(242,178,51,0.10);
+  --gold-a20: rgba(242,178,51,0.20);
+  --gold-a30: rgba(242,178,51,0.30);
+  --gold-btn-text: #1A1206;
+  --accent-blue: #4A9EF5;
+  --accent-blue-a15: rgba(74,158,245,0.15);
+  --text-main: #E8ECF4;
+  --text-sub: #8E98AA;
+  --text-weak: #555F73;
+  --wechat-color: #07C160;
+  --wechat-bg-a12: rgba(7,193,96,0.12);
+  --douyin-color: #FE2C55;
+  --douyin-bg-a12: rgba(254,44,85,0.12);
+  --douyin-cyan: #25F4EE;
+  --qr-bg: #FFFFFF;
+  --star-color: rgba(232,236,244,0.3);
+  --star-bright: rgba(232,236,244,0.6);
+  --border-hover: rgba(255,255,255,0.1);
+  --border-hover-2: rgba(255,255,255,0.15);
+  --border-subtle: rgba(255,255,255,0.08);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --font-stack: -apple-system, 'PingFang SC', 'Helvetica Neue', Helvetica, sans-serif;
+  --fs-display: 28px;
+  --fs-title: 18px;
+  --fs-body: 14px;
+  --fs-caption: 12px;
+  --fs-mini: 11px;
+  --shadow-card: 0 4px 16px rgba(0,0,0,0.3);
+  --glow-gold: 0 8px 24px rgba(242,178,51,0.12);
+  --glow-gold-strong: 0 12px 40px rgba(242,178,51,0.20);
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-stack);
+  background: var(--bg);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ===== STATE SWITCHER (TOP TAB BAR) ===== */
+.state-switcher {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--surface-0);
+  border-bottom: 1px solid var(--surface-3);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 48px;
+  gap: 4px;
+}
+
+.state-switcher .label {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  letter-spacing: 0.02em;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.state-tab {
+  padding: 6px 14px;
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+.state-tab:hover {
+  color: var(--text-main);
+  background: var(--surface-2);
+}
+
+.state-tab.active {
+  color: var(--gold);
+  background: var(--gold-a10);
+  border-color: var(--gold-a20);
+}
+
+/* ===== PREVIEW STAGE ===== */
+.stage {
+  padding-top: 48px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.state-panel {
+  display: none;
+  width: 100%;
+  min-height: calc(100vh - 48px);
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.state-panel.active {
+  display: flex;
+}
+
+/* ===== MODAL OVERLAY ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-a70);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-overlay.bottom-sheet {
+  align-items: flex-end;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ===== MODAL CONTAINER ===== */
+.modal-container {
+  background: var(--surface-1);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--surface-3);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.3s ease;
+}
+
+.modal-container.pc {
+  width: 580px;
+  padding: 36px 32px 32px;
+}
+
+.modal-container.sheet {
+  width: 100%;
+  max-width: 420px;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  padding: 24px 20px 28px;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* ===== CLOSE BUTTON ===== */
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+
+.modal-close:hover {
+  background: var(--surface-2);
+}
+
+.modal-close::before,
+.modal-close::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 1.5px;
+  background: var(--text-sub);
+  border-radius: 1px;
+}
+
+.modal-close::before { transform: rotate(45deg); }
+.modal-close::after { transform: rotate(-45deg); }
+
+/* ===== MODAL HEADER ===== */
+.modal-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.modal-header .title {
+  font-size: var(--fs-display);
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.modal-header .subtitle {
+  font-size: var(--fs-body);
+  color: var(--text-sub);
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+/* ===== PC DUAL CARDS ===== */
+.pc-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.platform-card {
+  flex: 1;
+  max-width: 240px;
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.platform-card:hover {
+  border-color: var(--border-hover);
+}
+
+.platform-card.highlighted {
+  border-color: var(--gold-a30);
+  box-shadow: var(--glow-gold);
+}
+
+.platform-card .badge {
+  display: inline-block;
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  background: var(--gold-a10);
+  border: 1px solid var(--gold-a20);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+.platform-card .platform-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
+}
+
+.platform-card .platform-name {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.platform-card .platform-desc {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* ===== QR CODE PLACEHOLDER ===== */
+.qr-container {
+  width: 160px;
+  height: 160px;
+  background: var(--qr-bg);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.qr-placeholder {
+  width: 140px;
+  height: 140px;
+  position: relative;
+}
+
+.qr-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+.qr-label {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  letter-spacing: 0.02em;
+}
+
+/* ===== MOBILE CARDS ===== */
+.mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-card {
+  background: var(--surface-2);
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.mobile-card:hover {
+  border-color: var(--border-hover);
+}
+
+.mobile-card .platform-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.mobile-card .card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-card .platform-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+.mobile-card .platform-desc {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  line-height: 1.4;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 18px;
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--glow-gold);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 18px;
+  background: transparent;
+  color: var(--text-sub);
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-ghost:hover {
+  color: var(--text-main);
+  border-color: var(--border-hover-2);
+  background: var(--surface-2);
+}
+
+.btn-ghost:active {
+  transform: scale(0.97);
+}
+
+/* ===== WECHAT / DOUYIN ENV: PRIMARY + SECONDARY ===== */
+.env-primary-card {
+  background: var(--surface-2);
+  border: 1px solid var(--gold-a30);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: var(--glow-gold);
+  position: relative;
+}
+
+.env-primary-card .badge {
+  display: inline-block;
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  background: var(--gold-a10);
+  border: 1px solid var(--gold-a20);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+.env-primary-card .card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.env-primary-card .platform-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+}
+
+.env-primary-card .platform-desc {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.env-primary-card .btn-primary {
+  width: 100%;
+  height: 40px;
+  font-size: var(--fs-body);
+}
+
+.env-secondary {
+  text-align: center;
+  padding: 12px 0 0;
+}
+
+.env-secondary .divider-text {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  margin-bottom: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* ===== FALLBACK QR EXPAND ===== */
+.fallback-qr-area {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--surface-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: expandIn 0.3s ease;
+}
+
+@keyframes expandIn {
+  from { opacity: 0; max-height: 0; margin-top: 0; padding-top: 0; }
+  to { opacity: 1; max-height: 300px; margin-top: 14px; padding-top: 14px; }
+}
+
+.fallback-qr-area .qr-container {
+  width: 180px;
+  height: 180px;
+  margin-bottom: 10px;
+}
+
+.fallback-qr-area .qr-hint {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ===== CONTEXT LABEL ===== */
+.context-label {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface-1);
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  letter-spacing: 0.02em;
+  z-index: 50;
+}
+
+/* ===== H5 PAGE BACKGROUND CONTENT ===== */
+.h5-bg-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.h5-bg-content .trigger-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 24px;
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-full, 999px);
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  box-shadow: var(--glow-gold);
+  transition: all 0.15s ease;
+}
+
+.h5-bg-content .trigger-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: var(--glow-gold-strong);
+}
+
+.h5-bg-content .bg-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-main);
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.h5-bg-content .bg-sub {
+  font-size: var(--fs-body);
+  color: var(--text-sub);
+  margin-bottom: 24px;
+}
+
+/* ===== STAR FIELD BACKGROUND ===== */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.starfield .star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--star-color);
+  border-radius: 50%;
+}
+
+.starfield .star.bright {
+  width: 2px;
+  height: 2px;
+  background: var(--star-bright);
+  box-shadow: 0 0 4px var(--star-color);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .state-switcher {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 2px;
+    padding: 0 8px;
+  }
+  .state-tab {
+    font-size: var(--fs-mini);
+    padding: 5px 10px;
+  }
+  .modal-container.pc {
+    width: calc(100% - 32px);
+    max-width: 420px;
+    padding: 28px 20px 24px;
+  }
+  .pc-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+  .platform-card {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== STAR FIELD ===== -->
+<div class="starfield" id="starfield"></div>
+
+<!-- ===== STATE SWITCHER ===== -->
+<nav class="state-switcher" data-component="state-switcher">
+  <span class="label">状态预览</span>
+  <button class="state-tab active" data-state="pc" onclick="switchState('pc')">PC 浏览器</button>
+  <button class="state-tab" data-state="mobile" onclick="switchState('mobile')">手机浏览器</button>
+  <button class="state-tab" data-state="wechat" onclick="switchState('wechat')">微信环境</button>
+  <button class="state-tab" data-state="douyin" onclick="switchState('douyin')">抖音环境</button>
+  <button class="state-tab" data-state="fallback" onclick="switchState('fallback')">二维码 Fallback</button>
+</nav>
+
+<main data-component="prototype-stage">
+<!-- ===== STATE: PC ===== -->
+<div class="state-panel active" id="panel-pc">
+  <div class="h5-bg-content">
+    <div class="bg-title">MCU 观影导航</div>
+    <div class="bg-sub">探索漫威电影宇宙的完整时间线</div>
+    <button class="trigger-btn" onclick="">进入小程序</button>
+  </div>
+  <div class="modal-overlay" style="z-index:10;">
+    <div class="modal-container pc" data-component="modal-pc-dual-entry">
+      <button class="modal-close" aria-label="关闭"></button>
+      <div class="modal-header">
+        <div class="title">进入 MCU 观影导航</div>
+        <div class="subtitle">选择你常用的平台继续探索 MCU 宇宙</div>
+      </div>
+      <div class="pc-cards">
+        <!-- WeChat -->
+        <div class="platform-card">
+          <div class="platform-icon">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="10" fill="var(--wechat-bg-a12)"/>
+              <path d="M15.5 12C11.36 12 8 14.84 8 18.3c0 1.96 1.1 3.72 2.82 4.92l-.7 2.1 2.44-1.22c.88.28 1.84.44 2.84.44.32 0 .64-.02.96-.04A6.48 6.48 0 0 1 16 22.5c0-3.58 3.36-6.5 7.5-6.5.52 0 1.04.04 1.54.14C24.2 13.88 20.16 12 15.5 12zm-3.2 3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm6.4 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z" fill="var(--wechat-color)"/>
+              <path d="M32 22.5c0-2.9-3.04-5.25-6.5-5.25S19 19.6 19 22.5s3.04 5.25 6.5 5.25c.72 0 1.42-.1 2.06-.28l1.94.98-.56-1.66C30.98 25.72 32 24.22 32 22.5zm-8.7-.9a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4.4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="var(--wechat-color)"/>
+            </svg>
+          </div>
+          <div class="platform-name">微信小程序</div>
+          <div class="platform-desc">微信扫码进入</div>
+          <div class="qr-container">
+            <div class="qr-placeholder" id="qr-wechat-pc"></div>
+          </div>
+          <div class="qr-label">微信扫一扫</div>
+        </div>
+        <!-- Douyin -->
+        <div class="platform-card">
+          <div class="platform-icon">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="40" height="40" rx="10" fill="var(--douyin-bg-a12)"/>
+              <path d="M25.5 10h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V10h1.5z" fill="var(--douyin-color)"/>
+              <path d="M24.5 11h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V11h1.5z" fill="var(--douyin-cyan)" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="platform-name">抖音小程序</div>
+          <div class="platform-desc">抖音扫码进入</div>
+          <div class="qr-container">
+            <div class="qr-placeholder" id="qr-douyin-pc"></div>
+          </div>
+          <div class="qr-label">抖音扫一扫</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATE: MOBILE ===== -->
+<div class="state-panel" id="panel-mobile">
+  <div class="h5-bg-content">
+    <div class="bg-title">MCU 观影导航</div>
+    <div class="bg-sub">探索漫威电影宇宙的完整时间线</div>
+    <button class="trigger-btn" onclick="">进入小程序</button>
+  </div>
+  <div class="modal-overlay bottom-sheet" style="z-index:10;">
+    <div class="modal-container sheet" data-component="modal-mobile-dual-entry">
+      <button class="modal-close" aria-label="关闭"></button>
+      <div class="modal-header">
+        <div class="title">进入 MCU 观影导航</div>
+        <div class="subtitle">选择你常用的平台继续探索</div>
+      </div>
+      <div class="mobile-cards">
+        <div class="mobile-card">
+          <div class="platform-icon">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="36" rx="9" fill="var(--wechat-bg-a12)"/>
+              <path d="M14 11C10.42 11 7.5 13.46 7.5 16.5c0 1.7.96 3.22 2.44 4.26l-.6 1.82 2.1-1.06c.76.24 1.6.38 2.46.38.28 0 .56-.02.82-.04A5.6 5.6 0 0 1 14.4 20c0-3.1 2.9-5.62 6.5-5.62.44 0 .88.04 1.32.12C21.52 12.52 18 11 14 11zm-2.7 3.1a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1zm5.6 0a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1z" fill="var(--wechat-color)"/>
+              <path d="M28 19.5c0-2.52-2.64-4.56-5.64-4.56S16.72 16.98 16.72 19.5s2.64 4.56 5.64 4.56c.62 0 1.22-.08 1.78-.24l1.68.84-.48-1.44C27.12 22.36 28 21.04 28 19.5zm-7.56-.78a.87.87 0 1 1 0 1.74.87.87 0 0 1 0-1.74zm3.82 0a.87.87 0 1 1 0 1.74.87.87 0 0 1 0-1.74z" fill="var(--wechat-color)"/>
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="platform-name">微信小程序</div>
+            <div class="platform-desc">微信用户推荐入口</div>
+          </div>
+          <button class="btn-primary">打开体验</button>
+        </div>
+        <div class="mobile-card">
+          <div class="platform-icon">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="36" rx="9" fill="var(--douyin-bg-a12)"/>
+              <path d="M22.8 9.5h2.8c.26 1.56.96 2.86 2.44 3.48v2.94c-1.3-.08-2.52-.52-3.48-1.2v5.6a6.06 6.06 0 1 1-6.06-6.06c.3 0 .6.02.9.06v2.84a3.16 3.16 0 1 0 2.12 2.98V9.5h1.28z" fill="var(--douyin-color)"/>
+              <path d="M22 10.2h2.8c.26 1.56.96 2.86 2.44 3.48v2.94c-1.3-.08-2.52-.52-3.48-1.2v5.6a6.06 6.06 0 1 1-6.06-6.06c.3 0 .6.02.9.06v2.84a3.16 3.16 0 1 0 2.12 2.98V10.2H22z" fill="var(--douyin-cyan)" opacity="0.7"/>
+            </svg>
+          </div>
+          <div class="card-info">
+            <div class="platform-name">抖音小程序</div>
+            <div class="platform-desc">抖音用户推荐入口</div>
+          </div>
+          <button class="btn-primary">打开体验</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATE: WECHAT ENV ===== -->
+<div class="state-panel" id="panel-wechat">
+  <div class="h5-bg-content">
+    <div class="bg-title">MCU 观影导航</div>
+    <div class="bg-sub">探索漫威电影宇宙的完整时间线</div>
+    <button class="trigger-btn" onclick="">进入小程序</button>
+  </div>
+  <div class="modal-overlay bottom-sheet" style="z-index:10;">
+    <div class="modal-container sheet" data-component="modal-wechat-env">
+      <button class="modal-close" aria-label="关闭"></button>
+      <div class="modal-header">
+        <div class="title">进入 MCU 观影导航</div>
+        <div class="subtitle">选择你常用的平台继续探索</div>
+      </div>
+      <!-- Primary: WeChat -->
+      <div class="env-primary-card">
+        <div class="badge">推荐</div>
+        <div class="card-top">
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="var(--wechat-bg-a12)"/>
+            <path d="M15.5 12C11.36 12 8 14.84 8 18.3c0 1.96 1.1 3.72 2.82 4.92l-.7 2.1 2.44-1.22c.88.28 1.84.44 2.84.44.32 0 .64-.02.96-.04A6.48 6.48 0 0 1 16 22.5c0-3.58 3.36-6.5 7.5-6.5.52 0 1.04.04 1.54.14C24.2 13.88 20.16 12 15.5 12zm-3.2 3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm6.4 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z" fill="var(--wechat-color)"/>
+            <path d="M32 22.5c0-2.9-3.04-5.25-6.5-5.25S19 19.6 19 22.5s3.04 5.25 6.5 5.25c.72 0 1.42-.1 2.06-.28l1.94.98-.56-1.66C30.98 25.72 32 24.22 32 22.5zm-8.7-.9a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4.4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="var(--wechat-color)"/>
+          </svg>
+          <div>
+            <div class="platform-name">微信小程序</div>
+          </div>
+        </div>
+        <div class="platform-desc">直接打开微信小程序，获得完整 MCU 观影导航体验</div>
+        <button class="btn-primary">打开微信小程序</button>
+      </div>
+      <!-- Secondary: Douyin -->
+      <div class="env-secondary">
+        <div class="divider-text">其他平台</div>
+        <button class="btn-ghost" onclick="">
+          <svg width="16" height="16" viewBox="0 0 36 36" fill="none" style="margin-right:6px;">
+            <path d="M22.8 9.5h2.8c.26 1.56.96 2.86 2.44 3.48v2.94c-1.3-.08-2.52-.52-3.48-1.2v5.6a6.06 6.06 0 1 1-6.06-6.06c.3 0 .6.02.9.06v2.84a3.16 3.16 0 1 0 2.12 2.98V9.5h1.28z" fill="currentColor"/>
+          </svg>
+          抖音小程序
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATE: DOUYIN ENV ===== -->
+<div class="state-panel" id="panel-douyin">
+  <div class="h5-bg-content">
+    <div class="bg-title">MCU 观影导航</div>
+    <div class="bg-sub">探索漫威电影宇宙的完整时间线</div>
+    <button class="trigger-btn" onclick="">进入小程序</button>
+  </div>
+  <div class="modal-overlay bottom-sheet" style="z-index:10;">
+    <div class="modal-container sheet" data-component="modal-douyin-env">
+      <button class="modal-close" aria-label="关闭"></button>
+      <div class="modal-header">
+        <div class="title">进入 MCU 观影导航</div>
+        <div class="subtitle">选择你常用的平台继续探索</div>
+      </div>
+      <!-- Primary: Douyin -->
+      <div class="env-primary-card">
+        <div class="badge">推荐</div>
+        <div class="card-top">
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="var(--douyin-bg-a12)"/>
+            <path d="M25.5 10h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V10h1.5z" fill="var(--douyin-color)"/>
+            <path d="M24.5 11h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V11h1.5z" fill="var(--douyin-cyan)" opacity="0.7"/>
+          </svg>
+          <div>
+            <div class="platform-name">抖音小程序</div>
+          </div>
+        </div>
+        <div class="platform-desc">直接打开抖音小程序，获得完整 MCU 观影导航体验</div>
+        <button class="btn-primary">打开抖音小程序</button>
+      </div>
+      <!-- Secondary: WeChat -->
+      <div class="env-secondary">
+        <div class="divider-text">其他平台</div>
+        <button class="btn-ghost" onclick="">
+          <svg width="16" height="16" viewBox="0 0 40 40" fill="none" style="margin-right:6px;">
+            <path d="M15.5 12C11.36 12 8 14.84 8 18.3c0 1.96 1.1 3.72 2.82 4.92l-.7 2.1 2.44-1.22c.88.28 1.84.44 2.84.44.32 0 .64-.02.96-.04A6.48 6.48 0 0 1 16 22.5c0-3.58 3.36-6.5 7.5-6.5.52 0 1.04.04 1.54.14C24.2 13.88 20.16 12 15.5 12z" fill="currentColor"/>
+          </svg>
+          微信小程序
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STATE: QR FALLBACK ===== -->
+<div class="state-panel" id="panel-fallback">
+  <div class="h5-bg-content">
+    <div class="bg-title">MCU 观影导航</div>
+    <div class="bg-sub">探索漫威电影宇宙的完整时间线</div>
+    <button class="trigger-btn" onclick="">进入小程序</button>
+  </div>
+  <div class="modal-overlay bottom-sheet" style="z-index:10;">
+    <div class="modal-container sheet" data-component="modal-qr-fallback">
+      <button class="modal-close" aria-label="关闭"></button>
+      <div class="modal-header">
+        <div class="title">进入 MCU 观影导航</div>
+        <div class="subtitle">选择你常用的平台继续探索</div>
+      </div>
+      <!-- WeChat with fallback QR -->
+      <div class="env-primary-card">
+        <div class="card-top">
+          <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="var(--wechat-bg-a12)"/>
+            <path d="M15.5 12C11.36 12 8 14.84 8 18.3c0 1.96 1.1 3.72 2.82 4.92l-.7 2.1 2.44-1.22c.88.28 1.84.44 2.84.44.32 0 .64-.02.96-.04A6.48 6.48 0 0 1 16 22.5c0-3.58 3.36-6.5 7.5-6.5.52 0 1.04.04 1.54.14C24.2 13.88 20.16 12 15.5 12zm-3.2 3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm6.4 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z" fill="var(--wechat-color)"/>
+            <path d="M32 22.5c0-2.9-3.04-5.25-6.5-5.25S19 19.6 19 22.5s3.04 5.25 6.5 5.25c.72 0 1.42-.1 2.06-.28l1.94.98-.56-1.66C30.98 25.72 32 24.22 32 22.5zm-8.7-.9a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4.4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="var(--wechat-color)"/>
+          </svg>
+          <div>
+            <div class="platform-name">微信小程序</div>
+          </div>
+        </div>
+        <div class="platform-desc">长按识别二维码，打开微信小程序</div>
+        <div class="fallback-qr-area">
+          <div class="qr-container" style="width:180px;height:180px;">
+            <div class="qr-placeholder" id="qr-wechat-fb"></div>
+          </div>
+          <div class="qr-hint">长按识别二维码 或 截图后扫码</div>
+        </div>
+      </div>
+      <!-- Douyin with fallback QR -->
+      <div style="margin-top:12px; background:var(--surface-2); border:1px solid var(--surface-3); border-radius:var(--radius-lg); padding:18px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="10" fill="var(--douyin-bg-a12)"/>
+            <path d="M25.5 10h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V10h1.5z" fill="var(--douyin-color)"/>
+          </svg>
+          <div class="platform-name" style="font-size:15px;">抖音小程序</div>
+        </div>
+        <div class="platform-desc" style="font-size:var(--fs-caption); color:var(--text-sub); margin-bottom:12px;">长按识别二维码，打开抖音小程序</div>
+        <div style="display:flex; justify-content:center;">
+          <div class="qr-container" style="width:160px;height:160px;">
+            <div class="qr-placeholder" id="qr-douyin-fb"></div>
+          </div>
+        </div>
+        <div class="qr-hint" style="text-align:center; margin-top:8px; font-size:var(--fs-mini); color:var(--text-weak);">长按识别二维码 或 截图后扫码</div>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<!-- ===== CONTEXT LABEL ===== -->
+<div class="context-label" id="context-label">当前状态：PC 浏览器 — 双卡片等权重二维码</div>
+
+<script>
+/* ===== STATE SWITCHER ===== */
+const labels = {
+  pc: '当前状态：PC 浏览器 — 双卡片等权重二维码',
+  mobile: '当前状态：手机浏览器 — 纵向卡片 + 按钮跳转',
+  wechat: '当前状态：微信环境 — 微信小程序优先',
+  douyin: '当前状态：抖音环境 — 抖音小程序优先',
+  fallback: '当前状态：二维码 Fallback — 无法跳转时展示二维码'
+};
+
+function switchState(state) {
+  document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.state-tab[data-state="${state}"]`).classList.add('active');
+  document.querySelectorAll('.state-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + state).classList.add('active');
+  document.getElementById('context-label').textContent = labels[state];
+}
+
+/* ===== QR CODE PLACEHOLDER GENERATOR ===== */
+function generateQRPlaceholder(containerId, accentColor) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  const size = container.offsetWidth || 140;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 25 25');
+  svg.setAttribute('width', size);
+  svg.setAttribute('height', size);
+  svg.style.borderRadius = '4px';
+
+  const bgColor = qrBg;
+
+  // Background
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bg.setAttribute('width', '25');
+  bg.setAttribute('height', '25');
+  bg.setAttribute('fill', bgColor);
+  svg.appendChild(bg);
+
+  // Position detection patterns (3 corners)
+  function addFinderPattern(x, y) {
+    // Outer
+    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    outer.setAttribute('x', x);
+    outer.setAttribute('y', y);
+    outer.setAttribute('width', '7');
+    outer.setAttribute('height', '7');
+    outer.setAttribute('fill', accentColor);
+    outer.setAttribute('rx', '0.5');
+    svg.appendChild(outer);
+    // Inner white
+    const inner = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    inner.setAttribute('x', x + 1);
+    inner.setAttribute('y', y + 1);
+    inner.setAttribute('width', '5');
+    inner.setAttribute('height', '5');
+    inner.setAttribute('fill', bgColor);
+    inner.setAttribute('rx', '0.3');
+    svg.appendChild(inner);
+    // Core
+    const core = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    core.setAttribute('x', x + 2);
+    core.setAttribute('y', y + 2);
+    core.setAttribute('width', '3');
+    core.setAttribute('height', '3');
+    core.setAttribute('fill', accentColor);
+    core.setAttribute('rx', '0.3');
+    svg.appendChild(core);
+  }
+
+  addFinderPattern(0, 0);
+  addFinderPattern(18, 0);
+  addFinderPattern(0, 18);
+
+  // Random data modules
+  const seed = containerId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  function pseudoRandom(n) {
+    let x = Math.sin(n * 9301 + seed * 49297) * 233280;
+    return x - Math.floor(x);
+  }
+
+  let idx = 0;
+  for (let row = 0; row < 25; row++) {
+    for (let col = 0; col < 25; col++) {
+      // Skip finder pattern areas
+      if ((row < 8 && col < 8) || (row < 8 && col > 16) || (row > 16 && col < 8)) continue;
+      // Timing patterns
+      if (row === 6 || col === 6) {
+        if ((row + col) % 2 === 0) {
+          const m = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          m.setAttribute('x', col);
+          m.setAttribute('y', row);
+          m.setAttribute('width', '1');
+          m.setAttribute('height', '1');
+          m.setAttribute('fill', accentColor);
+          m.setAttribute('opacity', '0.6');
+          svg.appendChild(m);
+        }
+        continue;
+      }
+      if (pseudoRandom(idx++) > 0.55) {
+        const m = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        m.setAttribute('x', col);
+        m.setAttribute('y', row);
+        m.setAttribute('width', '1');
+        m.setAttribute('height', '1');
+        m.setAttribute('fill', accentColor);
+        m.setAttribute('opacity', (0.4 + pseudoRandom(idx) * 0.4).toFixed(2));
+        svg.appendChild(m);
+      }
+    }
+  }
+
+  container.appendChild(svg);
+}
+
+/* ===== STAR FIELD ===== */
+function generateStars() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = Math.random() > 0.7 ? 'star bright' : 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.opacity = (0.15 + Math.random() * 0.4).toFixed(2);
+    if (Math.random() > 0.8) {
+      star.style.width = '3px';
+      star.style.height = '3px';
+    }
+    sf.appendChild(star);
+  }
+}
+
+/* ===== INIT ===== */
+generateStars();
+const wechatColor = getComputedStyle(document.documentElement).getPropertyValue('--wechat-color').trim();
+const douyinColor = getComputedStyle(document.documentElement).getPropertyValue('--douyin-color').trim();
+const qrBg = getComputedStyle(document.documentElement).getPropertyValue('--qr-bg').trim();
+generateQRPlaceholder('qr-wechat-pc', wechatColor);
+generateQRPlaceholder('qr-douyin-pc', douyinColor);
+generateQRPlaceholder('qr-wechat-fb', wechatColor);
+generateQRPlaceholder('qr-douyin-fb', douyinColor);
+</script>
+</body>
+</html>
