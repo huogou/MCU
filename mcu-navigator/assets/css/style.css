@@ -69,6 +69,15 @@
   --maxw: 1180px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
           "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+
+  /* ── 双平台品牌色（H5 双小程序入口，2026-08-28 策划确认）──
+     仅新增，不替换任何既有 token；平台 logo 沿用官方品牌色 */
+  --wechat-brand: #07C160;
+  --wechat-soft:  rgba(7, 193, 96, 0.14);
+  --douyin-brand: #FE2C55;
+  --douyin-soft:  rgba(254, 44, 85, 0.14);
+  --douyin-cyan:  #25F4EE;
+  --qr-bg:        #FFFFFF;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -866,6 +875,200 @@ h3 { font-size: 16px; font-weight: 600; }
 .mp-modal-ok:hover { background: #1FA377; }
 
 /* ============================================================
+ * 双小程序入口面板（微信 + 抖音）— 2026-08-28 策划确认
+ * 视觉：延续 MCU 深色宇宙主题；平台平级（非环境态等权重）
+ * 状态：is-pc（双卡并列）/ is-mobile（纵向卡）/ is-env（环境优先+次级）
+ * 色值全部走 CSS 变量，本段不引入裸 hex（品牌色见 :root）
+ * ============================================================ */
+
+/* 弹窗主体改为深色（与 MCU 宇宙主题一致） */
+.mp-modal {
+  background: linear-gradient(165deg, var(--surface-2) 0%, var(--surface) 100%);
+  color: var(--text);
+  border: 1px solid var(--border-lit);
+  max-width: 440px;
+  padding: 26px 24px 22px;
+}
+.mp-modal-close { color: var(--text-3); }
+.mp-modal-close:hover { background: var(--surface-3); color: var(--text); }
+.mp-modal-t { color: var(--text); }
+.mp-modal-d { color: var(--text-2); }
+.mp-modal-note {
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+.mp-modal-note b { color: var(--gold); }
+.mp-modal-ok { background: var(--gold); color: #1A1206; }
+.mp-modal-ok:hover { background: #F0B84A; }
+
+/* ── 平台卡通用 ── */
+.mp-modal-body { margin-top: 18px; }
+
+.mp-plat-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-lit);
+  border-radius: var(--r-lg);
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.mp-plat-card:hover { border-color: var(--border-lit); }
+
+.mp-plat-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  margin-bottom: 10px;
+}
+
+.mp-plat-icon { width: 40px; height: 40px; margin-bottom: 10px; }
+.mp-plat-icon svg { width: 100%; height: 100%; display: block; }
+
+.mp-plat-name {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.mp-plat-desc {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-bottom: 14px;
+}
+
+/* ── 二维码区 ── */
+.mp-qr-box {
+  width: 168px;
+  height: 168px;
+  background: var(--qr-bg);
+  border-radius: var(--r);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .28);
+}
+.mp-qr-box img { width: 100%; height: 100%; object-fit: contain; }
+.mp-qr-box-fb {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+  background: var(--qr-bg);
+}
+.mp-qr-box-fb svg { width: 108px; height: 108px; }
+
+.mp-qr-hint {
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--text-3);
+  letter-spacing: .02em;
+}
+
+/* ── 状态①：PC 双卡等权重 ── */
+.mp-modal-body.is-pc .mp-pc-cards {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.mp-modal-body.is-pc .mp-plat-card {
+  flex: 1;
+  min-width: 0;
+  max-width: 200px;
+}
+.mp-modal-body.is-pc .mp-qr-box { width: 132px; height: 132px; }
+
+/* ── 状态②：手机浏览器纵向卡 ── */
+.mp-modal-body.is-mobile .mp-mobile-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.mp-modal-body.is-mobile .mp-qr-box { width: 150px; height: 150px; }
+
+/* ── 状态③④：环境优先（微信/抖音）── */
+.mp-modal-body.is-env .mp-env-card {
+  background: var(--surface-2);
+  border: 1px solid var(--gold);
+  border-radius: var(--r-lg);
+  padding: 18px 16px;
+  text-align: center;
+  box-shadow: 0 0 0 1px var(--gold-soft), 0 8px 24px rgba(240, 169, 50, .12);
+}
+.mp-modal-body.is-env .mp-env-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.mp-modal-body.is-env .mp-env-top .mp-plat-icon {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 0;
+}
+.mp-modal-body.is-env .mp-env-top .mp-plat-name { margin-bottom: 0; }
+.mp-modal-body.is-env .mp-qr-box { width: 156px; height: 156px; margin-left: auto; margin-right: auto; }
+
+.mp-env-secondary {
+  margin-top: 14px;
+  text-align: center;
+}
+.mp-env-divider {
+  font-size: 11.5px;
+  color: var(--text-3);
+  margin-bottom: 9px;
+  letter-spacing: .04em;
+}
+.mp-ghost-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  border: 1px solid var(--border-lit);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.mp-ghost-btn:hover {
+  color: var(--text);
+  border-color: var(--text-3);
+  background: var(--surface-3);
+}
+.mp-ghost-ic {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  flex: none;
+}
+.mp-ghost-ic svg { width: 100%; height: 100%; display: block; }
+
+/* ── 窄屏适配 ── */
+@media (max-width: 480px) {
+  .mp-modal { padding: 22px 18px 18px; max-width: 100%; }
+  .mp-modal-body.is-pc .mp-pc-cards { flex-direction: column; align-items: center; }
+  .mp-modal-body.is-pc .mp-plat-card { max-width: 100%; width: 100%; }
+  .mp-modal-body.is-pc .mp-qr-box { width: 150px; height: 150px; }
+}
+
+/* ============================================================
  * D8 · H5 → 小程序衔接入口（六档强度，暗色 surface + 金/绿强调，复用 QR_SVG）
  * 强度：5/5 全景 > 4/5 路线模块 > 3/5 探索卡 > 2/5 详情内联 > 1/5 首页/页脚
  * ============================================================ */
@@ -1220,24 +1423,9 @@ h3 { font-size: 16px; font-weight: 600; }
 .milestone-d { font-size: 13.5px; color: var(--text-2); line-height: 1.65; }
 .milestone-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
-/* ── V1.3 最终收口：小程序扫码面板环境适配 ── */
-.mp-modal-env {
-  display: flex; align-items: center; gap: 8px; justify-content: center;
-  margin-top: 10px; padding: 9px 14px; border-radius: var(--r-sm);
-  background: rgba(91,141,239,.08); border: 1px solid rgba(91,141,239,.18);
-  font-size: 12.5px; color: var(--blue);
-}
-.mp-modal-env svg { width: 16px; height: 16px; flex: none; }
-.mp-modal-env.wechat-env {
-  background: rgba(40,180,135,.08); border-color: rgba(40,180,135,.18); color: var(--green);
-}
-.mp-modal-qr.hint-longpress {
-  animation: qr-pulse 2.2s ease-in-out infinite;
-}
-@keyframes qr-pulse {
-  0%, 100% { box-shadow: 0 4px 16px rgba(26,32,48,.08); }
-  50% { box-shadow: 0 4px 24px rgba(40,180,135,.28), 0 0 0 4px rgba(40,180,135,.10); }
-}
+/* 注：V1.3 时期的 .mp-modal-env 环境引导条与 qr-pulse 动画已随「双小程序入口」
+   改造（2026-08-28）移除——环境态改由 .mp-modal-body.is-env 主卡承载，
+   此处不再保留旧规则，避免与新版样式并存造成歧义。 */
 
 /* ── V1.3 最终收口：路线页分组标签 ── */
 .route-group-label {
@@ -1335,7 +1523,6 @@ h3 { font-size: 16px; font-weight: 600; }
   .milestone-t { font-size: 15px; }
   .milestone-d { font-size: 13px; }
   .milestone-actions { flex-direction: column; align-items: stretch; }
-  .mp-modal-env { font-size: 11.5px; padding: 8px 10px; }
   .route-group-label { font-size: 10px; letter-spacing: .5px; padding: 0 3px; }
   .rec-from-phase { font-size: 10px; padding: 2px 6px; }
 }

@@ -806,11 +806,101 @@ var VIEW_MODES = {
       return '';
     },
 
+    /* 环境检测：wechat / douyin / desktop / mobile
+     * 判定顺序（重要，不可调换）：
+     *   ① 先判 App 内嵌环境（微信 / 抖音）——Android UA 同时含 "Linux"，
+     *      若先判 desktop 会把「安卓微信/安卓抖音」误判为 PC。
+     *   ② 再判桌面端：桌面系统 且 明确非移动端。
+     *   ③ 其余为手机浏览器。
+     * 注：微信与抖音 UA 互斥，两者先后不影响结果。 */
     _detectEnv: function () {
       var ua = navigator.userAgent || '';
-      if (/windows|macintosh|linux/i.test(ua) && !/mobile/i.test(ua)) return 'desktop';
       if (/micromessenger/i.test(ua)) return 'wechat';
+      /* 抖音系：BytedanceWebView（抖音 App 内嵌）/ Douyin / Aweme（抖音国际版） */
+      if (/bytedancewebview|douyin|aweme/i.test(ua)) return 'douyin';
+      if (/windows|macintosh|linux/i.test(ua) && !/mobile/i.test(ua)) return 'desktop';
       return 'mobile';
+    },
+    /* ── 双平台入口：各平台配置（单一来源，便于后续替换二维码/跳转链接）──
+     * qr：二维码图片路径。抖音小程序二维码需在抖音小程序上线后获取，
+     *     届时只需把 douyin.qr 换成真实图片路径（如 assets/miniprogram/qrcode-douyin.png），
+     *     无需改动任何布局或交互逻辑。
+     * icon：内联 SVG（微信绿 / 抖音红），色值走 CSS 变量，无裸 hex。 */
+    MP_PLATFORMS: {
+      wechat: {
+        key: 'wechat',
+        name: '微信小程序',
+        desc: '微信扫码进入',
+        color: 'var(--wechat-brand)',
+        qr: 'assets/miniprogram/qrcode.png',
+        icon: '<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+          + '<rect width="40" height="40" rx="10" fill="var(--wechat-soft)"/>'
+          + '<path d="M15.5 12C11.36 12 8 14.84 8 18.3c0 1.96 1.1 3.72 2.82 4.92l-.7 2.1 2.44-1.22c.88.28 1.84.44 2.84.44.32 0 .64-.02.96-.04A6.48 6.48 0 0 1 16 22.5c0-3.58 3.36-6.5 7.5-6.5.52 0 1.04.04 1.54.14C24.2 13.88 20.16 12 15.5 12zm-3.2 3.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zm6.4 0a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z" fill="var(--wechat-brand)"/>'
+          + '<path d="M32 22.5c0-2.9-3.04-5.25-6.5-5.25S19 19.6 19 22.5s3.04 5.25 6.5 5.25c.72 0 1.42-.1 2.06-.28l1.94.98-.56-1.66C30.98 25.72 32 24.22 32 22.5zm-8.7-.9a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4.4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" fill="var(--wechat-brand)"/>'
+          + '</svg>'
+      },
+      douyin: {
+        key: 'douyin',
+        name: '抖音小程序',
+        desc: '抖音扫码进入',
+        color: 'var(--douyin-brand)',
+        qr: '', /* 待抖音小程序上线后替换为真实二维码图片路径 */
+        icon: '<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+          + '<rect width="40" height="40" rx="10" fill="var(--douyin-soft)"/>'
+          + '<path d="M25.5 10h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V10h1.5z" fill="var(--douyin-brand)"/>'
+          + '<path d="M24.5 11h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V11h1.5z" fill="var(--douyin-cyan)" opacity="0.7"/>'
+          + '</svg>'
+      }
+    },
+    /* 二维码占位（抖音二维码未就位时使用）：保持与原小程序码一致的视觉规格 */
+    _mpQrFallback: function (platformKey) {
+      var p = ui.MP_PLATFORMS[platformKey];
+      return '<div class="mp-qr-box-fb" data-fb-platform="' + platformKey + '">' + QR_SVG + '</div>';
+    },
+    /* 单个平台的二维码区：真实二维码优先，缺失则降级为 SVG 占位 */
+    _mpQrBox: function (platformKey) {
+      var p = ui.MP_PLATFORMS[platformKey];
+      var inner = p.qr
+        ? '<img src="' + p.qr + '" alt="' + p.name + '码" loading="lazy"'
+          + ' onerror="this.style.display=\'none\';var s=this.parentNode.querySelector(\'.mp-qr-box-fb\');if(s)s.style.display=\'\'">'
+          + '<div class="mp-qr-box-fb" style="display:none">' + QR_SVG + '</div>'
+        : ui._mpQrFallback(platformKey);
+      return '<div class="mp-qr-box">' + inner + '</div>';
+    },
+    /* 平台卡（PC 双卡 / 二维码 Fallback 用，纵向排列） */
+    _mpPlatformCard: function (platformKey, opt) {
+      opt = opt || {};
+      var p = ui.MP_PLATFORMS[platformKey];
+      var desc = opt.desc || p.desc;
+      return '<div class="mp-plat-card' + (opt.highlight ? ' is-primary' : '') + '" data-platform="' + platformKey + '">'
+        + (opt.badge ? '<div class="mp-plat-badge">' + esc(opt.badge) + '</div>' : '')
+        + '<div class="mp-plat-icon">' + p.icon + '</div>'
+        + '<div class="mp-plat-name">' + p.name + '</div>'
+        + '<div class="mp-plat-desc">' + desc + '</div>'
+        + ui._mpQrBox(platformKey)
+        + '<div class="mp-qr-hint">' + (p.qr ? '扫一扫打开' : '二维码待上线') + '</div>'
+        + '</div>';
+    },
+    /* 环境态主卡（微信/抖音环境）：平台优先 + 另一平台次级入口 */
+    _mpEnvPrimary: function (platformKey, otherKey) {
+      var p = ui.MP_PLATFORMS[platformKey];
+      var other = ui.MP_PLATFORMS[otherKey];
+      return '<div class="mp-env-card" data-platform="' + platformKey + '">'
+        + '<div class="mp-plat-badge">推荐</div>'
+        + '<div class="mp-env-top">'
+        +   '<div class="mp-plat-icon">' + p.icon + '</div>'
+        +   '<div class="mp-plat-name">' + p.name + '</div>'
+        + '</div>'
+        + '<div class="mp-plat-desc">直接打开' + p.name + '，获得完整 MCU 观影导航体验</div>'
+        + ui._mpQrBox(platformKey)
+        + '<div class="mp-qr-hint">' + (p.qr ? '长按识别二维码打开' : '二维码待上线') + '</div>'
+        + '</div>'
+        + '<div class="mp-env-secondary">'
+        +   '<div class="mp-env-divider">其他平台</div>'
+        +   '<button class="mp-ghost-btn" type="button" data-mp-switch="' + otherKey + '">'
+        +     '<span class="mp-ghost-ic">' + other.icon + '</span>' + other.name
+        +   '</button>'
+        + '</div>';
     },
     openMpModal: function (title, desc, payload) {
       var ov = ui._ensureMpModal();
@@ -819,33 +909,50 @@ var VIEW_MODES = {
       /* D8：参数化预留——把入口携带的 movieId/routeId/exploreId 暂存到面板，
          未来小程序支持带参跳转时，此处即可读取并拼接跳转链接（当前仅预留，不跳转）。 */
       ov.setAttribute('data-mp-payload', payload ? JSON.stringify(payload) : '');
+
       var c = progress.count();
       var env = ui._detectEnv();
-      var envEl = ov.querySelector('.mp-modal-env');
-      var qrEl = ov.querySelector('.mp-modal-qr');
+      var bodyEl = ov.querySelector('.mp-modal-body');
+      var noteEl = ov.querySelector('.mp-modal-note');
 
-      /* 环境引导文案 */
+      /* ── 5 状态渲染（策划 2026-08-28 确认）──
+       * ① desktop：PC 双卡等权重（微信/抖音并列，各展示二维码）
+       * ② mobile：手机浏览器纵向卡 + 按钮跳转
+       * ③ wechat：微信小程序优先 + 抖音次级
+       * ④ douyin：抖音小程序优先 + 微信次级
+       * ⑤ 二维码 Fallback：无法跳转时两平台均展示二维码
+       * 注：平台平级——非环境态下微信与抖音完全等权重，仅环境感知时对应平台优先。 */
       if (env === 'desktop') {
-        envEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>打开微信扫一扫，扫描屏幕上的二维码';
-        envEl.className = 'mp-modal-env';
-        qrEl.classList.remove('hint-longpress');
+        bodyEl.className = 'mp-modal-body is-pc';
+        bodyEl.innerHTML =
+          '<div class="mp-pc-cards">'
+          + ui._mpPlatformCard('wechat')
+          + ui._mpPlatformCard('douyin')
+          + '</div>';
       } else if (env === 'wechat') {
-        envEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>长按识别上方小程序码，直接打开小程序';
-        envEl.className = 'mp-modal-env wechat-env';
-        qrEl.classList.add('hint-longpress');
+        bodyEl.className = 'mp-modal-body is-env';
+        bodyEl.innerHTML = ui._mpEnvPrimary('wechat', 'douyin');
+      } else if (env === 'douyin') {
+        bodyEl.className = 'mp-modal-body is-env';
+        bodyEl.innerHTML = ui._mpEnvPrimary('douyin', 'wechat');
       } else {
-        envEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="2" width="14" height="20" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>打开微信扫一扫，扫描上方小程序码';
-        envEl.className = 'mp-modal-env';
-        qrEl.classList.remove('hint-longpress');
+        bodyEl.className = 'mp-modal-body is-mobile';
+        bodyEl.innerHTML =
+          '<div class="mp-mobile-cards">'
+          + ui._mpPlatformCard('wechat')
+          + ui._mpPlatformCard('douyin')
+          + '</div>';
       }
 
-      ov.querySelector('.mp-modal-note').innerHTML =
-        (env === 'wechat'
-          ? '长按识别上方小程序码即可打开。<br>'
-          : '小程序已上线，微信扫码即可打开。<br>')
+      /* 进度说明：与已看数量联动，沿用原有文案口径 */
+      noteEl.innerHTML =
+        (env === 'wechat' || env === 'douyin'
+          ? '长按识别上方二维码即可打开。<br>'
+          : '小程序已上线，扫码即可打开。<br>')
         + (c > 0
           ? '你标记的 <b>' + c + '</b> 部已看作品已保存在本机浏览器，不会丢失。'
           : '你当前的浏览记录已保存在本机浏览器，不会丢失。');
+
       ov.classList.add('show');
       document.body.style.overflow = 'hidden';
     },
@@ -859,23 +966,27 @@ var VIEW_MODES = {
       _mpOverlay = document.createElement('div');
       _mpOverlay.className = 'mp-modal-overlay';
       _mpOverlay.innerHTML =
-        '<div class="mp-modal" role="dialog" aria-modal="true" aria-label="扫码打开小程序">'
+        '<div class="mp-modal" role="dialog" aria-modal="true" aria-label="选择平台打开小程序">'
         +   '<button class="mp-modal-close" type="button" aria-label="关闭">×</button>'
-        +   '<div class="mp-modal-badge">微信小程序 · 已上线</div>'
-        +   '<div class="mp-modal-qr">'
-        +     '<img src="assets/miniprogram/qrcode.png" alt="小程序码"'
-        +       ' onerror="this.style.display=\'none\';var s=this.nextElementSibling;if(s)s.style.display=\'\'">'
-        +     '<div class="mp-modal-qr-fb" style="display:none">' + QR_SVG + '</div>'
-        +   '</div>'
-        +   '<div class="mp-modal-env"></div>'
         +   '<div class="mp-modal-t"></div>'
         +   '<div class="mp-modal-d"></div>'
+        +   '<div class="mp-modal-body"></div>'
         +   '<div class="mp-modal-note"></div>'
         +   '<button class="mp-modal-ok" type="button">知道了</button>'
         + '</div>';
       document.body.appendChild(_mpOverlay);
       _mpOverlay.addEventListener('click', function (e) {
-        if (e.target === _mpOverlay) ui.closeMpModal();
+        if (e.target === _mpOverlay) { ui.closeMpModal(); return; }
+        /* 次级平台切换：在环境态中点击「其他平台」按钮，切换到该平台的二维码视图 */
+        var sw = e.target.closest ? e.target.closest('[data-mp-switch]') : null;
+        if (sw) {
+          var key = sw.getAttribute('data-mp-switch');
+          var bodyEl = _mpOverlay.querySelector('.mp-modal-body');
+          if (key && ui.MP_PLATFORMS[key]) {
+            bodyEl.innerHTML = ui._mpPlatformCard(key);
+            bodyEl.className = 'mp-modal-body is-mobile';
+          }
+        }
       });
       _mpOverlay.querySelector('.mp-modal-close').onclick = ui.closeMpModal;
       _mpOverlay.querySelector('.mp-modal-ok').onclick = ui.closeMpModal;
