@@ -1,0 +1,427 @@
+/* 首页 home（Tab1）· V1.2 视觉系统落地样式（按《MCU-V1.2-Visual-Design-System》VDS V2 §2）
+ * 结构：① Hero Banner(满宽沉浸) → ② 旅程/推荐卡(简化) → ③ 推荐下一部大卡
+ *       → ④ 功能入口 2×2 → ⑤ 热门角色横滚 → ⑥ 最近观看横滚
+ * 颜色一律 var()（零裸 hex）；字号 5 档；圆角 Token；间距 --space-*
+ * 阵营色 / 海报阶段色系统统一在 app.wxss 全局（Step4 提取）
+ */
+
+.home-page {
+  padding: 0 var(--page-x);               /* 顶部留白由 Hero Banner 承担（满宽突破） */
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding-bottom: var(--space-2xl);
+}
+
+.section { margin-top: var(--space-xl); }
+.section:last-child { margin-bottom: 0; }
+
+/* 模块标题（36rpx/600/main，下距 28rpx） */
+.module-title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: var(--space-md);
+}
+
+/* ═══ ① Hero Banner（VDS §2.2） ═══ */
+.hero-banner {
+  position: relative;
+  width: auto;
+  height: 420rpx;
+  overflow: hidden;
+  margin: 0 calc(-1 * var(--page-x));     /* 满宽突破页边距 */
+}
+.hero-banner-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-banner-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(8,11,18,0.2) 0%,
+    rgba(8,11,18,0.1) 40%,
+    rgba(8,11,18,0.7) 80%,
+    var(--bg) 100%
+  );
+}
+.hero-banner-content {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 var(--page-x) var(--space-lg);
+}
+.hero-banner-tag {
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 4rpx;
+  margin-bottom: var(--space-xs);
+}
+.hero-banner-title {
+  font-size: var(--fs-display);          /* 56rpx */
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+.hero-banner-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+/* 迷你旅程条 */
+.hero-journey-bar {
+  display: flex;
+  align-items: center;
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-full);
+  padding: var(--space-xs) var(--space-sm);
+  margin-top: var(--space-md);
+}
+.hero-journey-hover { opacity: 0.9; }
+.hero-journey-progress {
+  flex: 1;
+  height: 6rpx;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  margin-right: var(--space-sm);
+  overflow: hidden;
+}
+.hero-journey-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: var(--radius-full);
+}
+.hero-journey-text {
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ */
+.journey-card {
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-xl);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+.journey-inner {
+  padding: var(--space-md);
+}
+.journey-label {
+  font-size: var(--fs-caption);          /* 24rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  letter-spacing: 2rpx;
+  margin-bottom: var(--space-sm);
+}
+.journey-movie {
+  display: flex;
+  align-items: center;
+}
+.jm-poster {
+  width: 88rpx;
+  height: 132rpx;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.jm-poster text {
+  font-size: var(--fs-display-sm);       /* 44rpx 首字 */
+  font-weight: 700;
+  color: var(--white-a60);
+}
+.jm-info { flex: 1; min-width: 0; margin-left: var(--space-md); }
+.jm-name {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--text-main);
+}
+.jm-en {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+.jm-phase {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-weak);
+  margin-top: var(--space-xs);
+}
+.jm-cta {
+  flex-shrink: 0;
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--gold-a10);
+  padding: 10rpx var(--space-md);
+  border-radius: var(--radius-full);
+  margin-left: var(--space-sm);
+}
+
+/* ═══ ③ 推荐下一部大卡（保持） ═══ */
+.rec-card {
+  background: var(--surface-1);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-hero);
+  margin-bottom: var(--space-xl);
+}
+.rec-poster-wrap {
+  position: relative;
+  width: 100%;
+  height: 360rpx;
+}
+.rec-poster {
+  width: 100%;
+  height: 360rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rec-poster text {
+  font-size: var(--fs-display);          /* 56rpx 首字 */
+  font-weight: 700;
+  color: var(--white-a50);
+}
+/* 海报底部渐变，保证文字可读 */
+.rec-poster-mask {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 200rpx;
+  background: linear-gradient(to top, var(--surface-1), transparent);
+  pointer-events: none;
+}
+.rec-body { padding: var(--space-md); }
+.rec-tag {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 2rpx;
+}
+.rec-phase {
+  float: right;
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  color: var(--text-weak);
+}
+.rec-name {
+  font-size: var(--fs-title);            /* 36rpx */
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: var(--space-xs);
+}
+.rec-sub {
+  font-size: var(--fs-caption);          /* 24rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+}
+.rec-reason {
+  font-size: var(--fs-caption);          /* 24rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  line-height: 1.5;
+  margin-top: var(--space-sm);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* 强调按钮（全页唯一金色实心） */
+.btn-accent {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  height: 88rpx;
+  line-height: 88rpx;
+  text-align: center;
+  margin-top: var(--space-lg);
+  box-shadow: var(--glow-gold);
+}
+.btn-hover { opacity: 0.85; }
+
+/* ═══ ④ 功能入口 2×2 视觉卡片（VDS §2.3 重设计） ═══ */
+.entry-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.entry-visual-card {
+  width: calc((100% - var(--space-sm)) / 2);
+  height: 240rpx;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+.evc-hover { opacity: 0.9; }
+.evc-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+}
+.evc-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(8,11,18,0.75) 0%,
+    rgba(8,11,18,0.45) 100%
+  );
+}
+.evc-content {
+  position: relative;
+  height: 100%;
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.evc-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: var(--radius-md);
+  background: var(--gold-a15);
+  color: var(--gold);
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+}
+.evc-title {
+  font-size: var(--fs-title);            /* 36rpx */
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+}
+.evc-desc {
+  font-size: var(--fs-mini);             /* 22rpx */
+  color: var(--text-sub);
+  margin-top: var(--space-xs);           /* 4→8（P1-4） */
+}
+
+/* ═══ ⑤ 热门角色（横滚） ═══ */
+.char-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+.char-row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.char-card {
+  flex-shrink: 0;
+  width: 168rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-xs);
+  box-sizing: border-box;
+  margin-right: var(--space-sm);
+}
+.char-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3rpx solid transparent;        /* 由 fring-* 覆盖阵营色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.char-img { width: 100%; height: 100%; }
+.char-initial {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-display-sm);       /* 44rpx 首字 */
+  font-weight: 700;
+  color: var(--white-a70);
+}
+.char-name {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: var(--space-sm);
+}
+.char-faction {
+  font-size: var(--fs-mini);             /* 22rpx */
+  font-weight: 400;
+  margin-top: var(--space-xs);
+}
+.char-hover { border: 1rpx solid var(--gold-a20); }
+
+/* ═══ ⑥ 最近观看（横滚） ═══ */
+.recent-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+.recent-row {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.recent-item {
+  flex-shrink: 0;
+  width: 120rpx;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: var(--space-sm);
+}
+.recent-poster {
+  width: 120rpx;
+  height: 160rpx;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recent-img { width: 100%; height: 100%; }
+.poster-text {
+  font-size: var(--fs-display);          /* 48rpx */
+  font-weight: 700;
+  color: var(--white-a50);
+}
+.recent-name {
+  font-size: var(--fs-caption);          /* 24rpx */
+  font-weight: 400;
+  color: var(--text-sub);
+  margin-top: var(--space-xs);
+  max-width: 120rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent-hover { opacity: 0.85; }
+
+.empty-hint {
+  font-size: var(--fs-body);             /* 28rpx */
+  font-weight: 400;
+  color: var(--text-weak);
+  padding: var(--space-xl) 0;
+  text-align: center;
+}
+
+/* 阵营色 / 海报阶段色系统统一至 app.wxss 全局（Step4 全局统一） */

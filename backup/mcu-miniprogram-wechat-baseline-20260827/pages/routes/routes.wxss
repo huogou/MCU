@@ -1,0 +1,179 @@
+/* 路线 routes 样式 · V1.2 统一视觉
+ * 颜色全部引用 app.wxss 全局 Token（零 raw hex 泄漏）
+ * 字号/间距统一使用全局 var(--fs-*) / var(--space-*)
+ */
+
+.routes-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding-bottom: var(--space-2xl);
+}
+
+/* ══════ 头部 ══════ */
+.routes-header {
+  padding: var(--space-md) var(--page-x) 0;
+}
+.rh-title {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: var(--space-md);
+}
+.route-tabs {
+  display: flex;
+  border-bottom: 2rpx solid var(--surface-3);
+}
+.route-tab {
+  padding: var(--space-sm) 36rpx;
+  font-size: var(--fs-body);
+  color: var(--text-weak);
+  border-bottom: 4rpx solid transparent;
+  margin-bottom: -2rpx;
+  box-sizing: border-box;
+}
+.route-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+  font-weight: 600;
+}
+
+/* ══════ Phase 导航序列（专项⑥：阶段图辅助视觉，纯展示） ══════ */
+.phase-strip {
+  width: 100%;
+  white-space: nowrap;
+  padding: var(--space-xs) var(--page-x) 0;
+  box-sizing: border-box;
+}
+.phase-strip-inner {
+  display: inline-flex;
+  gap: var(--space-xs);
+  padding: 4rpx 0;
+}
+.phase-cell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6rpx;
+  flex-shrink: 0;
+}
+.phase-cell-img {
+  width: 96rpx;
+  height: 52rpx;
+  border-radius: var(--radius-sm);
+  border: 1rpx solid var(--surface-3);
+}
+.phase-cell-label {
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--text-sub);
+  letter-spacing: 1rpx;
+}
+
+/* ══════ 当前路线进度 ══════ */
+.section-label {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  margin: var(--space-md) var(--page-x) var(--space-sm);
+  letter-spacing: 0.02em;
+}
+.route-next-card {
+  margin: 0 var(--page-x) var(--space-md);
+  background: var(--surface-2);
+  border: 2rpx solid var(--gold-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.route-next-info {
+  flex: 1;
+  min-width: 0;
+}
+.rn-label {
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  letter-spacing: 0.04em;
+}
+.rn-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4rpx;
+}
+.rn-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+}
+.route-next-btn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--space-xs);
+  flex-shrink: 0;
+}
+.route-next-btn.is-disabled {
+  background: var(--surface-3);
+  color: var(--text-weak);
+}
+
+/* ══════ 路线列表 ══════ */
+.route-list {
+  padding: var(--space-md) var(--page-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.route-card {
+  background: var(--surface-2);
+  border: 2rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+.route-card.current-route {
+  border-color: var(--gold-a50);
+  background: linear-gradient(135deg, var(--gold-a04), var(--surface-2));
+}
+.rc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+.rc-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+}
+.rc-count {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+.rc-tag {
+  font-size: var(--fs-caption);
+  color: var(--gold);
+  margin-bottom: var(--space-xs);
+  font-weight: 400;   /* 500→400（全局字重统一，Step5） */
+}
+.rc-for {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  line-height: 1.4;
+  margin-bottom: var(--space-sm);
+}
+.rc-progress {
+  height: 8rpx;
+  background: var(--surface-3);
+  border-radius: 4rpx;
+  overflow: hidden;
+}
+.rc-progress .bar {
+  height: 100%;
+  border-radius: 4rpx;
+}

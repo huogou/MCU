@@ -1,0 +1,381 @@
+/* 我的MCU 样式 · V1.2 统一视觉
+ * 颜色全部引用 app.wxss 全局 Token（零 raw hex 泄漏）
+ * 字号/间距统一使用全局 var(--fs-*) / var(--space-*)
+ */
+
+.mcu-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding-bottom: var(--space-2xl);
+}
+
+/* 海报阶段色系统已统一至 app.wxss 全局（Step4）*/
+
+/* ══════ ① 顶部用户状态区 ══════ */
+.mcu-hero {
+  padding: var(--space-xl) var(--page-x) 36rpx;
+  background: linear-gradient(160deg, var(--gold-a10), transparent 60%);
+  border-bottom: 2rpx solid var(--surface-3);
+}
+.mcu-hero-label {
+  font-size: var(--fs-caption);
+  color: var(--text-weak);
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-sm);
+}
+.mcu-explore {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+}
+.mcu-explore-num {
+  font-size: 72rpx;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.mcu-explore-sep,
+.mcu-explore-total {
+  font-size: var(--fs-display-sm);
+  font-weight: 600;
+  color: var(--text-sub);
+}
+.mcu-explore-tip {
+  font-size: var(--fs-caption);
+  color: var(--text-weak);
+  margin-top: var(--space-xs);
+}
+.mcu-progress {
+  height: 12rpx;
+  background: var(--surface-3);
+  border-radius: 6rpx;
+  overflow: hidden;
+  margin: var(--space-md) 0 12rpx;
+}
+.mcu-progress-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 6rpx;
+  transition: width 0.3s ease;
+}
+.mcu-progress-tip {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+
+/* ══════ 区块标签 ══════ */
+.section-label {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  margin: var(--space-lg) var(--page-x) var(--space-sm);
+  letter-spacing: 0.02em;
+}
+
+/* ══════ ② 当前路线卡 ══════ */
+.route-next-card {
+  margin: 0 var(--page-x) var(--space-xs);
+  background: var(--surface-2);
+  border: 2rpx solid var(--gold-a20);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.route-next-info {
+  flex: 1;
+  min-width: 0;
+}
+.rn-label {
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+  letter-spacing: 0.04em;
+}
+.rn-title {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6rpx;
+}
+.rn-sub {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+}
+.route-next-btn {
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--space-xs);
+  flex-shrink: 0;
+}
+.route-next-btn.is-disabled {
+  background: var(--surface-3);
+  color: var(--text-weak);
+}
+
+/* ══════ ③ ④ 列表卡片 ══════ */
+.card-list {
+  padding: 0 var(--page-x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.work-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--surface-2);
+  border: 2rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.wc-poster {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  display: flex;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--white);
+  text-shadow: 0 2rpx 6rpx var(--black-a35);
+  border: 2rpx solid var(--white-a12);
+}
+.wc-info {
+  flex: 1;
+  min-width: 0;
+}
+.wc-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4rpx;
+}
+.wc-sub {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.wc-badge {
+  flex-shrink: 0;
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  padding: 6rpx 16rpx;
+  border-radius: var(--space-xs);
+}
+.wc-badge.done {
+  color: var(--text-weak);
+  background: var(--surface-3);
+}
+.wc-badge.fav {
+  color: var(--gold);
+  background: var(--gold-a12);
+  border: 2rpx solid var(--gold-a30);
+}
+
+/* ══════ 后续入口预留 ══════ */
+.entry-row {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--page-x) 0;
+}
+.entry-card {
+  flex: 1;
+  background: var(--surface-2);
+  border: 2rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+.entry-card.entry-primary {
+  background: linear-gradient(135deg, var(--gold-a10), var(--gold-a02));
+  border-color: var(--gold-a30);
+}
+.entry-hover { opacity: 0.88; }
+.entry-title {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6rpx;
+}
+.entry-card.entry-primary .entry-title { color: var(--gold); }
+.entry-desc {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+.entry-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 6rpx 14rpx;
+  font-size: var(--fs-mini);
+  color: var(--gold-btn-text);
+  background: var(--gold);
+  border-radius: 0 16rpx 0 14rpx;
+  font-weight: 600;
+}
+
+/* ══════ 成就墙 ══════ */
+.ach-row {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 0 var(--page-x);
+  white-space: nowrap;
+}
+.ach-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 132rpx;
+}
+.ach-hover { opacity: 0.85; }
+.ach-badge {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-display-sm);
+  font-weight: 700;
+  background: var(--surface-3);
+  border: 2rpx solid var(--surface-3);
+  color: var(--text-weak);
+  margin-bottom: 10rpx;
+}
+.ach-badge.gained {
+  background: var(--gold-a14);
+  border-color: var(--gold-a50);
+  color: var(--gold);
+}
+.ach-name {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 132rpx;
+}
+.ach-name.gained {
+  color: var(--text-main);
+}
+
+/* ══════ 路线进度条 ══════ */
+.rn-progress {
+  height: 8rpx;
+  background: var(--surface-3);
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin-top: 12rpx;
+}
+.rn-progress-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 4rpx;
+  transition: width 0.3s ease;
+}
+
+/* ══════ 最近观看 ══════ */
+.recent-row {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 0 var(--page-x);
+  white-space: nowrap;
+}
+.recent-item {
+  display: inline-flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 168rpx;
+}
+.recent-hover { opacity: 0.85; }
+.recent-poster {
+  width: 168rpx;
+  height: 236rpx;
+  border-radius: var(--radius-md);
+  margin-bottom: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+.recent-letter {
+  font-size: var(--fs-display-sm);
+  font-weight: 700;   /* 800→700（全局字重统一，Step5） */
+  color: var(--white-a70);
+}
+.recent-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6rpx 0;
+  font-size: var(--fs-mini);
+  text-align: center;
+  color: var(--text-weak);
+  background: var(--bg-a55);
+}
+.recent-name {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ══════ 空态 ══════ */
+.empty-tip {
+  font-size: var(--fs-caption);
+  color: var(--text-weak);
+  line-height: 1.6;
+  padding: var(--space-md) var(--space-xs);
+}
+.mcu-bottom-space {
+  height: 40rpx;
+}
+
+/* ══════ 反馈入口 ══════ */
+.fb-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 var(--page-x) var(--space-sm);
+  padding: var(--space-md) var(--space-md);
+  background: var(--surface-2);
+  border: 2rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+}
+.fb-entry-info { flex: 1; min-width: 0; }
+.fb-entry-title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--text-main);
+}
+.fb-entry-sub {
+  margin-top: var(--space-xs);
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+.fb-entry-arrow {
+  font-size: var(--fs-display-sm);
+  color: var(--text-weak);
+  margin-left: var(--space-sm);
+  flex-shrink: 0;
+}

@@ -1,0 +1,35 @@
+<!-- 浏览全部 browse · V1.2-DS 视觉校准：左海报缩略图 + 右信息（中文名/英文名/阶段/状态）
+     图片三态：加载中/失败 → poster-pN 阶段色渐变 + 首字兜底；成功 → image 覆盖 -->
+<view class="mcu-page">
+  <view class="page-head">
+    <view class="page-title">浏览全部</view>
+    <view class="page-sub">MCU 全部作品 · 按阶段排列</view>
+  </view>
+
+  <view wx:for="{{groups}}" wx:key="phase" class="phase-group">
+    <view class="group-head">
+      <view class="group-dot" style="background:{{item.color}};"></view>
+      <view class="group-title">{{item.title}}</view>
+      <view class="group-count">{{item.items.length}} 部</view>
+      <!-- 专项③：阶段图承接（Phase 导航辅助视觉，保持 750:400 比例小图） -->
+      <image wx:if="{{item.phaseImg}}" class="group-phase-img" src="{{item.phaseImg}}" mode="aspectFill" lazy-load="true"/>
+    </view>
+    <view class="film-list">
+      <view wx:for="{{item.items}}" wx:for-item="f" wx:key="id"
+            class="film-row" data-id="{{f.id}}" bindtap="goMovie" hover-class="film-row-hover">
+        <view class="film-poster poster-p{{f.phase}}">
+          <text class="film-poster-text">{{f.initial}}</text>
+          <image wx:if="{{f.posterUrl}}" class="film-poster-img" src="{{f.posterUrl}}" mode="aspectFill" lazy-load />
+        </view>
+        <view class="film-info">
+          <view class="film-cn">{{f.cn}}</view>
+          <view class="film-en">{{f.en}}</view>
+          <view class="film-phase">第 {{f.phase}} 阶段</view>
+        </view>
+        <view class="film-status status-{{f.status}}">{{f.status==='watched'?'已看':(f.status==='watching'?'在看':'未看')}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-pad"></view>
+</view>

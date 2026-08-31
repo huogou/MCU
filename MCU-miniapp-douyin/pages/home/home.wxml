@@ -1,0 +1,111 @@
+<!-- 首页 home（Tab1）· V1.2 视觉系统落地（按《MCU-V1.2-Visual-Design-System》VDS V2 §2）
+     结构（VDS §2.1 / §2.4，5 模块）：
+       ① Hero Banner（满宽沉浸）→ ② 旅程/推荐卡（简化）→ ③ 功能入口 2×2
+       → ④ 热门角色(横滚) → ⑤ 最近观看(横滚)
+     约束：不新增功能 / 不改数据模型 / 不自行设计（严格按 VDS 执行）
+     图片：经 mcuData 转发层取（URL 只存在于 visuals.js）；缺失走合规兜底
+     跳转：watch→routes(Tab) / timeline→panorama / characters→角色图鉴 / relationships→explore(Tab) -->
+<view class="mcu-page home-page">
+
+  <!-- ═══ ① Hero Banner（VDS §2.2，新增） ═══ -->
+  <view class="hero-banner">
+    <image wx:if="{{heroBanner}}" class="hero-banner-bg" src="{{heroBanner}}" mode="aspectFill" lazy-load="true"/>
+    <view class="hero-banner-overlay"></view>
+    <view class="hero-banner-content">
+      <view class="hero-banner-tag">MCU 宇宙入口</view>
+      <view class="hero-banner-title">探索无限传奇</view>
+      <view class="hero-banner-sub">{{heroMeta}}</view>
+      <view class="hero-journey-bar" bindtap="goJourney" hover-class="hero-journey-hover" hover-stay-time="60">
+        <view class="hero-journey-progress">
+          <view class="hero-journey-fill" style="width:{{progressPercent}}%;"></view>
+        </view>
+        <view class="hero-journey-text">{{progress.count}}/{{progress.total}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ -->
+  <view class="journey-card">
+    <view class="journey-inner">
+      <view class="journey-label">{{progress.journeyLabel}} · {{progress.phaseText}}</view>
+      <view class="journey-movie">
+        <image wx:if="{{progress.movie.poster}}" class="jm-poster" src="{{progress.movie.poster}}" mode="aspectFill" lazy-load="true"/>
+        <view wx:else class="jm-poster poster-p{{progress.movie.phase}}"><text>{{progress.movie.initial}}</text></view>
+        <view class="jm-info">
+          <view class="jm-name">{{progress.movie.name}}</view>
+          <view wx:if="{{progress.movie.enName}}" class="jm-en">{{progress.movie.enName}}</view>
+          <view class="jm-phase">{{progress.movie.phaseText}}<text wx:if="{{progress.movie.year}}"> · {{progress.movie.year}}</text></view>
+        </view>
+        <view class="jm-cta" data-id="{{progress.movie.id}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{progress.movie.statusLabel}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ③ 推荐下一部大卡（保持） ═══ -->
+  <view class="rec-card">
+    <view class="rec-poster-wrap">
+      <image wx:if="{{recommend.poster}}" class="rec-poster" src="{{recommend.poster}}" mode="aspectFill" lazy-load="true"/>
+      <view wx:else class="rec-poster poster-p{{recommend.phase}}"><text>{{recommend.initial}}</text></view>
+      <view class="rec-poster-mask"></view>
+    </view>
+    <view class="rec-body">
+      <view class="rec-tag">{{recommend.tag}}<text class="rec-phase">{{recommend.phaseLabel}}</text></view>
+      <view class="rec-name">{{recommend.name}}</view>
+      <view class="rec-sub">{{recommend.subInfo}}</view>
+      <view class="rec-reason">{{recommend.reason}}</view>
+      <view class="btn-accent" data-id="{{recommend.id}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{recommend.cta}}</view>
+    </view>
+  </view>
+
+  <!-- ═══ ④ 功能入口 2×2 视觉卡片（VDS §2.3 重设计） ═══ -->
+  <view class="section">
+    <view class="module-title">宇宙入口</view>
+    <view class="entry-grid">
+      <view class="entry-visual-card" wx:for="{{entryCards}}" wx:key="key"
+            data-key="{{item.key}}" bindtap="onEntryTap" hover-class="evc-hover" hover-stay-time="80">
+        <image wx:if="{{item.bg}}" class="evc-bg" src="{{item.bg}}" mode="aspectFill" lazy-load="true"/>
+        <view class="evc-overlay"></view>
+        <view class="evc-content">
+          <view class="evc-icon">{{item.icon}}</view>
+          <view class="evc-title">{{item.title}}</view>
+          <view class="evc-desc">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ⑤ 热门角色（横滚）（保持） ═══ -->
+  <view class="section">
+    <view class="module-title">热门角色</view>
+    <scroll-view class="char-scroll" scroll-x enable-flex>
+      <view class="char-row">
+        <view class="char-card" wx:for="{{hotChars}}" wx:key="id" data-id="{{item.id}}" bindtap="goChar" hover-class="char-hover" hover-stay-time="80">
+          <view class="char-avatar fring-{{item.factionCls}}">
+            <image wx:if="{{item.poster && !_imgErr[item.id]}}" class="char-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true" binderror="onImgError" data-id="{{item.id}}" />
+            <text wx:else class="char-initial fbg-{{item.factionCls}}">{{item.initial}}</text>
+          </view>
+          <view class="char-name">{{item.name}}</view>
+          <view class="char-faction fc-{{item.factionCls}}">{{item.factionLabel}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ═══ ⑥ 最近观看（横滚）（保持） ═══ -->
+  <view class="section">
+    <view class="module-title">最近观看</view>
+    <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
+      <view class="recent-row">
+        <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
+          <view class="recent-poster">
+            <image wx:if="{{item.poster}}" class="recent-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true"/>
+            <text wx:else class="poster-text poster-p{{item.phase}}">{{item.initial}}</text>
+          </view>
+          <view class="recent-name">{{item.name}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view wx:else class="empty-hint">还没有观看记录，从《钢铁侠》开始你的旅程</view>
+  </view>
+
+</view>

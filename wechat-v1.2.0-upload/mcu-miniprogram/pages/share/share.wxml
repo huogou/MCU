@@ -1,0 +1,22 @@
+<!-- 分享海报 share（V1.1 Step4）
+     支持三类型：progress 观影进度 / route 路线 / movie 电影
+     canvas 2d 生成（750×1100 逻辑尺寸），保存相册 / 转发给朋友
+     纪律：wxml 零内联 svg / 零 emoji / 全 Token 化 -->
+<view class="share-page">
+
+  <!-- 海报画布预览 -->
+  <view class="poster-stage">
+    <canvas type="2d" id="posterCanvas" class="poster-canvas"></canvas>
+  </view>
+
+  <view class="poster-tip">{{typeLabel}} · 保存到相册，或转发给朋友</view>
+
+  <!-- 操作区 -->
+  <view class="actions">
+    <button class="action-btn primary" bindtap="savePoster" hover-class="btn-hover">保存到相册</button>
+    <button class="action-btn" open-type="share" hover-class="btn-hover">转发给朋友</button>
+  </view>
+
+  <view class="share-note">海报为图片生成，可在微信 / 小红书 / 社群中传播</view>
+
+</view>

@@ -1,0 +1,23 @@
+<!-- 隐私保护政策 privacy · V1.2 上线准备：审核必备页 -->
+<view class="mcu-page legal">
+  <view class="legal-title">隐私保护政策</view>
+
+  <view class="mcu-card">
+    <view class="legal-h">一、数据收集说明</view>
+    <view class="legal-p">本小程序不强制收集任何个人身份信息。你的观影进度、收藏、路线选择等数据仅保存在本机（微信本地存储 wx.storage），不会上传任何服务器，开发者无法获取。我们不使用任何第三方统计或广告 SDK。</view>
+  </view>
+
+  <view class="mcu-card">
+    <view class="legal-h">二、图片保存权限说明</view>
+    <view class="legal-p">分享功能中的「保存到相册」会使用微信相册写入权限（scope.writePhotosAlbum）。该权限仅在用户主动点击「保存」时请求，用于将分享海报送至本机相册；我们不会读取你相册中的任何已有内容。</view>
+  </view>
+
+  <view class="mcu-card">
+    <view class="legal-h">三、分享功能说明</view>
+    <view class="legal-p">分享（转发给朋友 / 生成海报）仅包含公开电影信息，如电影名称、年份、所属阶段、你的进度统计等，不包含任何个人隐私数据。你可随时在微信中管理已分享内容。</view>
+  </view>
+
+  <view class="legal-foot">如你对隐私政策有疑问，可通过小程序内「我的MCU → 我要吐槽」反馈。我们重视你的隐私，本政策将随功能调整更新。</view>
+  <view class="legal-update">最近更新：2026-08-27</view>
+  <view class="mcu-bottom-space"></view>
+</view>

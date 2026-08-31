@@ -1,0 +1,82 @@
+/* browse 浏览全部 · V1.2-DS 视觉校准
+ * 依据：《MCU-V1.2-开发视觉标注》（字号5档/间距7级/圆角5级/三级卡片）
+ * 纪律：全 Token 引用、零裸 hex、字重仅 400/600/700
+ */
+
+.page-head { padding: var(--space-xl) 0 var(--space-md); }
+.page-title { font-size: var(--fs-display); font-weight: 700; color: var(--text-main); }
+.page-sub { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
+
+.phase-group { margin-bottom: var(--space-lg); }
+.group-head { display: flex; align-items: center; margin: var(--space-xs) 0 18rpx; }
+.group-dot { width: 16rpx; height: 16rpx; border-radius: 50%; margin-right: 14rpx; }
+.group-title { font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
+.group-count { font-size: var(--fs-mini); color: var(--text-weak); margin-left: auto; }
+/* 专项③：阶段图（Phase 导航辅助视觉，56×30rpx 保持 750:400≈1.875 比例） */
+.group-phase-img {
+  width: 56rpx;
+  height: 30rpx;
+  border-radius: var(--radius-sm);
+  margin-left: var(--space-sm);
+  flex-shrink: 0;
+}
+
+/* 电影行：Content 卡片（20rpx 圆角） */
+.film-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.film-row {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);
+  padding: var(--space-sm);
+  box-shadow: var(--shadow-card);
+}
+.film-row-hover { background: var(--surface-3); }
+
+/* 左侧海报缩略图（96×144，2:3）：阶段色渐变兜底 + image 覆盖 */
+.film-poster {
+  position: relative;
+  width: 96rpx;
+  height: 144rpx;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-sm);
+  flex-shrink: 0;
+}
+.film-poster-text {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--white-a50);
+}
+.film-poster-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.film-info { flex: 1; min-width: 0; }
+.film-cn { font-size: var(--fs-body); color: var(--text-main); font-weight: 600; }
+.film-en { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-xs); }
+.film-phase { font-size: var(--fs-caption); color: var(--text-weak); margin-top: var(--space-xs); }
+
+/* 状态胶囊（radius-full，22rpx） */
+.film-status {
+  font-size: var(--fs-mini);
+  padding: 6rpx 16rpx;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  margin-left: var(--space-sm);
+}
+.status-watched   { color: var(--success); background: var(--success-a15); }
+.status-watching  { color: var(--gold);    background: var(--gold-a15); }
+.status-unwatched { color: var(--text-weak); background: var(--surface-3); }
+
+/* 海报阶段色系统已统一至 app.wxss 全局（Step4）*/
+
+.bottom-pad { height: 60rpx; }

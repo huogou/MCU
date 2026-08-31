@@ -1,0 +1,22 @@
+<!-- 用户协议 agreement · V1.2 上线准备：审核必备页 -->
+<view class="mcu-page legal">
+  <view class="legal-title">用户协议</view>
+
+  <view class="mcu-card">
+    <view class="legal-h">一、服务说明</view>
+    <view class="legal-p">本小程序提供漫威电影宇宙（MCU）观看顺序整理、角色关系查询、电影信息展示、个人观影进度管理等功能。所有内容（电影信息、角色关系、观看路线）均为对公开影视资料的整理与二次编排，仅用于个人观影辅助，不构成任何官方说明。</view>
+  </view>
+
+  <view class="mcu-card">
+    <view class="legal-h">二、用户使用规则</view>
+    <view class="legal-li"><text class="legal-num">1.</text><view class="legal-li-t">本小程序为个人非商业工具，不提供任何影视资源下载或在线播放，不提供盗版内容。</view></view>
+    <view class="legal-li"><text class="legal-num">2.</text><view class="legal-li-t">页面所用图片（海报、剧照、角色头像）仅用于辅助说明，版权归原权利人所有。</view></view>
+    <view class="legal-li"><text class="legal-num">3.</text><view class="legal-li-t">用户在本机保存的观影进度、收藏、路线等数据仅存储于设备本地，不上传任何服务器。</view></view>
+    <view class="legal-li"><text class="legal-num">4.</text><view class="legal-li-t">分享功能生成的海报仅包含公开电影信息，用于个人记录与分享。</view></view>
+    <view class="legal-li"><text class="legal-num">5.</text><view class="legal-li-t">请勿将本工具内容用于商业用途，使用即表示同意以上规则。</view></view>
+  </view>
+
+  <view class="legal-foot">如您不同意本协议，请停止使用本小程序。我们保留在必要时更新本协议的权利，更新后将以页面展示为准。</view>
+  <view class="legal-update">最近更新：2026-08-27</view>
+  <view class="mcu-bottom-space"></view>
+</view>
