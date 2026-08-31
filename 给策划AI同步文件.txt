@@ -28,12 +28,23 @@ MCU观影导航 · 进度同步（给策划AI / GPT）
 
 【三、抖音小程序 · 待决策（球在 GPT 侧）】
 - 已闭环：Step1 独立工程 / Step2 API 迁移 / B1~B5 阻塞修复 / B3 feedback（本地队列，不上云、不汇总）/ 第一阶段扫描。
-- Git：wechat-production → baf309b（只读基线）；douyin-migration → 1242a65（最新）。
-- 待 GPT 确认 3 项：
-  ① 6 处用户可见文案仍写「微信」（privacy.wxml:7/12/17、about.wxml:13/19、share.wxml:20）→ 建议中性化。
-  ② 2 个遗留空目录（漫威电影导航/ 空白模板、__MACOSX/ 元数据）→ 建议清理。
-  ③ 运行时 R1-R5 需用户在抖音开发者工具真机验证：createSelectorQuery / pixelRatio /
+- Git：wechat-production → baf309b（只读基线）；douyin-migration → a67f597（最新）。
+- ✅ 已完成（8/31，提交 a67f597）：6 处用户可见「微信」文案中性化。
+  · privacy.wxml:7「微信本地存储 wx.storage」→「本机存储空间」
+    （抖音端实际为 tt.getStorageSync，原文描述与实现不符，属隐私政策实质性问题）
+  · privacy.wxml:12「微信相册写入权限 scope.writePhotosAlbum」→「系统相册写入权限」
+    （字节 scope 为 scope.album，非微信的 scope.writePhotosAlbum）
+  · privacy.wxml:17「在微信中管理已分享内容」→「在抖音中管理已分享内容」
+  · about.wxml:13/19「微信后台」→「小程序后台」
+  · share.wxml:20「可在微信/小红书/社群中传播」→「可在抖音/小红书/社群中传播」
+  · 未动：app.wxss:245 / explore.js:7 / feedback.js:5 三处注释中的「微信」（用户不可见，
+    打包时 minified + minifyWXSS 会剥离）
+- 待 GPT / 用户确认 2 项：
+  ① 空目录清理：实测抖音工程仅剩 assets/achievements 1 个空目录（原报告称 2 个，另 1 个已不存在）。
+  ② 运行时 R1-R5 需用户在抖音开发者工具真机验证：createSelectorQuery / pixelRatio /
      toDataURL 导出 / 相册授权 / 视觉。
+- 上传就绪度（8/31 实测）：AppID ✅ / sitemap.json 已删 ✅ / app.json 无微信专属字段 ✅ /
+  打包体积 0.39MB（114 文件）✅ / 无未守卫 wx.* 调用 ✅ → 技术面可上传。
 - 第二阶段条件：具备（阻塞项 0）。
 
 【四、微信小程序 · 待办】

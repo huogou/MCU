@@ -24,6 +24,12 @@ MCU观影导航 · 开发AI工作日志
     根 HTML 已额外显式补传（successCount 5/5）
 - 微信小程序 ✅ V1.2.0 已上传（8/28 13:29），V1.2.1 审核修复在 HEAD
 - 抖音小程序 ⏸️ 第一阶段完成，等 GPT 确认进第二阶段
+  · 8/31 提交 a67f597（douyin-migration）：6 处用户可见「微信」文案中性化 → 技术面已达上传条件
+    （AppID ✅ / sitemap.json 已删 ✅ / app.json 无微信专属字段 ✅ / 打包 0.39MB ✅ / 无未守卫 wx.* ✅）
+  · ⚠ 抖音工程的提交方式：MCU-miniapp-douyin/ 在 master 上是**未跟踪**的，只应提交到
+    douyin-migration 分支；直接 `git checkout douyin-migration` 会因未跟踪文件冲突而失败。
+    正确做法 = git 底层命令（临时索引 GIT_INDEX_FILE + read-tree + update-index +
+    write-tree + commit-tree + update-ref），不触碰工作树与真实索引。后续抖音改动沿用此法。
 
 【H5 双小程序入口（8/28 提交 6054aa4）】
 - 改动：assets/js/app.js（+165/-46）、assets/css/style.css（+225/-11）
