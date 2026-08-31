@@ -9,11 +9,18 @@ node_modules/
 Thumbs.db
 *.log
 
-# 小程序渲染产物（原型预览图，可重新生成；已归档副本见 AI生成文件/小程序/原型图/）
-mcu-miniprogram/assets/preview/_*.png
-mcu-miniprogram/assets/preview/_*.svg
-mcu-miniprogram/assets/icons/tab/_*.png
-mcu-miniprogram/assets/icons/tab/_*.svg
+# 小程序渲染产物（原型预览图，可重新生成）
+wechat/assets/preview/_*.png
+wechat/assets/preview/_*.svg
+wechat/assets/icons/tab/_*.png
+wechat/assets/icons/tab/_*.svg
+douyin/assets/preview/_*.png
+douyin/assets/preview/_*.svg
 
-# 发布备份压缩包（构建产物；服务器备份见 CloudBase 云存储 backup/）
-backup/*.zip
+# 非源码目录（文档归档 / 备份 / 上传产物 / 恢复资料 / AI协作同步文件）
+# 仅本地保留，不进版本库
+AI生成文件/
+恢复资料/
+backup/
+wechat-v1.2.0-upload/
+给*AI同步文件.txt

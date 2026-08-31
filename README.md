@@ -1,80 +1,60 @@
-# MCU 观影导航
+# MCU 观影导航（Monorepo）
 
-MCU 观影导航是一个帮助用户解决「漫威电影宇宙怎么看」的轻量工具，采用**双端闭环**架构：H5 负责外部获客与首次体验，微信小程序负责长期使用与观影进度沉淀。
+漫威电影宇宙观影导航，定位「陪用户探索漫威宇宙的观影助手」。采用 **H5 获客 + 微信 / 抖音小程序长期使用** 三端闭环：H5 负责外部获客与首次体验，小程序负责长期使用与观影进度沉淀。
 
-## 项目介绍
+本仓库为单一 **Monorepo**，三端源码共库管理，便于跨端内容（尤其是数据）原子化更新。
 
-- **核心用户路径**：顺序 → 路线 → 下一部 → 关系 → 地图 → 进度
-- **核心能力**：观影顺序与路线推荐、电影关系图谱、宇宙全景时间线、观影进度管理、分享海报、成就系统、角色图鉴
-- **双端关系**：H5 与小程序不是替代关系，而是「传播 → 体验 → 长期使用」闭环
-
-| 端 | 定位 | 状态 |
-| --- | --- | --- |
-| H5（`mcu-navigator/`） | 外部获客 / 首体验 | 已上线（CloudBase 静态托管） |
-| 微信小程序（`mcu-miniprogram/`） | 长期使用 / 进度沉淀 | V1.1 上线前基线（真机验证通过） |
-
-## 技术架构
-
-| 项 | 说明 |
-| --- | --- |
-| H5 | 纯静态多页（index / map / movie / next / routes），原生 JS + CSS，无框架、无构建 |
-| 小程序 | 微信原生小程序（style v2），纯本地存储（`wx.storage` 键 `mcu_nav_user_v1`），无云函数、无外部 API |
-| 数据层 | 静态 JS 单一可信源：H5 `data/*.js`（`window.MCU_*`），小程序 `data/*.js`（`module.exports`，由 H5 机械适配去 window 前缀） |
-| 云端 | 腾讯云 CloudBase（环境 `mcu-d6gw0brqoa9521b58`）：H5 静态托管 + NoSQL（stats / feedback 集合） |
-| 视觉 | 设计 Token 体系：深色宇宙科技风，全局 CSS 变量（H5 `style.css` / 小程序 `app.wxss`），阶段色权威值统一 |
-
-**数据量**（单一可信源，禁止第二套）：CONTENT 59 / RELATIONS 92 / ROUTES 11 / CHARACTERS 24 / CAMPS 8 / PANO 40-41-6
-
-## 文件结构
+## 仓库结构
 
 ```
-MCU观影导航/
-├── mcu-navigator/           # H5 源码（与线上同源）
-│   ├── index.html / map.html / movie.html / next.html / routes.html
-│   ├── assets/              # css / js / 海报剧照
-│   └── data/                # 单一数据可信源（*.js）
-├── mcu-miniprogram/         # 小程序源码
-│   ├── app.js / app.json / app.wxss / sitemap.json / project.config.json
-│   ├── pages/               # 12 页面（home/routes/route-detail/movie/explore/
-│   │                        #   panorama/browse/my-mcu/characters/character/share/feedback）
-│   ├── data/                # 数据层（与 H5 同源，机械适配）
-│   ├── models/              # mcuData / userState / recommend / pano / shareData / achievements
-│   ├── assets/              # TabBar 图标等资源
-│   └── workspace-*.js       # 验收/渲染/一致性校验脚本（可复跑）
-├── AI生成文件/              # 项目文档与报告（按端分类）
-│   ├── H5/                  # H5 相关报告（运营数据闭环等）
-│   ├── 小程序/              # 小程序报告（按平台再分）
-│   │   ├── 微信/            #   微信小程序：D12-A恢复 / V1.1验收 / V1.2视觉重构 / V1.2上线检查 / 原型图
-│   │   └── 抖音/            #   抖音小程序：V1.2迁移
-│   ├── 设计/                # 设计系统 / 视觉方案 / 验收清单 / 图标资源
-│   ├── 跨端/                # 双端共用：版本归档 / 数据模型 / 上线前验收
-│   └── 旧版文件/            # 历史遗留（D10/D10-A/D10-B/D11 等，仅参考）
-├── 恢复资料/                # 从系统 Temp 抢救回的第一手资料
-├── backup/                  # 备份目录（版本记录 / 更新日志 / 设计文件索引）
-├── 给策划AI同步文件.txt     # 开发 AI → 策划 AI 同步文件（唯一活跃）
-├── verify_stats.js          # H5 运营数据统计验证脚本
-├── README.md                # 本文件
-└── .gitignore
+MCU/                        （本仓库根）
+├── wechat/                 # 微信小程序源码（已上线 V1.2，AppID wx78f00e7f0a5948b7）
+├── douyin/                 # 抖音小程序源码（由微信工程迁移，AppID tt00eb76569e914af801）
+├── h5/                     # H5 静态站源码（已上线 CloudBase 静态托管）
+├── shared/                 # 跨端单一数据源与同步工具
+│   ├── data/               # 权威数据（module.exports 格式，与微信/抖音一致）
+│   └── sync_data.sh        # 将 shared/data 同步到 wechat/data、douyin/data
+├── README.md
+├── VERSION.md
+└── verify_stats.js         # H5 运营数据统计验证脚本
 ```
 
-## 本地运行方式
+> 非源码目录（`AI生成文件/`、`backup/`、`恢复资料/`、`wechat-v1.2.0-upload/`、三份 AI 同步文件）仅本地保留，已被 `.gitignore` 排除，**不进本仓库**。
+
+## 数据单一源（铁律）
+
+- 微信与抖音数据格式一致（`module.exports`），以 **`shared/data/` 为唯一权威源**。
+- 修改数据后运行 `bash shared/sync_data.sh`，自动同步到 `wechat/data/`、`douyin/data/`。**禁止在各端各改一套**。
+- H5 数据为 `window.MCU_*` 全局格式（与小程序不同），由 H5 侧机械适配生成，**不在此脚本范围内**，需单独维护（见下方「H5 数据」说明）。
+
+## 各端说明
+
+| 端 | 目录 | 技术栈 | 部署 |
+| --- | --- | --- | --- |
+| 微信小程序 | `wechat/` | 微信原生小程序，纯本地存储 | 微信开发者工具「上传」→ 提审发布 |
+| 抖音小程序 | `douyin/` | 抖音原生小程序，纯本地存储 | 抖音开发者工具「上传」→ 提审发布 |
+| H5 | `h5/` | 纯静态多页，原生 JS/CSS，无框架无构建 | CloudBase 静态托管 |
+
+数据量（单一可信源，禁止第二套）：CONTENT 59 / RELATIONS 92 / ROUTES 11 / CHARACTERS 24 / CAMPS 8 / PANO 40-41-6。
+
+## 本地运行
+
+### 微信小程序
+微信开发者工具导入 `wechat/` 目录，AppID `wx78f00e7f0a5948b7`，编译即可在模拟器查看。
+
+### 抖音小程序
+抖音开发者工具导入 `douyin/` 目录，AppID `tt00eb76569e914af801`。
 
 ### H5
-静态站点，任选其一：
 ```bash
-cd mcu-navigator
+cd h5
 python -m http.server 8080        # 或 npx serve / 任意静态服务器
 # 访问 http://localhost:8080/index.html
 ```
 
-### 小程序
-1. 微信开发者工具（服务端口需在「设置 → 安全设置」开启）
-2. 导入项目目录 `mcu-miniprogram/`，AppID `wx78f00e7f0a5948b7`
-3. 编译即可在模拟器查看；「预览」生成真机二维码扫码真机测试
-
 ### 自动化校验（Node 22+，需 sharp）
 ```bash
-cd mcu-miniprogram
+cd wechat
 node workspace-smoke-v11-full.js     # 三场景流程 42 断言
 node workspace-smoke-v11-device.js   # 分享/全景设备流程 16 断言
 node workspace-check-data-v11.js     # 数据一致性 35 断言
@@ -84,25 +64,15 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 | 端 | 方式 |
 | --- | --- |
-| H5 | CloudBase 静态托管（`mcu-navigator/` 上传至环境 `mcu-d6gw0brqoa9521b58`，域名 `mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com`） |
-| 小程序 | 微信开发者工具「上传」→ `mp.weixin.qq.com` 提交审核 → 发布 |
+| H5 | CloudBase 静态托管（环境 `mcu-d6gw0brqoa9521b58`）：将 `h5/` 上传至该环境，域名 `mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com` |
+| 微信 | 微信开发者工具「上传」→ `mp.weixin.qq.com` 提交审核 → 发布 |
+| 抖音 | 抖音开发者工具「上传」→ 抖音开放平台提交审核 → 发布 |
 
-## 当前版本
+## H5 数据说明
 
-| 项 | 值 |
-| --- | --- |
-| 版本 | **V1.1**（待发布 · 发布确认报告已生成） |
-| 功能 | 首页继续观看 / 我的MCU 2.0 / 分享海报 / 成就系统 / 角色主页 / D12 视觉统一 |
-| 真机测试 | Step7 13/13 通过 |
-| 数据一致性 | H5↔小程序 JSON 级一致（35/35） |
-| 上传版本号 | `v1.1.0`（用户于微信开发者工具手动上传提审） |
-| 发布确认 | 《V1.1最终发布确认报告》见 `AI生成文件/跨端/V1.1最终发布确认报告.md` |
-| 提交规范 | 每完成一个开发阶段提交一次，格式 `DXX-阶段名称`（见 `backup/CHANGELOG.md`） |
-| V1.2 设计重构 | 进行中（门控逐页，严格按《V1.2 UI Design System》）：①首页已重构待截图确认；②~⑦路线/电影详情/探索/角色系统/我的MCU/分享待开发 |
+H5 的 `h5/data/*.js` 采用 `window.MCU_*` 全局变量格式，与小程序 `module.exports` 格式不同，属「机械适配」关系（去 window 前缀）。因此 `shared/data` 仅直接服务于微信 / 抖音；H5 数据需由适配脚本另行生成，未纳入 `sync_data.sh`，避免格式错配破坏 H5。
 
 ## 备份与恢复
 
-- Git 仓库：本仓库（`MCU观影导航/`），远程托管见 `backup/版本记录.md`
-- 版本提交格式：`DXX-阶段名称`（例：`D12-首页完成`）
-- 重大修改前必须先提交版本
-- 恢复流程见 `backup/版本记录.md`「恢复流程」
+- 本仓库为单一 Monorepo，重大修改前先提交版本。
+- 本地另有 `backup/`（版本记录 / 更新日志）与 `恢复资料/`（抢救资料），均不进版本库。
