@@ -1,0 +1,9 @@
+# MCU 观影导航 H5 · Cloudflare Pages 部署配置
+# 目的：让 /index.html /next.html /routes.html /map.html /movie.html 直接 200，
+# 覆盖 CF Pages 默认开启的 "Pretty URL" 自动重写（默认会把 .html 308 跳到无扩展名）。
+# 这是部署配置，不影响产品功能。
+/index.html  /index.html  200
+/next.html   /next.html   200
+/routes.html /routes.html 200
+/map.html    /map.html    200
+/movie.html  /movie.html  200
