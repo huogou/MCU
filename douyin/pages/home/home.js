@@ -94,6 +94,8 @@ Page({
       const r = recommend.next(latest.id, 'mainline');
       if (r && r.content) recMovie = movieVM(r.content.id);
     }
+    /* CTA 文案与「点击即标记」的实际行为保持一致（避免文案与行为不符） */
+    const recSeen = userState.isSeen(recMovie.id);
     const recommendCard = {
       id: recMovie.id,
       poster: recMovie.poster,
@@ -104,7 +106,7 @@ Page({
       name: recMovie.name,
       subInfo: recMovie.year ? ('Phase ' + recMovie.phase + ' · ' + recMovie.year) : recMovie.phaseText,
       reason: hasProgress ? '上一部留下的悬念，从这里继续' : 'MCU 的起点，一切从这里开始',
-      cta: hasProgress ? '继续观看' : '开始观看'
+      cta: recSeen ? '取消已看' : '标记为已看'
     };
 
     /* ③ 最近观看（按观看时间倒序取最近 6 部） */
@@ -139,9 +141,15 @@ Page({
    * 等内容资讯型页面。原指向这些页面的入口统一收敛至「我的MCU」观影记录页（Tab）。
    */
 
-  /* 推荐/继续 → 我的MCU（观影记录） */
-  goContinue() {
-    tt.switchTab({ url: '/pages/my-mcu/my-mcu' });
+  /* 推荐/继续 → 标记已看（把「记录」主链路闭环在首页）
+   * 2026-09-07：movie / route-detail 页已按审核要求移除，原跳转入口改为本地标记，
+   * 复用 userState.toggle（纯本地 storage，不上云）；标记后 refresh 自动推进到下一部。 */
+  goContinue(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    const seen = userState.toggle(id);
+    tt.showToast({ title: seen ? '已标记为已看' : '已取消已看', icon: 'none' });
+    this.refresh();
   },
 
   /* 最近观看 → 我的MCU（观影记录） */
