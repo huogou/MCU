@@ -4,7 +4,7 @@
 
   <view class="mcu-card">
     <view class="legal-h">一、数据收集说明</view>
-    <view class="legal-p">本小程序不强制收集任何个人身份信息。你的观影进度、收藏、路线选择等数据仅保存在本机存储空间，不会上传任何服务器，开发者无法获取。我们不使用任何第三方统计或广告 SDK。</view>
+    <view class="legal-p">本小程序不强制收集任何个人身份信息。你的观影进度、收藏等数据仅保存在本机存储空间，不会上传任何服务器，开发者无法获取。我们不使用任何第三方统计或广告 SDK。</view>
   </view>
 
   <view class="mcu-card">
@@ -18,6 +18,6 @@
   </view>
 
   <view class="legal-foot">如你对隐私政策有疑问，可通过小程序内「我的MCU → 我要吐槽」反馈。我们重视你的隐私，本政策将随功能调整更新。</view>
-  <view class="legal-update">最近更新：2026-08-27</view>
+  <view class="legal-update">最近更新：2026-09-07</view>
   <view class="mcu-bottom-space"></view>
 </view>
