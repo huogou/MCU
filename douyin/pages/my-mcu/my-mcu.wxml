@@ -40,10 +40,10 @@
   </scroll-view>
 
   <!-- ③ 当前路线区（增强：路线名称 + 当前阶段 Phase N + 当前进度） -->
-  <view class="section-label">当前路线</view>
-  <view class="route-next-card" wx:if="{{current}}" bindtap="goRoute">
+  <view class="section-label">我的片单进度</view>
+  <view class="route-next-card" wx:if="{{current}}">
     <view class="route-next-info">
-      <view class="rn-label">继续你的路线 · {{current.phaseText}}</view>
+      <view class="rn-label">继续观看 · {{current.phaseText}}</view>
       <view class="rn-title">{{current.name}}</view>
       <view class="rn-sub">{{current.watched}} / {{current.total}} 部 · 下一部 {{current.nextName}}</view>
       <view class="rn-progress">
@@ -57,7 +57,7 @@
   <view class="section-label">最近观看</view>
   <block wx:if="{{recentList.length}}">
     <scroll-view class="recent-row" scroll-x enhanced show-scrollbar="{{false}}">
-      <view class="recent-item" wx:for="{{recentList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
+      <view class="recent-item" wx:for="{{recentList}}" wx:key="id">
         <view class="recent-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
           <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
           <text wx:else class="recent-letter">{{item.letter}}</text>
@@ -73,7 +73,7 @@
   <view class="section-label">观看记录 · {{watchedCount}} 部</view>
   <view class="card-list">
     <block wx:if="{{watchedList.length}}">
-      <view class="work-card" wx:for="{{watchedList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
+      <view class="work-card" wx:for="{{watchedList}}" wx:key="id">
         <view class="wc-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
           <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
           <text wx:else>{{item.letter}}</text>
@@ -92,7 +92,7 @@
   <view class="section-label">我的收藏 · {{favCount}}</view>
   <view class="card-list">
     <block wx:if="{{hasFav}}">
-      <view class="work-card" wx:for="{{favList}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie">
+      <view class="work-card" wx:for="{{favList}}" wx:key="id">
         <view class="wc-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
           <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" />
           <text wx:else>{{item.letter}}</text>
@@ -104,7 +104,7 @@
         <view class="wc-badge fav">★</view>
       </view>
     </block>
-    <view wx:else class="empty-tip">还没有收藏。在电影详情页点击收藏，记录想保留的作品</view>
+    <view wx:else class="empty-tip">还没有收藏</view>
   </view>
 
   <!-- ⑦ 反馈入口（Step3-8）：置于个人页底部，不进入核心观影流程 -->

@@ -4,7 +4,7 @@
 
   <view class="mcu-card">
     <view class="legal-h">产品介绍</view>
-    <view class="legal-p">漫威电影观影指南是一款帮助用户整理漫威电影宇宙（MCU）观看顺序、规划个人观影路线的工具类小程序。提供电影时间线、角色关系、观看路线、个人进度管理等功能，帮助你按自己的节奏看懂 MCU。</view>
+    <view class="legal-p">漫威电影观影导航是一款帮助用户记录漫威电影宇宙（MCU）观影进度、管理个人片单的工具类小程序。提供观看记录、进度统计、观影成就、个人海报等功能，全部数据仅保存在本机，不上传服务器。</view>
   </view>
 
   <view class="mcu-card">
@@ -19,7 +19,7 @@
     <view class="legal-note">商务 / 其他联系：见小程序后台设置</view>
   </view>
 
-  <view class="legal-foot">本小程序为个人非商业工具，所有影视资料均来自公开信息整理，仅用于观影辅助。</view>
-  <view class="legal-update">最近更新：2026-08-27</view>
+  <view class="legal-foot">本小程序为个人非商业工具，仅提供观影记录与进度管理服务，影视资料均来自公开信息整理。</view>
+  <view class="legal-update">最近更新：2026-09-07</view>
   <view class="mcu-bottom-space"></view>
 </view>

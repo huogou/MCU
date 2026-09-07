@@ -172,16 +172,9 @@ Page({
     };
   },
 
-  goRoute: function () {
-    var id = (this.data.current && this.data.current.routeId) || 'newcomer';
-    tt.navigateTo({ url: '/pages/route-detail/route-detail?id=' + id });
-  },
-
-  goMovie: function (e) {
-    var id = e.currentTarget.dataset.id;
-    if (!id) return;
-    tt.navigateTo({ url: '/pages/movie/movie?id=' + id });
-  },
+  /* 2026-09-07 抖音合规整改：电影详情页 / 路线详情页已按审核要求移除，
+     原 goRoute（→route-detail）与 goMovie（→movie）跳转方法同步删除，
+     最近观看 / 观看记录 / 收藏三个列表改为纯展示，不再产生死链。 */
 
   /* 分享入口 → share 页（Step4）；成就墙见下方 onTapAch（Step5） */
   goEntry: function (e) {
