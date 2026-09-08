@@ -1,9 +1,6 @@
 $imgs = @(
-  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T05-18-37-003Z-b0db044e.png",
-  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T05-18-37-008Z-ca3fc845.png",
-  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T05-18-37-012Z-3011bf3a.png",
-  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T05-18-37-015Z-3d85268a.png",
-  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T05-18-37-017Z-6f7e0759.png"
+  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T07-38-19-313Z-7f9a3e7e.png",
+  "C:\Users\Administrator\.workbuddy\clipboard-images\clipboard-2026-09-07T07-38-19-315Z-31556478.png"
 )
 
 Add-Type -AssemblyName System.Runtime.WindowsRuntime | Out-Null
