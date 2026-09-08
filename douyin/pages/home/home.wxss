@@ -424,4 +424,41 @@
   text-align: center;
 }
 
+/* ══════ 2026-09-08 新增：首页作品查询入口 ══════
+   纪律：颜色引用 app.wxss 变量，零 raw hex 泄漏 */
+.lib-entry {
+  display: flex;
+  align-items: center;
+  margin: var(--space-md) 0;
+  padding: var(--space-md);
+  background: var(--surface-1);
+  border: 1rpx solid var(--gold-a30);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+.lib-entry-hover { background: var(--surface-2); }
+.le-body { flex: 1; min-width: 0; }
+.le-title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--gold);
+}
+.le-desc {
+  margin-top: var(--space-xs);
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+.le-stat {
+  margin-top: var(--space-xs);
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+.le-arrow {
+  flex: none;
+  margin-left: var(--space-sm);
+  font-size: var(--fs-display-sm);
+  color: var(--gold-a60);
+}
+
 /* 阵营色 / 海报阶段色系统统一至 app.wxss 全局（Step4 全局统一） */

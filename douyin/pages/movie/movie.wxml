@@ -1,0 +1,79 @@
+<!-- 作品详情 movie · 2026-09-08 重建（轻量版 · 信息查询工具）
+     定位：查询 → 查看基础信息 → 标记已看 → 收藏
+     合规：无资讯 / 新闻 / 热点 / 影评 / 演员资料 / 推荐文章 / 官方或正版表述
+     id 缺失或不存在时走 notFound 兜底，不留白屏 -->
+<view class="mcu-page movie-page">
+
+  <!-- ═══ id 缺失 / 作品不存在 ═══ -->
+  <view wx:if="{{notFound}}" class="mv-empty">
+    <view class="me-title">没有找到这部作品</view>
+    <view class="me-desc">可能链接已失效，去作品库重新查询</view>
+    <view class="me-btn" bindtap="goLibrary" hover-class="btn-hover" hover-stay-time="80">去作品查询</view>
+  </view>
+
+  <block wx:else>
+
+    <!-- ═══ ① 作品标识：海报 + 名称 + 元信息 ═══ -->
+    <view class="mv-head">
+      <view class="mv-poster {{poster ? '' : 'poster-p' + phase}}">
+        <image wx:if="{{poster}}" class="fill-img" src="{{poster}}" mode="aspectFill" lazy-load="true" />
+        <text wx:else>{{letter}}</text>
+      </view>
+      <view class="mv-head-info">
+        <view class="mv-cn">{{cn}}</view>
+        <view wx:if="{{en}}" class="mv-en">{{en}}</view>
+        <view class="mv-pills">
+          <text wx:if="{{typeLabel}}" class="mv-pill pill-blue">{{typeLabel}}</text>
+          <text wx:if="{{phaseText}}" class="mv-pill pill-gold">{{phaseText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- ═══ ② 我的观看状态 + 两个可用动作（工具页核心） ═══ -->
+    <view class="mv-status-card">
+      <view class="ms-top">
+        <text class="ms-label">我的观看状态</text>
+        <text class="ms-state {{watched ? 'is-done' : ''}}">{{watched ? '已看' : '未看'}}</text>
+      </view>
+      <view wx:if="{{seenAtText}}" class="ms-seen-at">{{seenAtText}}</view>
+      <view class="ms-actions">
+        <view class="ms-btn {{watched ? 'is-off' : 'is-primary'}}"
+              bindtap="onToggleWatched" hover-class="btn-hover" hover-stay-time="80">{{watchedLabel}}</view>
+        <view class="ms-btn {{favored ? 'is-faved' : 'is-ghost'}}"
+              bindtap="onToggleFav" hover-class="btn-hover" hover-stay-time="80">{{favorLabel}}</view>
+      </view>
+    </view>
+
+    <!-- ═══ ③ 作品基础信息表（工具型字段） ═══ -->
+    <view class="section-label">作品信息</view>
+    <view class="mv-info">
+      <view class="mi-row" wx:for="{{infoRows}}" wx:key="k">
+        <text class="mi-k">{{item.k}}</text>
+        <text class="mi-v">{{item.v}}</text>
+      </view>
+    </view>
+
+    <!-- ═══ ④ 作品简介（无剧透，作品基础信息） ═══ -->
+    <view wx:if="{{synopsis}}" class="mv-block">
+      <view class="section-label">作品简介</view>
+      <view class="mv-synopsis">{{synopsis}}</view>
+    </view>
+
+    <!-- ═══ ⑤ 基础作品关系（≤4 条；可点击继续查询） ═══ -->
+    <view wx:if="{{hasRelations}}" class="mv-block">
+      <view class="section-label">相关作品 · {{relCount}} 条</view>
+      <view class="rel-list">
+        <view class="rel-item" wx:for="{{relations}}" wx:key="id"
+              data-id="{{item.id}}" bindtap="goRelated" hover-class="rel-hover" hover-stay-time="60">
+          <view class="rel-main">
+            <view class="rel-name">{{item.cn}}<text wx:if="{{item.watched}}" class="rel-seen">已看</text></view>
+            <view wx:if="{{item.why}}" class="rel-why">{{item.why}}</view>
+          </view>
+          <text class="rel-type">{{item.typeLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="mcu-bottom-space"></view>
+  </block>
+</view>

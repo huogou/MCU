@@ -1,7 +1,9 @@
 {
   "pages": [
     "pages/home/home",
+    "pages/library/library",
     "pages/my-mcu/my-mcu",
+    "pages/movie/movie",
     "pages/feedback/feedback",
     "pages/share/share",
     "pages/about/about",
@@ -26,6 +28,12 @@
         "text": "首页",
         "iconPath": "assets/icons/tab/home.png",
         "selectedIconPath": "assets/icons/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/library/library",
+        "text": "作品",
+        "iconPath": "assets/icons/tab/library.png",
+        "selectedIconPath": "assets/icons/tab/library-active.png"
       },
       {
         "pagePath": "pages/my-mcu/my-mcu",

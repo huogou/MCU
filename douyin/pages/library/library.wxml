@@ -1,0 +1,102 @@
+<!-- 作品查询 library（Tab2）· 2026-09-08 新增
+     定位：MCU 作品信息查询工具。结构：① 搜索 ② 三重筛选 ③ 排序 ④ 结果列表
+     合规：无资讯/新闻/热点/推荐文章表述；列表项仅展示作品基础信息 + 个人观看/收藏状态
+     图片：经 mcuData.visual 转发；缺失走 poster-p{phase} 阶段色兜底 -->
+<view class="mcu-page lib-page">
+
+  <!-- ═══ ① 搜索框 ═══ -->
+  <view class="lib-search">
+    <view class="ls-icon">⌕</view>
+    <input class="ls-input"
+           value="{{keyword}}"
+           placeholder="搜索作品名称"
+           placeholder-class="ls-ph"
+           confirm-type="search"
+           bindinput="onInput"
+           bindconfirm="onInput" />
+    <view wx:if="{{keyword}}" class="ls-clear" bindtap="onClearKeyword" hover-class="btn-hover" hover-stay-time="80">✕</view>
+  </view>
+
+  <!-- ═══ ② 筛选：类型 ═══ -->
+  <view class="lib-filter-row">
+    <text class="lf-label">类型</text>
+    <scroll-view class="lf-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="lf-chips">
+        <view wx:for="{{typeFilters}}" wx:key="key"
+              class="lf-chip {{item.key === typeKey ? 'is-on' : ''}}"
+              data-key="{{item.key}}" bindtap="onPickType" hover-class="btn-hover" hover-stay-time="60">{{item.label}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ═══ ② 筛选：阶段 ═══ -->
+  <view class="lib-filter-row">
+    <text class="lf-label">阶段</text>
+    <scroll-view class="lf-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="lf-chips">
+        <view wx:for="{{phaseFilters}}" wx:key="key"
+              class="lf-chip {{item.key === phaseKey ? 'is-on' : ''}}"
+              data-key="{{item.key}}" bindtap="onPickPhase" hover-class="btn-hover" hover-stay-time="60">{{item.label}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- ═══ ② 筛选：观看状态 + 排序 + 重置 ═══ -->
+  <view class="lib-filter-row">
+    <text class="lf-label">状态</text>
+    <scroll-view class="lf-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="lf-chips">
+        <view wx:for="{{statusFilters}}" wx:key="key"
+              class="lf-chip {{item.key === statusKey ? 'is-on' : ''}}"
+              data-key="{{item.key}}" bindtap="onPickStatus" hover-class="btn-hover" hover-stay-time="60">{{item.label}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="lib-sort-row">
+    <scroll-view class="lf-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="lf-chips">
+        <view wx:for="{{sorts}}" wx:key="key"
+              class="lf-chip sort {{item.key === sortKey ? 'is-on' : ''}}"
+              data-key="{{item.key}}" bindtap="onPickSort" hover-class="btn-hover" hover-stay-time="60">{{item.label}}</view>
+      </view>
+    </scroll-view>
+    <view wx:if="{{isFiltering}}" class="lf-reset" bindtap="onReset" hover-class="btn-hover" hover-stay-time="80">重置</view>
+  </view>
+
+  <!-- ═══ ③ 结果统计 ═══ -->
+  <view class="lib-result">
+    <text class="lr-count">共 {{resultCount}} 部</text>
+    <text class="lr-total">/ 全库 {{totalCount}} 部 · 已看 {{watchedCount}} · 收藏 {{favCount}}</text>
+  </view>
+
+  <!-- ═══ ④ 作品列表 ═══ -->
+  <block wx:if="{{hasResult}}">
+    <view class="work-card" wx:for="{{list}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goDetail" hover-class="wc-hover" hover-stay-time="60">
+      <view class="wc-poster {{item.poster ? '' : 'poster-p' + item.phase}}">
+        <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true" />
+        <text wx:else>{{item.letter}}</text>
+      </view>
+      <view class="wc-info">
+        <view class="wc-name-row">
+          <text class="wc-name">{{item.cn}}</text>
+          <text wx:if="{{item.favored}}" class="wc-star">★</text>
+        </view>
+        <view wx:if="{{item.en}}" class="wc-en">{{item.en}}</view>
+        <view class="wc-sub">{{item.typeLabel}} · {{item.phaseText}}<text wx:if="{{item.year}}"> · {{item.year}}</text></view>
+        <view class="wc-order">{{item.order}}</view>
+      </view>
+      <view class="wc-badge {{item.watched ? 'done' : 'todo'}}">{{item.watched ? '已看' : '未看'}}</view>
+    </view>
+  </block>
+
+  <!-- 空状态（搜索/筛选无结果时必须给出可执行指引） -->
+  <view wx:else class="lib-empty">
+    <view class="le-title">没有匹配的作品</view>
+    <view class="le-desc">换个关键词，或重置筛选条件后重试</view>
+    <view class="le-btn" bindtap="onReset" hover-class="btn-hover" hover-stay-time="80">重置筛选</view>
+  </view>
+
+  <view class="mcu-bottom-space"></view>
+</view>

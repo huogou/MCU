@@ -27,8 +27,8 @@
     <view class="journey-inner">
       <view class="journey-label">{{progress.journeyLabel}} · {{progress.phaseText}}</view>
       <view class="journey-movie">
-        <image wx:if="{{progress.movie.poster}}" class="jm-poster" src="{{progress.movie.poster}}" mode="aspectFill" lazy-load="true"/>
-        <view wx:else class="jm-poster poster-p{{progress.movie.phase}}"><text>{{progress.movie.initial}}</text></view>
+        <image wx:if="{{progress.movie.poster}}" class="jm-poster" src="{{progress.movie.poster}}" mode="aspectFill" lazy-load="true" data-id="{{progress.movie.id}}" bindtap="goDetail"/>
+        <view wx:else class="jm-poster poster-p{{progress.movie.phase}}" data-id="{{progress.movie.id}}" bindtap="goDetail"><text>{{progress.movie.initial}}</text></view>
         <view class="jm-info">
           <view class="jm-name">{{progress.movie.name}}</view>
           <view wx:if="{{progress.movie.enName}}" class="jm-en">{{progress.movie.enName}}</view>
@@ -39,9 +39,19 @@
     </view>
   </view>
 
-  <!-- ═══ ③ 推荐下一部大卡（保持） ═══ -->
+  <!-- ═══ ①.5 作品查询入口（2026-09-08 新增：首页必须有一眼可见的查询能力入口） ═══ -->
+  <view class="lib-entry" bindtap="goLibrary" hover-class="lib-entry-hover" hover-stay-time="80">
+    <view class="le-body">
+      <view class="le-title">{{libraryEntry.title}}</view>
+      <view class="le-desc">{{libraryEntry.desc}}</view>
+      <view class="le-stat">{{libraryEntry.statText}}</view>
+    </view>
+    <view class="le-arrow">›</view>
+  </view>
+
+  <!-- ═══ ② 推荐下一部大卡（保持） ═══ -->
   <view class="rec-card">
-    <view class="rec-poster-wrap">
+    <view class="rec-poster-wrap" data-id="{{recommend.id}}" bindtap="goDetail" hover-class="btn-hover" hover-stay-time="80">
       <image wx:if="{{recommend.poster}}" class="rec-poster" src="{{recommend.poster}}" mode="aspectFill" lazy-load="true"/>
       <view wx:else class="rec-poster poster-p{{recommend.phase}}"><text>{{recommend.initial}}</text></view>
       <view class="rec-poster-mask"></view>
@@ -60,7 +70,7 @@
     <view class="module-title">最近观看</view>
     <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
       <view class="recent-row">
-        <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
+        <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" hover-class="recent-hover" hover-stay-time="80">
           <view class="recent-poster">
             <image wx:if="{{item.poster}}" class="recent-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true"/>
             <text wx:else class="poster-text poster-p{{item.phase}}">{{item.initial}}</text>

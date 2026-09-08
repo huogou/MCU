@@ -47,7 +47,8 @@ Page({
     progressPercent: 0, /* Hero 迷你旅程条进度 */
     progress: null,   /* ① 旅程卡：当前观看 */
     recommend: null,  /* ② 推荐下一部大卡 */
-    recent: []        /* ③ 最近观看 */
+    recent: [],       /* ③ 最近观看 */
+    libraryEntry: null /* ④ 作品查询入口（2026-09-08 新增） */
   },
 
   onShow() { this.refresh(); },
@@ -125,13 +126,21 @@ Page({
     }).filter(Boolean);
 
     /* Hero 副标题：仅保留观影进度相关统计，弱化内容库表述（审核合规调整） */
+    /* 作品查询入口：为 Tab2 提供明确、可被立即理解的入口 */
+    const libraryEntry = {
+      title: '作品查询',
+      desc: '按名称 / 类型 / 阶段 / 观看状态检索已有作品',
+      statText: '全库 ' + total + ' 部 · 已看 ' + count + ' · 未看 ' + (total - count)
+    };
+
     this.setData({
       heroBanner: heroBanner,
       heroMeta: total + ' 部作品 · 6 个阶段',
       progressPercent: progressPercent,
       progress: progress,
       recommend: recommendCard,
-      recent: recent
+      recent: recent,
+      libraryEntry: libraryEntry
     });
   },
 
@@ -152,14 +161,24 @@ Page({
     this.refresh();
   },
 
-  /* 最近观看 → 我的MCU（观影记录） */
-  goMovie() {
-    tt.switchTab({ url: '/pages/my-mcu/my-mcu' });
+  /* 最近观看 / 推荐卡海报 → 作品详情
+   * 2026-09-08：作品详情（轻量版）已重建为信息查询工具页，此处恢复跳转，
+   * 用户可查看作品基础信息并进行标记已看 / 收藏操作。 */
+  goDetail(e) {
+    const id = e.currentTarget.dataset.id;
+    if (!id) return;
+    tt.navigateTo({ url: '/pages/movie/movie?id=' + id });
   },
 
   /* Hero 迷你旅程条 → 我的MCU（观影记录） */
   goJourney() {
     tt.switchTab({ url: '/pages/my-mcu/my-mcu' });
+  },
+
+  /* 作品查询入口 → 作品查询页（Tab2）
+   * 2026-09-08 新增：首页必须有明确入口，使用户一眼理解本产品的查询能力。 */
+  goLibrary() {
+    tt.switchTab({ url: '/pages/library/library' });
   },
 
   /* 头像远程 URL 加载失败兜底（CDN/网络异常时自动降级到阵营色首字徽章，G-19） */

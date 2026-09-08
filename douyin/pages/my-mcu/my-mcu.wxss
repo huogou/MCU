@@ -379,3 +379,107 @@
   margin-left: var(--space-sm);
   flex-shrink: 0;
 }
+
+/* ══════ 2026-09-08 整改第二阶段新增 ══════
+ * 作品清单统计卡 / 列表切换 / 内联收藏开关
+ * 纪律：颜色一律引用 app.wxss 变量，零 raw hex 泄漏 */
+
+/* 统计卡（4 宫格，点击切换列表口径） */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+.stat-card {
+  flex: 1;
+  margin-right: var(--space-xs);
+  padding: var(--space-sm) 0;
+  text-align: center;
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-lg);
+}
+.stat-card:last-child { margin-right: 0; }
+.stat-card.is-on {
+  background: var(--gold-a10);
+  border-color: var(--gold-a40);
+}
+.stat-num {
+  font-size: var(--fs-title);
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.stat-card.is-on .stat-num { color: var(--gold); }
+.stat-label {
+  margin-top: 4rpx;
+  font-size: var(--fs-mini);
+  color: var(--text-sub);
+}
+.stat-card.is-on .stat-label { color: var(--gold); }
+
+/* 列表切换 chips */
+.tab-row {
+  display: flex;
+  margin-bottom: var(--space-sm);
+}
+.tab-chip {
+  flex: 1;
+  margin-right: var(--space-xs);
+  padding: 12rpx 0;
+  text-align: center;
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+}
+.tab-chip:last-child { margin-right: 0; }
+.tab-chip.is-on {
+  color: var(--gold);
+  background: var(--gold-a10);
+  border-color: var(--gold-a40);
+  font-weight: 600;
+}
+
+/* 列表卡片：交互态 + 内联收藏开关 */
+.wc-hover { background: var(--surface-2); }
+.btn-hover { opacity: 0.7; }
+
+.wc-fav {
+  flex: none;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: var(--text-weak);
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  margin-right: var(--space-xs);
+}
+.wc-fav.is-on {
+  color: var(--gold);
+  background: var(--gold-a15);
+}
+
+.wc-order {
+  margin-top: 2rpx;
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+
+.wc-badge.done {
+  color: var(--success);
+  background: var(--success-a15);
+}
+.wc-badge.todo {
+  color: var(--text-weak);
+  background: var(--surface-3);
+}
+
+/* 片单进度按钮（可点击进入下一部） */
+.route-next-btn.is-disabled {
+  color: var(--text-weak);
+  background: var(--surface-3);
+}
