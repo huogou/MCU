@@ -24,3 +24,13 @@ AI生成文件/
 backup/
 wechat-v1.2.0-upload/
 给*AI同步文件.txt
+
+# OCR 瞬时输出（可重新生成，不进版本库）
+workspace/ocr_result*.txt
+
+# 私钥等凭据（严禁入库；仓库 huogou/MCU 为公开仓库）
+*.pem
+*.key
+*.p12
+id_rsa*
+id_ed25519*
