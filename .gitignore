@@ -28,6 +28,9 @@ wechat-v1.2.0-upload/
 # OCR 瞬时输出（可重新生成，不进版本库）
 workspace/ocr_result*.txt
 
+# 部署打包产物（可由 h5/ 重新打包，不进版本库，避免仓库膨胀）
+*.tar.gz
+
 # 私钥等凭据（严禁入库；仓库 huogou/MCU 为公开仓库）
 *.pem
 *.key

@@ -8,12 +8,13 @@
 
 ```
 MCU/                        （本仓库根）
-├── wechat/                 # 微信小程序源码（已上线 V1.2，AppID wx78f00e7f0a5948b7）
+├── wechat/                 # 微信小程序源码（已发布 V1.2.0，AppID wx78f00e7f0a5948b7）
 ├── douyin/                 # 抖音小程序源码（由微信工程迁移，AppID tt00eb76569e914af801）
-├── h5/                     # H5 静态站源码（已上线 CloudBase 静态托管）
+├── h5/                     # H5 静态站源码（已上线阿里云轻量，HTTPS）
 ├── shared/                 # 跨端单一数据源与同步工具
 │   ├── data/               # 权威数据（module.exports 格式，与微信/抖音一致）
 │   └── sync_data.sh        # 将 shared/data 同步到 wechat/data、douyin/data
+├── MCU项目总览.md          # 项目总览（AI 协作版：架构/部署/治理/待办）
 ├── README.md
 ├── VERSION.md
 └── verify_stats.js         # H5 运营数据统计验证脚本
@@ -33,7 +34,7 @@ MCU/                        （本仓库根）
 | --- | --- | --- | --- |
 | 微信小程序 | `wechat/` | 微信原生小程序，纯本地存储 | 微信开发者工具「上传」→ 提审发布 |
 | 抖音小程序 | `douyin/` | 抖音原生小程序，纯本地存储 | 抖音开发者工具「上传」→ 提审发布 |
-| H5 | `h5/` | 纯静态多页，原生 JS/CSS，无框架无构建 | CloudBase 静态托管 |
+| H5 | `h5/` | 纯静态多页，原生 JS/CSS，无框架无构建 | 阿里云轻量（Nginx 独立站点 + Let's Encrypt HTTPS） |
 
 数据量（单一可信源，禁止第二套）：CONTENT 59 / RELATIONS 92 / ROUTES 11 / CHARACTERS 24 / CAMPS 8 / PANO 40-41-6。
 
@@ -64,9 +65,17 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 | 端 | 方式 |
 | --- | --- |
-| H5 | CloudBase 静态托管（环境 `mcu-d6gw0brqoa9521b58`）：将 `h5/` 上传至该环境，域名 `mcu-d6gw0brqoa9521b58-1307093647.tcloudbaseapp.com` |
+| H5 | 阿里云轻量（Nginx 独立站点）：`h5/` 上传至 `/www/wwwroot/mcu-h5/`，站点配置见 `workspace/deploy/mcu.yaoqiang.xin.conf`，证书由 acme.sh 自动签发续签 |
 | 微信 | 微信开发者工具「上传」→ `mp.weixin.qq.com` 提交审核 → 发布 |
 | 抖音 | 抖音开发者工具「上传」→ 抖音开放平台提交审核 → 发布 |
+
+### H5 访问地址
+
+- **当前生产**：`https://mcu.yaoqiang.xin/`（临时子域，父域已备案）
+- **规划地址**：`mcuatlas.xyz`（已购，**待 ICP 备案**；备案后切换，`mcu.yaoqiang.xin` 退役）
+- **已下线**：CloudBase 静态托管（2026-09-08 清空）、Cloudflare Pages（2026-09-08 删除）
+
+> H5 的浏览统计与用户反馈写入 CloudBase 环境 `mcu-d6gw0brqoa9521b58` 的 `feedback` 集合（跨端与微信小程序共用）。该环境目前**保留**，待小程序反馈迁移至自建后端后再下线。
 
 ## H5 数据说明
 
