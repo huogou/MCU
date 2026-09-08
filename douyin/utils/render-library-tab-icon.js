@@ -17,9 +17,17 @@ const GRID_BODY =
   '<rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/>' +
   '<rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/>';
 
+/* ⚠ 关键：这里刻意使用「与实际产出 PNG 一致」的色值，而不是 app.json 里的
+   新 Token（#555F73 / #F2B233）。原因：
+   现存 4 张 Tab 图标（home / my-mcu，2026-08 生成）实际测量到的平均色为
+   normal #6B7384 / active #E9A93B，与 render-tab-icons.js STATES 常量声明的
+   #555F73 / #F2B233 存在历史漂移（旧图未随 Token 更新而重绘）。
+   若新图标用新 Token，同一个 TabBar 内三个图标会出现肉眼可见的深浅差异。
+   → 本轮以「与兄弟图标视觉一致」为准；不动已通过的 4 张旧图。
+   → Token 漂移本身作为遗留项上报，待产品决定是否需要整体统一。 */
 const STATES = {
-  normal: { stroke: '#555F73', fill: 'none' },
-  active: { stroke: '#F2B233', fill: 'rgba(242,178,51,0.15)' }
+  normal: { stroke: '#6B7384', fill: 'none' },
+  active: { stroke: '#E9A93B', fill: 'rgba(233,169,59,0.15)' }
 };
 
 const OUT_DIR = path.join(__dirname, '..', 'assets', 'icons', 'tab');

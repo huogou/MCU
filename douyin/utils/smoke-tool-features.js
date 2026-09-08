@@ -378,6 +378,65 @@ try {
 } catch (e) { ok('H3 home 页 refresh 正常', false, e.message); }
 
 /* ══════════════════════════════════════════════════════════
+   O. 首页进度联动（第二阶段遗漏，V1.3.0 补）
+   ══════════════════════════════════════════════════════════ */
+section('O. 首页进度联动');
+userState.setState({ watched: {}, want_to_watch: {}, favorite: {}, saved_routes: [], milestones_shown: {} });
+
+const homeA = mount('pages/home/home.js');
+homeA.onShow();
+eq('O1 初始首页已看数为 0', homeA.data.progress.count, 0);
+eq('O2 初始首页进度百分比为 0', homeA.data.progressPercent, 0);
+
+const mvMark = mount('pages/movie/movie.js');
+mvMark.onLoad({ id: 'iron-man' });
+mvMark.onToggleWatched();
+
+const homeB = mount('pages/home/home.js');
+homeB.onShow();
+eq('O3 详情标记已看后首页已看数=1', homeB.data.progress.count, 1);
+eq('O4 首页进度百分比同步更新', homeB.data.progressPercent, Math.round(1 / TOTAL * 100));
+eq('O5 作品查询口径同步', userState.count(), 1);
+
+mvMark.onToggleWatched();
+const homeC = mount('pages/home/home.js');
+homeC.onShow();
+eq('O6 取消已看后首页回落 0', homeC.data.progress.count, 0);
+eq('O7 首页进度百分比回落 0', homeC.data.progressPercent, 0);
+
+/* ══════════════════════════════════════════════════════════
+   P. V1.3.0 产品决策落地校验
+   ══════════════════════════════════════════════════════════ */
+section('P. V1.3.0 产品决策落地');
+const aboutSrc = fs.readFileSync(path.join(ROOT, 'pages/about/about.wxml'), 'utf8');
+ok('P1 about 版本号已改为 V1.3.0', /当前版本：V1\.3\.0/.test(aboutSrc));
+ok('P2 about 已无 V1.2.0 残留', !/V1\.2\.0/.test(aboutSrc));
+ok('P3 about 更新日期已同步 2026-09-08', /最近更新：2026-09-08/.test(aboutSrc));
+
+const relSrc = fs.readFileSync(path.join(ROOT, 'data/relations.js'), 'utf8');
+ok('P4 relations 已移除「失去官方支持」', relSrc.indexOf('失去官方支持') < 0);
+ok('P5 改写后仍保留原剧情语义', /神盾局在《冬日战士》里解体/.test(relSrc) && /失去机构后盾/.test(relSrc));
+
+const { RELATIONS: REL_ALL } = require(path.join(ROOT, 'data/relations.js'));
+const badWhy = REL_ALL.filter(function (r) {
+  return r.why && /官方|正版|授权|资讯|新闻|热点|影评|票房/.test(r.why);
+});
+ok('P6 全部 ' + REL_ALL.length + ' 条关系文案无违规词', badWhy.length === 0,
+   badWhy.map(function (r) { return r.from + '→' + r.to; }).join(','));
+
+ok('P7 TabBar 仍为 3 项（未新增独立收藏 Tab）', appJson.tabBar.list.length === 3,
+   'count=' + appJson.tabBar.list.length);
+ok('P8 TabBar 三项为 首页/作品/我的MCU',
+   appJson.tabBar.list.map(function (t) { return t.text; }).join('/') === '首页/作品/我的MCU',
+   appJson.tabBar.list.map(function (t) { return t.text; }).join('/'));
+
+/* 被删除页面不得复活 */
+['explore', 'panorama', 'characters', 'character', 'routes', 'route-detail'].forEach(function (p) {
+  ok('P9 已删除页面未复活：' + p, appJson.pages.indexOf('pages/' + p + '/' + p) < 0 &&
+     !fs.existsSync(path.join(ROOT, 'pages', p)));
+});
+
+/* ══════════════════════════════════════════════════════════
    汇总
    ══════════════════════════════════════════════════════════ */
 console.log('\n════════════════════════════════════');

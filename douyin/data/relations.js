@@ -58,7 +58,7 @@ const RELATIONS = [
   { from: 'winter-soldier', to: 'civil-war', type: 'prereq', weight: 3,
     why: '巴基的身份在《冬日战士》里被揭开，而《内战》最后的决裂，正是因为托尼发现巴基杀了自己的父母。这两部本质是同一个故事的上下半场。' },
   { from: 'winter-soldier', to: 'age-of-ultron', type: 'sequel', weight: 2,
-    why: '神盾局在《冬日战士》里解体，复仇者从此失去官方支持、只能自己行动。《奥创纪元》就是他们独立后闯下的第一场大祸。' },
+    why: '神盾局在《冬日战士》里解体，复仇者从此失去机构后盾、只能自己行动。《奥创纪元》就是他们独立后闯下的第一场大祸。' },
   { from: 'age-of-ultron', to: 'civil-war', type: 'sequel', weight: 3,
     why: '索科维亚的平民伤亡直接催生了要求超级英雄接受政府管辖的协议。《内战》的分裂就是从签不签这份协议开始的，是严格的因果关系。' },
   { from: 'age-of-ultron', to: 'multiverse-of-madness', type: 'character', weight: 2,
