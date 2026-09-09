@@ -4,7 +4,7 @@
 > 不替代 `给策划AI/开发AI/设计AI同步文件.txt`（三角色间的窄向协同通道），也不替代 README/VERSION（产品/版本元数据）。
 >
 > **维护**：随项目推进同步更新；大改动后整段重写而非追加（沿用"归档后重写"约定）。
-> 最后更新：2026-09-08（部署迁移到阿里云 + 旧地址清理 + 新域名 `mcuatlas.xyz` 入场）
+> 最后更新：2026-09-08（当前状态校正：抖音 V1.3.0 提审准备态 · H5 阿里云正式运行 · 三端状态对齐）
 
 ---
 
@@ -20,11 +20,11 @@
 
 | 端 | 定位 | 用户场景 | 当前生产地址 / AppID |
 |---|---|---|---|
-| **H5** | 外部获客 / 首体验 | 微信/浏览器分享链接打开 | `https://mcu.yaoqiang.xin/`（**临时**，待切 `mcuatlas.xyz`） |
+| **H5** | 外部获客 / 首体验 | 微信/浏览器分享链接打开 | `https://mcu.yaoqiang.xin/`（**阿里云轻量正式运行**；品牌域名 `mcuatlas.xyz` 备案后切换） |
 | **微信小程序** | 长期使用 / 进度沉淀 | 核心用户日活 | AppID `wx78f00e7f0a5948b7`，V1.2.0 已发布 |
-| **抖音小程序** | 抖音生态获客 | 抖音用户观影查询 | AppID `tt00eb76569e914af801`，V1.2.0 真机测试过、待上传审核 |
+| **抖音小程序** | 作品查询 / 个人记录工具 | 抖音用户作品查询与进度管理 | AppID `tt00eb76569e914af801`，**V1.3.0（提审准备阶段）** |
 
-**核心用户路径**（三端共享心智）：`顺序 → 路线 → 下一部 → 关系 → 地图 → 进度`
+**核心用户路径**（共享心智；H5/微信为完整链路）：`顺序 → 路线 → 下一部 → 关系 → 地图 → 进度`。抖音为轻量工具版，仅保留「作品查询 → 已看/收藏 → 进度管理」子链路。
 
 ---
 
@@ -35,7 +35,7 @@
 ```
 .
 ├── wechat/                    # 微信小程序源码（基线 wechat-production → baf309b）
-├── douyin/                    # 抖音小程序源码（提交 700210a，2 次驳回整改后形态）
+├── douyin/                    # 抖音小程序源码（提交 22494e1，V1.3.0，2 次驳回整改后形态）
 ├── h5/                        # H5 源码（与线上同源，121 文件）
 ├── shared/                    # 跨端共享数据（11 个 data/*.js + 1 个 sh，H5+抖音直接 import）
 │
@@ -58,14 +58,14 @@
 
 **关键 Git 标记**：
 - 微信：`wechat-production` → `baf309b`（只读基线）
-- 抖音：当前 `douyin/` 工作树，提交 `700210a`
+- 抖音：当前 `douyin/` 工作树，提交 `22494e1`（V1.3.0）
 - H5：当前 `h5/` 工作树（无单独 tag，H5 与线上同源）
 
 ---
 
 ## 4. 共享数据层（`shared/data/*.js`）
 
-11 个 JS 是 H5/微信/抖音三端**单一可信源**（治理铁律：禁止编造、不得丢入 CMS、禁第二套）：
+11 个 JS 是跨端**唯一数据源头**（治理铁律：禁止编造、不得丢入 CMS、禁第二套）。四端各自持有同步副本（`shared/data`、`h5/data`、`douyin/data`、`wechat/data` 各 11 个），由 `shared/sync_data.sh` 从源头单向下发：
 
 | 文件 | 用途 | 体量 |
 |---|---|---|
@@ -81,6 +81,8 @@
 | `special.js`, `short.js` | 特殊内容/短片 | — |
 
 **注意**：`visuals.js` 是 H5 端 CloudBase 写库（Stats + FeedbackUI）的 envId 承载文件；**当 CloudBase 写库链路迁移到阿里云时需同步改此文件**。
+
+> ⚠ **单端改写风险**：端上副本是同步产物，手工改动会被 `sync_data.sh` 覆盖。`douyin/data/relations.js:61` 文案中性化即属单端改写未回源（见 §7.3）；如需全端统一，须策划拍板后改 `shared/` 源头再同步。
 
 ---
 
@@ -124,8 +126,6 @@ https://mcu.yaoqiang.xin/
 | 2026-09-07 | Cloudflare Pages（`mcu-navigator-h5.pages.dev`） | **2026-09-08 清理**（项目删除 → 连接失败） |
 | 2026-09-08 | 阿里云轻量 + `mcu.yaoqiang.xin` 子域 | **当前主用** |
 | 未来 | 阿里云轻量 + `mcuatlas.xyz`（用户已购、已加 3 条 A 记录、**未备案**） | **待备案后切生产** |
-
-**决策教训（已写入治理）**：用户会推翻前序方案（CF → Aliyun），AI 不抱怨、不重复论据，立刻按新方案推进。
 
 ---
 
@@ -171,40 +171,45 @@ about / agreement / privacy
 ### 7.1 基本信息
 
 - **AppID**：`tt00eb76569e914af801`
-- **当前版本**：V1.2.0（**真机测试已完成**，上传审核准备阶段；待 2 处产品确认后提交）
-- **服务类目**：工具-实用工具-信息查询（资质已通过）
-- **驳回历史**：2 次驳回
-  - 第 1 次（2026-09-07）：「文娱-资讯」类目不符 → 改类目后通过
-  - 第 2 次：「小程序功能不完整且可用性低」 → 整改后提交 `700210a`
+- **产品定位**：**MCU 作品信息查询 + 个人观影记录 + 进度管理 + 收藏工具**（工具型应用，非内容/资讯平台）
+- **服务类目**：工具-实用工具-信息查询（类目资质已通过）
+- **驳回历史**（2 次，均未过审）：
+  - 第 1 次（2026-09-07）：申请「文娱-资讯」类目不符合个人主体资质 → 改类目（非整体过审）
+  - 第 2 次：「小程序功能不完整且可用性低」 → 整改为 V1.3.0（补充作品查询/作品详情/收藏/观影进度等工具功能）
+- **当前版本**：**V1.3.0（提审准备阶段）**——开发与自动化测试已完成（151 项断言通过），**等待最终真机确认后提交审核；未上传、未过审**
+- **核心功能**：作品查询、搜索、类型/阶段/已看筛选、排序、轻量作品详情、标记已看、收藏、我的作品清单、首页作品查询入口
 
 ### 7.2 页面结构（9 页 / 3 TabBar）
 
-**TabBar**：首页 / 作品 / 我的MCU（V1.2 从 2 Tab 改为 3 Tab）
+**TabBar**：首页 / 作品 / 我的MCU（V1.3.0 定稿 3 Tab）
 
 ```
-home（首页）              library（作品查询，V1.2 新增 Tab）     my-mcu（我的 MCU）
-movie（详情，V1.2 改为轻量工具版）
-feedback / share / about / agreement / privacy
+home（首页，含作品查询入口）       library（作品：查询/搜索/筛选/排序）       my-mcu（我的 MCU：观影记录/我的作品清单/收藏/进度）
+movie（轻量作品详情）              feedback / share / about / agreement / privacy
 ```
 
-**永久删除、禁止恢复**（审核风险）：`explore` / `panorama` / `characters` / `character` / `routes` / `route-detail`
+**已删除且禁止恢复**（不作为当前产品功能描述）：`explore` / `panorama` / `characters` / `character` / `routes` / `route-detail`
 
 ### 7.3 与微信版的差异（治理要点）
 
 - 抖音版 `movie` 是**轻量工具版**：仅信息表 + 无剧透简介(sf) + 标记已看 + 收藏 + ≤4 条基础关系
 - **主动规避 `role` 字段**（剧情作用解读类编辑文本，审核风险）
 - `feedback.js`：**纯本地队列**（`tt.getStorageSync/setStorageSync`），数据不上云、不汇总（提交 `1242a65`，策划拍板"选项一 本地"）
+- `douyin/data/relations.js:61` 文案已中性化（「失去官方支持」→「失去机构后盾」）；属**单端改写未回源**，`shared/` 源头仍为原文——需全端统一须策划拍板后改源头再同步
 
-### 7.4 测试基建
+### 7.4 测试基建（151 项断言全通过）
 
-- `douyin/utils/smoke-tool-features.js` —— **headless 页面测试范式**：桩化全局 `tt` + 桩化 `Page()` + 手动实例化 + 直接调方法断言 userState 真实落库 → 82 断言全通过
-- 运行：`cd douyin && node utils/smoke-tool-features.js`
+- `smoke-tool-features.js`（103 项）—— headless 页面测试范式：桩 `tt` + 桩 `Page()` + 手动实例化 + 直接调方法断言 userState 真实落库
+- `smoke-canvas.js`（25 项）—— Canvas 绘制指令执行 / 保存成功 / 写文件失败 / 相册权限拒绝 / Canvas 未就绪 五分支
+- `check-visible-content.js`（0 命中）—— WXML 文本 + JS 字符串 + CONTENT 全量禁用词扫描
+- `check-tab-icons.js`（23 项，需 sharp）—— 81×81 / 非空白 / 两态异色 / 跨 Tab 无色差（通道偏差 ≤1/255）
+- 运行：`cd douyin && node utils/smoke-tool-features.js`；sharp 相关需 NODE_PATH 指向 node workspace
 
-### 7.5 待产品确认（已停止，未上传提审）
+### 7.5 提审决策（2026-09-08 已拍板，不再挂起）
 
-1. 提审版本号（about 页仍 V1.2.0 / 日期 2026-09-07）
-2. `relations.js:61` why 文本含"失去官方支持"（剧情内语义、低危）是否保留
-3. 是否另设独立"收藏"Tab 入口
+1. 提审版本：**V1.3.0**（about 页已同步版本号与日期）
+2. `relations.js`「失去官方支持」：**改为中性表述**（「失去机构后盾」，已落地于 douyin 端）
+3. 收藏：**并入"我的MCU"内部功能，不设独立 Tab**（已落地）
 
 ---
 
@@ -220,9 +225,9 @@ feedback / share / about / agreement / privacy
 | 文本 main / secondary / weak | `#E8ECF4` / `#A8B0C0` / `#6B7384` |
 | 状态 success / error | `#3FB98A` / `#E5604D` |
 
-- 完整规范见 `DESIGN.md`
-- V1.2 视觉升级：首页 Hero Banner + 2×2 入口、电影详情氛围图、角色详情 Hero 增强、关系探索 Canvas 网络图/列表混合、characters/my-mcu 真实图片接入
-- CDN 0.75 MB、主包 ~0.6 MB
+- 设计令牌与规范：微信/抖音遵循 `DESIGN.md`（同套 token）
+- 以下视觉里程碑为**微信端 V1.2**：首页 Hero Banner + 2×2 入口、电影详情氛围图、角色详情 Hero 增强、关系探索 Canvas 网络图/列表混合、characters/my-mcu 真实图片接入（抖音端无探索/角色/路线页面，不适用）
+- 微信 CDN 0.75 MB、主包 ~0.6 MB
 
 ---
 
@@ -236,7 +241,7 @@ feedback / share / about / agreement / privacy
 | Web | Nginx 1.26.3 + 宝塔 11.1.0 |
 | 外网 IP | `<阿里云ECS公网IP>`（真实值见本地 `.workbuddy/memory/MEMORY.md`，**已 gitignore，不入库**） |
 | 主域 | `yaoqiang.xin`（WordPress） |
-| H5 | `mcu.yaoqiang.xin`（临时）→ 计划切 `mcuatlas.xyz` |
+| H5 | `mcu.yaoqiang.xin`（**正式运行**）→ `mcuatlas.xyz`（品牌域名，备案后切换） |
 | SSH | RSA 2048 密钥登录；本地 PEM `AI生成文件/H5/MCU.pem`（未入库） |
 
 ### 9.2 DNS
@@ -326,13 +331,12 @@ feedback / share / about / agreement / privacy
 
 | 项 | 状态 |
 |---|---|
-| H5 生产地址 | `https://mcu.yaoqiang.xin/`（HTTPS 200，LE 自动续签） |
-| H5 CloudBase 静态托管 | **已清空**（旧地址 404） |
-| H5 Cloudflare Pages | **已删除**（旧地址连接失败） |
-| H5 新域名 `mcuatlas.xyz` | **已购、未备案**，3 条 A 记录已加（mcu/@/www → <阿里云ECS公网IP>） |
-| 微信小程序 V1.2.0 | 已发布（基线 baf309b） |
-| 微信小程序 V1.2.1 | 待上传（含审核反馈修复） |
-| 抖音小程序 V1.2.0 | 真机测试过，待上传审核（3 项产品待确认） |
+| **H5** | **阿里云轻量服务器正式运行**：`https://mcu.yaoqiang.xin/`（HTTPS 200，LE 自动续签；部署 `/www/wwwroot/mcu-h5/`） |
+| H5 CloudBase 静态托管 | **已清空**（历史部署记录，旧地址 404） |
+| H5 Cloudflare Pages | **已删除**（历史部署记录，旧地址连接失败） |
+| H5 新域名 `mcuatlas.xyz` | **已购、未备案**（3 条 A 记录已加），备案后切生产 |
+| **微信小程序** | **V1.2.0 已发布**（基线 baf309b）；V1.2.1（审核反馈修复）待后续上传 |
+| **抖音小程序** | **V1.3.0 开发完成**（自动化测试 151 项通过），真机最终确认后提审；未上传、未过审 |
 | CloudBase 环境 | **保留**（仅静态托管清空，DB/存储仍在，供小程序 + 新 H5 反馈） |
 | 博客 yaoqiang.xin | 正常（零影响） |
 
@@ -358,9 +362,9 @@ feedback / share / about / agreement / privacy
 
 ### P2
 
-5. 微信小程序 V1.2.1 上传
-6. 抖音小程序 V1.2.0 提交审核（先解决 3 项产品确认）
-7. H5 `mcuatlas.xyz` 域名加 CloudBase 白名单（让 Stats/Feedback 写库恢复，否则仅在新 H5 反馈暂存本地；此项可与 P1.3 并行）
+5. 微信小程序 V1.2.1 上传（含审核反馈修复）
+6. 抖音小程序 V1.3.0：抖音开发者工具完成最终真机验收 → 提交审核（3 项提审决策已落地：版本 V1.3.0 / relations 中性表述 / 收藏并入我的MCU）
+7. 将 H5 生产域名 `mcu.yaoqiang.xin` 加入 CloudBase WEB 安全域名白名单（恢复 Stats/Feedback 写库；`mcuatlas.xyz` 切生产后再改加新域名）
 
 ---
 
@@ -372,7 +376,7 @@ feedback / share / about / agreement / privacy
 | CloudBase 写库依赖共享 env | 删环境会同时坏掉小程序反馈 + 新 H5 反馈 | **环境保留**；小程序迁移后再删 |
 | H5 Stats/Feedback 在新域名失效 | 控制台报错；用户数据不写入 | P2 加 CloudBase 白名单解决 |
 | 历史反馈数据 | CloudBase feedback 集合内的历史数据 | 迁移时导出/保留；用户决策后处理 |
-| 抖音 V1.2.0 第 2 次驳回整改后 | 仍有 3 项产品待确认，未提审 | 用户拍板后再上传 |
+| 抖音 V1.3.0 | 开发/自动化测试完成，**未做最终真机验收、未提审** | 产品负责人在抖音开发者工具完成人工真机验收（清单见 `AI生成文件/小程序/抖音/`）后提交审核 |
 
 ---
 
@@ -392,7 +396,6 @@ feedback / share / about / agreement / privacy
    - DNS 探测：`curl -s 'https://dns.alidns.com/resolve?name=<fqdn>&type=A'`（独立源核验，不依赖 nslookup/dig）
 8. **踩过的坑**：
    - 不要盲目试 `acme.sh`（Let's Encrypt 每小时 5 次限流），DNS 未生效先 DoH 验 NXDOMAIN
-   - 用户会推翻前序方案——不抱怨、不重复论据，立刻按新方案推进
    - 阿里云"绑定密钥对"对运行中实例不自动写 authorized_keys → 用 Workbench 一键连接(Admin)+sudo 注入公钥
 
 ---
