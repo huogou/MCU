@@ -844,7 +844,7 @@ var VIEW_MODES = {
         name: '抖音小程序',
         desc: '抖音扫码进入',
         color: 'var(--douyin-brand)',
-        qr: '', /* 待抖音小程序上线后替换为真实二维码图片路径 */
+        qr: 'assets/miniprogram/qrcode-douyin.png', /* 抖音小程序 ICP 备案已通过后启用的官方小程序码（带平台标识版） */
         icon: '<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
           + '<rect width="40" height="40" rx="10" fill="var(--douyin-soft)"/>'
           + '<path d="M25.5 10h3.2c.3 1.8 1.1 3.3 2.8 4v3.4c-1.5-.1-2.9-.6-4-1.4v6.5a7 7 0 1 1-7-7c.35 0 .7.03 1.04.08v3.3a3.66 3.66 0 1 0 2.46 3.46V10h1.5z" fill="var(--douyin-brand)"/>'
