@@ -1,0 +1,28 @@
+# MCU 观影导航 H5 —— 独立站点（新域名 mcu.yaokaixin.top）
+# ------------------------------------------------------------
+# 阶段一配置：仅 HTTP。用于 Let's Encrypt HTTP-01（webroot）校验；
+# 证书签发成功后，用同目录下的 mcu.yaokaixin.top.conf（含 443）替换本文件。
+#
+# 与 mcu.yaoqiang.xin.conf 结构完全一致，零博客改动：
+#   80 端口：仅 /.well-known/acme-challenge/ 走本地目录，其余 301 → HTTPS
+#   站点根：/www/wwwroot/mcu-h5（与旧域名共用同一份静态文件，不做数据复制）
+# ------------------------------------------------------------
+
+server
+{
+    listen 80;
+    server_name mcu.yaokaixin.top;
+
+    # ACME 续签必须保留（仅 /.well-known/acme-challenge/ 走 HTTP）
+    location ^~ /.well-known/acme-challenge/ {
+        root /www/wwwroot/mcu-h5;
+    }
+
+    # 其余 HTTP 请求 301 跳转 HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+
+    access_log /www/wwwlogs/mcu.yaokaixin.top.log;
+    error_log  /www/wwwlogs/mcu.yaokaixin.top.error.log;
+}

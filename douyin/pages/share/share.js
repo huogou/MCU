@@ -486,7 +486,7 @@ Page({
       ctx.fillStyle = C.textWeak;
       ctx.font = '20px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('最近观看', W / 2, 644);
+      ctx.fillText('最近标记', W / 2, 644);
       var pw = 120, ph = 160, gap = 30;
       var totalW = recents.length * pw + (recents.length - 1) * gap;
       var sx = (W - totalW) / 2;

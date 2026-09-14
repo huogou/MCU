@@ -1,5 +1,5 @@
 <!-- 首页 home（Tab1）· 2026-09-07 抖音合规整改版
-     结构（3 模块）：① Hero Banner（进度）→ ② 旅程卡 + 推荐下一部 → ③ 最近观看
+     结构（3 模块）：① Hero Banner（进度）→ ② 旅程卡 + 推荐下一部 → ③ 最近标记
      整改：按抖音《版本审核标准》第二节移除「功能入口 2×2（宇宙入口）」「热门角色」
            两个内容资讯型模块；所有入口统一跳转「我的MCU」观影记录页（Tab）
      图片：经 mcuData 转发层取（URL 只存在于 visuals.js）；缺失走合规兜底 -->
@@ -10,7 +10,7 @@
     <image wx:if="{{heroBanner}}" class="hero-banner-bg" src="{{heroBanner}}" mode="aspectFill" lazy-load="true"/>
     <view class="hero-banner-overlay"></view>
     <view class="hero-banner-content">
-      <view class="hero-banner-tag">我的观影进度</view>
+      <view class="hero-banner-tag">我的观看进度</view>
       <view class="hero-banner-title">我的 MCU 旅程</view>
       <view class="hero-banner-sub">{{heroMeta}}</view>
       <view class="hero-journey-bar" bindtap="goJourney" hover-class="hero-journey-hover" hover-stay-time="60">
@@ -65,9 +65,9 @@
     </view>
   </view>
 
-  <!-- ═══ ③ 最近观看（横滚） ═══ -->
+  <!-- ═══ ③ 最近标记（横滚） ═══ -->
   <view class="section">
-    <view class="module-title">最近观看</view>
+    <view class="module-title">最近标记</view>
     <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
       <view class="recent-row">
         <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" hover-class="recent-hover" hover-stay-time="80">
@@ -79,7 +79,7 @@
         </view>
       </view>
     </scroll-view>
-    <view wx:else class="empty-hint">还没有观看记录，从《钢铁侠》开始你的旅程</view>
+    <view wx:else class="empty-hint">还没有已标记的作品，从《钢铁侠》开始你的旅程</view>
   </view>
 
 </view>

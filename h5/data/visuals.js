@@ -19,13 +19,27 @@
 (function (global) {
   'use strict';
 
+  /* ── 资源基址（CDN 支持，2026-09-10 V2.0）────────────────────
+   * 默认留空：沿用数据文件里的相对路径，本地 file:// 双击打开与同域部署都可用。
+   * 若日后把图片迁到独立 CDN，只需在引入本文件**之前**设置一次：
+   *     <script>window.MCU_ASSET_BASE = 'https://cdn.example.com/mcu/';</script>
+   * 全站海报 / 剧照自动切换，无需改动任何页面或数据文件。
+   * 已是绝对地址（http(s):// 或 //）的路径不做拼接，避免重复前缀。 */
+  var ASSET_BASE = global.MCU_ASSET_BASE || '';
+
+  function resolve(p) {
+    if (!p) return null;
+    if (/^(https?:)?\/\//i.test(p)) return p;
+    return ASSET_BASE + p;
+  }
+
   function visual(id) {
     var posters = global.MCU_POSTERS || {};
     var stills  = global.MCU_STILLS || {};
 
     return {
-      poster:   (id && posters[id]) ? posters[id] : null,
-      backdrop: (id && stills[id])  ? stills[id]  : null
+      poster:   (id && posters[id]) ? resolve(posters[id]) : null,
+      backdrop: (id && stills[id])  ? resolve(stills[id])  : null
     };
   }
 

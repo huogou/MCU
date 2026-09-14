@@ -84,7 +84,7 @@ Page({
         year: cur.year,
         initial: cur.initial,
         phase: cur.phase,
-        statusLabel: isCurrent ? '当前观看' : '已观看',
+        statusLabel: isCurrent ? '进行中' : '已观看',
         statusCls: isCurrent ? 'st-current' : 'st-done'
       }
     };

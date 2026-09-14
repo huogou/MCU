@@ -39,6 +39,7 @@
 <div id="app-foot"></div>
 
 <script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
 <script src="data/relations.js"></script>
 <script src="data/routes.js"></script>
 <script src="data/characters.js"></script>
@@ -103,11 +104,11 @@
     var status = m._status === 'upcoming' ? '🕐即将上映' : '✅已上映';
     var seen = (m._status !== 'upcoming' && m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
     return '<option value="' + MCU.ui.esc(m.id || '') + '">'
-      + m._morder + '. ' + MCU.ui.esc(m.cn) + '（' + m.year + '）' + status + seen + '</option>';
+      + m._morder + '. ' + MCU.ui.esc(m.cn || m.title || '') + '（' + m.year + '）' + status + seen + '</option>';
   }
   function otherOpt(m) {
     var seen = (m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
-    return '<option value="' + MCU.ui.esc(m.id || '') + '">' + MCU.ui.esc(m.cn) + '（' + m.year + '）' + seen + '</option>';
+    return '<option value="' + MCU.ui.esc(m.id || '') + '">' + MCU.ui.esc(m.cn || m.title || '') + '（' + m.year + '）' + seen + '</option>';
   }
 
   function movieGroups(movies) {
@@ -202,7 +203,7 @@
       var _up = (window.MCU_UPCOMING || []).slice().sort(function (a, b) { return String(a.date || '').localeCompare(String(a.date || '')); })[0];
       var _end = '《' + MCU.ui.esc(from.cn) + '》已经是这条路径上的最后一部了。<br>';
       if (_latest) _end += '目前 MCU 最新上映的作品是《' + MCU.ui.esc(_latest.cn) + '》（' + MCU.ui.esc(_latest.date) + '）。<br>';
-      if (_up) _end += '接下来是《' + MCU.ui.esc(_up.cn) + '》，' + MCU.ui.esc(_up.date) + ' 上映。';
+      if (_up) _end += '接下来是《' + MCU.ui.esc(_up.cn || _up.title) + '》，' + MCU.ui.esc(_up.date) + ' 上映。';
       resultEl.innerHTML = '<div class="empty">' + _end + '</div>';
       return;
     }

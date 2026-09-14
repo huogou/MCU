@@ -37,3 +37,9 @@ workspace/ocr_result*.txt
 *.p12
 id_rsa*
 id_ed25519*
+
+# Trae IDE「导出为 HTML 分享」残留（非源码，可重新生成）
+.trae-html-share-packages/
+
+# 本地验证截图与瞬时产物（可由脚本重新生成，不进版本库）
+workspace/captures/

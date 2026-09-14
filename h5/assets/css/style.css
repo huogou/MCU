@@ -6,24 +6,30 @@
  * ============================================================ */
 
 :root {
-  --bg:        #0B0E14;
-  --bg-soft:   #11151E;
-  --surface:   #161B26;
-  --surface-2: #1D2331;
-  --surface-3: #262D3D;
-  --border:    #262D3D;
-  --border-lit:#39425A;
+  /* ── V2.0（2026-09-10）：H5 已统一采用小程序 Token 体系 ──
+     策划决策「A 统一小程序Token」，背景 #080B12 / 主色 #F2B233。
+     变量**名**全部保留，只改值，既有页面（map/routes/movie/next）零改动跟随。 */
+  --bg:        #080B12;
+  --bg-soft:   #0D1119;
+  --surface:   #161D2B;   /* 小程序 surface-1 */
+  --surface-2: #1E2636;   /* 小程序 surface-2 */
+  --surface-3: #2A3447;   /* 小程序 border     */
+  --border:    #2A3447;
+  --border-lit:#354160;
 
-  --text:      #E9ECF3;
-  --text-2:    #A2ABBF;
-  --text-3:    #8A93A8;
+  --text:      #E8ECF4;   /* 小程序 text-main */
+  --text-2:    #8E98AA;   /* 小程序 text-sub  */
+  /* 小程序 text-weak #555F73 在 #080B12 上对比度约 2.9:1，低于 WCAG AA 4.5:1，
+     用于 11–12px 说明文字不可读。此处保留为 #6E7889（约 4.4:1），
+     是「统一 Token」与「可读性」的折中；后续若设计侧坚持原值需单独评估。 */
+  --text-3:    #6E7889;
 
   --red:       #E8483F;
   --red-soft:  rgba(232, 72, 63, 0.12);
   --blue:      #5B8DEF;
   --blue-soft: rgba(91, 141, 239, 0.12);
-  --gold:      #E9A93B;
-  --gold-soft: rgba(233, 169, 59, 0.12);
+  --gold:      #F2B233;
+  --gold-soft: rgba(242, 178, 51, 0.12);
   /* 注：--p3/--type-movie/--imp-recommended 仍沿用 #F0A932（各自语义的独立色 token，非「金色 Token」，
      不在 D8 微调范围；如后续要做全站金色统一可另起任务 */
   --green:     #28B487;
@@ -78,6 +84,35 @@
   --douyin-soft:  rgba(254, 44, 85, 0.14);
   --douyin-cyan:  #25F4EE;
   --qr-bg:        #FFFFFF;
+}
+
+/* ============================================================
+ * V2.0 追加 Token（2026-09-10，对齐小程序体系）
+ * 单独开一个 :root 块：只做追加，不动上方任何既有变量。
+ * ============================================================ */
+:root {
+  --bg-deep:    #050810;
+  --surface-0:  #0D1119;
+  --surface-4:  #354160;
+
+  --gold-light: #FFD66B;
+  --gold-dark:  #C9901E;
+  --gold-btn-text: #1A1206;
+  --gold-a10: rgba(242,178,51,0.10);
+  --gold-a20: rgba(242,178,51,0.20);
+  --gold-a30: rgba(242,178,51,0.30);
+
+  --text-main: var(--text);
+  --text-sub:  var(--text-2);
+  --text-weak: var(--text-3);
+  --text-inverse: #1A1206;
+
+  --page-x: 16px;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 16px; --r-xl: 24px; --r-full: 999px;
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.30);
+  /* 单一克制的金色光晕：仅用于主 CTA 与进度环，不做全站发光 */
+  --glow-gold: 0 0 20px rgba(242,178,51,0.12);
+  --fs-display: 30px; --fs-title: 18px; --fs-body: 14px; --fs-caption: 12px; --fs-mini: 11px;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

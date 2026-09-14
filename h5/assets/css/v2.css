@@ -1,0 +1,792 @@
+/* ============================================================
+ * MCU 观影导航 H5 · V2.0 组件样式
+ * ------------------------------------------------------------
+ * 定位：黑金电影档案馆。电影感 / 收藏感 / 专业导航工具。
+ * 明确不做：过度炫技动画、大面积发光、游戏化 UI、社区化风格。
+ *
+ * 命名纪律：全部 v2- 前缀。
+ *   原因：style.css 已存在 .hero（47 处引用）、.mp-entry、.btn-primary 等，
+ *   map.html / routes.html 还各自内联了 .movie-card / .upcoming-tag。
+ *   加前缀可保证 V2.0 首页改造不污染任何既有页面。
+ *
+ * 断点：移动优先，基准 390px；≥720px 内容居中限宽，不做桌面端重排。
+ * 依赖：必须先引入 style.css（复用其中的 token 与 reset）。
+ * ============================================================ */
+
+/* ---------- 布局容器 ---------- */
+.v2 { display: block; }
+.v2-inner { max-width: 760px; margin: 0 auto; }
+
+.v2-section { padding: 28px var(--page-x); }
+.v2-rule { height: 1px; margin: 0 var(--page-x);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); }
+
+/* ---------- SectionTitle 组件 ---------- */
+.v2-hd { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.v2-hd-l { min-width: 0; }
+.v2-st-eyebrow { display: block; font-size: var(--fs-mini); letter-spacing: .12em;
+  color: var(--gold); opacity: .85; margin-bottom: 4px; }
+.v2-st-title { font-size: var(--fs-title); font-weight: 700; color: var(--text-main); line-height: 1.3; }
+.v2-st-sub { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 3px; }
+.v2-st-more { flex-shrink: 0; font-size: var(--fs-caption); color: var(--text-weak);
+  display: inline-flex; align-items: center; gap: 3px; }
+.v2-st-more svg { width: 13px; height: 13px; fill: currentColor; }
+.v2-st-more:active { color: var(--gold); }
+
+/* ============================================================
+ * 1. Hero
+ * ============================================================ */
+.v2-hero { position: relative; overflow: hidden;
+  padding: 56px var(--page-x) 34px; }
+.v2-hero-bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 46% at 50% 8%, rgba(91,141,239,0.06) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 40% at 24% 62%, rgba(139,111,232,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 56% 50% at 78% 74%, var(--gold-a10) 0%, transparent 58%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%); }
+/* 静态星点：保留宇宙感但不做闪烁动画（策划明确要求避免过度动效） */
+.v2-hero-stars { position: absolute; inset: 0; overflow: hidden; }
+.v2-star { position: absolute; border-radius: 50%; background: #fff; opacity: .28; }
+.v2-hero-inner { position: relative; z-index: 2; max-width: 760px; margin: 0 auto; }
+
+.v2-hero-badge { display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; margin-bottom: 16px;
+  background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  border-radius: var(--r-full);
+  font-size: var(--fs-mini); color: var(--gold); letter-spacing: .06em; }
+.v2-hero-badge i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+
+.v2-hero-title { font-size: var(--fs-display); font-weight: 700; line-height: 1.24;
+  letter-spacing: .01em; margin-bottom: 12px;
+  background: linear-gradient(135deg, var(--text-main) 0%, var(--gold-light) 52%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: var(--gold); }
+.v2-hero-sub { font-size: var(--fs-body); color: var(--text-sub);
+  line-height: 1.75; margin-bottom: 24px; max-width: 22em; }
+
+.v2-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.v2-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 12px 22px; border-radius: var(--r-full);
+  font-size: var(--fs-body); font-weight: 600; letter-spacing: .02em;
+  transition: transform .18s ease, background .18s ease; }
+.v2-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.v2-btn:active { transform: scale(.975); }
+.v2-btn-primary { background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--text-inverse); box-shadow: var(--glow-gold); }
+.v2-btn-ghost { background: var(--surface-2); color: var(--text-main);
+  border: 1px solid rgba(255,255,255,0.08); }
+.v2-btn-ghost:active { background: var(--surface-3); }
+
+.v2-hero-stats { display: flex; gap: 22px; margin-top: 28px; flex-wrap: wrap; }
+.v2-stat b { display: block; font-size: 19px; font-weight: 700; color: var(--gold); line-height: 1.2; }
+.v2-stat span { font-size: var(--fs-mini); color: var(--text-weak); }
+
+/* ============================================================
+ * 2. 观影路线（电影卡片流）
+ * ============================================================ */
+.v2-pills { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.v2-pills::-webkit-scrollbar { display: none; }
+.v2-pill { flex: 0 0 auto; padding: 6px 14px; border-radius: var(--r-full);
+  font-size: var(--fs-caption); font-weight: 500; white-space: nowrap;
+  background: var(--surface); color: var(--text-sub);
+  border: 1px solid rgba(255,255,255,0.05); transition: all .18s ease; }
+.v2-pill.on { background: var(--gold-a10); color: var(--gold); border-color: var(--gold-a20); }
+.v2-pills--sub { padding-top: 2px; }
+.v2-pills--sub .v2-pill { padding: 4px 11px; font-size: var(--fs-mini); }
+
+/* 横向卡片流 */
+.v2-rail { display: flex; gap: 12px; overflow-x: auto; padding: 2px 0 10px;
+  scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.v2-rail::-webkit-scrollbar { display: none; }
+
+/* ============================================================
+ * MovieCard 组件（横跨路线流 / 资料库网格）
+ * ============================================================ */
+.v2-mcard { flex: 0 0 128px; scroll-snap-align: start; display: block; }
+.v2-mcard-poster { position: relative; width: 128px; height: 180px;
+  border-radius: var(--r-md); overflow: hidden; margin-bottom: 7px;
+  background: var(--surface-2); border: 1px solid rgba(255,255,255,0.06);
+  transition: border-color .18s ease, box-shadow .18s ease; }
+.v2-mcard-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* 无海报占位：阶段色渐变 + 片名首字（不破图） */
+.v2-mcard-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.30);
+  background: linear-gradient(150deg, var(--surface-2) 0%, var(--surface-3) 100%); }
+.v2-mcard-phase { position: absolute; top: 6px; left: 6px; z-index: 2;
+  padding: 2px 7px; border-radius: var(--r-full);
+  font-size: 10px; font-weight: 700; letter-spacing: .03em;
+  background: rgba(8,11,18,0.72); backdrop-filter: blur(4px); }
+.v2-mcard-seen { position: absolute; top: 6px; right: 6px; z-index: 2;
+  display: none; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: var(--r-full);
+  background: var(--gold); color: var(--text-inverse);
+  font-size: 10px; font-weight: 700; }
+.v2-mcard-seen svg { width: 9px; height: 9px; fill: currentColor; }
+.v2-mcard-title { font-size: var(--fs-caption); font-weight: 600; color: var(--text-main);
+  line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v2-mcard-meta { font-size: 10px; color: var(--text-weak); margin-top: 2px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 已观看：金色边框 + 已观看标签 */
+.v2-mcard.is-seen .v2-mcard-poster { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-a30); }
+.v2-mcard.is-seen .v2-mcard-seen { display: inline-flex; }
+.v2-mcard.is-seen .v2-mcard-title { color: var(--gold-light); }
+.v2-mcard:active .v2-mcard-poster { opacity: .82; }
+
+/* 资料库网格态 */
+.v2-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 10px; }
+.v2-grid .v2-mcard { flex: none; width: 100%; min-width: 0; }
+.v2-grid .v2-mcard-poster { width: 100%; height: auto; aspect-ratio: 2 / 3; }
+
+.v2-empty { padding: 26px 0; text-align: center; font-size: var(--fs-caption); color: var(--text-weak); }
+.v2-more { display: block; width: 100%; margin-top: 12px; padding: 11px;
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md); color: var(--text-sub);
+  font-size: var(--fs-caption); font-weight: 500; text-align: center; }
+.v2-more:active { background: var(--surface-2); color: var(--gold); }
+
+/* ============================================================
+ * 3. 上映预告（TimelineCard 组件 · 垂直时间轴）
+ * ============================================================ */
+.v2-tl { position: relative; }
+.v2-tl-year { display: flex; align-items: center; gap: 8px; margin: 4px 0 10px; }
+.v2-tl-year b { font-size: 15px; font-weight: 700; color: var(--gold); letter-spacing: .02em; }
+.v2-tl-year i { flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold-a30), transparent); }
+.v2-tl-year span { font-size: var(--fs-mini); color: var(--text-weak); }
+
+.v2-tl-list { position: relative; padding-left: 18px; }
+.v2-tl-list::before { content: ''; position: absolute; left: 4px; top: 10px; bottom: 10px; width: 1px;
+  background: linear-gradient(180deg, var(--gold-a30), var(--surface-3)); }
+
+.v2-tl-item { position: relative; padding: 0 0 14px 14px; }
+.v2-tl-item:last-child { padding-bottom: 0; }
+.v2-tl-dot { position: absolute; left: -18px; top: 14px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--bg); border: 2px solid var(--surface-4); }
+.v2-tl-item.featured .v2-tl-dot { background: var(--gold); border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(242,178,51,0.35); }
+
+.v2-tl-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-md); padding: 12px 14px; }
+.v2-tl-item.featured .v2-tl-card { border-color: var(--gold-a20); background: var(--surface-2); }
+.v2-tl-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+.v2-tl-date { font-size: var(--fs-mini); color: var(--text-weak); font-variant-numeric: tabular-nums; }
+.v2-tl-name { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); line-height: 1.4; }
+.v2-tl-en { font-size: 10px; color: var(--text-weak); margin-top: 1px; }
+.v2-tl-note { font-size: var(--fs-caption); color: var(--text-sub); line-height: 1.6; margin-top: 6px; }
+
+/* 阶段 / 状态徽标 */
+.v2-badge { display: inline-block; padding: 2px 8px; border-radius: var(--r-full);
+  font-size: 10px; font-weight: 700; letter-spacing: .02em; }
+.v2-badge--p1 { background: rgba(91,141,239,.16); color: var(--p1); }
+.v2-badge--p2 { background: rgba(40,180,135,.16); color: var(--p2); }
+.v2-badge--p3 { background: rgba(240,169,50,.16); color: var(--p3); }
+.v2-badge--p4 { background: rgba(139,111,232,.16); color: var(--p4); }
+.v2-badge--p5 { background: rgba(232,72,63,.16);  color: var(--p5); }
+.v2-badge--p6 { background: rgba(194,91,142,.16); color: var(--p6); }
+.v2-badge--na { background: var(--surface-3); color: var(--text-weak); }
+.v2-badge--soon { background: var(--gold); color: var(--text-inverse); }
+.v2-badge--tba { background: var(--surface-3); color: var(--text-sub); }
+
+/* ============================================================
+ * 4/5. 我的 MCU（ProgressCard 组件）
+ * ============================================================ */
+.v2-prog { position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-0) 100%);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-xl); padding: 20px; }
+.v2-prog::before { content: ''; position: absolute; top: -46px; right: -46px;
+  width: 128px; height: 128px; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-a10), transparent 70%); }
+.v2-prog-hd { position: relative; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.v2-prog-label { font-size: var(--fs-caption); color: var(--text-sub); margin-bottom: 3px; }
+.v2-prog-count { font-size: 24px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+.v2-prog-count em { font-style: normal; color: var(--gold); }
+.v2-prog-count span { font-size: var(--fs-body); color: var(--text-weak); font-weight: 400; }
+.v2-prog-note { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 6px; }
+
+.v2-prog-ring { position: relative; width: 76px; height: 76px; flex-shrink: 0; }
+.v2-prog-ring svg { transform: rotate(-90deg); display: block; }
+.v2-prog-ring-bg { stroke: var(--surface-3); fill: none; stroke-width: 6; }
+.v2-prog-ring-fill { stroke: var(--gold); fill: none; stroke-width: 6; stroke-linecap: round;
+  transition: stroke-dashoffset .9s cubic-bezier(0.16,1,0.3,1); }
+.v2-prog-pct { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 700; color: var(--gold); }
+
+.v2-prog-bar { height: 6px; background: var(--surface-3); border-radius: var(--r-full); overflow: hidden; }
+.v2-prog-fill { height: 100%; border-radius: var(--r-full);
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+  transition: width .9s cubic-bezier(0.16,1,0.3,1); }
+
+.v2-prog-phases { display: flex; gap: 5px; margin-top: 12px; }
+.v2-prog-dot { flex: 1; height: 3px; border-radius: var(--r-full); opacity: .26; }
+.v2-prog-dot.done { opacity: 1; }
+.v2-prog-dot.cur { opacity: .75; }
+
+.v2-btn-archive { width: 100%; margin-top: 16px; padding: 12px;
+  background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  border-radius: var(--r-md); color: var(--gold);
+  font-size: var(--fs-body); font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 8px; }
+.v2-btn-archive svg { width: 16px; height: 16px; fill: currentColor; }
+.v2-btn-archive:active { background: var(--gold-a20); }
+
+.v2-prog-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 12px;
+  font-size: var(--fs-caption); color: var(--gold); }
+.v2-prog-link svg { width: 13px; height: 13px; fill: currentColor; }
+
+/* 里程碑（沿用 V1.3 结构，V2.0 仅做视觉对齐） */
+.v2-milestone { margin-top: 14px; padding: 14px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid var(--gold-a20); }
+.v2-ms-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+  border-radius: var(--r-full); background: var(--gold-a10); color: var(--gold);
+  font-size: var(--fs-mini); font-weight: 700; }
+.v2-ms-badge svg { width: 11px; height: 11px; fill: currentColor; }
+.v2-ms-t { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); margin-top: 8px; }
+.v2-ms-d { font-size: var(--fs-caption); color: var(--text-sub); margin-top: 4px; line-height: 1.6; }
+.v2-ms-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* ============================================================
+ * 6. 社区入口（不可交互，仅预留）
+ * ============================================================ */
+.v2-community { display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-lg); padding: 16px; }
+.v2-com-icon { width: 44px; height: 44px; flex-shrink: 0; border-radius: var(--r-md);
+  background: var(--gold-a10); display: flex; align-items: center; justify-content: center; }
+.v2-com-icon svg { width: 20px; height: 20px; fill: var(--gold); }
+.v2-com-info { flex: 1; min-width: 0; }
+.v2-com-title { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); }
+.v2-com-meta { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 2px; line-height: 1.5; }
+.v2-com-soon { flex-shrink: 0; padding: 3px 9px; border-radius: var(--r-full);
+  background: var(--surface-2); border: 1px solid rgba(255,255,255,0.05);
+  font-size: 10px; color: var(--text-weak); }
+
+/* ============================================================
+ * 快捷入口（保留既有 next / map 能力，避免 V2.0 造成功能丢失）
+ * ============================================================ */
+.v2-quick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.v2-quick-item { display: flex; align-items: center; gap: 10px; padding: 13px 14px;
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-md); }
+.v2-quick-item svg { width: 18px; height: 18px; fill: var(--gold); flex-shrink: 0; }
+.v2-quick-item b { font-size: var(--fs-caption); font-weight: 600; color: var(--text-main);
+  display: block; line-height: 1.3; }
+.v2-quick-item span { font-size: 10px; color: var(--text-weak); }
+.v2-quick-item:active { background: var(--surface-2); }
+
+/* ============================================================
+ * 7. 小程序入口
+ * ============================================================ */
+.v2-mp { background: linear-gradient(135deg, var(--surface), var(--surface-0));
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: var(--r-xl); padding: 20px 18px; text-align: center; }
+.v2-mp-title { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); }
+.v2-mp-desc { font-size: var(--fs-caption); color: var(--text-sub); margin-top: 4px; line-height: 1.6; }
+.v2-mp-btns { display: flex; gap: 10px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+.v2-mp-btn { padding: 8px 18px; border-radius: var(--r-full);
+  font-size: var(--fs-caption); font-weight: 600; }
+.v2-mp-btn--wechat { background: var(--gold-a10); border: 1px solid var(--gold-a20); color: var(--gold); }
+.v2-mp-btn--douyin { background: var(--surface-2); border: 1px solid rgba(255,255,255,0.07); color: var(--text-main); }
+
+/* ---------- 轻提示（社区未开放等） ---------- */
+.v2-toast { position: fixed; left: 50%; bottom: 42px; transform: translate(-50%, 12px);
+  max-width: 84vw; padding: 10px 18px; border-radius: var(--r-full);
+  background: rgba(22,29,43,0.96); border: 1px solid var(--border);
+  color: var(--text-main); font-size: var(--fs-caption);
+  opacity: 0; pointer-events: none; z-index: 90;
+  transition: opacity .22s ease, transform .22s ease; }
+.v2-toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- 无障碍：尊重系统减弱动效 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .v2-btn, .v2-prog-fill, .v2-prog-ring-fill, .v2-toast { transition: none; }
+}
+
+/* ============================================================
+ * V2.1 我的MCU：已观看电影列表
+ * ============================================================ */
+.v2-seen { margin-top: 16px; }
+.v2-seen-hd { font-size: var(--fs-caption); color: var(--text-sub); margin-bottom: 10px; }
+.v2-seen-hd b { color: var(--gold); font-style: normal; }
+.v2-seen-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 8px; }
+.v2-seen-chip { display: block; }
+.v2-seen-ph { display: block; width: 100%; aspect-ratio: 2 / 3; border-radius: var(--r-md);
+  overflow: hidden; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.06); }
+.v2-seen-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.v2-seen-name { display: block; margin-top: 5px; font-size: 10px; color: var(--text-sub);
+  line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v2-seen-chip:active .v2-seen-ph { opacity: .82; }
+.v2-seen-more { margin-top: 8px; font-size: var(--fs-mini); color: var(--text-weak); text-align: center; }
+
+/* ============================================================
+ * V2.1 我的MCU：成就系统
+ * ============================================================ */
+.v2-ach { margin-top: 16px; }
+.v2-ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.v2-ach-item { display: flex; flex-direction: column; gap: 2px;
+  padding: 11px 12px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+  opacity: .55; transition: opacity .18s ease, border-color .18s ease; }
+.v2-ach-item.is-on { opacity: 1; border-color: var(--gold-a20); background: var(--gold-a10); }
+.v2-ach-ic { width: 22px; height: 22px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  background: var(--surface-3); color: var(--text-weak); margin-bottom: 4px; }
+.v2-ach-item.is-on .v2-ach-ic { background: var(--gold); color: var(--text-inverse); }
+.v2-ach-ic svg { width: 14px; height: 14px; fill: currentColor; }
+.v2-ach-t { font-size: var(--fs-caption); font-weight: 600; color: var(--text-main); }
+.v2-ach-item.is-on .v2-ach-t { color: var(--gold); }
+.v2-ach-d { font-size: 10px; color: var(--text-weak); line-height: 1.45; }
+
+/* ============================================================
+ * V2.1 未来上映：推荐关注按钮
+ * ============================================================ */
+.v2-tl-follow { margin-left: auto; padding: 4px 12px; border-radius: var(--r-full);
+  font-size: 10px; font-weight: 700; letter-spacing: .02em; white-space: nowrap;
+  background: var(--surface-2); color: var(--text-sub);
+  border: 1px solid rgba(255,255,255,0.08); transition: all .18s ease; }
+.v2-tl-follow.is-on { background: var(--gold-a10); color: var(--gold); border-color: var(--gold-a20); }
+.v2-tl-follow:active { transform: scale(.95); }
+
+/* ============================================================
+ * V2.1 社区入口：热门话题 + 参与提示
+ * ============================================================ */
+.v2-community-wrap { display: flex; flex-direction: column; gap: 12px; }
+.v2-topics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.v2-topic { display: flex; flex-direction: column; gap: 4px; text-align: left;
+  padding: 12px 13px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.05);
+  transition: border-color .18s ease, background .18s ease; }
+.v2-topic:active { background: var(--surface-2); border-color: var(--gold-a20); }
+.v2-topic-tag { align-self: flex-start; padding: 1px 8px; border-radius: var(--r-full);
+  font-size: 10px; font-weight: 700; color: var(--p4); background: rgba(139,111,232,0.16); }
+.v2-topic-t { font-size: var(--fs-caption); font-weight: 600; color: var(--text-main); line-height: 1.4; }
+.v2-topic-d { font-size: 10px; color: var(--text-weak); line-height: 1.5; }
+.v2-com-tip { font-size: var(--fs-mini); color: var(--text-weak); line-height: 1.6;
+  padding: 10px 12px; border-radius: var(--r-md); background: var(--surface-0);
+  border: 1px dashed rgba(255,255,255,0.08); }
+
+/* ---------- V2.1 大屏微调（内容限宽，不重排） ---------- */
+@media (min-width: 720px) {
+  .v2-seen-grid { grid-template-columns: repeat(8, 1fr); }
+  .v2-ach-grid { grid-template-columns: repeat(5, 1fr); }
+  .v2-topics { grid-template-columns: repeat(4, 1fr); }
+}
+
+
+/* ---------- 大屏：内容限宽居中，不重排 ---------- */
+@media (min-width: 720px) {
+  .v2-hero { padding-top: 72px; padding-bottom: 44px; }
+  .v2-hero-title { font-size: 38px; }
+  .v2-section { padding: 34px var(--page-x); }
+}
+
+/* ============================================================
+ * V2.1 首页视觉与信息层级优化（精修 · 2026-09-10）
+ * ------------------------------------------------------------
+ * 目标（不删模块 / 不改结构 / 不改数据 / 不换视觉系统）：
+ *   仅通过 间距 · 内容密度 · 字重 · 层级权重，做到：
+ *   ① 「观影路线」成为首页第一核心内容；
+ *   ② 压缩首屏高度，让观影路线更早进入视野；
+ *   ③ 整体页面长度收敛，降低视觉疲劳。
+ *
+ * 层级优先级：P0 观影路线 > P1 未来计划 > P2 资料库 > P3 我的MCU > P4 讨论区
+ * 手法：文件末尾统一覆盖（同选择器后置生效），集中可回滚，不散改既有规则。
+ * 注：无任何 HTML / JS / data / Token 改动，纯 CSS 视觉层。
+ * ============================================================ */
+
+/* ---------- 全局：区块间距收敛 + 标题密度收紧 ---------- */
+.v2-section { padding: 24px var(--page-x); }
+.v2-hd { margin-bottom: 12px; }
+.v2-st-sub { margin-top: 2px; }
+.v2-rule { opacity: .72; }
+
+/* ---------- 1. Hero：压缩首屏高度（内容与结构不变） ---------- */
+.v2-hero { padding: 38px var(--page-x) 26px; }
+.v2-hero-badge { margin-bottom: 10px; }
+.v2-hero-sub { margin-bottom: 15px; line-height: 1.66; }
+.v2-hero-actions { gap: 9px; }
+.v2-hero-stats { margin-top: 17px; gap: 17px; }
+.v2-stat b { font-size: 18px; }
+
+/* ---------- 2. 观影路线：首页第一核心，提升层级权重（不改变卡片/pills 本身） ---------- */
+#v2-routes { position: relative; }
+/* 极淡金色顶光：与 Hero 的宇宙感同源，仅用于强化「第一核心」的视觉重音 */
+#v2-routes::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(120% 62% at 50% -6%, rgba(242,178,51,0.05), transparent 60%); }
+#v2-routes .v2-inner { position: relative; }
+#v2-routes .v2-st-title { font-size: 20px; }
+#v2-routes .v2-st-eyebrow { opacity: 1; }
+#v2-routes .v2-pills { margin-bottom: 2px; }
+
+/* ---------- 3. 漫威未来计划：权重略低于路线，收紧卡片内部密度 ---------- */
+.v2-tl-year { margin: 2px 0 6px; }
+.v2-tl-item { padding-bottom: 9px; }
+.v2-tl-card { padding: 10px 13px; }
+.v2-tl-top { margin-bottom: 3px; }
+.v2-tl-note { margin-top: 3px; line-height: 1.52; }
+
+/* ---------- 4. 电影资料库：网格更紧凑，避免过强视觉占位（保持海报为主） ---------- */
+.v2-grid { gap: 11px 9px; }
+.v2-mcard-poster { margin-bottom: 6px; }
+.v2-pills { padding-bottom: 8px; }
+.v2-rail { padding: 2px 0 8px; }
+.v2-more { margin-top: 10px; }
+
+/* ---------- 5. 我的 MCU：降低视觉压迫，压缩成就卡与已看列表高度 ---------- */
+.v2-prog { padding: 16px; }
+.v2-prog-hd { margin-bottom: 11px; }
+.v2-seen { margin-top: 12px; }
+.v2-seen-hd { margin-bottom: 8px; }
+.v2-seen-grid { gap: 8px 6px; }
+.v2-seen-name { margin-top: 4px; }
+.v2-ach { margin-top: 12px; }
+.v2-ach-grid { gap: 7px; }
+.v2-ach-item { padding: 10px 11px; }
+.v2-ach-ic { margin-bottom: 3px; }
+.v2-milestone { margin-top: 12px; padding: 12px; }
+
+/* ---------- 6. 漫威讨论区：保持轻量，权重明确低于我的 MCU ---------- */
+.v2-community-wrap { gap: 9px; }
+.v2-topic { padding: 10px 11px; }
+.v2-com-tip { padding: 9px 11px; }
+
+/* ---------- 7. 快捷入口 / 小程序：单一清晰入口，压缩留白 ---------- */
+.v2-quick { gap: 9px; }
+.v2-quick-item { padding: 11px 12px; }
+.v2-mp { padding: 16px 15px; }
+.v2-mp-btns { margin-top: 11px; }
+
+/* ---------- 大屏：同步收敛首屏与区块间距（限宽居中，不重排） ---------- */
+@media (min-width: 720px) {
+  .v2-hero { padding-top: 52px; padding-bottom: 30px; }
+  .v2-section { padding: 30px var(--page-x); }
+}
+
+
+/* ============================================================
+ * V2.2 观影路线详情页（route-detail）
+ * ------------------------------------------------------------
+ * 依据：V2.2 Rev2 设计稿（AI生成文件/设计/H5-V2.0/route-detail.html）
+ *       + 策划 2026-09-11 拍板 1A / 2A / 3A / 4A
+ *
+ * 纪律：
+ *   ① 全部 rd- 前缀。设计稿中的 .section / .divider / .movie-item /
+ *      .btn-primary / .overview-* 等通用名一律不落地，避免污染既有页面。
+ *   ② 零新增 Token、零新增主色：只用 style.css :root 既有变量
+ *      （--bg/--surface*/--gold*/--text*/--p1..p6/--green/--r-*/--glow-gold）
+ *      与既有按钮组件 .v2-btn / .v2-btn-primary / .v2-btn-ghost。
+ *   ③ 星点静态、无 twinkle/pulse 动画（与首页 v2-star 同语言；
+ *      策划明令禁止新增复杂背景动画）。
+ *   ④ 决策 3A：Hero 全端不展示时长；PC Hero meta 第 3 项改「涉及阶段」。
+ *
+ * 布局：移动优先（基准 390px）；≥1024px 切 PC 布局
+ *      （内容 1080px 居中 / 概览 5 格 / 列表双列 / Next 横向）。
+ * ============================================================ */
+
+/* ---------- 容器与区块 ---------- */
+.rd { display: block; padding-bottom: 8px; }
+.rd-sec { padding: 20px var(--page-x); }
+.rd-rule { height: 1px; margin: 0 var(--page-x);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); }
+.rd-sec-hd { margin-bottom: 12px; }
+.rd-sec-t { display: flex; align-items: center; gap: 8px;
+  font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
+.rd-sec-t::before { content: ''; width: 3px; height: 16px;
+  border-radius: 2px; background: var(--gold); flex: 0 0 auto; }
+
+/* 全宽按钮修饰（复用 .v2-btn 基类） */
+.rd-btn-block { width: 100%; }
+
+/* ---------- 共用海报框（Next / 列表两处使用；无图时用阶段色 + 首字兜底） ---------- */
+.rd-phbox { position: relative; overflow: hidden; flex: 0 0 auto;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);   /* 不支持 color-mix 时的回退 */
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--pc, var(--surface-4)) 26%, var(--surface-2)) 0%,
+    var(--surface-3) 100%); }
+.rd-phbox b, .rd-phbox img { position: absolute; inset: 0; }
+.rd-phbox b { display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: var(--text-main); opacity: .85; }
+.rd-phbox img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* ---------- ① Hero ---------- */
+.rd-hero { position: relative; overflow: hidden; padding: 18px var(--page-x) 22px; }
+.rd-hero-bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(242,178,51,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 30% 80%, rgba(91,141,239,0.03) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%); }
+.rd-hero-stars { position: absolute; inset: 0; overflow: hidden; }
+.rd-star { position: absolute; border-radius: 50%; background: #fff; opacity: .28; }
+.rd-hero-in { position: relative; z-index: 2; }
+
+.rd-back { width: 34px; height: 34px; border-radius: var(--r-full); flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; background: var(--surface-2);
+  border: 1px solid rgba(255,255,255,0.08); transition: background .18s ease; }
+.rd-back:active { background: var(--surface-3); }
+.rd-back svg { width: 17px; height: 17px; fill: var(--text-main); }
+
+.rd-eyebrow { font-size: var(--fs-mini); font-weight: 600; color: var(--gold);
+  letter-spacing: .12em; text-transform: uppercase; margin-bottom: 7px; }
+.rd-name { font-size: var(--fs-display); font-weight: 700; line-height: 1.22;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text) 0%, var(--gold-light) 52%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.rd-tagline { font-size: var(--fs-body); color: var(--text-2);
+  line-height: 1.6; margin-bottom: 13px; }
+
+.rd-meta { display: flex; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 13px; }
+.rd-meta-i { display: flex; align-items: flex-start; gap: 5px; min-width: 0;
+  font-size: var(--fs-caption); color: var(--text-2); line-height: 1.5; }
+.rd-meta-i svg { width: 14px; height: 14px; margin-top: 2px;
+  fill: var(--text-3); flex: 0 0 auto; }
+.rd-meta-i.is-pc { display: none; }   /* 时长已按决策 3A 取消；本项目仅 PC 展示「涉及阶段」 */
+
+.rd-badge { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 13px;
+  align-self: flex-start;   /* PC Hero 为纵向 flex，避免 badge 被拉伸成整行 */
+  padding: 5px 13px; border-radius: var(--r-full);
+  background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  font-size: var(--fs-caption); color: var(--gold); }
+.rd-badge i { width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); flex: 0 0 auto; }
+
+.rd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- ② 下一部看这部 ---------- */
+.rd-next { position: relative; overflow: hidden; padding: 18px 16px;
+  border-radius: var(--r-xl); border: 1px solid var(--gold-a20);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-0) 100%);
+  box-shadow: var(--glow-gold); }
+.rd-next::before { content: ''; position: absolute; top: -30px; right: -30px;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle, var(--gold-a10), transparent 70%); }
+.rd-next-lbl { position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 12px;
+  font-size: var(--fs-mini); font-weight: 600; color: var(--gold); letter-spacing: .04em; }
+.rd-next-lbl i { width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold); flex: 0 0 auto; }
+.rd-next-body { display: flex; gap: 14px; align-items: center;
+  position: relative; z-index: 1; }
+.rd-next-ph { width: 60px; height: 84px;
+  border: 1px solid var(--gold-a20); box-shadow: var(--glow-gold); }
+.rd-next-info { flex: 1; min-width: 0; }
+.rd-next-name { font-size: var(--fs-title); font-weight: 600; color: var(--text-main);
+  line-height: 1.35; margin-bottom: 3px; }
+.rd-next-meta { font-size: var(--fs-mini); color: var(--text-3); margin-bottom: 6px; }
+.rd-next-reason { font-size: var(--fs-caption); color: var(--text-2); line-height: 1.55; }
+.rd-next-cta { position: relative; z-index: 1; margin-top: 14px; }
+
+/* ---------- ③ 路线概览 ---------- */
+.rd-ov { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.rd-ov-c { padding: 12px 6px; text-align: center; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.04); }
+.rd-ov-n { font-size: 22px; font-weight: 700; line-height: 1.15; color: var(--text-main); }
+.rd-ov-n.is-gold { color: var(--gold); }
+.rd-ov-l { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+.rd-ov-c.is-pc { display: none; }
+
+.rd-phases { display: flex; gap: 6px; margin-top: 12px; }
+.rd-phase { flex: 1; text-align: center; padding: 7px 2px; border-radius: var(--r-sm);
+  background: var(--surface); border-top: 2px solid var(--surface-3);
+  font-size: 10px; font-weight: 600; color: var(--text-3); opacity: .55; }
+.rd-phase.is-on { opacity: 1; }
+.rd-phase.p1.is-on { color: var(--p1); border-top-color: var(--p1); }
+.rd-phase.p2.is-on { color: var(--p2); border-top-color: var(--p2); }
+.rd-phase.p3.is-on { color: var(--p3); border-top-color: var(--p3); }
+.rd-phase.p4.is-on { color: var(--p4); border-top-color: var(--p4); }
+.rd-phase.p5.is-on { color: var(--p5); border-top-color: var(--p5); }
+.rd-phase.p6.is-on { color: var(--p6); border-top-color: var(--p6); }
+.rd-phase .rd-pd { display: none; }
+
+/* ---------- ④ 观影列表 ---------- */
+.rd-list { display: flex; flex-direction: column; gap: 10px; }
+.rd-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px;
+  border-radius: var(--r-md); background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: background .18s ease, border-color .18s ease; }
+.rd-item:active { background: var(--surface-2); }
+.rd-item.is-watched { opacity: .5; }
+.rd-item.is-next { border-color: var(--gold-a30);
+  background: linear-gradient(135deg, rgba(242,178,51,0.06) 0%, var(--surface) 100%);
+  box-shadow: var(--glow-gold); }
+
+.rd-num { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-caption); font-weight: 700;
+  background: var(--surface-2); color: var(--text-2); }
+.rd-num svg { width: 14px; height: 14px; fill: currentColor; }
+.rd-item.is-watched .rd-num { background: rgba(40,180,135,0.15); color: var(--green); }
+.rd-item.is-next .rd-num { background: var(--gold-a10); color: var(--gold);
+  border: 1px solid var(--gold-a20); }
+
+.rd-ph { width: 44px; height: 62px; }
+
+.rd-info { flex: 1; min-width: 0; }
+.rd-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 3px; }
+.rd-nm { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); }
+.rd-item.is-watched .rd-nm { color: var(--text-2); }
+.rd-item.is-next .rd-nm { color: var(--gold); }
+.rd-yr { font-size: var(--fs-mini); color: var(--text-3); }
+.rd-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.rd-tag { padding: 1px 6px; border-radius: var(--r-full);
+  font-size: 9px; font-weight: 600;
+  background: var(--surface-2); color: var(--text-2); }
+.rd-note { margin-top: 4px; font-size: var(--fs-mini); color: var(--text-3);
+  line-height: 1.45; }
+.rd-item.is-next .rd-note { color: var(--gold); opacity: .8; }
+.rd-state { width: 20px; height: 20px; flex: 0 0 auto; margin-top: 3px;
+  display: flex; align-items: center; justify-content: center; }
+.rd-state svg { width: 16px; height: 16px; }
+/* 偏差1 修复（2026-09-11）：右侧图标统一为箭头；原先的「已看对勾」专用类已无引用处，规则一并移除。
+   已看状态的绿色对勾只保留在左侧序号位（.rd-num）。 */
+.rd-state .ic-arrow { fill: var(--text-3); }
+
+/* 「你看到这里了」进度分割线 */
+.rd-split { display: flex; align-items: center; gap: 12px; margin: 2px 0; }
+.rd-split-line { flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-a30), transparent); }
+.rd-split-tx { display: flex; align-items: center; gap: 4px; white-space: nowrap;
+  font-size: var(--fs-mini); font-weight: 600; color: var(--gold); }
+.rd-split-tx i { width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold); flex: 0 0 auto; }
+
+/* ---------- ⑤ 路线说明 ---------- */
+.rd-notes { padding: 14px 16px; border-radius: var(--r-md);
+  background: var(--surface-0); border: 1px solid rgba(255,255,255,0.03); }
+.rd-note-b { margin-bottom: 12px; }
+.rd-note-b:last-child { margin-bottom: 0; }
+.rd-note-l { font-size: var(--fs-mini); font-weight: 600; color: var(--gold);
+  letter-spacing: .03em; margin-bottom: 4px; }
+.rd-note-t { font-size: var(--fs-caption); color: var(--text-2); line-height: 1.65; }
+
+/* ---------- ⑥ Bottom Bar（sticky，不遮挡内容） ---------- */
+.rd-bar { position: sticky; bottom: 0; z-index: 20;
+  padding: 12px var(--page-x) calc(14px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top,
+    var(--bg) 0%, var(--bg) 74%, rgba(8,11,18,0.82) 90%, rgba(8,11,18,0) 100%); }
+.rd-bar-in { display: flex; gap: 10px; }
+.rd-bar-in .v2-btn { flex: 1 1 auto; }
+
+/* ============================================================
+ * PC 布局（≥1024px）
+ * 设计稿 PC 视图：内容 1080px 居中、概览 5 格、列表双列、
+ * Next 横向、Bottom Bar 居中不遮挡。
+ * ============================================================ */
+@media (min-width: 1024px) {
+  .rd-hero { padding: 0 0 32px; }
+  .rd-hero-in { max-width: 1080px; margin: 0 auto; padding: 32px 40px 0;
+    min-height: 320px; display: flex; flex-direction: column;
+    justify-content: flex-end; }
+  .rd-back { width: 40px; height: 40px; margin-bottom: 20px; }
+  .rd-back svg { width: 19px; height: 19px; }
+  .rd-name { font-size: 36px; margin-bottom: 10px; }
+  .rd-tagline { font-size: 16px; max-width: 620px; margin-bottom: 16px; }
+  .rd-meta { gap: 20px; margin-bottom: 18px; }
+  .rd-meta-i { font-size: var(--fs-body); }
+  .rd-meta-i.is-pc { display: flex; }
+  .rd-actions { gap: 14px; }
+  .rd-badge { margin-bottom: 18px; }
+
+  .rd-rule { max-width: 1000px; margin-left: auto; margin-right: auto; }
+  .rd-sec { max-width: 1080px; margin-left: auto; margin-right: auto;
+    padding: 24px 40px; }
+
+  /* Next：海报 | 标签/标题/元信息/理由/CTA */
+  .rd-next { display: grid; grid-template-columns: 80px 1fr;
+    column-gap: 24px; align-items: center; padding: 24px; }
+  .rd-next-lbl { grid-column: 2; grid-row: 1; align-self: end; margin-bottom: 8px; }
+  .rd-next-body { display: contents; }
+  .rd-next-ph { grid-column: 1; grid-row: 1 / span 3; align-self: center;
+    width: 80px; height: 112px; }
+  .rd-next-info { grid-column: 2; grid-row: 2; }
+  .rd-next-name { font-size: 22px; margin-bottom: 4px; }
+  .rd-next-reason { font-size: var(--fs-body); max-width: 620px; }
+  .rd-next-cta { grid-column: 2; grid-row: 3; margin-top: 16px; }
+  .rd-next-cta .v2-btn { min-width: 168px; }
+
+  /* 概览：5 格 */
+  .rd-ov { grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .rd-ov-c { padding: 18px 10px; }
+  .rd-ov-c.is-m { display: none; }
+  .rd-ov-c.is-pc { display: block; }
+  .rd-ov-n { font-size: 28px; }
+  .rd-ov-l { font-size: var(--fs-caption); margin-top: 4px; }
+  .rd-phases { gap: 8px; margin-top: 16px; }
+  .rd-phase { padding: 10px 4px; font-size: var(--fs-caption); }
+  .rd-phase .rd-pm { display: none; }
+  .rd-phase .rd-pd { display: inline; }
+
+  /* 列表：双列，分割线跨两列 */
+  .rd-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rd-item { padding: 14px; }
+  .rd-num { width: 32px; height: 32px; font-size: 13px; }
+  .rd-ph { width: 52px; height: 73px; }
+  .rd-nm { font-size: 15px; }
+  .rd-yr { font-size: var(--fs-caption); }
+  .rd-note { font-size: var(--fs-caption); margin-top: 6px; }
+  .rd-state { width: 22px; height: 22px; }
+  .rd-state svg { width: 18px; height: 18px; }
+  .rd-split { grid-column: 1 / -1; }
+
+  .rd-notes { padding: 20px 24px; }
+  .rd-note-b { margin-bottom: 16px; }
+  .rd-note-l { font-size: var(--fs-caption); margin-bottom: 6px; }
+  .rd-note-t { font-size: var(--fs-body); line-height: 1.7; }
+
+  .rd-bar { padding: 16px 0 24px; }
+  .rd-bar-in { max-width: 1080px; margin: 0 auto; padding: 0 40px;
+    justify-content: center; gap: 12px; }
+  .rd-bar-in .v2-btn { flex: 0 0 auto; min-width: 190px; }
+}
+
+/* ============================================================
+ * H5 首页 PC 版式（≥1024px）—— 2026-09-14 设计AI（方案 C · 桌面端重排）
+ * 多列网格填满 1280px，非单列拉满。
+ * 约束（来自设计说明 h5-pc-layout-design-spec.md）：
+ *   · 不动 Token（纯布局层）· 不触碰首页收口禁令（移动端 3 列 / 12 部 / 已看 8 部不变）
+ *   · 仅作用于首页 index.html 的 .v2- 组件；route-detail 用 .rd- 前缀独立处理，不受影响。
+ * 真实时间轴 DOM 为「年份分隔符 + 竖向列表（含连接线/圆点）」，与 Mockup 纯双列不同；
+ *   故 PC 下将每个年份组的 .v2-tl-list 改双列，并隐藏连接线/圆点，避免错位。
+ * ============================================================ */
+@media (min-width: 1024px) {
+  /* 容器加宽：760 → 1280（两侧 padding 40px） */
+  .v2-inner,
+  .v2-hero-inner { max-width: 1280px; padding: 0 40px; }
+  .v2-hero { padding: 60px 0 40px; }
+  .v2-section { padding: 36px 0; }
+
+  /* Hero 字号放大 + 副标题限宽保可读 */
+  .v2-hero-title { font-size: 42px; }
+  .v2-hero-sub { max-width: 680px; }
+  .v2-hero-stats { gap: 32px; }
+  .v2-stat b { font-size: 28px; }
+
+  /* 观影路线：轨道容器已变宽，PC 下可见更多海报 */
+  #v2-routes .v2-rail { gap: 14px; }
+
+  /* 漫威未来计划（上市预告）：真实 DOM 为竖向时间轴，PC 改双列 + 隐藏连接线/圆点 */
+  #v2-upcoming .v2-tl-list {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px 28px; padding-left: 0;
+  }
+  #v2-upcoming .v2-tl-list::before { display: none; }
+  #v2-upcoming .v2-tl-item { padding: 0; }
+  #v2-upcoming .v2-tl-dot { display: none; }
+
+  /* 电影资料库：3 列 → 5 列（12 部 = 5×3，最后一行 2 部；数量与移动端列数不变） */
+  #v2-library .v2-grid { grid-template-columns: repeat(5, 1fr); gap: 16px 14px; }
+
+  /* 我的 MCU：进度卡 | 已看+成就+里程碑 → 2 列（约 60% / 40%） */
+  #v2-mine .v2-inner { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: start; }
+  #v2-mine #mine-title { grid-column: 1 / -1; }
+  #v2-mine #progress-card { grid-column: 1; grid-row: 2 / 5; }
+  #v2-mine #seen-slot { grid-column: 2; grid-row: 2; }
+  #v2-mine #ach-slot { grid-column: 2; grid-row: 3; }
+  #v2-mine #milestone-slot { grid-column: 2; grid-row: 4; }
+
+  /* 快捷入口 + 小程序卡：小程序卡限宽 800 居中，避免二维码区过宽 */
+  #v2-entry .v2-mp { max-width: 800px; margin: 14px auto 0; }
+}

@@ -1,5 +1,5 @@
 <!-- 我的MCU my-mcu（Tab3）
-     结构：① 顶部个人进度区 ② 分享入口 ③ 成就墙 ④ 我的片单进度 ⑤ 最近观看
+     结构：① 顶部个人进度区 ② 分享入口 ③ 成就墙 ④ 我的片单进度 ⑤ 最近标记
            ⑥ 我的作品清单（全部/已看/未看/收藏 · 可点击进详情 · 可就地收藏）
            ⑦ 反馈 ⑧ 法律与说明
      2026-09-08 整改第二阶段：原先「观看记录」「收藏」两段静态列表合并为 ⑥，
@@ -8,7 +8,7 @@
 
   <!-- ① 顶部个人进度区 -->
   <view class="mcu-hero">
-    <view class="mcu-hero-label">我的观影进度</view>
+    <view class="mcu-hero-label">我的观看进度</view>
     <view class="mcu-explore">
       <text class="mcu-explore-num">{{explored}}</text>
       <text class="mcu-explore-sep">/</text>
@@ -45,7 +45,7 @@
   <view class="section-label">我的片单进度</view>
   <view class="route-next-card" wx:if="{{current}}" data-id="{{current.nextId}}" bindtap="goNext" hover-class="recent-hover" hover-stay-time="80">
     <view class="route-next-info">
-      <view class="rn-label">继续观看 · {{current.phaseText}}</view>
+      <view class="rn-label">继续进度 · {{current.phaseText}}</view>
       <view class="rn-title">{{current.name}}</view>
       <view class="rn-sub">{{current.watched}} / {{current.total}} 部 · 下一部 {{current.nextName}}</view>
       <view class="rn-progress">
@@ -55,8 +55,8 @@
     <view class="route-next-btn {{current.nextId ? '' : 'is-disabled'}}">查看下一部</view>
   </view>
 
-  <!-- ⑤ 最近观看 -->
-  <view class="section-label">最近观看</view>
+  <!-- ⑤ 最近标记 -->
+  <view class="section-label">最近标记</view>
   <block wx:if="{{recentList.length}}">
     <scroll-view class="recent-row" scroll-x enhanced show-scrollbar="{{false}}">
       <view class="recent-item" wx:for="{{recentList}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" hover-class="recent-hover" hover-stay-time="80">
@@ -69,7 +69,7 @@
       </view>
     </scroll-view>
   </block>
-  <view wx:else class="empty-tip">还没有观看记录，去「作品」页挑一部开始吧</view>
+  <view wx:else class="empty-tip">还没有已标记的作品，去「作品」页挑一部开始吧</view>
 
   <!-- ⑥ 我的作品清单：统计卡 + 列表 -->
   <view class="section-label">我的作品清单</view>

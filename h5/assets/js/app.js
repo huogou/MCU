@@ -1127,10 +1127,16 @@ var VIEW_MODES = {
 
     /* SEO：canonical + Open Graph（JS 输出，部署到任意域名都自动生成正确 URL）
      * canonical 去掉状态参数（?r= / ?from= / ?focus=），只保留内容定义参数
-     * （movie.html 的 ?id=），避免参数化 URL 被搜索引擎重复收录。 */
+     * （movie.html / route-detail.html 的 ?id=），避免参数化 URL 被搜索引擎重复收录。
+     * ⚠ route-detail.html 必须在内，否则 canonical 会把 ?id= 洗掉，
+     *   导致 3 条基础路线全部指向同一个无参 URL。 */
     injectSeoTags: function (currentPage) {
       try {
-        var KEEP = { 'movie.html': ['id'], 'routes.html': ['r'] };
+        var KEEP = {
+          'movie.html': ['id'],
+          'routes.html': ['r'],
+          'route-detail.html': ['id']
+        };
         var u = new URL(global.location.href);
         var q = new URLSearchParams();
         (KEEP[currentPage] || []).forEach(function (k) {
@@ -1180,19 +1186,21 @@ var VIEW_MODES = {
       /* ── 运营数据统计：页面访问上报（V1.0 运营数据闭环 · 第四步）──
        * 仅统计层改动；channel 取自 URL ?from=/?channel=/?utm_source。
        * 页面键映射：index→home / routes(?r=)→route_detail / routes→routes
-       *            / map→panorama / movie→movie / next→next */
+       *            / route-detail(?id=)→route_detail / map→panorama / movie→movie / next→next */
       try {
         var _base = (currentPage || '').replace('.html', '');
         var _qs = new URLSearchParams(global.location.search);
         var _pg = _base;
         if (_base === 'index') _pg = 'home';
         else if (_base === 'routes') _pg = _qs.get('r') ? 'route_detail' : 'routes';
+        else if (_base === 'route-detail') _pg = 'route_detail';
         else if (_base === 'map') _pg = 'panorama';
         else if (_base === 'movie') _pg = 'movie';
         else if (_base === 'next') _pg = 'next';
         var _pvPayload = null;
         if (_base === 'movie') { var _mid = _qs.get('id'); if (_mid) _pvPayload = { id: _mid }; }
         else if (_base === 'routes' && _qs.get('r')) { _pvPayload = { routeId: _qs.get('r') }; }
+        else if (_base === 'route-detail' && _qs.get('id')) { _pvPayload = { routeId: _qs.get('id') }; }
         if (global.MCU && global.MCU.stats) global.MCU.stats.pageView(_pg, { payload: _pvPayload });
       } catch (e) {}
     }
@@ -1484,6 +1492,10 @@ var VIEW_MODES = {
         } else if (path === 'routes') {
           var rid = q.get('r') || 'newcomer';
           if (MCU.data.routeById) { var r = MCU.data.routeById(rid); if (r) { ctx.routeId = rid; ctx.name = r.name || rid; } }
+        } else if (path === 'route-detail') {
+          /* V2.2：路线详情页的吐槽上下文同样归到「当前路线」 */
+          var rid2 = q.get('id') || 'newcomer';
+          if (MCU.data.routeById) { var r2 = MCU.data.routeById(rid2); if (r2) { ctx.routeId = rid2; ctx.name = r2.name || rid2; } }
         } else if (path === 'map') {
           var fid = q.get('focus');
           if (fid && MCU.data.get) { var fm = MCU.data.get(fid); if (fm) { ctx.exploreId = fid; ctx.movieId = fid; ctx.name = fm.cn || fm.title || fm.name || fid; } }
@@ -1517,9 +1529,9 @@ var VIEW_MODES = {
       if (ctx.name) { c.style.display = 'flex'; document.getElementById('fbContextText').textContent = ctx.name; }
       else c.style.display = 'none';
       var lbl = document.getElementById('fbContextLabel');
-      if (lbl) lbl.textContent = (ctx.page === 'routes') ? '当前路线：' : '当前作品：';
+      if (lbl) lbl.textContent = (ctx.page === 'routes' || ctx.page === 'route-detail') ? '当前路线：' : '当前作品：';
       var ex = '我觉得《钢铁侠 2》应该放在《无敌浩克》之后。';
-      if (ctx.page === 'routes') ex = '这条路线的顺序好像不太对。';
+      if (ctx.page === 'routes' || ctx.page === 'route-detail') ex = '这条路线的顺序好像不太对。';
       else if (ctx.page === 'map') ex = '这两部作品的关系好像不成立。';
       document.getElementById('fbExample').textContent = ex;
       resetForm();

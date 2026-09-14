@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>观影路线详情 - MCU 宇宙导航</title>
+<meta name="description" content="漫威观影路线详情页：看这条路线怎么排、下一部该看哪部、以及你的观看进度。">
+<meta name="keywords" content="漫威观影路线,漫威电影观看顺序,MCU时间线,新手入坑,漫威电影上映顺序,MCU观影进度">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/v2.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="rd" id="rd-root"></main>
+
+<div id="app-foot"></div>
+
+<!-- 数据层：与 routes.html / index.html 同一套单一数据源，顺序不可调整 -->
+<script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/stills.js"></script>
+<script src="data/visuals.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+/* ============================================================
+ * MCU 观影导航 H5 · 观影路线详情页（V2.2）
+ * ------------------------------------------------------------
+ * 唯一设计基准：AI生成文件/设计/H5-V2.0/route-detail.html（Rev2）
+ * 策划拍板（2026-09-11）：1A 入口沿用首页「全部路线」链 / 2A 分享=复制链接 /
+ *                        3A 取消时长 / 4A routes.html 保留为 11 条总览
+ *
+ * 数据纪律：
+ *   - 不新建路线数据：全部经 MCU.data.routeById + expandRoute 取自 routes.js
+ *   - 不写死任何演示值：下一部、进度、分类计数、覆盖度全部实时计算
+ *   - 不新增 localStorage key：进度读写复用 MCU.progress（mcu_nav_user_v1.watched）
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  var MCU = window.MCU;
+  var V2  = window.MCU.v2;
+  var esc = MCU.ui.esc;
+
+  MCU.ui.mount('route-detail.html');
+
+  /* ---------- 图形常量（与 V2 组件层同一套路径，去播放三角形） ---------- */
+  var IC = {
+    back:  'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
+    right: 'M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z',
+    chev:  'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z',
+    check: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
+    share: 'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.13c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 10.2c-.54-.5-1.25-.81-2.04-.81-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z',
+    book:  'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z',
+    user:  'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+    stage: 'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z'
+  };
+  function svg(path, cls) {
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"'
+      + (cls ? ' class="' + cls + '"' : '') + '><path d="' + path + '"/></svg>';
+  }
+
+  /* ---------- 本页负责的 3 条基础路线（其余 8 条专题路线仍在 routes.html） ---------- */
+  var ROUTE_IDS = ['newcomer', 'release', 'chrono'];
+  /* eyebrow 为展示层 UI 文案（routes.js 无此字段，属表现层常量，不进数据源） */
+  var EYEBROW = { newcomer: 'NEWCOMER ROUTE', release: 'RELEASE ORDER', chrono: 'MCU TIMELINE' };
+
+  var id = MCU.ui.param('id');
+  if (ROUTE_IDS.indexOf(id) < 0) id = 'newcomer';
+  var route = MCU.data.routeById(id);
+
+  /* ---------- 真实数据计算 ---------- */
+  var list  = MCU.data.expandRoute(route);          /* 路线真实顺序 */
+  var total = list.length;
+  var tc = { movie: 0, series: 0, special: 0, short: 0 };
+  list.forEach(function (m) { if (tc[m.type] != null) tc[m.type]++; });
+  var specialContent = tc.special + tc.short;       /* 「特别内容」= 特别篇 2 + 短片 5 */
+
+  var phaseList = [];
+  list.forEach(function (m) { if (m.phase && phaseList.indexOf(m.phase) < 0) phaseList.push(m.phase); });
+  phaseList.sort(function (a, b) { return a - b; });
+
+  var seenArr   = list.map(function (m) { return MCU.progress.isSeen(m.id); });
+  var seenCount = seenArr.filter(function (x) { return x; }).length;
+  var nextIdx   = seenArr.indexOf(false);           /* 路线中第一部未看作品 */
+  var nextItem  = nextIdx >= 0 ? list[nextIdx] : null;
+  var allWatched = nextIdx < 0 && total > 0;
+  var hasProgress = seenCount > 0;
+
+  var mcuTotal = MCU.progress.total();
+  var coverage = mcuTotal ? Math.round(total / mcuTotal * 100) : 0;
+
+  /* ---------- 首页 SEO/统计口径：本页 title、description 按路线独立生成 ---------- */
+  document.title = route.name + ' 观影路线详情 · ' + total + ' 部 - MCU 宇宙导航';
+  var descEl = document.querySelector('meta[name="description"]');
+  if (descEl) descEl.content = (route.tagline + '。' + route.desc).slice(0, 150);
+
+  /* ---------- 片段构造 ---------- */
+  function metaItem(path, text, extraCls) {
+    return '<span class="rd-meta-i' + (extraCls ? ' ' + extraCls : '') + '">'
+      + svg(path) + '<span>' + esc(text) + '</span></span>';
+  }
+
+  function posterBox(m, sizeCls) {
+    var v = MCU.data.visual(m.id);
+    var ph = MCU.data.phaseColor(m.phase);
+    var ch = esc(String(m.cn || '?').slice(0, 1));
+    var img = v.poster
+      ? '<img src="' + esc(v.poster) + '" alt="《' + esc(m.cn) + '》海报"'
+        + ' loading="lazy" decoding="async" onerror="this.style.display=\'none\'">'
+      : '';
+    return '<span class="rd-phbox ' + sizeCls + '" style="--pc:' + ph + '">'
+      + '<b>' + ch + '</b>' + img + '</span>';
+  }
+
+  /* ---------- ① Hero ---------- */
+  var stars = [[8,15,2],[12,72,2],[25,45,3],[18,88,1],[35,22,2],[5,55,1],[42,78,2]]
+    .map(function (p) {
+      return '<span class="rd-star" style="top:' + p[0] + '%;left:' + p[1] + '%;width:'
+        + p[2] + 'px;height:' + p[2] + 'px"></span>';
+    }).join('');
+
+  var heroCtaText    = hasProgress ? '继续这条路线' : '开始这条路线';
+  var bottomCtaText  = hasProgress ? '继续观看' : '从第一部开始';
+
+  var heroHtml = ''
+    + '<section class="rd-hero" data-section-label="' + esc(route.name) + '">'
+    +   '<div class="rd-hero-bg" aria-hidden="true"></div>'
+    +   '<div class="rd-hero-stars" aria-hidden="true">' + stars + '</div>'
+    +   '<div class="rd-hero-in">'
+    +     '<button class="rd-back" type="button" data-rd-back aria-label="返回">' + svg(IC.back) + '</button>'
+    +     '<div class="rd-eyebrow">' + esc(EYEBROW[id] || 'WATCH ROUTE') + '</div>'
+    +     '<h1 class="rd-name">' + esc(route.name) + '</h1>'
+    +     '<p class="rd-tagline">' + esc(route.tagline) + '</p>'
+    +     '<div class="rd-meta">'
+    +       metaItem(IC.book, total + ' 部作品')
+    +       metaItem(IC.user, route.forWho)
+    +       metaItem(IC.stage, '涉及 ' + phaseList.length + ' 个阶段', 'is-pc')
+    +     '</div>'
+    +     (hasProgress
+            ? '<div class="rd-badge"><i></i>已看 ' + seenCount + ' / ' + total + ' 部 · 继续</div>'
+            : '')
+    +     '<div class="rd-actions">'
+    +       '<button class="v2-btn v2-btn-primary" type="button" data-rd-go>'
+    +         svg(IC.right) + esc(heroCtaText) + '</button>'
+    +       '<a class="v2-btn v2-btn-ghost" href="routes.html?r=' + esc(id) + '">'
+    +         svg(IC.back) + '返回路线</a>'
+    +     '</div>'
+    +   '</div>'
+    + '</section>'
+    + '<div class="rd-rule"></div>';
+
+  /* ---------- ② 下一部看这部（紧跟 Hero） ---------- */
+  var nextInner;
+  if (nextItem) {
+    var nextMeta = (id === 'chrono')
+      ? '故事发生在 ' + esc(nextItem.coLabel) + ' · Phase ' + nextItem.phase + ' · 路线第 ' + (nextIdx + 1) + ' 部'
+      : nextItem.year + ' · Phase ' + nextItem.phase + ' · 路线第 ' + (nextIdx + 1) + ' 部';
+    nextInner = ''
+      + '<div class="rd-next-lbl"><i></i>下一部看这部</div>'
+      + '<div class="rd-next-body">'
+      +   posterBox(nextItem, 'rd-next-ph')
+      +   '<div class="rd-next-info">'
+      +     '<div class="rd-next-name">' + esc(nextItem.cn) + '</div>'
+      +     '<div class="rd-next-meta">' + nextMeta + '</div>'
+      +     '<div class="rd-next-reason">' + esc(nextItem.role || '') + '</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="rd-next-cta">'
+      +   '<a class="v2-btn v2-btn-primary" href="movie.html?id=' + esc(nextItem.id) + '">'
+      +     svg(IC.right) + '查看作品</a>'
+      + '</div>';
+  } else if (allWatched) {
+    /* 全部看完：设计稿未覆盖该状态，此处复用同一 Next 卡呈现完成态，不加新组件 */
+    var first = list[0];
+    nextInner = ''
+      + '<div class="rd-next-lbl"><i></i>这条路线已全部看完</div>'
+      + '<div class="rd-next-body">'
+      +   posterBox(first, 'rd-next-ph')
+      +   '<div class="rd-next-info">'
+      +     '<div class="rd-next-name">' + esc(first.cn) + '</div>'
+      +     '<div class="rd-next-meta">路线共 ' + total + ' 部 · 全部已看</div>'
+      +     '<div class="rd-next-reason">这条路线你已经全部看完。想重温可以从第一部重新开始，'
+      +       '也可以去「全部路线」看看其他路线。</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div class="rd-next-cta">'
+      +   '<a class="v2-btn v2-btn-primary" href="movie.html?id=' + esc(first.id) + '">'
+      +     svg(IC.right) + '查看作品</a>'
+      + '</div>';
+  } else {
+    nextInner = '<div class="rd-next-reason">这条路线暂无内容。</div>';
+  }
+
+  var nextHtml = ''
+    + '<section class="rd-sec" id="rd-next-sec" data-section-label="下一部看这部">'
+    +   '<div class="rd-sec-hd"><h2 class="rd-sec-t">下一步</h2></div>'
+    +   '<div class="rd-next">' + nextInner + '</div>'
+    + '</section>'
+    + '<div class="rd-rule"></div>';
+
+  /* ---------- ③ 路线概览 ---------- */
+  var ovCards = [
+    { n: total,          l: '总作品',   gold: true },
+    { n: tc.movie,       l: '电影' },
+    { n: tc.series,      l: '剧集' },
+    { n: specialContent, l: '特别内容', cls: 'is-m' },        /* 移动端第 4 格 */
+    { n: phaseList.length, l: '涉及阶段', cls: 'is-pc' },      /* PC 第 4 格 */
+    { n: coverage + '%', l: '全MCU覆盖', gold: true, cls: 'is-pc' }
+  ].map(function (c) {
+    return '<div class="rd-ov-c' + (c.cls ? ' ' + c.cls : '') + '">'
+      + '<div class="rd-ov-n' + (c.gold ? ' is-gold' : '') + '">' + c.n + '</div>'
+      + '<div class="rd-ov-l">' + esc(c.l) + '</div></div>';
+  }).join('');
+
+  var phaseBar = [1, 2, 3, 4, 5, 6].map(function (p) {
+    var on = phaseList.indexOf(p) >= 0;
+    return '<div class="rd-phase p' + p + (on ? ' is-on' : '') + '">'
+      + '<span class="rd-pm">P' + p + '</span>'
+      + '<span class="rd-pd">Phase ' + p + '</span></div>';
+  }).join('');
+
+  var ovHtml = ''
+    + '<section class="rd-sec" data-section-label="路线概览">'
+    +   '<div class="rd-sec-hd"><h2 class="rd-sec-t">路线概览</h2></div>'
+    +   '<div class="rd-ov">' + ovCards + '</div>'
+    +   '<div class="rd-phases">' + phaseBar + '</div>'
+    + '</section>'
+    + '<div class="rd-rule"></div>';
+
+  /* ---------- ④ 观影列表 ---------- */
+  function listItem(m, i) {
+    var seen = seenArr[i];
+    var isNext = (i === nextIdx);
+    var cls = 'rd-item' + (seen ? ' is-watched' : '') + (isNext ? ' is-next' : '');
+    var num = seen
+      ? svg(IC.check)
+      : String(i + 1);
+    var note = (isNext ? '下一步看这部 · ' : '') + (m.role || '');
+    return '<a class="' + cls + '" href="movie.html?id=' + esc(m.id) + '">'
+      + '<span class="rd-num">' + num + '</span>'
+      + posterBox(m, 'rd-ph')
+      + '<span class="rd-info">'
+      +   '<span class="rd-row">'
+      +     '<span class="rd-nm">' + esc(m.cn) + '</span>'
+      +     '<span class="rd-yr">' + m.year + '</span>'
+      +   '</span>'
+      +   '<span class="rd-tags">'
+      +     '<span class="rd-tag" style="color:' + MCU.data.phaseColor(m.phase) + '">P' + m.phase + '</span>'
+      +     '<span class="rd-tag">' + esc(MCU.data.typeLabel[m.type] || m.type) + '</span>'
+      +   '</span>'
+      +   '<span class="rd-note">' + esc(note) + '</span>'
+      + '</span>'
+      /* 右侧图标统一为右箭头 —— 见偏差1：已看项右侧原为绿色对勾，
+         与左侧序号位的对勾重复，且丢掉了「可点击进入」的暗示。
+         状态区分只由左侧序号位承担（已看=绿色✓ / 下一部=金色数字+金边 / 未看=灰色数字）。 */
+      + '<span class="rd-state">' + svg(IC.chev, 'ic-arrow') + '</span>'
+      + '</a>';
+  }
+
+  var splitHtml = ''
+    + '<div class="rd-split">'
+    +   '<span class="rd-split-line"></span>'
+    +   '<span class="rd-split-tx"><i></i>你看到这里了</span>'
+    +   '<span class="rd-split-line"></span>'
+    + '</div>';
+
+  var listHtml = list.map(function (m, i) {
+    var out = listItem(m, i);
+    /* 「你看到这里了」：仅在「有进度且未全部看完」时，插在最后一部已看之后 */
+    if (hasProgress && !allWatched && i === nextIdx - 1) out += splitHtml;
+    return out;
+  }).join('');
+
+  var listSecHtml = ''
+    + '<section class="rd-sec" id="rd-list-sec" data-section-label="观影列表">'
+    +   '<div class="rd-sec-hd"><h2 class="rd-sec-t">观影列表</h2></div>'
+    +   '<div class="rd-list">' + (listHtml || '<div class="rd-next-reason">这条路线暂无内容。</div>') + '</div>'
+    + '</section>'
+    + '<div class="rd-rule"></div>';
+
+  /* ---------- ⑤ 路线说明 ---------- */
+  /* 「与其他路线的区别」由真实数据计算（条目数/构成），不抄设计稿演示文案 */
+  var others = MCU.data.routes
+    .filter(function (r) { return ROUTE_IDS.indexOf(r.id) >= 0 && r.id !== id; })
+    .map(function (r) { return '「' + r.name + '」' + MCU.data.expandRoute(r).length + ' 部'; })
+    .join('；');
+  var diffText = '本路线 ' + total + ' 部（电影 ' + tc.movie + ' · 剧集 ' + tc.series
+    + ' · 特别内容 ' + specialContent + '）；' + others + '。';
+
+  var noteBlocks = [
+    { l: '路线定位', t: route.desc },
+    { l: '为什么这样排', t: route.why },
+    { l: '与其他路线的区别', t: diffText }
+  ];
+  if (route.note) noteBlocks.push({ l: '补充说明', t: route.note });
+
+  var notesHtml = ''
+    + '<section class="rd-sec" data-section-label="路线说明">'
+    +   '<div class="rd-sec-hd"><h2 class="rd-sec-t">路线说明</h2></div>'
+    +   '<div class="rd-notes">'
+    +     noteBlocks.map(function (b) {
+            return '<div class="rd-note-b"><div class="rd-note-l">' + esc(b.l) + '</div>'
+              + '<div class="rd-note-t">' + esc(b.t || '') + '</div></div>';
+          }).join('')
+    +   '</div>'
+    + '</section>';
+
+  /* ---------- ⑥ Bottom Bar（sticky） ---------- */
+  var barHtml = ''
+    + '<footer class="rd-bar">'
+    +   '<div class="rd-bar-in">'
+    +     '<button class="v2-btn v2-btn-primary" type="button" data-rd-go>'
+    +       svg(IC.right) + esc(bottomCtaText) + '</button>'
+    +     '<button class="v2-btn v2-btn-ghost" type="button" data-rd-share>'
+    +       svg(IC.share) + '分享路线</button>'
+    +   '</div>'
+    + '</footer>';
+
+  document.getElementById('rd-root').innerHTML =
+    heroHtml + nextHtml + ovHtml + listSecHtml + notesHtml + barHtml;
+
+  /* ============================================================
+   * 交互
+   * ============================================================ */
+
+  /* 路线内导航：Hero / Bottom CTA → 滚动到「下一部看这部」，无 Next 时退到列表首项 */
+  function goRoute() {
+    var target = document.getElementById('rd-next-sec') || document.getElementById('rd-list-sec');
+    if (!target) return;
+    var nav = document.querySelector('.nav');
+    var offset = nav ? nav.getBoundingClientRect().height : 0;
+    var top = target.getBoundingClientRect().top + window.pageYOffset - offset - 8;
+    window.scrollTo({ top: top < 0 ? 0 : top, behavior: 'smooth' });
+  }
+
+  /* 返回：优先浏览器后退；无站内历史时回「全部路线」总览页（routes.html 仍为 11 条总览） */
+  function goBack() {
+    var ref = document.referrer || '';
+    var sameSite = ref && ref.indexOf(location.origin) === 0;
+    if (sameSite && window.history.length > 1) { window.history.back(); return; }
+    location.href = 'routes.html?r=' + id;
+  }
+
+  /* 分享路线（策划 2A）：浏览器 clipboard → execCommand → prompt 兜底；无后端、无新存储 */
+  function routeUrl() {
+    return location.origin + location.pathname + '?id=' + id;
+  }
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:-1000px;left:0;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return !!ok;
+    } catch (e) { return false; }
+  }
+  function copyText(text) {
+    return new Promise(function (resolve) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          function () { resolve(true); },
+          function () { resolve(legacyCopy(text)); }
+        );
+      } else {
+        resolve(legacyCopy(text));
+      }
+    });
+  }
+  function shareRoute() {
+    var url = routeUrl();
+    copyText(url).then(function (ok) {
+      if (ok) { V2.toast('路线链接已复制，粘贴即可分享'); return; }
+      V2.toast('这个浏览器不支持自动复制，请手动复制');
+      window.prompt('复制这条路线链接：', url);
+    });
+  }
+
+  document.getElementById('rd-root').addEventListener('click', function (e) {
+    var t = e.target;
+    while (t && t !== this) {
+      if (t.getAttribute) {
+        if (t.getAttribute('data-rd-go') !== null) { e.preventDefault(); goRoute(); return; }
+        if (t.getAttribute('data-rd-share') !== null) { e.preventDefault(); shareRoute(); return; }
+        if (t.getAttribute('data-rd-back') !== null) { e.preventDefault(); goBack(); return; }
+      }
+      t = t.parentNode;
+    }
+  });
+})();
+</script>
+</body>
+</html>
