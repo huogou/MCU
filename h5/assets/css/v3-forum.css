@@ -1,0 +1,262 @@
+/* ============================================================
+ * MCU 宇宙导航 H5 · V3.0 论坛样式层
+ * ------------------------------------------------------------
+ * 纪律（forum-design-spec.md 9.2）：
+ *   - 全部 v3f- 前缀，不污染 v2- 组件
+ *   - 复用 style.css :root 既有 Token，不新增全局 token
+ *   - 移动优先 390px；黑金电影档案馆风格；无花哨动画
+ * 设计基准：AI生成文件/设计/H5-V3.0/forum-design-spec.md
+ * ============================================================ */
+
+/* ---------- 页面容器 ---------- */
+.v3f {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 18px 16px 96px;
+  color: var(--text);
+}
+
+/* ---------- 内页顶栏（返回 + 标题） ---------- */
+.v3f-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.v3f-back {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex: none; color: var(--text);
+}
+.v3f-back svg { width: 18px; height: 18px; fill: var(--text-2); }
+.v3f-topbar-title { font-size: 17px; font-weight: 700; letter-spacing: .5px; }
+.v3f-topbar-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+/* ---------- 排序 Tab（最新/最热） ---------- */
+.v3f-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.v3f-tab {
+  padding: 7px 16px; border-radius: 18px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-2); font-size: 13px; cursor: pointer; border: 1px solid transparent;
+}
+.v3f-tab.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); font-weight: 600; }
+
+/* ---------- 分类 chips（横向滑动） ---------- */
+.v3f-cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+.v3f-cats::-webkit-scrollbar { display: none; }
+.v3f-cat {
+  flex: none; padding: 5px 12px; border-radius: 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-2); font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.v3f-cat.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); }
+
+/* ---------- 话题卡片 TopicCard（设计 3.1） ---------- */
+.v3f-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+  transition: border-color .15s;
+}
+.v3f-card:active { border-color: var(--border-lit); }
+.v3f-card-top { margin-bottom: 8px; }
+.v3f-card-title { font-size: 15px; font-weight: 600; line-height: 1.45; margin-bottom: 4px; }
+.v3f-card-excerpt {
+  font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.v3f-card-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
+.v3f-card-meta .v3f-av { width: 18px; height: 18px; font-size: 9px; }
+.v3f-card-meta .num { margin-left: auto; display: flex; align-items: center; gap: 3px; }
+.v3f-card-meta .num + .num { margin-left: 10px; }
+.v3f-card-meta .num svg { width: 13px; height: 13px; fill: var(--text-3); }
+.v3f-card-meta .num.liked svg { fill: var(--gold); }
+.v3f-card-meta .num.liked { color: var(--gold); }
+
+/* 分类徽标（设计第五节 6 色映射到既有 Token） */
+.v3f-badge {
+  display: inline-block; padding: 2px 9px; border-radius: 10px;
+  font-size: 11px; line-height: 1.6; font-weight: 600;
+}
+.v3f-badge--movie    { color: var(--gold);   background: var(--gold-soft); }
+.v3f-badge--series   { color: var(--blue);   background: var(--blue-soft); }
+.v3f-badge--char     { color: var(--purple); background: rgba(139, 111, 232, .12); }
+.v3f-badge--timeline { color: var(--green);  background: rgba(40, 180, 135, .12); }
+.v3f-badge--new      { color: var(--red);    background: var(--red-soft); }
+.v3f-badge--general  { color: var(--text-2); background: rgba(110, 120, 137, .14); }
+
+/* 审核状态徽标（我的社区 / 详情横幅） */
+.v3f-st { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.v3f-st--pending  { color: var(--gold); background: var(--gold-soft); }
+.v3f-st--rejected { color: var(--red);  background: var(--red-soft); }
+.v3f-st--approved { color: var(--green); background: rgba(40, 180, 135, .12); }
+.v3f-st--hidden   { color: var(--text-3); background: rgba(110, 120, 137, .14); }
+
+/* ---------- 详情页（设计 3.2） ---------- */
+.v3f-post { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+.v3f-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.v3f-post-head .who { flex: 1; min-width: 0; }
+.v3f-post-head .name { font-size: 13px; font-weight: 600; }
+.v3f-post-head .time { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+.v3f-post-title { font-size: 20px; font-weight: 700; line-height: 1.4; margin: 10px 0; }
+.v3f-post-body { font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.v3f-post-ops { display: flex; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }
+.v3f-op { display: flex; align-items: center; gap: 5px; color: var(--text-2); background: none; border: 0; cursor: pointer; font-size: 13px; padding: 4px 2px; }
+.v3f-op svg { width: 16px; height: 16px; fill: var(--text-2); }
+.v3f-op.liked { color: var(--gold); }
+.v3f-op.liked svg { fill: var(--gold); }
+.v3f-op--right { margin-left: auto; color: var(--text-3); }
+.v3f-flag {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--gold-soft); border: 1px solid rgba(242, 178, 51, .25);
+  color: var(--gold); font-size: 13px; border-radius: 10px;
+  padding: 9px 12px; margin-bottom: 12px;
+}
+.v3f-flag svg { width: 15px; height: 15px; fill: var(--gold); flex: none; }
+.v3f-dim { opacity: .55; }
+
+/* ---------- 回复区（设计 3.3，一层，无楼中楼） ---------- */
+.v3f-replies { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 6px 16px 10px; }
+.v3f-replies-title { font-size: 13px; color: var(--text-2); padding: 10px 0 4px; }
+.v3f-reply { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.v3f-reply:last-child { border-bottom: 0; }
+.v3f-reply-main { flex: 1; min-width: 0; }
+.v3f-reply-head { display: flex; align-items: baseline; gap: 6px; font-size: 12px; }
+.v3f-reply-head .name { font-weight: 600; color: var(--text); }
+.v3f-reply-head .floor { color: var(--text-3); }
+.v3f-reply-head .time { color: var(--text-3); margin-left: auto; }
+.v3f-reply-body { font-size: 13px; line-height: 1.6; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+.v3f-reply-ops { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+.v3f-reply-ops .v3f-op { font-size: 12px; }
+.v3f-reply-ops .v3f-op svg { width: 14px; height: 14px; }
+
+/* ---------- 底部回复输入栏（设计 3.4） ---------- */
+.v3f-inputbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  background: rgba(8, 11, 18, .86);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+}
+.v3f-inputbar-in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
+.v3f-inputbar input {
+  flex: 1; min-width: 0; height: 40px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text); font-size: 13px; padding: 0 16px; outline: none;
+}
+.v3f-inputbar input:focus { border-color: var(--gold); }
+.v3f-send {
+  height: 40px; padding: 0 18px; border-radius: 20px; border: 0;
+  background: linear-gradient(135deg, var(--gold), #D99A1F);
+  color: #141414; font-size: 13px; font-weight: 700; cursor: pointer; flex: none;
+}
+.v3f-send:disabled { background: var(--surface-3); color: var(--text-3); cursor: default; }
+
+/* ---------- 底部弹窗 BottomSheet（设计 3.5） ---------- */
+.v3f-mask {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, .5); z-index: 50;
+  opacity: 0; transition: opacity .2s;
+}
+.v3f-mask.show { opacity: 1; }
+.v3f-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 51;
+  background: var(--bg-soft); border-radius: 24px 24px 0 0;
+  padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+  transform: translateY(100%); transition: transform .25s;
+  max-height: 82vh; overflow-y: auto;
+}
+.v3f-sheet.show { transform: translateY(0); }
+.v3f-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--surface-3); margin: 0 auto 14px; }
+.v3f-sheet-title { font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 16px; }
+
+/* ---------- 表单元素 ---------- */
+.v3f-label { display: block; font-size: 13px; color: var(--text-2); margin: 14px 0 6px; }
+.v3f-label:first-child { margin-top: 0; }
+.v3f-input, .v3f-textarea {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: 14px;
+  padding: 11px 13px; outline: none; font-family: var(--font);
+}
+.v3f-input:focus, .v3f-textarea:focus { border-color: var(--gold); }
+.v3f-textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
+.v3f-count { text-align: right; font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.v3f-count.over { color: var(--red); }
+.v3f-btn-primary {
+  width: 100%; padding: 12px; border: 0; border-radius: 12px; margin-top: 16px;
+  background: linear-gradient(135deg, var(--gold), #D99A1F);
+  color: #141414; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.v3f-btn-primary:disabled { background: var(--surface-3); color: var(--text-3); cursor: default; }
+.v3f-cats-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+.v3f-cats-pick .v3f-cat { font-size: 13px; padding: 7px 14px; }
+
+/* ---------- 头像（CSS 生成式，预设 a01~a12 → 12 色轮换） ---------- */
+.v3f-av {
+  border-radius: 50%; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #141414; overflow: hidden;
+}
+.v3f-av svg { width: 55%; height: 55%; fill: rgba(20, 20, 20, .78); }
+.v3f-av--c0  { background: #F2B233; } .v3f-av--c1  { background: #5B8DEF; }
+.v3f-av--c2  { background: #8B6FE8; } .v3f-av--c3  { background: #28B487; }
+.v3f-av--c4  { background: #E8483F; } .v3f-av--c5  { background: #C25B8E; }
+.v3f-av--c6  { background: #5BC0E8; } .v3f-av--c7  { background: #9FBF3B; }
+.v3f-av--c8  { background: #E87D3F; } .v3f-av--c9  { background: #7A8CE8; }
+.v3f-av--c10 { background: #E85BB0; } .v3f-av--c11 { background: #3BB4C4; }
+.v3f-av-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 4px; }
+.v3f-av-item {
+  aspect-ratio: 1; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; display: flex; align-items: center; justify-content: center;
+}
+.v3f-av-item.on { border-color: var(--gold); box-shadow: 0 0 0 2px var(--gold-soft); }
+
+/* ---------- 空状态 / 提示页（设计 3.7） ---------- */
+.v3f-empty { text-align: center; padding: 52px 24px; }
+.v3f-empty-ico {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px;
+  background: var(--surface); display: flex; align-items: center; justify-content: center;
+}
+.v3f-empty-ico svg { width: 28px; height: 28px; fill: var(--text-3); }
+.v3f-empty-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.v3f-empty-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 16px; }
+.v3f-empty-cta {
+  display: inline-block; padding: 9px 20px; border-radius: 20px;
+  background: var(--gold-soft); border: 1px solid rgba(242, 178, 51, .3);
+  color: var(--gold); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
+}
+
+/* ---------- 骨架屏（静态灰块，无动画——纪律：禁复杂动效） ---------- */
+.v3f-skel { height: 92px; border-radius: 16px; background: var(--surface-2); margin-bottom: 10px; opacity: .5; }
+
+/* ---------- FAB 发帖按钮（设计 3.6，仅社区首页） ---------- */
+.v3f-fab {
+  position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 30;
+  padding: 11px 20px; border: 0; border-radius: 22px;
+  background: linear-gradient(135deg, var(--gold), #D99A1F);
+  color: #141414; font-size: 13px; font-weight: 700; cursor: pointer;
+  box-shadow: var(--gold-glow), 0 4px 16px rgba(0, 0, 0, .3);
+}
+
+/* ---------- 我的社区 Tab ---------- */
+.v3f-mtabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.v3f-mtab {
+  flex: 1; text-align: center; padding: 9px 0; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text-2); font-size: 14px; cursor: pointer;
+}
+.v3f-mtab.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); font-weight: 600; }
+.v3f-mine { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+.v3f-mine-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.v3f-mine-head .st { margin-left: auto; }
+.v3f-mine-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.v3f-mine-body { font-size: 13px; color: var(--text-2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.v3f-mine-foot { font-size: 11px; color: var(--text-3); margin-top: 8px; }
+
+/* ---------- 举报选项 ---------- */
+.v3f-opt {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  color: var(--text); font-size: 14px; padding: 13px 14px; cursor: pointer; margin-bottom: 8px;
+}
+.v3f-opt .dot { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--text-3); flex: none; }
+.v3f-opt.on { border-color: var(--gold); color: var(--gold); }
+.v3f-opt.on .dot { border-color: var(--gold); background: var(--gold); }
+
+/* ---------- 加载失败提示 ---------- */
+.v3f-error { text-align: center; padding: 40px 0; color: var(--text-2); font-size: 13px; }
+.v3f-error .v3f-empty-cta { margin-top: 12px; }

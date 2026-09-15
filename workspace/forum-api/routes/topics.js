@@ -100,7 +100,9 @@ function register(route) {
     if (v === 'notfound' || v === 'hidden') throw httpError(404, 'NOT_FOUND', '话题不存在');
     if (v === 'deleted') throw httpError(410, 'TOPIC_DELETED', '此话题已被删除');
     const liked = likedIdsFor(ctx.user && ctx.user.uid, 'topic', [topic.id]);
-    json(ctx.res, 200, topicOut(topic, liked));
+    const out = topicOut(topic, liked);
+    out.content = topic.content; // 详情才带正文（列表仅摘要，见设计契约 9.3）
+    json(ctx.res, 200, out);
   });
 
   route('POST', /^\/api\/topics$/, async (ctx) => {
