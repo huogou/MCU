@@ -8,6 +8,7 @@
 <meta name="keywords" content="漫威观影导航,漫威电影观看顺序,MCU时间线,漫威电影上映顺序,MCU观影路线">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/v2.css">
+<link rel="stylesheet" href="assets/css/v3-forum.css">
 </head>
 <body>
 
@@ -396,30 +397,55 @@
   renderMilestone();
 
   /* ==========================================================
-   * 模块 6：社区入口（点击仅提示，无发帖 / 评论 / 用户系统）
+   * 模块 6：社区入口（V3.0 已上线：点击进入 community.html）
+   * 设计基准：AI生成文件/设计/H5-V3.0/forum-design-spec.md 第六节（9-B）
+   * 变更范围：仅本区块；不新增导航项；不动其他模块
    * ========================================================== */
   document.getElementById('community-title').innerHTML = V2.sectionTitle({
     eyebrow: 'COMMUNITY',
     title: '漫威讨论区',
-    sub: '社区即将开放'
+    sub: '来聊聊你最近看的 MCU 作品'
   });
-  document.getElementById('community-slot').innerHTML = V2.communityCard(window.MCU_COMMUNITY_TOPICS);
+  document.getElementById('community-slot').innerHTML =
+    '<div class="v3f-entry" id="v3f-entry" role="link" tabindex="0">'
+    + '<div class="v3f-entry-in">'
+    + '<span class="v3f-entry-icon"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></span>'
+    + '<div class="v3f-entry-txt"><div class="v3f-entry-b">进入社区讨论</div>'
+    + '<div class="v3f-entry-d">观后感 · 阵容猜想 · 时间线考据</div></div>'
+    + '<svg class="v3f-entry-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>'
+    + '</div>'
+    + '<div class="v3f-entry-preview" id="community-preview" hidden></div>'
+    + '</div>';
 
   (function bindCommunity() {
-    var el = document.getElementById('v2-community');
-    if (el) {
-      var fire = function () { V2.toast('社区功能正在筹备中，欢迎关注。'); };
-      el.addEventListener('click', fire);
-      el.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fire(); }
+    var esc = MCU.ui.esc;
+    var entry = document.getElementById('v3f-entry');
+    function go() { location.href = 'community.html'; }
+    if (entry) {
+      entry.addEventListener('click', go);
+      entry.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); }
       });
     }
-    /* V2.1 话题卡片：点击提示筹备中（不跳转、不虚构互动） */
-    var wrap = document.getElementById('community-slot');
-    if (wrap) wrap.addEventListener('click', function (e) {
-      var t = e.target.closest ? e.target.closest('.v2-topic') : null;
-      if (t) { e.preventDefault(); V2.toast('话题讨论即将开放，敬请期待。'); }
-    });
+    /* 最新话题预览（匿名读公开数据；空库/网络失败静默隐藏，不占位） */
+    fetch('/api/topics?sort=latest&size=2')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) {
+        if (!j || !j.items || !j.items.length) return;
+        var box = document.getElementById('community-preview');
+        if (!box) return;
+        var CATL = { movie: '电影', series: '剧集', char: '角色', timeline: '时间线', new: '新作', general: '闲聊' };
+        var heart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+        var chat = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>';
+        box.hidden = false;
+        box.innerHTML = j.items.map(function (t) {
+          return '<div class="v3f-entry-row">'
+            + '<span class="v3f-badge v3f-badge--' + esc(t.category) + '">' + esc({ movie: '电影', series: '剧集', char: '角色', timeline: '时间线', new: '新作', general: '闲聊' }[t.category] || '闲聊') + '</span>'
+            + '<span class="t">' + esc(t.title) + '</span>'
+            + '<span class="m"><span>' + heart + esc(String(t.likeCount)) + '</span><span>' + chat + esc(String(t.replyCount)) + '</span></span>'
+            + '</div>';
+        }).join('');
+      }).catch(function () { /* 静默：预览失败不影响入口 */ });
   })();
 })();
 </script>
