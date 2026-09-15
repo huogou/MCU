@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU 论坛审核台</title>
+<!-- robots 防抓取 -->
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root { --bg:#0D1119; --card:#161D2B; --gold:#F2B233; --line:#243043; --text:#E8ECF4; --sub:#8E98AA; --red:#E5484D; --green:#46A758; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; padding:16px; font-size:14px; }
+  .wrap { max-width:720px; margin:0 auto; }
+  h1 { font-size:18px; margin-bottom:12px; color:var(--gold); }
+  .toolbar { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+  .toolbar input { background:var(--card); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:8px 10px; flex:1; min-width:220px; }
+  .toolbar button { background:var(--gold); color:#141414; border:0; border-radius:8px; padding:8px 14px; font-weight:700; cursor:pointer; }
+  .tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .tabs .tab { padding:6px 12px; border-radius:16px; border:1px solid var(--line); color:var(--sub); cursor:pointer; }
+  .tabs .tab.on { border-color:var(--gold); color:var(--gold); }
+  .item { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  .meta { color:var(--sub); font-size:12px; margin-bottom:6px; }
+  .title { font-weight:600; margin-bottom:4px; }
+  .content { white-space:pre-wrap; line-height:1.6; color:var(--text); }
+  .ops { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .ops button { border:0; border-radius:8px; padding:6px 12px; cursor:pointer; font-size:13px; }
+  .b-approve { background:var(--green); color:#fff; }
+  .b-reject  { background:var(--red); color:#fff; }
+  .b-hide    { background:#5A6478; color:#fff; }
+  .b-restore { background:var(--gold); color:#141414; }
+  .b-delete  { background:#3A1D22; color:var(--red); border:1px solid var(--red); }
+  .empty { text-align:center; color:var(--sub); padding:40px 0; }
+  .toast { position:fixed; left:50%; bottom:28px; transform:translateX(-50%); background:var(--gold); color:#141414; padding:8px 16px; border-radius:20px; font-size:13px; display:none; }
+  .err { color:var(--red); font-size:13px; margin-top:8px; min-height:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MCU 论坛审核台（V3.0 MVP）</h1>
+  <div class="toolbar">
+    <input id="tk" type="password" placeholder="管理 Token（服务端 data/admin-token.key）">
+    <button onclick="saveTk()">保存</button>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="err" id="err"></div>
+  <div id="list"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+var STATES = ['pending','approved','rejected','hidden','deleted'];
+var STATE_LABEL = { pending:'待审核', approved:'已通过', rejected:'已驳回', hidden:'已隐藏', deleted:'已删除' };
+var KIND = 'topics';
+var STATE = 'pending';
+var A_VERIFY = { approve:'通过', reject:'驳回', hide:'隐藏', restore:'恢复', delete:'删除' };
+
+function tk(){ return sessionStorage.getItem('forum_admin_token') || ''; }
+function saveTk(){ sessionStorage.setItem('forum_admin_token', document.getElementById('tk').value.trim()); load(); }
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(function(){ t.style.display='none'; }, 1600); }
+function showErr(m){ document.getElementById('err').textContent = m || ''; }
+
+function renderTabs(){
+  var el = document.getElementById('tabs'); el.innerHTML='';
+  STATES.forEach(function(s){
+    var d = document.createElement('div');
+    d.className = 'tab' + (s===STATE?' on':'');
+    d.textContent = STATE_LABEL[s];
+    d.onclick = function(){ STATE = s; renderTabs(); load(); };
+    el.appendChild(d);
+  });
+}
+
+function esc(s){ var d=document.createElement('div'); d.textContent=s==null?'':s; return d.innerHTML; }
+
+function load(){
+  showErr('');
+  if(!tk()){ document.getElementById('list').innerHTML = '<div class="empty">请先填写管理 Token</div>'; return; }
+  fetch('/api/admin/' + KIND + '?status=' + STATE, { headers:{ 'Authorization':'Bearer ' + tk() } })
+  .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, j:j }; }); })
+  .then(function(x){
+    if(!x.ok){ showErr((x.j&&x.j.error&&x.j.error.message)||'加载失败'); document.getElementById('list').innerHTML=''; return; }
+    var items = x.j.items || [];
+    if(!items.length){ document.getElementById('list').innerHTML = '<div class="empty">「'+STATE_LABEL[STATE]+'」暂无内容</div>'; return; }
+    var html = '';
+    items.forEach(function(it){
+      html += '<div class="item">'
+        + '<div class="meta">#' + esc(it.id.slice(0,8)) + ' · ' + esc(it.author.name) + ' · ' + esc(it.createdAt) + (it.topicId? ' · 回复话题 ' + esc(it.topicId.slice(0,8)) : '') + '</div>'
+        + (it.title ? '<div class="title">' + esc(it.title) + (it.category? ' <span class="meta">[' + esc(it.category) + ']</span>':'') + '</div>' : '')
+        + '<div class="content">' + esc(it.content) + '</div>'
+        + '<div class="ops">' + opButtons(it) + '</div>'
+        + '</div>';
+    });
+    document.getElementById('list').innerHTML = html;
+  })
+  .catch(function(e){ showErr('网络错误'); });
+}
+
+function opButtons(it){
+  var map = { pending:['approve','reject','delete'], approved:['hide','delete'], rejected:['delete'], hidden:['restore','delete'], deleted:[] };
+  return (map[it.status]||[]).map(function(a){
+    return '<button class="b-' + a + '" onclick="act(\'' + it.id + '\',\'' + a + '\')">' + A_VERIFY[a] + '</button>';
+  }).join('');
+}
+
+function act(id, action){
+  if(action==='delete' && !confirm('确认删除？逻辑删除，不可恢复为公开内容。')) return;
+  fetch('/api/admin/' + KIND + '/' + id + '/' + action, {
+    method:'POST',
+    headers:{ 'Authorization':'Bearer ' + tk() }
+  })
+  .then(function(r){ return r.json().then(function(j){ return { ok:r.ok, j:j }; }); })
+  .then(function(x){
+    if(!x.ok){ showErr((x.j&&x.j.error&&x.j.error.message)||'操作失败'); return; }
+    toast(A_VERIFY[action] + '成功'); load();
+  })
+  .catch(function(){ showErr('网络错误'); });
+}
+
+renderTabs(); load();
+</script>
+</body>
+</html>

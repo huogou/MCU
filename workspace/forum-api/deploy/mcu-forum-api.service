@@ -1,0 +1,19 @@
+[Unit]
+Description=MCU Forum API (V3.0) - Node.js 24 / SQLite WAL
+After=network.target
+
+[Service]
+Type=simple
+User=forumapi
+Group=forumapi
+WorkingDirectory=/www/wwwroot/forum-api
+ExecStart=/opt/node24/bin/node /www/wwwroot/forum-api/server.js
+Restart=always
+RestartSec=3
+MemoryMax=150M
+Environment=NODE_ENV=production
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
