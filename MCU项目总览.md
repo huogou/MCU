@@ -34,26 +34,25 @@
 
 ```
 .
-├── wechat/                    # 微信小程序源码（基线 wechat-production → baf309b）
-├── douyin/                    # 抖音小程序源码（提交 22494e1，V1.3.0，2 次驳回整改后形态）
-├── h5/                        # H5 源码（与线上同源，121 文件）
-├── shared/                    # 跨端共享数据（11 个 data/*.js + 1 个 sh，H5+抖音直接 import）
+├── wechat/                    # 微信小程序当前代码（基线 wechat-production → baf309b）
+├── douyin/                    # 抖音小程序当前代码（V1.3.0）
+├── h5/                        # H5 当前生产代码（与线上同源）
+├── shared/                    # 跨端共享代码/数据（data/*.js + sync_data.sh）
+├── workspace/                 # 开发/部署/验证工具（deploy/、自测脚本、移动日志）
 │
-├── 给策划AI同步文件.txt       # 协同通道：用户/策划 → 开发
-├── 给开发AI同步文件.txt       # 协同通道：用户/策划/设计 → 开发（Work）
-├── 给设计AI同步文件.txt       # 协同通道：用户/策划 → 设计（QoderWork CN）
+├── docs/                      # 当前有效项目文档
+│   ├── 产品/                  #   产品方案（含 V3.0论坛/后续论坛扩展方案.md）
+│   ├── 技术/                  #   部署/同步/交接说明（DESIGN.md、仓库同步交接说明.md 等）
+│   ├── 版本/                  #   CHANGELOG.md、版本记录.md、设计文件索引.md
+│   └── 同步/                  #   三份 AI 同步文件 + 历史归档/
+├── design/                    # 当前有效设计资料（H5/、小程序/微信、小程序/抖音、其他）
+├── archive/                   # 历史版本与废弃资料（V1/ V2.0/ V2.1/ V2.2/ 其他历史/）
+├── release/                   # 发布包（微信小程序-v1.2.0上传包）
 │
 ├── README.md                  # 产品 README
-├── DESIGN.md                  # 设计规范（两小程序共用）
 ├── VERSION.md                 # 版本号与发布记录
 ├── MCU项目总览.md             # ★ 本文件（AI 协作总览）
-│
-├── workspace/                 # 临时工具/脚本/部署文件（不入产品构建）
-│   ├── deploy/                 # 阿里云 H5 部署相关（conf/脚本/打包）
-│   ├── ocr.ps1, *.js, *.mjs   # 临时自测脚本
-├── AI生成文件/                # 报告/截图/分类（已被 .gitignore 覆盖，**不在 Git**）
-├── backup/                    # 基线/发布备份（368 文件）
-└── 恢复资料/                  # D7→D10 抢救资料
+└── AI生成文件/                # 仅存服务器 SSH 密钥 H5/MCU.pub、H5/MCU.pem（R4 冻结；.gitignore 覆盖，不在 Git）
 ```
 
 **关键 Git 标记**：
@@ -317,9 +316,9 @@ movie（轻量作品详情）              feedback / share / about / agreement 
 
 ### 10.3 源码管理
 
-- 每次修改 → Git 提交 + 版本号 + README/同步文件 + backup
-- 跨 AI 协作通过 `给X同步文件.txt`（三份窄向通道）+ `.workbuddy/memory/YYYY-MM-DD.md`（长期记忆）
-- `AI生成文件/` 已被 .gitignore 覆盖 → **不在 Git 中**，勿用 git 找回
+- 每次修改 → Git 提交 + 版本号 + README/同步文件 + 归档（`archive/`）
+- 跨 AI 协作通过 `docs/同步/给X同步文件.txt`（三份窄向通道）+ `.workbuddy/memory/YYYY-MM-DD.md`（长期记忆）
+- `AI生成文件/`、`archive/`、`release/`、`design/` 已被 .gitignore 覆盖 → **不在 Git 中**，勿用 git 找回
 
 ---
 
@@ -328,15 +327,15 @@ movie（轻量作品详情）              feedback / share / about / agreement 
 ### 11.1 同步文件（三份无空格文件 = 唯一工作集）
 
 ```
-给策划AI同步文件.txt  →  GPT/用户（维护：开发/设计）
-给开发AI同步文件.txt  →  Work（维护：策划/设计）
-给设计AI同步文件.txt  →  QoderWork CN（维护：开发/策划）
+docs/同步/给策划AI同步文件.txt  →  GPT/用户（维护：开发/设计）
+docs/同步/给开发AI同步文件.txt  →  Work（维护：策划/设计）
+docs/同步/给设计AI同步文件.txt  →  QoderWork CN（维护：开发/策划）
 ```
 
 - 交付物写完整绝对路径 + 扩展名
 - 修改列表给相对路径
 - 完成后自动写对应通道，无需逐次询问
-- **精简约定**：文件过长（>~150 行）时整体覆盖重写为"当前态"而非继续追加。流程：先 cp 原件归档到 `backup/同步文件归档/{YYYY-MM-DD}/` → 再重写 → 文件内注明归档路径
+- **精简约定**：文件过长（>~150 行）时整体覆盖重写为"当前态"而非继续追加。流程：先 cp 原件归档到 `docs/同步/历史归档/{YYYY-MM-DD}/` → 再重写 → 文件内注明归档路径
 
 ### 11.2 记忆
 
@@ -347,9 +346,8 @@ movie（轻量作品详情）              feedback / share / about / agreement 
 
 ### 11.3 Backup
 
-- `backup/` —— 基线 / 发布备份（368 文件）
-- `恢复资料/` —— D7→D10-A/B 抢救资料
-- `backup/同步文件归档/{YYYY-MM-DD}/` —— 同步文件精简前的归档
+- `archive/` —— 历史版本与废弃资料（V1/ V2.0/ V2.1/ V2.2/ 其他历史；原 `backup/`、`恢复资料/` 已归入）
+- `docs/同步/历史归档/{YYYY-MM-DD}/` —— 同步文件精简前的归档
 
 ---
 

@@ -6,6 +6,7 @@ import os
 import re
 
 ROOT = r'D:\SEO\发挥余热\漫威电影宇宙导航'
+SYNC = os.path.join(ROOT, 'docs', '同步')  # 2026-09-15 目录整理：同步文件已迁至 docs/同步/
 FILES = ['给设计AI同步文件.txt', '给策划AI同步文件.txt',
          '给开发AI同步文件.txt']
 
@@ -14,11 +15,11 @@ ABS = re.compile(r'[A-Za-z]:\\[^\s`()|、，,;；<>]*')
 # 以「…\」省略根目录的写法
 ELL = re.compile(r'…\\([^\s`]+)')
 # 裸相对路径（应被消灭）
-REL = re.compile(r'(?<![\w\\/:.…])(AI生成文件|workspace|backup)/[^\s`()|、，,;；]*')
+REL = re.compile(r'(?<![\w\\/:.…])(AI生成文件|workspace|backup|archive|design|docs)/[^\s`()|、，,;；]*')
 
 total_abs, total_rel = {}, {}
 for f in FILES:
-    p = os.path.join(ROOT, f)
+    p = os.path.join(SYNC, f)
     if not os.path.exists(p):
         continue
     s = open(p, encoding='utf-8').read()
@@ -54,7 +55,7 @@ print()
 print('=== 「…\\」省略简写校验（应全为 0：收件方无法直接粘贴打开）===')
 ell_total = 0
 for f in FILES:
-    p = os.path.join(ROOT, f)
+    p = os.path.join(SYNC, f)
     if not os.path.exists(p):
         continue
     for i, line in enumerate(open(p, encoding='utf-8').read().splitlines(), 1):
@@ -66,8 +67,8 @@ if ell_total == 0:
 
 print()
 print('=== 目录清单 ===')
-for d in ['AI生成文件\\V2.2路线详情页', 'workspace', 'backup\\V2.2-route-detail-20260911',
-          'backup\\同步文件归档\\2026-09-11']:
+for d in ['archive\\V2.2\\路线详情页', 'workspace', 'archive\\V2.2\\route-detail-20260911',
+          'docs\\同步\\历史归档\\2026-09-11']:
     fp = os.path.join(ROOT, d)
     n = len(os.listdir(fp)) if os.path.isdir(fp) else -1
     print('  %s  ->  %s' % ('存在(%d 项)' % n if n >= 0 else '不存在', d))

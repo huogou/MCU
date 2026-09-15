@@ -8,19 +8,27 @@
 
 ```
 MCU/                        （本仓库根）
-├── wechat/                 # 微信小程序源码（已发布 V1.2.0，AppID wx78f00e7f0a5948b7）
-├── douyin/                 # 抖音小程序源码（由微信工程迁移，AppID tt00eb76569e914af801）
-├── h5/                     # H5 静态站源码（已上线阿里云轻量，HTTPS）
+├── wechat/                 # 微信小程序当前代码（AppID wx78f00e7f0a5948b7）
+├── douyin/                 # 抖音小程序当前代码（AppID tt00eb76569e914af801）
+├── h5/                     # H5 当前生产代码（已上线阿里云轻量，HTTPS）
 ├── shared/                 # 跨端单一数据源与同步工具
 │   ├── data/               # 权威数据（module.exports 格式，与微信/抖音一致）
 │   └── sync_data.sh        # 将 shared/data 同步到 wechat/data、douyin/data
+├── workspace/              # 开发 / 部署 / 验证工具（含 verify_stats.js、deploy/、移动日志）
+├── docs/                   # 当前有效项目文档
+│   ├── 产品/               #   产品方案（含 V3.0论坛/）
+│   ├── 技术/               #   部署/同步/交接说明（DESIGN.md 等）
+│   ├── 版本/               #   CHANGELOG / 版本记录 / 设计文件索引
+│   └── 同步/               #   三份 AI 同步文件 + 历史归档/
+├── design/                 # 当前有效设计资料（H5/、小程序/、其他）
+├── archive/                # 历史版本与废弃资料（V1/ V2.0/ V2.1/ V2.2/ 其他历史/）
+├── release/                # 发布包（微信小程序-v1.2.0上传包）
 ├── MCU项目总览.md          # 项目总览（AI 协作版：架构/部署/治理/待办）
 ├── README.md
-├── VERSION.md
-└── verify_stats.js         # H5 运营数据统计验证脚本
+└── VERSION.md
 ```
 
-> 非源码目录（`AI生成文件/`、`backup/`、`恢复资料/`、`AI生成文件/发布包/微信小程序-v1.2.0上传包/`（原 `wechat-v1.2.0-upload/`）、三份 AI 同步文件）仅本地保留，已被 `.gitignore` 排除，**不进本仓库**。
+> 非源码目录（`archive/`、`release/`、`design/`、`AI生成文件/`、原 `backup/`·`恢复资料/`、三份 AI 同步文件）仅本地保留，已被 `.gitignore` 排除，**不进本仓库**。
 
 ## 数据单一源（铁律）
 
@@ -88,7 +96,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 - **微信 V1.2.1 审核**：曾因「涉及视频服务，属个人主体未开放类目」被驳回；申诉说明小程序无播放器、无视频资源、无外部视频跳转（代码不存在 `web-view` / `navigateToMiniProgram` / 任何视频链接），经复核判定为**误判**后通过上线。
 - **图像资源**：`visuals.js` CDN 已由已清空的 CloudBase 默认域名迁至 `https://mcu.yaoqiang.xin`，并补齐 posters/stills/avatars/phases/hero/entries（阿里云实测 HTTP 200），随 V1.2.1 发布**已生效**。
-- **下一步**：V1.3 三端升级进入设计阶段，设计 AI 交接资料见 [`给设计AI-项目交接说明.md`](./给设计AI-项目交接说明.md)。
+- **下一步**：V1.3 三端升级进入设计阶段，设计 AI 交接资料见 [`给设计AI-项目交接说明.md`](./docs/技术/给设计AI-项目交接说明.md)。
 
 > ⚠ 设计注意：本项目 H5 与小程序为**两套独立 Token**（H5 gold `#E9A93B` / 小程序 gold `#F2B233`），勿跨端套用。详见总览 §8。
 
@@ -99,4 +107,4 @@ H5 的 `h5/data/*.js` 采用 `window.MCU_*` 全局变量格式，与小程序 `m
 ## 备份与恢复
 
 - 本仓库为单一 Monorepo，重大修改前先提交版本。
-- 本地另有 `backup/`（版本记录 / 更新日志）与 `恢复资料/`（抢救资料），均不进版本库。
+- 历史版本与抢救资料已归入 `archive/`（原 `backup/`、`恢复资料/`），均不进版本库；版本记录 / 更新日志见 `docs/版本/`。
