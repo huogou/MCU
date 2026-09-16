@@ -95,7 +95,7 @@ v1.2.0-release
 - 路线详情页 `route-detail.html` 上线：六大模块（路线说明 / 作品串联 / 下一部 / 关系 / 阶段 / 吐槽上下文归到当前路线）
 - 首页 PC 版式基础加宽：`v2.css` 在 ≥1024px 断点将 Hero 等由 760px 提至 1280px（整体铺满「方案 C」待策划授权，未动手）
 - 三端 `visuals.js` CDN 由 `mcu.yaoqiang.xin` 迁至 `mcu.yaokaixin.top`（shared / wechat / douyin 同源）
-- 2026-09-16：H5 生产域名切换为专属域名 `https://mcuatlas.xyz`（旧域 `mcu.yaokaixin.top` 下线）；三端 `visuals.js` CDN 同步切至 `https://mcuatlas.xyz`
+- 2026-09-16：H5 生产域名切换为专属域名 `https://mcuatlas.xyz`；三端 `visuals.js` CDN **保持** `https://mcu.yaokaixin.top`（旧域保留作小程序图片 CDN，避免重发小程序）
 - 反馈/统计代码已落地，但因 CloudBase WEB 安全域名白名单未加新域，当前「已开发未生效」（写入失败，本地队列兜底）
 
 备注：

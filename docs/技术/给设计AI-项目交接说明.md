@@ -163,7 +163,7 @@ Tab：   home    library   my-mcu
 
 - **禁止缩小 Hero 卡片尺寸**偏离规范。
 - 小程序无用 `web-view`、无 `navigateToMiniProgram`、无外部视频链接（保持现状）——这是避免触碰视频类目的事实基础。
-- 图片资源 CDN：`https://mcuatlas.xyz`（H5 与两小程序共用），资源含 posters/stills/avatars/phases/hero/entries。
+- 图片资源 CDN：`https://mcu.yaokaixin.top`（H5 与两小程序共用；旧域保留作资源域），资源含 posters/stills/avatars/phases/hero/entries。
 - H5 与小程序尚未做 token 统一——**是否统一，是需要你在升级方案里先回答的产品/设计问题**，不要默认统一。
 
 ---

@@ -80,7 +80,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 ### H5 访问地址
 
 - **当前生产**：`https://mcuatlas.xyz/`（2026-09-16 起；漫威专属域名，已 ICP 备案）
-- **已退役**：`mcu.yaokaixin.top`（2026-09-16 下线）、`mcu.yaoqiang.xin`（NXDOMAIN）
+- **旧域保留**：`mcu.yaokaixin.top` **保留作小程序图片 CDN**（不随 H5 页面域切换、暂不重发小程序）；`mcu.yaoqiang.xin`（NXDOMAIN）
 - **已下线**：CloudBase 静态托管（2026-09-08 清空）、Cloudflare Pages（2026-09-08 删除）
 
 > H5 的浏览统计与用户反馈写入 CloudBase 环境 `mcu-d6gw0brqoa9521b58` 的 `feedback` 集合（跨端与微信小程序共用）。该环境目前**保留**，待小程序反馈迁移至自建后端后再下线。
@@ -91,10 +91,10 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 |---|---|---|
 | **微信小程序** | V1.2.1 | **已通过审核并正式上线**（2026-09-10） |
 | **抖音小程序** | V1.3.0 | **已上线** |
-| **H5** | — | 运行中：`https://mcuatlas.xyz/`（旧域 `mcu.yaokaixin.top` 已下线） |
+| **H5** | — | 运行中：`https://mcuatlas.xyz/`（旧域 `mcu.yaokaixin.top` 保留作小程序图片 CDN） |
 
 - **微信 V1.2.1 审核**：曾因「涉及视频服务，属个人主体未开放类目」被驳回；申诉说明小程序无播放器、无视频资源、无外部视频跳转（代码不存在 `web-view` / `navigateToMiniProgram` / 任何视频链接），经复核判定为**误判**后通过上线。
-- **图像资源**：三端 `visuals.js` CDN = `https://mcuatlas.xyz`（2026-09-16 切换；微信/抖音需重新发布后生效）。
+- **图像资源**：三端 `visuals.js` CDN = `https://mcu.yaokaixin.top`（**保持不切换**——避免重发小程序；该域继续作为小程序图片资源域）。
 - **下一步**：V1.3 三端升级进入设计阶段，设计 AI 交接资料见 [`给设计AI-项目交接说明.md`](./docs/技术/给设计AI-项目交接说明.md)。
 
 > ⚠ 设计注意：本项目 H5 与小程序为**两套独立 Token**（H5 gold `#E9A93B` / 小程序 gold `#F2B233`），勿跨端套用。详见总览 §8。
