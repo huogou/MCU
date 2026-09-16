@@ -1,0 +1,168 @@
+/* 观看路线 journey（Tab2）· V2.0.0 新增
+ * 纪律：颜色一律引用 app.wxss 变量（零 raw hex 泄漏） */
+.journey-page { padding-bottom: 0; }
+
+/* ═══ Segmented Control ═══ */
+.seg-control {
+  display: flex;
+  height: 80rpx;
+  margin: var(--space-md) 0;
+  background: var(--surface-0);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-full);
+  padding: 4rpx;
+}
+.seg-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-body);
+  color: var(--text-sub);
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+}
+.seg-item.is-on {
+  background: var(--gold);
+  color: var(--gold-btn-text);
+  font-weight: 600;
+}
+
+/* ═══ 路线进度 ═══ */
+.route-progress {
+  display: flex;
+  align-items: center;
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-md);
+}
+.rp-label {
+  font-size: var(--fs-caption);
+  color: var(--text-sub);
+  flex-shrink: 0;
+}
+.rp-bar {
+  flex: 1;
+  height: 6rpx;
+  background: var(--surface-3);
+  border-radius: var(--radius-full);
+  margin: 0 var(--space-sm);
+  overflow: hidden;
+}
+.rp-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: var(--radius-full);
+  transition: width 0.3s;
+}
+.rp-text {
+  font-size: var(--fs-mini);
+  color: var(--gold);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ═══ 全部完成 ═══ */
+.all-done {
+  text-align: center;
+  padding: var(--space-lg) 0;
+  margin-bottom: var(--space-md);
+}
+.ad-title {
+  display: block;
+  font-size: var(--fs-title);
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: var(--space-sm);
+}
+.ad-share {
+  display: inline-block;
+  padding: 12rpx 40rpx;
+  font-size: var(--fs-caption);
+  color: var(--gold);
+  background: var(--gold-a10);
+  border: 1rpx solid var(--gold-a40);
+  border-radius: var(--radius-full);
+}
+
+/* ═══ 路线列表 ═══ */
+.route-list { margin-bottom: var(--space-lg); }
+
+.route-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+  transition: all 0.15s;
+}
+.ri-hover { background: var(--surface-2); }
+
+.route-item.is-watched { opacity: 0.7; }
+.route-item.is-current {
+  background: var(--gold-a08);
+  border-color: var(--gold);
+}
+
+/* 顺序号 */
+.ri-order {
+  flex-shrink: 0;
+  width: 56rpx;
+  font-size: var(--fs-display-sm);
+  font-weight: 700;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  color: var(--text-weak);
+  text-align: center;
+}
+.route-item.is-watched .ri-order { color: var(--success); }
+.route-item.is-current .ri-order { color: var(--gold); }
+
+/* 作品信息 */
+.ri-info {
+  flex: 1;
+  min-width: 0;
+  margin: 0 var(--space-sm);
+}
+.ri-name {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+  display: block;
+}
+.ri-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 2rpx;
+}
+.ri-type {
+  font-size: var(--fs-mini);
+  padding: 2rpx 12rpx;
+  border-radius: var(--radius-full);
+  margin-right: var(--space-xs);
+}
+.ri-type-movie { background: var(--accent-blue-a10); color: var(--accent-blue); }
+.ri-type-series { background: var(--accent-blue-a10); color: var(--accent-blue); }
+.ri-type-special { background: var(--accent-purple-a10); color: var(--accent-purple); }
+.ri-type-short { background: var(--accent-purple-a10); color: var(--accent-purple); }
+
+.ri-phase {
+  font-size: var(--fs-mini);
+  color: var(--text-weak);
+}
+
+/* 状态 */
+.ri-status {
+  flex-shrink: 0;
+  font-size: var(--fs-display-sm);
+  color: var(--text-weak);
+}
+.ri-status.done { color: var(--success); }
+.ri-status.todo { color: var(--text-weak); }
+
+/* ═══ 通用 ═══ */
+.btn-hover { opacity: 0.85; }
+.mcu-bottom-space { height: var(--space-xl); }

@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/home/home",
+    "pages/journey/journey",
     "pages/library/library",
     "pages/my-mcu/my-mcu",
     "pages/movie/movie",
@@ -28,6 +29,12 @@
         "text": "首页",
         "iconPath": "assets/icons/tab/home.png",
         "selectedIconPath": "assets/icons/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/journey/journey",
+        "text": "路线",
+        "iconPath": "assets/icons/tab/routes.png",
+        "selectedIconPath": "assets/icons/tab/routes-active.png"
       },
       {
         "pagePath": "pages/library/library",

@@ -1,85 +1,77 @@
-<!-- 首页 home（Tab1）· 2026-09-07 抖音合规整改版
-     结构（3 模块）：① Hero Banner（进度）→ ② 旅程卡 + 推荐下一部 → ③ 最近标记
-     整改：按抖音《版本审核标准》第二节移除「功能入口 2×2（宇宙入口）」「热门角色」
-           两个内容资讯型模块；所有入口统一跳转「我的MCU」观影记录页（Tab）
-     图片：经 mcuData 转发层取（URL 只存在于 visuals.js）；缺失走合规兜底 -->
+<!-- 首页 home（Tab1）· V2.0.0 轻量版重构
+     结构（5 层）：
+     ① 进度 Hero（数据型，非影视背景图）
+     ② 核心入口 2×2（首次/继续/路线/宇宙关系→H5）
+     ③ 下一步建议（仅顺序逻辑，无剧情推荐理由）
+     ④ 最近标记（横滚，工具属性）
+     ⑤ H5 引导（工具型引导卡，非影视推广 Banner）
+     合规：无剧情推荐、无影视资讯、无角色内容、无评分票房、无播放入口 -->
 <view class="mcu-page home-page">
 
-  <!-- ═══ ① Hero Banner（VDS §2.2，新增） ═══ -->
-  <view class="hero-banner">
-    <image wx:if="{{heroBanner}}" class="hero-banner-bg" src="{{heroBanner}}" mode="aspectFill" lazy-load="true"/>
-    <view class="hero-banner-overlay"></view>
-    <view class="hero-banner-content">
-      <view class="hero-banner-tag">我的观看进度</view>
-      <view class="hero-banner-title">我的 MCU 旅程</view>
-      <view class="hero-banner-sub">{{heroMeta}}</view>
-      <view class="hero-journey-bar" bindtap="goJourney" hover-class="hero-journey-hover" hover-stay-time="60">
-        <view class="hero-journey-progress">
-          <view class="hero-journey-fill" style="width:{{progressPercent}}%;"></view>
-        </view>
-        <view class="hero-journey-text">{{progress.count}}/{{progress.total}}</view>
+  <!-- ═══ ① 进度 Hero（数据型，非影视背景图） ═══ -->
+  <view class="progress-hero" bindtap="goJourney" hover-class="btn-hover" hover-stay-time="80">
+    <view class="ph-tag">我的观看进度</view>
+    <view class="ph-title">MCU 旅程</view>
+    <view class="ph-sub">{{hasProgress ? '已完成 ' + progressCount + ' / ' + progressTotal + ' 部 · ' + phaseText : '已完成 0 / ' + progressTotal + ' 部 · 尚未开始'}}</view>
+    <view class="ph-bar">
+      <view class="ph-fill" style="width:{{progressPercent}}%;"></view>
+    </view>
+    <view class="ph-cta">查看路线 ›</view>
+  </view>
+
+  <!-- ═══ ② 核心入口 2×2 ═══ -->
+  <view class="section-title">快速开始</view>
+  <view class="entry-grid">
+    <view class="entry-card ec-{{item.iconColor}} {{item.action === 'none' ? 'is-disabled' : ''}}"
+          wx:for="{{entries}}" wx:key="key"
+          data-key="{{item.key}}" bindtap="onEntry"
+          hover-class="btn-hover" hover-stay-time="80">
+      <view class="ec-icon">{{item.icon}}</view>
+      <view class="ec-title">{{item.title}}</view>
+      <view class="ec-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <!-- ═══ ③ 下一步建议（仅顺序逻辑，无推荐理由） ═══ -->
+  <block wx:if="{{nextStep}}">
+    <view class="section-title">下一步</view>
+    <view class="next-card" data-id="{{nextStep.id}}" bindtap="goDetail"
+          hover-class="btn-hover" hover-stay-time="80">
+      <view class="nc-poster poster-p{{nextStep.phase}}">
+        <image wx:if="{{nextStep.poster}}" class="fill-img" src="{{nextStep.poster}}" mode="aspectFill" lazy-load="true"/>
+        <text wx:else class="nc-initial">{{nextStep.initial}}</text>
       </view>
-    </view>
-  </view>
-
-  <!-- ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ -->
-  <view class="journey-card">
-    <view class="journey-inner">
-      <view class="journey-label">{{progress.journeyLabel}} · {{progress.phaseText}}</view>
-      <view class="journey-movie">
-        <image wx:if="{{progress.movie.poster}}" class="jm-poster" src="{{progress.movie.poster}}" mode="aspectFill" lazy-load="true" data-id="{{progress.movie.id}}" bindtap="goDetail"/>
-        <view wx:else class="jm-poster poster-p{{progress.movie.phase}}" data-id="{{progress.movie.id}}" bindtap="goDetail"><text>{{progress.movie.initial}}</text></view>
-        <view class="jm-info">
-          <view class="jm-name">{{progress.movie.name}}</view>
-          <view wx:if="{{progress.movie.enName}}" class="jm-en">{{progress.movie.enName}}</view>
-          <view class="jm-phase">{{progress.movie.phaseText}}<text wx:if="{{progress.movie.year}}"> · {{progress.movie.year}}</text></view>
-        </view>
-        <view class="jm-cta" data-id="{{progress.movie.id}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{progress.movie.statusLabel}}</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- ═══ ①.5 作品查询入口（2026-09-08 新增：首页必须有一眼可见的查询能力入口） ═══ -->
-  <view class="lib-entry" bindtap="goLibrary" hover-class="lib-entry-hover" hover-stay-time="80">
-    <view class="le-body">
-      <view class="le-title">{{libraryEntry.title}}</view>
-      <view class="le-desc">{{libraryEntry.desc}}</view>
-      <view class="le-stat">{{libraryEntry.statText}}</view>
-    </view>
-    <view class="le-arrow">›</view>
-  </view>
-
-  <!-- ═══ ② 推荐下一部大卡（保持） ═══ -->
-  <view class="rec-card">
-    <view class="rec-poster-wrap" data-id="{{recommend.id}}" bindtap="goDetail" hover-class="btn-hover" hover-stay-time="80">
-      <image wx:if="{{recommend.poster}}" class="rec-poster" src="{{recommend.poster}}" mode="aspectFill" lazy-load="true"/>
-      <view wx:else class="rec-poster poster-p{{recommend.phase}}"><text>{{recommend.initial}}</text></view>
-      <view class="rec-poster-mask"></view>
-    </view>
-    <view class="rec-body">
-      <view class="rec-tag">{{recommend.tag}}<text class="rec-phase">{{recommend.phaseLabel}}</text></view>
-      <view class="rec-name">{{recommend.name}}</view>
-      <view class="rec-sub">{{recommend.subInfo}}</view>
-      <view class="rec-reason">{{recommend.reason}}</view>
-      <view class="btn-accent" data-id="{{recommend.id}}" bindtap="goContinue" hover-class="btn-hover" hover-stay-time="80">{{recommend.cta}}</view>
-    </view>
-  </view>
-
-  <!-- ═══ ③ 最近标记（横滚） ═══ -->
-  <view class="section">
-    <view class="module-title">最近标记</view>
-    <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
-      <view class="recent-row">
-        <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" hover-class="recent-hover" hover-stay-time="80">
-          <view class="recent-poster">
-            <image wx:if="{{item.poster}}" class="recent-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true"/>
-            <text wx:else class="poster-text poster-p{{item.phase}}">{{item.initial}}</text>
-          </view>
-          <view class="recent-name">{{item.name}}</view>
+      <view class="nc-info">
+        <view class="nc-order">{{nextStep.order}}</view>
+        <view class="nc-name">{{nextStep.name}}</view>
+        <view class="nc-meta">
+          <text class="nc-type nc-type-{{nextStep.typeKey}}">{{nextStep.typeLabel}}</text>
+          <text class="nc-phase">{{nextStep.phaseText}}</text>
         </view>
       </view>
-    </scroll-view>
-    <view wx:else class="empty-hint">还没有已标记的作品，从《钢铁侠》开始你的旅程</view>
-  </view>
+      <view class="nc-badge {{nextStep.watched ? 'done' : 'todo'}}">{{nextStep.watched ? '已看' : '未看'}}</view>
+    </view>
+  </block>
 
+  <!-- ═══ ④ 最近标记（横滚） ═══ -->
+  <view class="section-title">最近标记</view>
+  <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
+    <view class="recent-row">
+      <view class="recent-item" wx:for="{{recent}}" wx:key="id"
+            data-id="{{item.id}}" bindtap="goDetail"
+            hover-class="recent-hover" hover-stay-time="80">
+        <view class="recent-poster poster-p{{item.phase}}">
+          <image wx:if="{{item.poster}}" class="fill-img" src="{{item.poster}}" mode="aspectFill" lazy-load="true"/>
+          <text wx:else class="poster-text">{{item.initial}}</text>
+        </view>
+        <view class="recent-name">{{item.name}}</view>
+      </view>
+    </view>
+  </scroll-view>
+  <view wx:else class="empty-hint">还没有已标记的作品，从《钢铁侠》开始你的旅程</view>
+
+  <!-- ═══ ⑤ H5 引导（工具型引导卡，非影视推广 Banner） ═══ -->
+  <h5-guide title="{{h5Guide.title}}" desc="{{h5Guide.desc}}" />
+
+  <view class="mcu-bottom-space"></view>
 </view>

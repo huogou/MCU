@@ -1,6 +1,6 @@
-/* 作品查询 library（Tab2）· 2026-09-08 新增
- * 纪律：颜色一律引用 app.wxss 变量（零 raw hex 泄漏），与设计 Token 体系一致
- */
+/* 作品索引 library（Tab3）· V2.0.0 降级为「作品索引」
+ * 纪律：颜色一律引用 app.wxss 变量（零 raw hex 泄漏）
+ * V2.0 变更：删除类型/阶段筛选行、排序行，仅保留状态筛选 */
 .lib-page {
   padding-bottom: 0;
 }
@@ -39,23 +39,13 @@
   font-size: var(--fs-caption);
 }
 
-/* ── ② 筛选行 ── */
-.lib-filter-row,
-.lib-sort-row {
+/* ── ② 状态筛选行（V2.0 唯一筛选维度） ── */
+.lib-filter-row {
   display: flex;
   align-items: center;
   margin-bottom: var(--space-sm);
 }
-.lib-sort-row { justify-content: space-between; }
-
-.lf-label {
-  flex: none;
-  width: 68rpx;
-  font-size: var(--fs-caption);
-  color: var(--text-weak);
-}
-.lf-scroll { flex: 1; width: 0; }
-.lf-chips { display: flex; flex-direction: row; }
+.lf-chips { display: flex; flex-direction: row; flex: 1; }
 
 .lf-chip {
   flex: none;
@@ -73,7 +63,6 @@
   border-color: var(--gold-a40);
   font-weight: 600;
 }
-.lf-chip.sort { padding: 8rpx 20rpx; font-size: var(--fs-mini); }
 
 .lf-reset {
   flex: none;

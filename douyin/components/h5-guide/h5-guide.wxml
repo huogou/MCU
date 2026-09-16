@@ -1,0 +1,8 @@
+<view class="h5-guide" bindtap="onTap" hover-class="btn-hover" hover-stay-time="80">
+  <view class="h5-icon">H5</view>
+  <view class="h5-body">
+    <text class="h5-title">{{title}}</text>
+    <text class="h5-desc">{{desc}}</text>
+  </view>
+  <text class="h5-arrow">›</text>
+</view>

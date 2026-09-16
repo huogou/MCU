@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "h5-guide": "/components/h5-guide/h5-guide"
+  },
   "navigationBarTitleText": "我的MCU"
 }

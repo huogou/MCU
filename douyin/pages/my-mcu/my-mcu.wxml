@@ -92,12 +92,6 @@
     </view>
   </view>
 
-  <view class="tab-row">
-    <view wx:for="{{tabs}}" wx:key="key"
-          class="tab-chip {{item.key === listKey ? 'is-on' : ''}}"
-          data-key="{{item.key}}" bindtap="onPickTab" hover-class="recent-hover" hover-stay-time="60">{{item.label}}</view>
-  </view>
-
   <view class="card-list">
     <block wx:if="{{list.length}}">
       <view class="work-card" wx:for="{{list}}" wx:key="id" data-id="{{item.id}}" bindtap="goDetail" hover-class="wc-hover" hover-stay-time="60">
@@ -154,6 +148,9 @@
       <view class="fb-entry-arrow">›</view>
     </view>
   </view>
+
+  <!-- ⑨ H5 引导 -->
+  <h5-guide title="想深入探索 MCU？" desc="前往 H5 查看完整宇宙关系" />
 
   <view class="mcu-bottom-space"></view>
 </view>

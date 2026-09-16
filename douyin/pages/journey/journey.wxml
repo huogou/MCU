@@ -1,0 +1,56 @@
+<!-- 观看路线 journey（Tab2）· V2.0.0 新增
+     定位：观看路线工具页。帮用户快速确定观看路线。
+     两条路线：上映顺序 / 主线必看（都含短片）
+     每步仅展示：顺序号、作品名、类型、我的状态
+     合规：无剧情/资讯/角色/评分/票房/播放/榜单/多图海报 -->
+<view class="mcu-page journey-page">
+
+  <!-- ═══ 路线切换 Segmented Control ═══ -->
+  <view class="seg-control">
+    <view wx:for="{{routes}}" wx:key="key"
+          class="seg-item {{item.key === routeKey ? 'is-on' : ''}}"
+          data-key="{{item.key}}" bindtap="onPickRoute"
+          hover-class="btn-hover" hover-stay-time="60">{{item.label}}</view>
+  </view>
+
+  <!-- ═══ 路线进度 ═══ -->
+  <view class="route-progress">
+    <text class="rp-label">路线进度</text>
+    <view class="rp-bar">
+      <view class="rp-fill" style="width:{{progressPercent}}%;"></view>
+    </view>
+    <text class="rp-text">{{progressCount}}/{{progressTotal}}</text>
+  </view>
+
+  <!-- ═══ 全部完成庆祝 ═══ -->
+  <view wx:if="{{allDone}}" class="all-done">
+    <text class="ad-title">恭喜！你已完成全部 MCU 观看路线</text>
+    <view class="ad-share" bindtap="goH5" hover-class="btn-hover" hover-stay-time="80">分享你的成就</view>
+  </view>
+
+  <!-- ═══ 路线列表 ═══ -->
+  <view class="route-list">
+    <view class="route-item {{item.watched ? 'is-watched' : ''}} {{item.isCurrent ? 'is-current' : ''}}"
+          wx:for="{{list}}" wx:key="id"
+          data-id="{{item.id}}" bindtap="goDetail"
+          hover-class="ri-hover" hover-stay-time="60">
+      <!-- 顺序号 -->
+      <text class="ri-order">{{item.order}}</text>
+      <!-- 作品信息 -->
+      <view class="ri-info">
+        <text class="ri-name">{{item.cn}}</text>
+        <view class="ri-meta">
+          <text class="ri-type ri-type-{{item.typeKey}}">{{item.typeLabel}}</text>
+          <text class="ri-phase">{{item.phaseText}}<text wx:if="{{item.year}}"> · {{item.year}}</text></text>
+        </view>
+      </view>
+      <!-- 状态 -->
+      <text class="ri-status {{item.watched ? 'done' : 'todo'}}">{{item.watched ? '✓' : '○'}}</text>
+    </view>
+  </view>
+
+  <!-- ═══ H5 引导 ═══ -->
+  <h5-guide title="想了解完整宇宙关系？" desc="前往 H5 探索" />
+
+  <view class="mcu-bottom-space"></view>
+</view>

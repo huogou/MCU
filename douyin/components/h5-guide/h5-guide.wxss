@@ -1,0 +1,46 @@
+/* H5 引导组件 · 可复用 */
+.h5-guide {
+  display: flex;
+  align-items: center;
+  margin-top: var(--space-lg);
+  padding: var(--space-md);
+  background: var(--gold-a10);
+  border: 1rpx solid var(--gold-a40);
+  border-radius: var(--radius-lg);
+}
+.h5-icon {
+  flex: none;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-a20);
+  border-radius: var(--radius-md);
+}
+.h5-body {
+  flex: 1;
+  min-width: 0;
+  margin-left: var(--space-md);
+}
+.h5-title {
+  display: block;
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text-main);
+}
+.h5-desc {
+  display: block;
+  margin-top: 4rpx;
+  font-size: var(--fs-mini);
+  color: var(--text-sub);
+}
+.h5-arrow {
+  flex: none;
+  margin-left: var(--space-sm);
+  font-size: var(--fs-body);
+  color: var(--gold);
+}
+.btn-hover { opacity: 0.7; }

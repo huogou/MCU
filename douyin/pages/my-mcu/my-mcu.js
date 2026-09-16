@@ -19,14 +19,6 @@ const { PHASE_LABEL } = require('../../data/constants.js');
 
 const RECENT_MAX = 3;
 
-/* 列表切换维度（唯一定义，页面不写死到 WXML） */
-const TABS = [
-  { key: 'all', label: '全部' },
-  { key: 'watched', label: '已看' },
-  { key: 'unwatched', label: '未看' },
-  { key: 'fav', label: '收藏' }
-];
-
 function cnPhase(n) {
   return ['一', '二', '三', '四', '五', '六'][n - 1] || String(n);
 }
@@ -75,7 +67,6 @@ Page({
     ],
     achievements: [],
     achProgress: { count: 0, total: 6 },
-    tabs: TABS,
     listKey: 'all',
     list: [],
     listEmptyText: '',
