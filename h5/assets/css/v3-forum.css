@@ -12,33 +12,86 @@
 .v3f {
   max-width: 760px;
   margin: 0 auto;
-  padding: 18px 16px 96px;
+  padding: 0 0 96px;
   color: var(--text);
 }
 
-/* ---------- 内页顶栏（返回 + 标题） ---------- */
-.v3f-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+/* ---------- 社区首页 Hero（紧凑型） ---------- */
+.v3f-hero {
+  padding: 16px 16px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.v3f-hero-left { flex: 1; min-width: 0; }
+.v3f-hero-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: .12em;
+  color: var(--gold); opacity: .7; margin-bottom: 4px;
+}
+.v3f-hero-title { font-size: 20px; font-weight: 700; line-height: 1.3; }
+.v3f-hero-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+.v3f-hero-btn {
+  flex: none; height: 36px; padding: 0 14px;
+  border-radius: 8px; border: 0;
+  background: linear-gradient(135deg, var(--gold), #D99A1F);
+  color: #141414; font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+}
+.v3f-hero-btn:active { opacity: .85; }
+
+/* ---------- 辅助入口双卡（下一部看什么 / 宇宙关系地图） ---------- */
+.v3f-hints {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  padding: 0 16px 14px;
+}
+.v3f-hint {
+  display: flex; align-items: center; gap: 10px;
+  height: 76px; padding: 0 14px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; cursor: pointer; text-decoration: none; color: var(--text);
+  transition: border-color .15s;
+}
+.v3f-hint:active { border-color: var(--border-lit); }
+.v3f-hint-ico {
+  width: 36px; height: 36px; border-radius: 8px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.v3f-hint-ico svg { width: 18px; height: 18px; }
+.v3f-hint-txt { flex: 1; min-width: 0; }
+.v3f-hint-b { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.v3f-hint-d { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* ---------- 区块标题 ---------- */
+.v3f-sec-hd {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 16px; margin-bottom: 10px;
+}
+.v3f-sec-hd h2 { font-size: 15px; font-weight: 700; }
+.v3f-sec-hd .more { margin-left: auto; font-size: 12px; color: var(--text-3); cursor: pointer; }
+
+/* ---------- 内页顶栏（返回 + 标题，详情/发帖/我的社区用） ---------- */
+.v3f-topbar { display: flex; align-items: center; gap: 12px; padding: 14px 16px 12px; }
 .v3f-back {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 32px; height: 32px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer; flex: none; color: var(--text);
 }
 .v3f-back svg { width: 18px; height: 18px; fill: var(--text-2); }
-.v3f-topbar-title { font-size: 17px; font-weight: 700; letter-spacing: .5px; }
-.v3f-topbar-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.v3f-topbar-title { font-size: 16px; font-weight: 700; }
+.v3f-topbar-sub { font-size: 11px; color: var(--text-3); margin-top: 1px; }
 
 /* ---------- 排序 Tab（最新/最热） ---------- */
-.v3f-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.v3f-tabs { display: flex; gap: 0; padding: 0 16px; margin-bottom: 10px; }
 .v3f-tab {
-  padding: 7px 16px; border-radius: 18px;
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text-2); font-size: 13px; cursor: pointer; border: 1px solid transparent;
+  padding: 8px 0; margin-right: 24px;
+  background: none; border: 0; border-bottom: 2px solid transparent;
+  color: var(--text-2); font-size: 14px; cursor: pointer;
 }
-.v3f-tab.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); font-weight: 600; }
+.v3f-tab.on { color: var(--gold); border-bottom-color: var(--gold); font-weight: 600; }
 
 /* ---------- 分类 chips（横向滑动） ---------- */
-.v3f-cats { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
+.v3f-cats { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 4px; margin-bottom: 12px; scrollbar-width: none; }
 .v3f-cats::-webkit-scrollbar { display: none; }
 .v3f-cat {
   flex: none; padding: 5px 12px; border-radius: 14px;
@@ -47,23 +100,36 @@
 }
 .v3f-cat.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); }
 
-/* ---------- 话题卡片 TopicCard（设计 3.1） ---------- */
+/* ---------- 话题卡片 TopicCard（设计 3.1，带缩略图） ---------- */
 .v3f-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-  padding: 14px 16px; margin-bottom: 10px; cursor: pointer;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 14px; margin: 0 16px 10px; cursor: pointer;
   transition: border-color .15s;
 }
 .v3f-card:active { border-color: var(--border-lit); }
-.v3f-card-top { margin-bottom: 8px; }
-.v3f-card-title { font-size: 15px; font-weight: 600; line-height: 1.45; margin-bottom: 4px; }
+.v3f-card-main { display: flex; gap: 12px; align-items: flex-start; }
+.v3f-card-text { flex: 1; min-width: 0; }
+.v3f-card-top { margin-bottom: 6px; }
+.v3f-card-title {
+  font-size: 15px; font-weight: 600; line-height: 1.45; margin-bottom: 6px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  word-break: break-word;
+}
 .v3f-card-excerpt {
-  font-size: 13px; color: var(--text-2); line-height: 1.5; margin-bottom: 10px;
+  font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 8px;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.v3f-card-meta { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-3); }
+.v3f-card-thumb {
+  flex: none; width: 72px; height: 72px; border-radius: 8px;
+  background-size: cover; background-position: center; background-color: var(--surface-2);
+}
+.v3f-card-meta {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-3);
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.03);
+}
 .v3f-card-meta .v3f-av { width: 18px; height: 18px; font-size: 9px; }
-.v3f-card-meta .num { margin-left: auto; display: flex; align-items: center; gap: 3px; }
-.v3f-card-meta .num + .num { margin-left: 10px; }
+.v3f-card-meta .num { display: flex; align-items: center; gap: 3px; }
+.v3f-card-meta .num + .num { margin-left: 12px; }
 .v3f-card-meta .num svg { width: 13px; height: 13px; fill: var(--text-3); }
 .v3f-card-meta .num.liked svg { fill: var(--gold); }
 .v3f-card-meta .num.liked { color: var(--gold); }
@@ -88,15 +154,15 @@
 .v3f-st--hidden   { color: var(--text-3); background: rgba(110, 120, 137, .14); }
 
 /* ---------- 详情页（设计 3.2） ---------- */
-.v3f-post { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
-.v3f-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.v3f-post { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin: 0 16px 12px; }
+.v3f-post-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .v3f-post-head .who { flex: 1; min-width: 0; }
 .v3f-post-head .name { font-size: 13px; font-weight: 600; }
-.v3f-post-head .time { font-size: 11px; color: var(--text-3); margin-top: 2px; }
-.v3f-post-title { font-size: 20px; font-weight: 700; line-height: 1.4; margin: 10px 0; }
-.v3f-post-body { font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
-.v3f-post-ops { display: flex; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }
-.v3f-op { display: flex; align-items: center; gap: 5px; color: var(--text-2); background: none; border: 0; cursor: pointer; font-size: 13px; padding: 4px 2px; }
+.v3f-post-head .time { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.v3f-post-title { font-size: 18px; font-weight: 700; line-height: 1.35; margin: 8px 0 10px; word-break: break-word; }
+.v3f-post-body { font-size: 14px; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+.v3f-post-ops { display: flex; align-items: center; gap: 24px; margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border); }
+.v3f-op { display: flex; align-items: center; gap: 5px; color: var(--text-2); background: none; border: 0; cursor: pointer; font-size: 13px; padding: 6px 2px; min-height: 36px; }
 .v3f-op svg { width: 16px; height: 16px; fill: var(--text-2); }
 .v3f-op.liked { color: var(--gold); }
 .v3f-op.liked svg { fill: var(--gold); }
@@ -111,41 +177,44 @@
 .v3f-dim { opacity: .55; }
 
 /* ---------- 回复区（设计 3.3，一层，无楼中楼） ---------- */
-.v3f-replies { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 6px 16px 10px; }
-.v3f-replies-title { font-size: 13px; color: var(--text-2); padding: 10px 0 4px; }
-.v3f-reply { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.v3f-replies { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 4px 16px 8px; margin: 0 16px 12px; }
+.v3f-replies-title { font-size: 13px; color: var(--text-2); padding: 12px 0 6px; font-weight: 600; }
+.v3f-reply { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.03); }
 .v3f-reply:last-child { border-bottom: 0; }
 .v3f-reply-main { flex: 1; min-width: 0; }
 .v3f-reply-head { display: flex; align-items: baseline; gap: 6px; font-size: 12px; }
 .v3f-reply-head .name { font-weight: 600; color: var(--text); }
 .v3f-reply-head .floor { color: var(--text-3); }
 .v3f-reply-head .time { color: var(--text-3); margin-left: auto; }
-.v3f-reply-body { font-size: 13px; line-height: 1.6; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
-.v3f-reply-ops { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
-.v3f-reply-ops .v3f-op { font-size: 12px; }
+.v3f-reply-body { font-size: 13px; line-height: 1.65; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+.v3f-reply-ops { display: flex; align-items: center; gap: 20px; margin-top: 8px; }
+.v3f-reply-ops .v3f-op { font-size: 12px; padding: 4px 2px; min-height: 32px; }
 .v3f-reply-ops .v3f-op svg { width: 14px; height: 14px; }
 
-/* ---------- 底部回复输入栏（设计 3.4） ---------- */
+/* ---------- 底部回复输入栏（设计 3.4，适配键盘和安全区） ---------- */
 .v3f-inputbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-  background: rgba(8, 11, 18, .86);
+  background: rgba(8, 11, 18, .92);
   -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
   border-top: 1px solid var(--border);
-  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
 }
 .v3f-inputbar-in { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
 .v3f-inputbar input {
-  flex: 1; min-width: 0; height: 40px; border-radius: 20px;
+  flex: 1; min-width: 0; height: 38px; border-radius: 19px;
   background: var(--surface); border: 1px solid var(--border);
-  color: var(--text); font-size: 13px; padding: 0 16px; outline: none;
+  color: var(--text); font-size: 14px; padding: 0 16px; outline: none;
 }
 .v3f-inputbar input:focus { border-color: var(--gold); }
 .v3f-send {
-  height: 40px; padding: 0 18px; border-radius: 20px; border: 0;
+  height: 38px; padding: 0 18px; border-radius: 19px; border: 0;
   background: linear-gradient(135deg, var(--gold), #D99A1F);
-  color: #141414; font-size: 13px; font-weight: 700; cursor: pointer; flex: none;
+  color: #141414; font-size: 14px; font-weight: 700; cursor: pointer; flex: none;
+  min-width: 60px;
 }
 .v3f-send:disabled { background: var(--surface-3); color: var(--text-3); cursor: default; }
+/* 详情页底部留白，避免输入栏遮挡内容 */
+.v3f-detail-pad { height: calc(64px + env(safe-area-inset-bottom, 0px)); }
 
 /* ---------- 底部弹窗 BottomSheet（设计 3.5） ---------- */
 .v3f-mask {
@@ -220,30 +289,31 @@
   color: var(--gold); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid transparent;
 }
 
-/* ---------- 骨架屏（静态灰块，无动画——纪律：禁复杂动效） ---------- */
-.v3f-skel { height: 92px; border-radius: 16px; background: var(--surface-2); margin-bottom: 10px; opacity: .5; }
+/* ---------- 骨架屏 ---------- */
+.v3f-skel { height: 88px; border-radius: 14px; background: var(--surface-2); margin: 0 16px 10px; opacity: .5; }
 
 /* ---------- FAB 发帖按钮（设计 3.6，仅社区首页） ---------- */
 .v3f-fab {
-  position: fixed; right: 20px; bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 30;
-  padding: 11px 20px; border: 0; border-radius: 22px;
+  position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  height: 40px; padding: 0 18px; border: 0; border-radius: 20px;
   background: linear-gradient(135deg, var(--gold), #D99A1F);
   color: #141414; font-size: 13px; font-weight: 700; cursor: pointer;
   box-shadow: var(--gold-glow), 0 4px 16px rgba(0, 0, 0, .3);
+  display: flex; align-items: center; gap: 4px;
 }
 
 /* ---------- 我的社区 Tab ---------- */
-.v3f-mtabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.v3f-mtabs { display: flex; gap: 0; padding: 0 16px; margin-bottom: 12px; border-bottom: 1px solid var(--border); }
 .v3f-mtab {
-  flex: 1; text-align: center; padding: 9px 0; border-radius: 12px;
-  background: var(--surface); border: 1px solid var(--border);
+  flex: 1; text-align: center; padding: 10px 0;
+  background: none; border: 0; border-bottom: 2px solid transparent;
   color: var(--text-2); font-size: 14px; cursor: pointer;
 }
-.v3f-mtab.on { color: var(--gold); border-color: var(--gold); background: var(--gold-soft); font-weight: 600; }
-.v3f-mine { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; }
+.v3f-mtab.on { color: var(--gold); border-bottom-color: var(--gold); font-weight: 600; }
+.v3f-mine { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin: 0 16px 10px; cursor: pointer; }
 .v3f-mine-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .v3f-mine-head .st { margin-left: auto; }
-.v3f-mine-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.v3f-mine-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
 .v3f-mine-body { font-size: 13px; color: var(--text-2); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .v3f-mine-foot { font-size: 11px; color: var(--text-3); margin-top: 8px; }
 
@@ -297,3 +367,49 @@
   font-size: 11px; color: var(--text-3);
 }
 .v3f-entry-row .m svg { width: 12px; height: 12px; fill: var(--text-3); vertical-align: -2px; }
+
+/* ============================================================
+ * 响应式适配（375px / 390px / 414px 三档检查）
+ * ============================================================ */
+
+/* ── 375px 及以下（iPhone SE 等小屏） ── */
+@media (max-width: 375px) {
+  .v3f-hero-title { font-size: 18px; }
+  .v3f-hero-sub { font-size: 11px; }
+  .v3f-hero-btn { height: 34px; padding: 0 12px; font-size: 12px; }
+  .v3f-hints { gap: 8px; }
+  .v3f-hint { height: 68px; padding: 0 10px; gap: 8px; }
+  .v3f-hint-ico { width: 32px; height: 32px; }
+  .v3f-hint-b { font-size: 12px; }
+  .v3f-hint-d { font-size: 10px; }
+  .v3f-card { padding: 12px; }
+  .v3f-card-title { font-size: 14px; }
+  .v3f-card-thumb { width: 60px; height: 60px; }
+  .v3f-card-excerpt { font-size: 11px; }
+  .v3f-post-title { font-size: 16px; }
+  .v3f-post-body { font-size: 13px; line-height: 1.7; }
+  .v3f-reply-body { font-size: 12px; }
+  .v3f-send { min-width: 52px; padding: 0 14px; }
+  .v3f-inputbar input { height: 36px; font-size: 13px; }
+  .v3f-fab { height: 38px; padding: 0 16px; font-size: 12px; }
+}
+
+/* ── 390px（iPhone 12-15 标准宽度，基准设计宽度） ── */
+@media (min-width: 376px) and (max-width: 390px) {
+  .v3f-card-title { font-size: 14px; }
+  .v3f-card-thumb { width: 68px; height: 68px; }
+}
+
+/* ── 414px 及以上（iPhone Plus / Pro Max 等） ── */
+@media (min-width: 411px) {
+  .v3f-hero-title { font-size: 22px; }
+  .v3f-card-title { font-size: 16px; }
+  .v3f-card-thumb { width: 80px; height: 80px; }
+  .v3f-post-title { font-size: 20px; }
+}
+
+/* ── 键盘弹出时的处理 ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .v3f-inputbar { position: fixed; bottom: 0; }
+  .v3f-sheet { max-height: 70vh; }
+}

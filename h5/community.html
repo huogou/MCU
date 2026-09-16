@@ -15,14 +15,41 @@
 <div id="app-nav"></div>
 
 <main class="v3f">
-  <div class="v3f-topbar">
-    <button class="v3f-back" onclick="history.length>1?history.back():location.href='index.html'">
-      <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-    </button>
-    <div>
-      <div class="v3f-topbar-title">社区</div>
-      <div class="v3f-topbar-sub">看完聊聊，才是完整的观影体验</div>
+  <!-- 紧凑 Hero -->
+  <div class="v3f-hero">
+    <div class="v3f-hero-left">
+      <div class="v3f-hero-tag">COMMUNITY</div>
+      <div class="v3f-hero-title">漫威讨论区</div>
+      <div class="v3f-hero-sub">看完聊聊，才是完整的观影体验</div>
     </div>
+    <button class="v3f-hero-btn" onclick="location.href='post-create.html'">+ 发帖</button>
+  </div>
+
+  <!-- 辅助入口双卡 -->
+  <div class="v3f-hints">
+    <a class="v3f-hint" href="next.html">
+      <div class="v3f-hint-ico" style="background:var(--gold-soft)">
+        <svg viewBox="0 0 24 24" fill="var(--gold)"><path d="M19 13l-7 7-7-7 1.41-1.41L11 16.17V4h2v12.17l4.59-4.58L19 13z"/></svg>
+      </div>
+      <div class="v3f-hint-txt">
+        <div class="v3f-hint-b">下一部看什么</div>
+        <div class="v3f-hint-d">按阶段/角色找路线</div>
+      </div>
+    </a>
+    <a class="v3f-hint" href="map.html">
+      <div class="v3f-hint-ico" style="background:var(--blue-soft)">
+        <svg viewBox="0 0 24 24" fill="var(--blue)"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      </div>
+      <div class="v3f-hint-txt">
+        <div class="v3f-hint-b">宇宙关系地图</div>
+        <div class="v3f-hint-d">角色关系一图看懂</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- 最新话题 -->
+  <div class="v3f-sec-hd">
+    <h2>最新话题</h2>
   </div>
 
   <div class="v3f-tabs">

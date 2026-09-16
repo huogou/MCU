@@ -265,13 +265,17 @@
     function card(t) {
       var d = document.createElement('div');
       d.className = 'v3f-card';
+      var thumb = t.cover || t.thumb ? '<div class="v3f-card-thumb" style="background-image:url(\'' + esc(t.cover || t.thumb) + '\')"></div>' : '';
       d.innerHTML =
+        '<div class="v3f-card-main">' +
+        '<div class="v3f-card-text">' +
         '<div class="v3f-card-top"><span class="v3f-badge v3f-badge--' + esc(t.category) + '">' + esc(catLabel(t.category)) + '</span></div>' +
         '<div class="v3f-card-title">' + esc(t.title) + '</div>' +
         (t.excerpt ? '<div class="v3f-card-excerpt">' + esc(t.excerpt) + '</div>' : '') +
+        '</div>' + thumb + '</div>' +
         '<div class="v3f-card-meta">' + avatarHtml(t.author.avatar, t.author.name, 18) +
         '<span>' + esc(t.author.name) + '</span><span>·</span><span>' + esc(timeAgo(t.createdAt)) + '</span>' +
-        '<span class="num' + (t.liked ? ' liked' : '') + '">' + svg(ICON.heart) + t.likeCount + '</span>' +
+        '<span class="num' + (t.liked ? ' liked' : '') + '" style="margin-left:auto">' + svg(ICON.heart) + t.likeCount + '</span>' +
         '<span class="num">' + svg(ICON.chat) + t.replyCount + '</span></div>';
       d.onclick = function () { location.href = 'topic-detail.html?id=' + encodeURIComponent(t.id); };
       return d;
@@ -370,7 +374,8 @@
         '<div class="v3f-inputbar"><div class="v3f-inputbar-in">' +
         '<input id="v3f-quick" placeholder="说点什么..." readonly>' +
         '<button class="v3f-send" id="v3f-quick-send">发送</button>' +
-        '</div></div>';
+        '</div></div>' +
+        '<div class="v3f-detail-pad"></div>';
       document.getElementById('v3f-like').onclick = toggleLike;
       document.getElementById('v3f-report').onclick = openReport;
       document.getElementById('v3f-quick').onclick = openReplySheet;
