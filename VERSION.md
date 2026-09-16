@@ -120,25 +120,46 @@ v1.2.0-release
 
 ---
 
-## H5 V2.2 / V2.1 / V2.0（H5 端 · 当前线上）
+## H5 V3.0 / V2.2 / V2.1 / V2.0（H5 端）
 
 > H5 为纯静态多页（`h5/` 部署于阿里云轻量 Nginx，域名 https://mcuatlas.xyz）。
-> H5 版本号独立于微信/抖音小程序，按大版本 V2.0 → V2.1 → V2.2 演进；以下均以「已上线/已部署」功能为准，未把规划中论坛写入已完成。
+> H5 版本号独立于微信/抖音小程序，按大版本 V2.0 → V2.1 → V2.2 → V3.0 演进；以下均以「已上线/已部署」功能为准。
 
-### H5 V2.2（当前线上）
+### H5 V3.0（论坛 · 当前线上）
+
+状态：**已上线（H5 线闭环，2026-09-16 第二轮真机复验通过）**
+适用端：H5（https://mcuatlas.xyz）；论坛 4 页：community / topic-detail / post-create / my-community
+
+本次内容：
+- 论坛 4 核心页 + `forum.js` + `v3-forum.css`（`v3f-` 前缀隔离）；先审后发、token 身份复用（H5 匿名身份体系）、点赞/举报/我的社区
+- 论坛后端（阿里云同机 8787）：Node 24 + SQLite(WAL)，systemd 守护；Nginx `^~ /api/` 反代（mcuatlas vhost，限流 zone=forum_api_atlas）；管理页 `/api/admin/`（token 用户持有）；备份 cron 14 份
+- 首页社区入口 9-B：金边入口卡 + 最新话题预览 2 条（git `69736bc`）
+- UI 修复 5 大项（紧凑 Hero 92-99px / 双入口卡 Grid / 话题卡 Flex+2 行截断+缩略图 / 详情紧凑化 / 输入栏 fixed+safe-area+防遮挡）+ 响应式三档 ≤375 / 376-390 / ≥411（git `1d413e7`）
+- 部署：mcuatlas.xyz 双域同源（2026-09-16 服务器部署生效，公网复验全过）
+
+验收记录：
+- 后端 e2e 60/60；H5 UI 断言 **111/111**（`workspace/forum-e2e.cjs`，Chrome headless + CDP，fetch 桩仅测试注入、产品零 mock）
+- 真机验收两轮通过（09-15 首轮；09-16 12:37 UI 修复后复验，用户确认）
+- ⑮ V2.2 回归 **35/35 全过**（2026-09-16，`workspace/v22-regression.cjs`：index/routes/movie/next/map/route-detail 零 JS 异常、零横向溢出、收口禁令合规、PC 方案 C 断点抽查通过）
+
+备注：
+- 论坛完整版未完：⑫ 微信只读（等产品方案）→ ⑬ 抖音只读 → ⑭ 联调 未启动
+- H5 版本号沿用项目内「论坛 V3.0」口径
+
+### H5 V2.2
 
 状态：已部署上线（2026-09-14 提交 `fa2dc2c` 后全量部署）
 适用端：H5（https://mcuatlas.xyz）
 
 本次内容：
 - 路线详情页 `route-detail.html` 上线：六大模块（路线说明 / 作品串联 / 下一部 / 关系 / 阶段 / 吐槽上下文归到当前路线）
-- 首页 PC 版式基础加宽：`v2.css` 在 ≥1024px 断点将 Hero 等由 760px 提至 1280px（整体铺满「方案 C」待策划授权，未动手）
+- 首页 PC 版式「方案 C」：`v2.css` 末尾 `@media ≥1024px` 块——容器 1280px、Hero 42px、资料库 5 列、未来计划双列、我的MCU 双列（ID 限定，移动端不变）；**已实现并部署，2026-09-16 线上实测命中**（此前"待策划授权"状态已由用户拍板解除）
 - 三端 `visuals.js` CDN 由 `mcu.yaoqiang.xin` 迁至 `mcu.yaokaixin.top`（shared / wechat / douyin 同源）
 - 2026-09-16：H5 生产域名切换为专属域名 `https://mcuatlas.xyz`；三端 `visuals.js` CDN **保持** `https://mcu.yaokaixin.top`（旧域保留作小程序图片 CDN，避免重发小程序）
-- 反馈/统计代码已落地，但因 CloudBase WEB 安全域名白名单未加新域，当前「已开发未生效」（写入失败，本地队列兜底）
+- 反馈/统计代码已落地；CloudBase WEB 安全域名**已加 `mcuatlas.xyz`**（2026-09-16），落库恢复待浏览器验证（本地队列兜底仍在）
 
 备注：
-- 社区仍为 V2.1 静态入口（4 张话题卡 + 点击 toast 筹备中）；真实论坛属 V3.0 规划，未开发、未建后端。
+- 社区静态入口已被 V3.0 真实论坛替代（本条目为历史记录，V2.2 期间社区仍为 V2.1 静态 4 卡 + toast 筹备中）。
 
 ### H5 V2.1
 
