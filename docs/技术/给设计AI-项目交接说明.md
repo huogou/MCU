@@ -22,7 +22,7 @@
 
 | 端 | 目录 | 技术栈 | 版本/状态 | 线上地址 / AppID |
 |---|---|---|---|---|
-| **H5** | `h5/` | 纯静态多页，原生 JS/CSS，无框架无构建 | 运行中（未打版本号） | `https://mcu.yaoqiang.xin/` |
+| **H5** | `h5/` | 纯静态多页，原生 JS/CSS，无框架无构建 | 运行中（未打版本号） | `https://mcuatlas.xyz/` |
 | **微信小程序** | `wechat/` | 微信原生小程序，**纯本地存储** | **V1.2.1 已审核通过 → 已上线**（2026-09-10） | AppID `wx78f00e7f0a5948b7` |
 | **抖音小程序** | `douyin/` | 抖音原生小程序，**纯本地存储** | **V1.3.0 已上线** | AppID `tt00eb76569e914af801` |
 
@@ -163,7 +163,7 @@ Tab：   home    library   my-mcu
 
 - **禁止缩小 Hero 卡片尺寸**偏离规范。
 - 小程序无用 `web-view`、无 `navigateToMiniProgram`、无外部视频链接（保持现状）——这是避免触碰视频类目的事实基础。
-- 图片资源 CDN：`https://mcu.yaoqiang.xin`（H5 与两小程序共用），资源含 posters/stills/avatars/phases/hero/entries。
+- 图片资源 CDN：`https://mcuatlas.xyz`（H5 与两小程序共用），资源含 posters/stills/avatars/phases/hero/entries。
 - H5 与小程序尚未做 token 统一——**是否统一，是需要你在升级方案里先回答的产品/设计问题**，不要默认统一。
 
 ---

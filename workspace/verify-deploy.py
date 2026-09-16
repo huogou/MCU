@@ -5,7 +5,7 @@
 import ssl
 import urllib.request
 
-NEW = 'https://mcu.yaokaixin.top'
+NEW = 'https://mcuatlas.xyz'
 OLD = 'https://mcu.yaoqiang.xin'
 
 PAGES = ['/', '/index.html', '/routes.html', '/movie.html?id=iron-man', '/next.html',
@@ -31,7 +31,7 @@ def get(url, timeout=20):
         return 'ERR:' + type(e).__name__, b''
 
 
-print('=== 新域名 mcu.yaokaixin.top ===')
+print('=== 新域名 mcuatlas.xyz ===')
 for p in PAGES:
     code, body = get(NEW + p)
     print('  %-42s -> %s' % (p, code))

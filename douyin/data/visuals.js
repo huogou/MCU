@@ -21,8 +21,8 @@
  *   3. 缺失资源返回 null，由前端统一兜底（阶段色渐变 + 首字）。
  * ============================================================ */
 
-/* 阿里云 H5 静态托管根（2026-09-11 由 mcu.yaoqiang.xin 迁至 mcu.yaokaixin.top） */
-const CDN = 'https://mcu.yaokaixin.top';
+/* 阿里云 H5 静态托管根（2026-09-16 迁至 mcuatlas.xyz 专属域名） */
+const CDN = 'https://mcuatlas.xyz';
 
 /* 本地资源根（已上传 CDN：2026-08-26 专项②，缩放后 36 文件 ~0.75MB 已托管至 /assets/*） */
 const LOCAL = CDN + '/assets';

@@ -83,18 +83,19 @@ v1.2.0-release
 
 ## H5 V2.2 / V2.1 / V2.0（H5 端 · 当前线上）
 
-> H5 为纯静态多页（`h5/` 部署于阿里云轻量 Nginx，域名 https://mcu.yaokaixin.top）。
+> H5 为纯静态多页（`h5/` 部署于阿里云轻量 Nginx，域名 https://mcuatlas.xyz）。
 > H5 版本号独立于微信/抖音小程序，按大版本 V2.0 → V2.1 → V2.2 演进；以下均以「已上线/已部署」功能为准，未把规划中论坛写入已完成。
 
 ### H5 V2.2（当前线上）
 
 状态：已部署上线（2026-09-14 提交 `fa2dc2c` 后全量部署）
-适用端：H5（https://mcu.yaokaixin.top）
+适用端：H5（https://mcuatlas.xyz）
 
 本次内容：
 - 路线详情页 `route-detail.html` 上线：六大模块（路线说明 / 作品串联 / 下一部 / 关系 / 阶段 / 吐槽上下文归到当前路线）
 - 首页 PC 版式基础加宽：`v2.css` 在 ≥1024px 断点将 Hero 等由 760px 提至 1280px（整体铺满「方案 C」待策划授权，未动手）
 - 三端 `visuals.js` CDN 由 `mcu.yaoqiang.xin` 迁至 `mcu.yaokaixin.top`（shared / wechat / douyin 同源）
+- 2026-09-16：H5 生产域名切换为专属域名 `https://mcuatlas.xyz`（旧域 `mcu.yaokaixin.top` 下线）；三端 `visuals.js` CDN 同步切至 `https://mcuatlas.xyz`
 - 反馈/统计代码已落地，但因 CloudBase WEB 安全域名白名单未加新域，当前「已开发未生效」（写入失败，本地队列兜底）
 
 备注：

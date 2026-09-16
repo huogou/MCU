@@ -6,13 +6,13 @@ import ssl
 import urllib.request
 
 CHECKS = [
-    ('https://mcu.yaokaixin.top/', 'strict'),
-    ('https://mcu.yaokaixin.top/index.html', 'strict'),
-    ('https://mcu.yaokaixin.top/routes.html', 'strict'),
-    ('https://mcu.yaokaixin.top/movie.html?id=iron-man', 'strict'),
-    ('https://mcu.yaokaixin.top/assets/css/style.css', 'strict'),
-    ('https://mcu.yaokaixin.top/assets/posters/iron-man.jpg', 'strict'),
-    ('https://mcu.yaokaixin.top/route-detail.html?id=newcomer', 'strict'),
+    ('https://mcuatlas.xyz/', 'strict'),
+    ('https://mcuatlas.xyz/index.html', 'strict'),
+    ('https://mcuatlas.xyz/routes.html', 'strict'),
+    ('https://mcuatlas.xyz/movie.html?id=iron-man', 'strict'),
+    ('https://mcuatlas.xyz/assets/css/style.css', 'strict'),
+    ('https://mcuatlas.xyz/assets/posters/iron-man.jpg', 'strict'),
+    ('https://mcuatlas.xyz/route-detail.html?id=newcomer', 'strict'),
     # 旧域名与博客：必须零影响
     ('https://mcu.yaoqiang.xin/', 'strict'),
     ('https://mcu.yaoqiang.xin/assets/posters/iron-man.jpg', 'strict'),
@@ -52,7 +52,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 opener = urllib.request.build_opener(NoRedirect)
-for url in ['http://mcu.yaokaixin.top/', 'http://mcu.yaoxin.top/'.replace('yaoxin', 'yaokaixin')]:
+for url in ['http://mcuatlas.xyz/', 'http://mcu.yaoxin.top/'.replace('yaoxin', 'yaokaixin')]:
     try:
         r = opener.open(urllib.request.Request(url, headers={'User-Agent': 'v/1'}), timeout=12)
         print('%-40s -> %s' % (url, r.status))
@@ -63,7 +63,7 @@ print()
 print('=== 新域名证书信息 ===')
 try:
     ctx = ssl.create_default_context()
-    with ctx.wrap_socket(__import__('socket').socket(), server_hostname='mcu.yaokaixin.top') as s:
+    with ctx.wrap_socket(__import__('socket').socket(), server_hostname='mcuatlas.xyz') as s:
         s.settimeout(12)
         s.connect(('8.137.48.145', 443))
         c = s.getpeercert()

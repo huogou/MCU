@@ -20,7 +20,7 @@
 
 | 端 | 定位 | 用户场景 | 当前生产地址 / AppID |
 |---|---|---|---|
-| **H5** | 外部获客 / 首体验 | 微信/浏览器分享链接打开 | `https://mcu.yaokaixin.top/`（**2026-09-11 起生产**；旧域 `mcu.yaoqiang.xin` 保留待退役；品牌域名 `mcuatlas.xyz` 备案后切换） |
+| **H5** | 外部获客 / 首体验 | 微信/浏览器分享链接打开 | `https://mcuatlas.xyz/`（**2026-09-16 起生产**，漫威专属域名；旧域 `mcu.yaokaixin.top` 下线） |
 | **微信小程序** | 长期使用 / 进度沉淀 | 核心用户日活 | AppID `wx78f00e7f0a5948b7`，**V1.2.1 已通过审核并上线**（2026-09-10） |
 | **抖音小程序** | 作品查询 / 个人记录工具 | 抖音用户作品查询与进度管理 | AppID `tt00eb76569e914af801`，**V1.3.0 已上线** |
 
@@ -266,7 +266,7 @@ movie（轻量作品详情）              feedback / share / about / agreement 
 | Web | Nginx 1.26.3 + 宝塔 11.1.0 |
 | 外网 IP | `<阿里云ECS公网IP>`（真实值见本地 `.workbuddy/memory/MEMORY.md`，**已 gitignore，不入库**） |
 | 主域 | `yaoqiang.xin`（WordPress） |
-| H5 | `mcu.yaoqiang.xin`（**正式运行**）→ `mcuatlas.xyz`（品牌域名，备案后切换） |
+| H5 | `mcuatlas.xyz`（**正式运行**，漫威专属域名，2026-09-16 起） |
 | SSH | RSA 2048 密钥登录；本地 PEM `AI生成文件/H5/MCU.pem`（未入库） |
 
 ### 9.2 DNS
@@ -355,10 +355,10 @@ docs/同步/给设计AI同步文件.txt  →  QoderWork CN（维护：开发/策
 
 | 项 | 状态 |
 |---|---|
-| **H5** | **阿里云轻量服务器正式运行**：`https://mcu.yaoqiang.xin/`（HTTPS 200，LE 自动续签；部署 `/www/wwwroot/mcu-h5/`） |
+| **H5** | **阿里云轻量服务器正式运行**：`https://mcuatlas.xyz/`（漫威专属域名，2026-09-16 起；部署 `/www/wwwroot/mcu-h5/`） |
 | H5 CloudBase 静态托管 | **已清空**（历史部署记录，旧地址 404） |
 | H5 Cloudflare Pages | **已删除**（历史部署记录，旧地址连接失败） |
-| H5 新域名 `mcuatlas.xyz` | **已购、未备案**（3 条 A 记录已加），备案后切生产 |
+| H5 专属域名 `mcuatlas.xyz` | **已备案，2026-09-16 切生产**（旧域 `mcu.yaokaixin.top` 下线） |
 | **微信小程序** | **V1.2.1 已通过审核并正式上线**（2026-09-10）；`mcu.yaoqiang.xin` 已加入 downloadFile 合法域名白名单；海报/图集正常渲染 |
 | **抖音小程序** | **V1.3.0 已上线**；自动化测试 151 项通过；真机演示海报正常渲染 |
 | 双端图像资源 | `visuals.js` CDN 已于 2026-09-09 迁至 `mcu.yaoqiang.xin` 并补齐 posters/stills/avatars/phases/hero/entries（阿里云实测 HTTP 200）；**随 V1.2.1 发布已生效** |

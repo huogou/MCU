@@ -73,15 +73,14 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 | 端 | 方式 |
 | --- | --- |
-| H5 | 阿里云轻量（Nginx 独立站点）：`h5/` 上传至 `/www/wwwroot/mcu-h5/`，站点配置见 `workspace/deploy/mcu.yaokaixin.top.conf`（新域）与 `workspace/deploy/mcu.yaoqiang.xin.conf`（旧域），证书由 acme.sh 自动签发续签 |
+| H5 | 阿里云轻量（Nginx 独立站点）：`h5/` 上传至 `/www/wwwroot/mcu-h5/`，站点配置见 `workspace/deploy/mcuatlas.xyz.conf`（生产；含论坛 `/api/` 反代） |
 | 微信 | 微信开发者工具「上传」→ `mp.weixin.qq.com` 提交审核 → 发布 |
 | 抖音 | 抖音开发者工具「上传」→ 抖音开放平台提交审核 → 发布 |
 
 ### H5 访问地址
 
-- **当前生产**：`https://mcu.yaokaixin.top/`（2026-09-11 起；子域，父域 `yaokaixin.top`）
-- **旧地址**：`https://mcu.yaoqiang.xin/`（含个人名，**保留但待退役**；是否 301 待定）
-- **规划地址**：`mcuatlas.xyz`（已购，**待 ICP 备案**；备案后切换为漫威专属域名）
+- **当前生产**：`https://mcuatlas.xyz/`（2026-09-16 起；漫威专属域名，已 ICP 备案）
+- **已退役**：`mcu.yaokaixin.top`（2026-09-16 下线）、`mcu.yaoqiang.xin`（NXDOMAIN）
 - **已下线**：CloudBase 静态托管（2026-09-08 清空）、Cloudflare Pages（2026-09-08 删除）
 
 > H5 的浏览统计与用户反馈写入 CloudBase 环境 `mcu-d6gw0brqoa9521b58` 的 `feedback` 集合（跨端与微信小程序共用）。该环境目前**保留**，待小程序反馈迁移至自建后端后再下线。
@@ -92,10 +91,10 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 |---|---|---|
 | **微信小程序** | V1.2.1 | **已通过审核并正式上线**（2026-09-10） |
 | **抖音小程序** | V1.3.0 | **已上线** |
-| **H5** | — | 运行中：`https://mcu.yaokaixin.top/`（旧地址 `mcu.yaoqiang.xin` 保留待退役） |
+| **H5** | — | 运行中：`https://mcuatlas.xyz/`（旧域 `mcu.yaokaixin.top` 已下线） |
 
 - **微信 V1.2.1 审核**：曾因「涉及视频服务，属个人主体未开放类目」被驳回；申诉说明小程序无播放器、无视频资源、无外部视频跳转（代码不存在 `web-view` / `navigateToMiniProgram` / 任何视频链接），经复核判定为**误判**后通过上线。
-- **图像资源**：`visuals.js` CDN 已由已清空的 CloudBase 默认域名迁至 `https://mcu.yaoqiang.xin`，并补齐 posters/stills/avatars/phases/hero/entries（阿里云实测 HTTP 200），随 V1.2.1 发布**已生效**。
+- **图像资源**：三端 `visuals.js` CDN = `https://mcuatlas.xyz`（2026-09-16 切换；微信/抖音需重新发布后生效）。
 - **下一步**：V1.3 三端升级进入设计阶段，设计 AI 交接资料见 [`给设计AI-项目交接说明.md`](./docs/技术/给设计AI-项目交接说明.md)。
 
 > ⚠ 设计注意：本项目 H5 与小程序为**两套独立 Token**（H5 gold `#E9A93B` / 小程序 gold `#F2B233`），勿跨端套用。详见总览 §8。

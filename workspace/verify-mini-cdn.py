@@ -11,7 +11,7 @@ import urllib.request
 
 ROOT = r'D:\SEO\发挥余热\漫威电影宇宙导航'
 FILES = ['shared/data/visuals.js', 'wechat/data/visuals.js', 'douyin/data/visuals.js']
-NEW = 'https://mcu.yaokaixin.top'
+NEW = 'https://mcuatlas.xyz'
 OLD = 'mcu.yaoqiang.xin'
 
 paths = {}
@@ -31,7 +31,7 @@ bad = [p for p in paths if not p.startswith('/assets/')
        or '//' in p[1:]
        or 'http' in p
        or OLD in p
-       or 'mcu.yaokaixin.top' in p]
+       or 'mcuatlas.xyz' in p]
 if bad:
     for p in bad:
         print('  [拼接异常]', p)
