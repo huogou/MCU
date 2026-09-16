@@ -50,3 +50,10 @@ archive/
 release/
 design/
 workspace/deploy/cert-mcuatlas/
+
+# V2.2 回归截图（本地测试资产，不入库）
+workspace/v22-regression-shots/
+workspace/clipboard-ocr*.ps1
+workspace/clipboard-2026*.png
+workspace/clipboard-2026*-ocr.txt
+workspace/clipboard-ocr*-run.log
