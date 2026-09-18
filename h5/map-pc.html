@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>观影宇宙地图 - 漫威作品关系全景图 · MCU 宇宙导航</title>
+<meta name="description" content="在一张可拖拽、可缩放的大地图上探索 MCU 全部作品之间的关系——主线承接、前置依赖、角色关联、伏笔铺垫，一眼看懂整个宇宙的发展脉络。">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* ============================================================
+ * PC 端观影宇宙地图 · V3 关系探索版
+ *
+ * 核心设计：两种模式
+ * 1. 全景模式 (overview) — 完整地图，时间轴，拖拽缩放
+ * 2. 聚焦模式 (focus) — 中心节点 + 放射状关联节点
+ *
+ * 节点定位使用 CSS transform（支持 transition 动画）
+ * 而非 SVG transform 属性，以实现模式切换时的平滑过渡
+ * ============================================================ */
+
+/* ---------- 页面骨架 ---------- */
+html,body{height:100%;margin:0;overflow:hidden}
+body{display:flex;flex-direction:column}
+#app-nav{flex:none}
+#app-foot{display:none}
+.pc-page{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;background:var(--bg-deep,#050810)}
+.pc-main{flex:1;display:flex;flex-direction:column;min-height:0;position:relative}
+
+/* ---------- 地图头部 ---------- */
+.pc-map-header{flex:none;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 12px;background:linear-gradient(180deg,var(--bg-deep,#050810) 0%,rgba(5,8,16,0) 100%);z-index:20;gap:16px}
+.pc-map-header-left .pc-eyebrow{font-size:11px;letter-spacing:.18em;color:var(--gold,#F2B233);text-transform:uppercase;font-weight:600;margin-bottom:3px}
+.pc-map-header-left h1{font-size:24px;font-weight:800;margin:0;line-height:1.2;background:linear-gradient(135deg,var(--text) 0%,var(--gold-light,#FFD66B) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.pc-map-header-left p{font-size:12px;color:var(--text-3,#6E7889);margin:3px 0 0}
+
+/* ---------- 面包屑（探索路径） ---------- */
+.pc-breadcrumb{display:none;align-items:center;gap:4px;flex:1;flex-wrap:wrap;min-width:0}
+.pc-breadcrumb.show{display:flex}
+.pc-crumb{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;border:1px solid var(--surface-3,#2A3447);background:var(--surface,#161D2B);color:var(--text-2,#8E98AA);font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.pc-crumb:hover{border-color:var(--border-lit,#354160);color:var(--text,#E8ECF4)}
+.pc-crumb.current{border-color:rgba(242,178,51,.4);background:rgba(242,178,51,.08);color:var(--gold,#F2B233);font-weight:600;cursor:default}
+.pc-crumb.home{border-color:rgba(91,141,239,.3);background:rgba(91,141,239,.08);color:var(--blue,#5B8DEF)}
+.pc-crumb-sep{color:var(--surface-4,#354160);font-size:10px;flex:none}
+
+/* ---------- 地图操作栏 ---------- */
+.pc-controls{display:flex;gap:8px;align-items:center;flex:none}
+.pc-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--surface-3,#2A3447);background:var(--surface,#161D2B);color:var(--text-2,#8E98AA);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex:none}
+.pc-btn:hover{background:var(--surface-2,#1E2636);border-color:var(--border-lit,#354160);color:var(--text,#E8ECF4)}
+.pc-btn.gold{border-color:rgba(242,178,51,.3);background:rgba(242,178,51,.08);color:var(--gold,#F2B233)}
+.pc-btn.gold:hover{background:rgba(242,178,51,.15);border-color:rgba(242,178,51,.5)}
+.pc-btn.wide{width:auto;padding:0 14px;font-size:13px;gap:6px;font-weight:500}
+.pc-btn svg{width:16px;height:16px}
+.pc-btn.back{display:none}
+.pc-btn.back.show{display:flex}
+.pc-zoom-display{font-size:12px;color:var(--text-3,#6E7889);min-width:38px;text-align:center;user-select:none}
+
+/* ---------- 地图画布 ---------- */
+.pc-canvas{flex:1;position:relative;overflow:hidden;cursor:grab;background:radial-gradient(ellipse at 30% 20%,rgba(91,141,239,.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(139,111,232,.04) 0%,transparent 50%),var(--bg-deep,#050810)}
+.pc-canvas.grabbing{cursor:grabbing}
+.pc-canvas *{box-sizing:border-box}
+
+/* 星空背景 */
+.pc-starfield{position:absolute;inset:0;pointer-events:none;opacity:.5;overflow:hidden}
+.pc-star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.6}}
+
+/* SVG 地图 */
+.pc-svg{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+.pc-map-content{transform-origin:0 0}
+/* 拖拽/缩放用——无过渡 */
+/* 模式切换/聚焦用——平滑过渡 */
+.pc-map-content.smooth{transition:transform .5s cubic-bezier(.22,.61,.36,1)}
+
+/* ============================================================
+ * 节点 —— 使用 CSS transform 定位，支持模式切换动画
+ * ============================================================ */
+.movie-node{
+  cursor:pointer;
+  transition:transform .6s cubic-bezier(.22,.61,.36,1),
+             opacity .4s ease,
+             filter .3s ease;
+}
+
+/* 全景模式：阶段背景 + 时间轴等装饰元素在聚焦模式中淡出 */
+.pc-map-content.focus-mode .phase-bg,
+.pc-map-content.focus-mode .timeline,
+.pc-map-content.focus-mode .golden-track,
+.pc-map-content.focus-mode .golden-track-glow,
+.pc-map-content.focus-mode .connections{opacity:0;transition:opacity .3s ease;pointer-events:none}
+
+/* 聚焦模式：无关节点淡出 */
+.pc-map-content.focus-mode .movie-node.unrelated{opacity:.04;pointer-events:none}
+/* 聚焦模式：关联节点和中心节点保持可见 */
+.pc-map-content.focus-mode .movie-node.related{opacity:1}
+.pc-map-content.focus-mode .movie-node.center{opacity:1}
+
+/* 聚焦模式节点视觉差异 */
+.pc-map-content.focus-mode .movie-node.center .node-ring{stroke-width:4;filter:drop-shadow(0 0 12px currentColor)}
+.pc-map-content.focus-mode .movie-node.center .node-glow{opacity:.4}
+.pc-map-content.focus-mode .movie-node.related .node-ring{stroke-width:3}
+.pc-map-content.focus-mode .movie-node.related .node-glow{opacity:.15}
+.pc-map-content.focus-mode .movie-node.related:hover .node-glow{opacity:.35}
+
+/* 聚焦模式标签：支持 y 属性过渡动画（现代浏览器） */
+.node-label,.node-year{transition:y .5s cubic-bezier(.22,.61,.36,1),opacity .3s ease,font-size .3s}
+
+/* 聚焦模式：中心节点隐藏文字标签（信息在浮动卡片中） */
+.pc-map-content.focus-mode .movie-node.center .node-label,
+.pc-map-content.focus-mode .movie-node.center .node-year{opacity:0;pointer-events:none}
+
+/* 聚焦模式：关联节点标签字号略大 */
+.pc-map-content.focus-mode .movie-node.related .node-label{font-size:13px}
+.pc-map-content.focus-mode .movie-node.related .node-year{font-size:11px}
+
+/* 阶段背景列 */
+.phase-band{fill:none;opacity:.03}
+.phase-band.p1{fill:var(--p1,#5B8DEF)}
+.phase-band.p2{fill:var(--p2,#28B487)}
+.phase-band.p3{fill:var(--p3,#F0A932)}
+.phase-band.p4{fill:var(--p4,#8B6FE8)}
+.phase-band.p5{fill:var(--p5,#E8483F)}
+.phase-band.p6{fill:var(--p6,#C25B8E)}
+.phase-divider{stroke:var(--surface-3,#2A3447);stroke-width:1;opacity:.3;stroke-dasharray:4 6}
+.phase-label-bg{fill:var(--surface,#161D2B);stroke:var(--surface-3,#2A3447);stroke-width:1;opacity:.8}
+.phase-label-text{font-size:14px;font-weight:700;fill:var(--text-2,#8E98AA);text-anchor:middle;dominant-baseline:central}
+.phase-year-text{font-size:11px;fill:var(--text-3,#6E7889);text-anchor:middle;dominant-baseline:central}
+
+/* 主线轨道 */
+.golden-track{stroke:var(--gold,#F2B233);stroke-width:3;fill:none;opacity:.15;stroke-linecap:round}
+.golden-track-glow{stroke:var(--gold,#F2B233);stroke-width:8;fill:none;opacity:.04;filter:blur(4px)}
+
+/* 连线（全景模式） */
+.conn{fill:none;transition:opacity .3s,stroke-width .2s}
+.conn-mainline{stroke:var(--gold,#F2B233);stroke-width:2.5;opacity:.5;stroke-linecap:round}
+.conn-support{stroke:rgba(255,255,255,.12);stroke-width:1;opacity:.5}
+.conn-cross{stroke:var(--purple,#8B6FE8);stroke-width:1.5;opacity:.3;stroke-dasharray:6 4}
+.conn-cross-glow{stroke:var(--purple,#8B6FE8);stroke-width:5;opacity:.05;filter:blur(3px);fill:none}
+
+/* 聚焦模式连线 */
+.focus-conn{fill:none;opacity:0;transition:opacity .4s ease .2s}
+.focus-conn.show{opacity:.7}
+.focus-conn.mainline{stroke:var(--gold,#F2B233);stroke-width:3;stroke-linecap:round}
+.focus-conn.support{stroke:rgba(255,255,255,.25);stroke-width:1.5}
+.focus-conn.cross{stroke:var(--purple,#8B6FE8);stroke-width:2;stroke-dasharray:6 4}
+.focus-conn-glow{fill:none;opacity:0;transition:opacity .4s ease .2s;filter:blur(3px)}
+.focus-conn-glow.show{opacity:.08}
+.focus-conn-glow.mainline{stroke:var(--gold,#F2B233);stroke-width:8}
+.focus-conn-glow.cross{stroke:var(--purple,#8B6FE8);stroke-width:6}
+.focus-conn-label{
+  font-size:10px;font-weight:500;text-anchor:middle;dominant-baseline:central;
+  fill:var(--text-3,#6E7889);opacity:0;transition:opacity .4s ease .3s;
+  pointer-events:none;letter-spacing:.02em;
+}
+.focus-conn-label.show{opacity:.6}
+.focus-conn-label-bg{fill:rgba(22,29,43,.9);rx:4;opacity:0;transition:opacity .4s ease .3s}
+.focus-conn-label-bg.show{opacity:.7}
+
+/* Hover 高亮态（全景模式） */
+.pc-map-content.highlighting .conn{opacity:.06}
+.pc-map-content.highlighting .conn.highlighted{opacity:.9;stroke-width:3}
+.pc-map-content.highlighting .conn.highlighted.conn-mainline{filter:drop-shadow(0 0 6px rgba(242,178,51,.4))}
+.pc-map-content.highlighting .movie-node{opacity:.25}
+.pc-map-content.highlighting .movie-node.highlighted{opacity:1}
+.pc-map-content.highlighting .movie-node.dimmed{opacity:.1}
+
+/* 节点样式 */
+.node-poster-clip{overflow:hidden}
+.node-ring{fill:none;stroke-width:2.5;transition:all .15s}
+.node-glow{fill:none;opacity:0;transition:opacity .15s}
+.movie-node:hover .node-ring{stroke-width:3.5}
+.movie-node:hover .node-glow{opacity:.3}
+.movie-node.core .node-ring{stroke:var(--gold,#F2B233)}
+.movie-node.recommended .node-ring{stroke:var(--p3,#F0A932)}
+.movie-node.optional .node-ring{stroke:var(--surface-4,#354160)}
+.movie-node.upcoming .node-ring{stroke:rgba(255,255,255,.15);stroke-dasharray:4 3}
+.node-poster-bg{fill:var(--surface-2,#1E2636)}
+.node-label{font-size:12px;font-weight:600;fill:var(--text,#E8ECF4);text-anchor:middle;pointer-events:none;transition:fill .15s}
+.node-year{font-size:10px;fill:var(--text-3,#6E7889);text-anchor:middle;pointer-events:none}
+.node-badge{font-size:9px;font-weight:700;text-anchor:middle;pointer-events:none;letter-spacing:.05em}
+
+/* 时间轴（SVG 内） */
+.tl-axis-line{stroke:var(--surface-3,#2A3447);stroke-width:1.5;opacity:.4}
+.tl-axis-glow{stroke:var(--gold,#F2B233);stroke-width:6;opacity:.03;filter:blur(3px);fill:none}
+.tl-year-tick{stroke:var(--surface-3,#2A3447);stroke-width:1;opacity:.3}
+.tl-year-tick.has-movie{opacity:.5;stroke-width:1.5}
+.tl-year-label{font-size:13px;font-weight:700;fill:var(--text-2,#8E98AA);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.tl-year-sublabel{font-size:10px;fill:var(--text-3,#6E7889);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.tl-year-mark{cursor:pointer}
+.tl-year-mark:hover .tl-year-dot{transform:scale(1.5)}
+.tl-year-dot{fill:var(--surface-3,#2A3447);stroke:var(--bg-deep,#050810);stroke-width:2;transition:all .15s}
+.tl-year-dot.has-movie{fill:var(--gold,#F2B233);opacity:.6}
+.tl-year-mark:hover .tl-year-dot{opacity:1}
+.tl-year-mark.active .tl-year-dot{opacity:1}
+.tl-connect-line{stroke:var(--surface-3,#2A3447);stroke-width:1;opacity:.2;stroke-dasharray:3 3}
+.tl-phase-label{font-size:11px;font-weight:600;fill:var(--text-3,#6E7889);text-anchor:middle;dominant-baseline:central;pointer-events:none;letter-spacing:.06em}
+
+/* ---------- 中心节点浮动信息卡（聚焦模式） ---------- */
+.pc-focus-card{
+  position:absolute;z-index:22;width:280px;
+  background:rgba(13,17,25,.94);backdrop-filter:blur(16px);
+  border:1px solid var(--surface-3,#2A3447);border-radius:16px;
+  overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(12px);pointer-events:none;
+  transition:all .4s cubic-bezier(.22,.61,.36,1) .15s;
+}
+.pc-focus-card.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.pc-focus-card-hero{position:relative;height:90px;overflow:hidden}
+.pc-focus-card-backdrop{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.3}
+.pc-focus-card-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(13,17,25,.98) 0%,rgba(13,17,25,.2) 100%)}
+.pc-focus-card-poster{position:absolute;bottom:-16px;left:16px;width:60px;aspect-ratio:2/3;border-radius:8px;overflow:hidden;border:2px solid var(--surface-3,#2A3447);background:var(--surface-2,#1E2636);z-index:1}
+.pc-focus-card-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-focus-card-poster-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:rgba(255,255,255,.7)}
+.pc-focus-card-body{padding:22px 16px 14px}
+.pc-focus-card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.pc-focus-card-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--surface-3,#2A3447);font-size:10px;color:var(--text-2,#8E98AA)}
+.pc-focus-card-chip.phase{border-color:rgba(242,178,51,.3);background:rgba(242,178,51,.08);color:var(--gold-light,#FFD66B)}
+.pc-focus-card-title{font-size:17px;font-weight:800;line-height:1.2;margin-bottom:2px}
+.pc-focus-card-en{font-size:11px;color:var(--text-3,#6E7889);margin-bottom:8px}
+.pc-focus-card-role{font-size:12px;color:var(--text-2,#8E98AA);line-height:1.6;margin-bottom:10px}
+.pc-focus-card-relations-title{font-size:10px;font-weight:600;color:var(--text-3,#6E7889);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.pc-focus-card-rel{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:7px;background:var(--surface,#161D2B);border:1px solid var(--surface-3,#2A3447);margin-bottom:5px;cursor:pointer;transition:all .15s}
+.pc-focus-card-rel:hover{border-color:rgba(242,178,51,.3);background:rgba(242,178,51,.05)}
+.pc-focus-card-rel-poster{width:26px;height:38px;border-radius:4px;overflow:hidden;background:var(--surface-2,#1E2636);flex:none}
+.pc-focus-card-rel-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-focus-card-rel-info{flex:1;min-width:0}
+.pc-focus-card-rel-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-focus-card-rel-type{font-size:10px;color:var(--text-3,#6E7889);margin-top:1px}
+.pc-focus-card-rel-type .type-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px;vertical-align:middle}
+.pc-focus-card-actions{display:flex;gap:6px;margin-top:10px}
+.pc-focus-card-actions a{flex:1;text-align:center;padding:7px 10px;border-radius:7px;font-size:12px;text-decoration:none;font-weight:600;transition:all .15s}
+.pc-focus-card-actions .primary{background:var(--gold,#F2B233);color:var(--gold-btn-text,#1A1206)}
+.pc-focus-card-actions .primary:hover{background:var(--gold-light,#FFD66B)}
+.pc-focus-card-actions .secondary{border:1px solid var(--surface-3,#2A3447);background:var(--surface,#161D2B);color:var(--text-2,#8E98AA)}
+.pc-focus-card-actions .secondary:hover{border-color:var(--border-lit,#354160);color:var(--text)}
+
+/* ---------- 图例 ---------- */
+.pc-legend{position:absolute;top:16px;right:16px;z-index:18;background:rgba(22,29,43,.92);backdrop-filter:blur(12px);border:1px solid var(--surface-3,#2A3447);border-radius:14px;padding:14px 16px;min-width:170px;box-shadow:0 8px 32px rgba(0,0,0,.4);transition:all .2s}
+.pc-legend.collapsed{padding:8px 12px;min-width:auto}
+.pc-legend.collapsed .pc-legend-body{display:none}
+.pc-legend-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.pc-legend.collapsed .pc-legend-head{margin-bottom:0}
+.pc-legend-title{font-size:11px;font-weight:600;color:var(--text-2,#8E98AA);letter-spacing:.08em;text-transform:uppercase}
+.pc-legend-toggle{background:none;border:none;color:var(--text-3,#6E7889);cursor:pointer;font-size:14px;padding:0;line-height:1}
+.pc-legend-body{display:flex;flex-direction:column;gap:7px}
+.pc-legend-item{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--text-2,#8E98AA)}
+.pc-legend-line{display:inline-block;width:22px;height:3px;border-radius:2px;flex:none}
+.pc-legend-line.mainline{background:var(--gold,#F2B233)}
+.pc-legend-line.support{background:rgba(255,255,255,.25);height:1px}
+.pc-legend-line.cross{background:repeating-linear-gradient(90deg,var(--purple,#8B6FE8) 0,var(--purple,#8B6FE8) 4px,transparent 4px,transparent 7px)}
+.pc-legend-dot{width:9px;height:9px;border-radius:50%;flex:none;border:2px solid}
+.pc-legend-dot.core{border-color:var(--gold,#F2B233)}
+.pc-legend-dot.recommended{border-color:var(--p3,#F0A932)}
+.pc-legend-dot.optional{border-color:var(--surface-4,#354160)}
+.pc-legend-dot.upcoming{border-color:rgba(255,255,255,.15);border-style:dashed}
+.pc-legend-divider{height:1px;background:var(--surface-3,#2A3447);margin:3px 0}
+
+/* 聚焦模式隐藏图例 */
+.pc-canvas.focus-mode .pc-legend{opacity:0;pointer-events:none;transition:opacity .3s}
+
+/* ---------- 迷你导航 ---------- */
+.pc-minimap{position:absolute;bottom:14px;right:16px;z-index:17;width:150px;height:50px;background:rgba(13,17,25,.85);backdrop-filter:blur(10px);border:1px solid var(--surface-3,#2A3447);border-radius:10px;overflow:hidden;pointer-events:none;transition:opacity .3s}
+.pc-minimap-track{position:absolute;inset:6px;border-radius:4px;background:var(--surface,#161D2B)}
+.pc-minimap-fill{position:absolute;top:0;height:100%;background:rgba(242,178,51,.15);border:1px solid rgba(242,178,51,.3);border-radius:2px;transition:all .15s}
+.pc-minimap-label{position:absolute;top:2px;left:0;right:0;text-align:center;font-size:8px;color:var(--text-3,#6E7889);pointer-events:none}
+.pc-canvas.focus-mode .pc-minimap{opacity:0}
+
+/* ---------- 筛选面板 ---------- */
+.pc-filter{position:absolute;top:0;right:0;bottom:0;width:260px;background:rgba(13,17,25,.96);backdrop-filter:blur(16px);border-left:1px solid var(--surface-3,#2A3447);z-index:30;transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;padding:18px}
+.pc-filter.show{transform:translateX(0)}
+.pc-filter-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.pc-filter-head h3{margin:0;font-size:14px;font-weight:700}
+.pc-filter-close{background:none;border:none;color:var(--text-3,#6E7889);font-size:20px;cursor:pointer;padding:0;line-height:1}
+.pc-filter-close:hover{color:var(--text)}
+.pc-filter-section{margin-bottom:20px}
+.pc-filter-section-title{font-size:10px;font-weight:600;color:var(--text-3,#6E7889);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.pc-filter-chips{display:flex;flex-wrap:wrap;gap:7px}
+.pc-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;border:1px solid var(--surface-3,#2A3447);background:var(--surface,#161D2B);color:var(--text-2,#8E98AA);font-size:11px;cursor:pointer;transition:all .15s;user-select:none}
+.pc-chip:hover{border-color:var(--border-lit,#354160);color:var(--text)}
+.pc-chip.active{border-color:transparent;font-weight:600}
+.pc-chip.active.p1{background:rgba(91,141,239,.15);color:var(--p1,#5B8DEF);border-color:rgba(91,141,239,.4)}
+.pc-chip.active.p2{background:rgba(40,180,135,.15);color:var(--p2,#28B487);border-color:rgba(40,180,135,.4)}
+.pc-chip.active.p3{background:rgba(240,169,50,.15);color:var(--p3,#F0A932);border-color:rgba(240,169,50,.4)}
+.pc-chip.active.p4{background:rgba(139,111,232,.15);color:var(--p4,#8B6FE8);border-color:rgba(139,111,232,.4)}
+.pc-chip.active.p5{background:rgba(232,72,63,.15);color:var(--p5,#E8483F);border-color:rgba(232,72,63,.4)}
+.pc-chip.active.p6{background:rgba(194,91,142,.15);color:var(--p6,#C25B8E);border-color:rgba(194,91,142,.4)}
+.pc-chip-dot{width:7px;height:7px;border-radius:50%;flex:none}
+.pc-filter-actions{display:flex;gap:7px;margin-top:6px}
+.pc-filter-actions .pc-btn{flex:1;width:auto}
+
+/* ---------- 遮罩 ---------- */
+.pc-overlay-mask{position:absolute;inset:0;z-index:28;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s}
+.pc-overlay-mask.show{opacity:1;pointer-events:auto}
+
+/* ---------- 首次提示 ---------- */
+.pc-first-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;text-align:center;pointer-events:none;animation:fadeHint 5s ease-out forwards}
+.pc-first-hint-text{font-size:13px;color:var(--text-3,#6E7889);letter-spacing:.05em}
+.pc-first-hint-text span{margin:0 7px;opacity:.5}
+@keyframes fadeHint{0%{opacity:0}10%{opacity:1}70%{opacity:1}100%{opacity:0;visibility:hidden}}
+
+/* ---------- 滚动条 ---------- */
+.pc-filter::-webkit-scrollbar{width:5px}
+.pc-filter::-webkit-scrollbar-thumb{background:var(--surface-3,#2A3447);border-radius:3px}
+
+/* ---------- 响应式 ---------- */
+@media(max-width:768px){
+  .pc-map-header{padding:12px 16px 8px}
+  .pc-map-header-left h1{font-size:18px}
+  .pc-map-header-left p{font-size:11px;display:none}
+  .pc-controls{gap:4px}
+  .pc-btn{width:30px;height:30px;font-size:14px}
+  .pc-btn.wide{padding:0 8px;font-size:11px}
+  .pc-legend{top:8px;right:8px;padding:8px 10px;min-width:130px}
+  .pc-minimap{display:none}
+  .pc-focus-card{width:calc(100% - 20px);max-width:280px}
+}
+</style>
+</head>
+<body>
+<div id="app-nav"></div>
+
+<div class="pc-page" style="margin-top:0">
+<div class="pc-main">
+
+<!-- 地图头部 -->
+<div class="pc-map-header">
+  <div class="pc-map-header-left">
+    <div class="pc-eyebrow">MCU UNIVERSE MAP</div>
+    <h1>观影宇宙地图</h1>
+    <p id="header-subtitle">点击任意作品，开始探索 MCU 关系网络</p>
+  </div>
+  <!-- 面包屑（探索路径） -->
+  <div class="pc-breadcrumb" id="breadcrumb"></div>
+  <div class="pc-controls">
+    <button class="pc-btn back" id="btn-back" title="返回上一步">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="pc-btn" id="btn-zoom-out" title="缩小">−</button>
+    <span class="pc-zoom-display" id="zoom-display">100%</span>
+    <button class="pc-btn" id="btn-zoom-in" title="放大">+</button>
+    <button class="pc-btn gold wide" id="btn-reset" title="重置/返回全景">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 12l9-9 9 9M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -1)"/><path d="M9 21V12h6v9" stroke="currentColor" stroke-width="0" /></svg>
+      <span id="reset-label">全景</span>
+    </button>
+    <button class="pc-btn wide" id="btn-filter" title="筛选">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3 5h18M6 12h12M10 19h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      筛选
+    </button>
+  </div>
+</div>
+
+<!-- 地图画布 -->
+<div class="pc-canvas" id="map-canvas">
+  <div class="pc-starfield" id="starfield"></div>
+  <svg class="pc-svg" id="map-svg" xmlns="http://www.w3.org/2000/svg">
+    <g class="pc-map-content" id="map-content"></g>
+  </svg>
+
+  <!-- 图例 -->
+  <div class="pc-legend" id="legend">
+    <div class="pc-legend-head">
+      <span class="pc-legend-title">图例</span>
+      <button class="pc-legend-toggle" id="legend-toggle">−</button>
+    </div>
+    <div class="pc-legend-body">
+      <div class="pc-legend-item"><span class="pc-legend-line mainline"></span>主线承接</div>
+      <div class="pc-legend-item"><span class="pc-legend-line support"></span>关键关联</div>
+      <div class="pc-legend-item"><span class="pc-legend-line cross"></span>跨阶段 / 多元宇宙</div>
+      <div class="pc-legend-divider"></div>
+      <div class="pc-legend-item"><span class="pc-legend-dot core"></span>核心主线</div>
+      <div class="pc-legend-item"><span class="pc-legend-dot recommended"></span>推荐观看</div>
+      <div class="pc-legend-item"><span class="pc-legend-dot optional"></span>可选观看</div>
+      <div class="pc-legend-item"><span class="pc-legend-dot upcoming"></span>即将上映</div>
+    </div>
+  </div>
+
+  <!-- 中心节点浮动信息卡（聚焦模式） -->
+  <div class="pc-focus-card" id="focus-card">
+    <div class="pc-focus-card-hero">
+      <div class="pc-focus-card-backdrop" id="focus-backdrop"></div>
+      <div class="pc-focus-card-overlay"></div>
+      <div class="pc-focus-card-poster" id="focus-poster"></div>
+    </div>
+    <div class="pc-focus-card-body" id="focus-body"></div>
+  </div>
+
+  <!-- 迷你导航 -->
+  <div class="pc-minimap" id="minimap">
+    <div class="pc-minimap-label">地图位置</div>
+    <div class="pc-minimap-track">
+      <div class="pc-minimap-fill" id="minimap-fill"></div>
+    </div>
+  </div>
+
+  <!-- 首次提示 -->
+  <div class="pc-first-hint" id="first-hint">
+    <div class="pc-first-hint-text">点击作品 <span>·</span> 探索关系 <span>·</span> 持续发现</div>
+  </div>
+</div>
+
+<!-- 筛选面板 -->
+<div class="pc-overlay-mask" id="filter-mask"></div>
+<div class="pc-filter" id="filter-panel">
+  <div class="pc-filter-head">
+    <h3>筛选</h3>
+    <button class="pc-filter-close" id="filter-close">&times;</button>
+  </div>
+  <div class="pc-filter-section">
+    <div class="pc-filter-section-title">阶段</div>
+    <div class="pc-filter-chips" id="filter-phases"></div>
+  </div>
+  <div class="pc-filter-section">
+    <div class="pc-filter-section-title">传奇</div>
+    <div class="pc-filter-chips" id="filter-sagas"></div>
+  </div>
+  <div class="pc-filter-section">
+    <div class="pc-filter-section-title">关系类型</div>
+    <div class="pc-filter-chips" id="filter-rel-types"></div>
+  </div>
+  <div class="pc-filter-actions">
+    <button class="pc-btn wide" id="filter-clear">清除筛选</button>
+    <button class="pc-btn gold wide" id="filter-apply">完成</button>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div id="app-foot"></div>
+
+<script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/stills.js"></script>
+<script src="data/visuals.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+(function(){
+  MCU.ui.mount('map-pc.html');
+
+  /* ========== 工具函数 ========== */
+  function esc(s){return MCU.ui.esc(String(s==null?'':s));}
+  function visual(id){return MCU.data.visual?MCU.data.visual(id):{poster:null,backdrop:null};}
+  function phaseColor(p){return MCU.data.phaseColor?MCU.data.phaseColor(p):'var(--gold)';}
+  function phaseName(p){return {1:'第一阶段',2:'第二阶段',3:'第三阶段',4:'第四阶段',5:'第五阶段',6:'第六阶段'}[p]||'';}
+  function statusOf(m){return m.date?'已上映':'即将上映';}
+  function getMovie(id){return MCU.data.get(id);}
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs){
+    var e=document.createElementNS(ns,tag);
+    if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);
+    return e;
+  }
+  function relTypeLabel(t){
+    return {mainline:'主线承接',support:'关键关联',cross:'跨阶段/多元宇宙',prereq:'前置依赖',character:'角色关联',setup:'伏笔铺垫',event:'事件关联',world:'世界观'}[t]||'关联';
+  }
+  function relTypeColor(t){
+    return {mainline:'#F2B233',support:'rgba(255,255,255,.3)',cross:'#8B6FE8',prereq:'#F0A932',character:'#5B8DEF',setup:'#8B6FE8',event:'#28B487',world:'#6E7889'}[t]||'#6E7889';
+  }
+
+  /* ========== 地图布局数据 ========== */
+  var LAYOUT_SCALE = 1.15;
+  var NODE_RADIUS = { core: 42, recommended: 34, optional: 28, upcoming: 24 };
+  /* 聚焦模式自适应缩放基准（屏幕像素，按目标缩放换算为地图坐标） */
+  var FOCUS_CENTER_R = 58;   /* 中心节点期望屏幕半径 */
+  var FOCUS_RING_R = 220;    /* 关联节点环绕屏幕半径 */
+  var SCALE_MIN = 0.25, SCALE_MAX = 3.5;
+  var BASE_Y = 340, SUPPORT_ABOVE_Y = 100, SUPPORT_BELOW_Y = 480, TIMELINE_Y = 600;
+
+  var PANO_MOVIES = [
+    {id:'incredible-hulk',cls:'support-above',left:195},
+    {id:'iron-man-2',cls:'support-above',left:325},
+    {id:'iron-man',cls:'mainline',left:100},
+    {id:'thor',cls:'mainline',left:360},
+    {id:'captain-america-first-avenger',cls:'mainline',left:490},
+    {id:'avengers',cls:'mainline',left:650},
+    {id:'iron-man-3',cls:'support-above',left:880},
+    {id:'thor-dark-world',cls:'support-above',left:1010},
+    {id:'winter-soldier',cls:'mainline',left:920},
+    {id:'guardians',cls:'mainline',left:1140},
+    {id:'age-of-ultron',cls:'mainline',left:1340},
+    {id:'ant-man',cls:'support-below',left:1200},
+    {id:'doctor-strange',cls:'support-above',left:1660},
+    {id:'guardians-2',cls:'support-above',left:1920},
+    {id:'black-panther',cls:'support-above',left:2180},
+    {id:'ant-man-wasp',cls:'support-above',left:2310},
+    {id:'captain-marvel',cls:'support-above',left:2440},
+    {id:'civil-war',cls:'mainline',left:1700},
+    {id:'spider-man-homecoming',cls:'mainline',left:1830},
+    {id:'thor-ragnarok',cls:'mainline',left:2050},
+    {id:'infinity-war',cls:'mainline',left:2500},
+    {id:'endgame',cls:'mainline',left:2600},
+    {id:'far-from-home',cls:'support-below',left:2680},
+    {id:'black-widow',cls:'support-above',left:2740},
+    {id:'shang-chi',cls:'support-above',left:2870},
+    {id:'eternals',cls:'support-above',left:3000},
+    {id:'no-way-home',cls:'mainline',left:2830},
+    {id:'multiverse-of-madness',cls:'mainline',left:3050},
+    {id:'love-and-thunder',cls:'support-below',left:2950},
+    {id:'wakanda-forever',cls:'support-below',left:3150},
+    {id:'quantumania',cls:'support-below',left:3400},
+    {id:'guardians-3',cls:'support-below',left:3490},
+    {id:'the-marvels',cls:'support-below',left:3580},
+    {id:'deadpool-wolverine',cls:'support-below',left:3670},
+    {id:'brave-new-world',cls:'support-below',left:3760},
+    {id:'thunderbolts',cls:'support-below',left:3850},
+    {id:'fantastic-four',cls:'mainline',left:3980},
+    {id:'brand-new-day',cls:'mainline',left:4100},
+    {id:'avengers-5',cls:'mainline upcoming',left:3980,top:480,title:'毁灭之日',year:'2026',upcoming:true},
+    {id:'avengers-6',cls:'mainline upcoming',left:4100,top:480,title:'秘密战争',year:'2027',upcoming:true}
+  ];
+
+  var PANO_CONN = [
+    ['iron-man','avengers','mainline'],['thor','avengers','mainline'],['captain-america-first-avenger','avengers','mainline'],
+    ['avengers','winter-soldier','mainline'],['avengers','age-of-ultron','mainline'],['winter-soldier','civil-war','mainline'],
+    ['guardians','infinity-war','mainline'],['age-of-ultron','infinity-war','mainline'],['civil-war','spider-man-homecoming','mainline'],
+    ['civil-war','infinity-war','mainline'],['doctor-strange','thor-ragnarok','support'],['thor-ragnarok','infinity-war','mainline'],
+    ['infinity-war','endgame','mainline'],['endgame','far-from-home','mainline'],['far-from-home','no-way-home','mainline'],
+    ['no-way-home','multiverse-of-madness','mainline'],['fantastic-four','brand-new-day','support'],
+    ['iron-man','iron-man-2','support'],['iron-man','incredible-hulk','support'],['iron-man-2','avengers','support'],
+    ['avengers','iron-man-3','support'],['avengers','thor-dark-world','support'],['age-of-ultron','ant-man','support'],
+    ['ant-man','endgame','support'],['ant-man','ant-man-wasp','support'],['captain-america-first-avenger','doctor-strange','support'],
+    ['doctor-strange','infinity-war','support'],['civil-war','black-panther','support'],['black-panther','infinity-war','support'],
+    ['guardians','guardians-2','support'],['captain-marvel','endgame','support'],['endgame','far-from-home','support'],
+    ['no-way-home','brand-new-day','support'],
+    ['iron-man','shang-chi','cross'],['ant-man-wasp','quantumania','cross'],['captain-marvel','the-marvels','cross'],
+    ['black-widow','thunderbolts','cross'],['eternals','fantastic-four','cross'],['endgame','brave-new-world','cross'],
+    ['thor-ragnarok','love-and-thunder','cross'],['guardians-2','guardians-3','cross']
+  ];
+
+  var PHASE_COLS = [
+    {phase:1,label:'第一阶段',year:'2008 – 2012',left:60,width:780},
+    {phase:2,label:'第二阶段',year:'2013 – 2015',left:840,width:780},
+    {phase:3,label:'第三阶段',year:'2016 – 2019',left:1620,width:1080},
+    {phase:4,label:'第四阶段',year:'2021 – 2022',left:2700,width:680},
+    {phase:5,label:'第五阶段',year:'2023 – 2025',left:3380,width:560},
+    {phase:6,label:'第六阶段',year:'2025 –',left:3940,width:260}
+  ];
+
+  var MAP_LEFT = 60 * LAYOUT_SCALE;
+  var MAP_RIGHT = 4200 * LAYOUT_SCALE;
+  var MAP_WIDTH = MAP_RIGHT - MAP_LEFT;
+  var MAP_HEIGHT = TIMELINE_Y + 60;
+
+  /* ========== 状态 ========== */
+  var state = {
+    mode: 'overview',      /* 'overview' | 'focus' */
+    scale: 1, tx: 0, ty: 0,
+    isDragging: false,
+    dragStartX: 0, dragStartY: 0, dragStartTX: 0, dragStartTY: 0,
+    velocityX: 0, velocityY: 0, lastMoveX: 0, lastMoveY: 0, lastMoveTime: 0,
+    inertiaRAF: null,
+    hoveredNode: null,
+    explorePath: [],       /* [{id, title}] 探索路径 */
+    focusCenter: null,     /* 当前聚焦节点 ID */
+    focusRelated: [],      /* 当前关联节点 ID 列表 */
+    filters: { phases:[1,2,3,4,5,6], sagas:['infinity','multiverse'], relTypes:['mainline','support','cross'] }
+  };
+
+  var content = document.getElementById('map-content');
+  var canvas = document.getElementById('map-canvas');
+  var svg = document.getElementById('map-svg');
+  var breadcrumb = document.getElementById('breadcrumb');
+  var focusCard = document.getElementById('focus-card');
+  var minimapFill = document.getElementById('minimap-fill');
+  var headerSubtitle = document.getElementById('header-subtitle');
+  var resetLabel = document.getElementById('reset-label');
+
+  /* ========== 节点预处理 ========== */
+  var nodes = [], nodeMap = {};
+  PANO_MOVIES.forEach(function(c){
+    var m = c.upcoming ? null : getMovie(c.id);
+    var node = {
+      id: c.id,
+      ovX: c.left * LAYOUT_SCALE,
+      ovY: (c.top != null ? c.top : (c.cls.indexOf('support-above') >= 0 ? SUPPORT_ABOVE_Y : c.cls.indexOf('support-below') >= 0 ? SUPPORT_BELOW_Y : BASE_Y)),
+      /* 聚焦模式位置（运行时计算） */
+      fcX: 0, fcY: 0,
+      cls: c.cls, upcoming: !!c.upcoming, title: c.title, year: c.year,
+      movie: m,
+      importance: m ? (m.mainline ? 'core' : (m.starter ? 'recommended' : 'optional')) : 'upcoming',
+      phase: m ? m.phase : 6,
+      saga: m ? m.saga : 'multiverse',
+      radius: c.upcoming ? NODE_RADIUS.upcoming : (m ? (m.mainline ? NODE_RADIUS.core : (m.starter ? NODE_RADIUS.recommended : NODE_RADIUS.optional)) : NODE_RADIUS.optional)
+    };
+    nodes.push(node);
+    nodeMap[c.id] = node;
+  });
+
+  /* 年份坐标 */
+  var yearCoords = {};
+  nodes.forEach(function(n){
+    var y = n.movie ? n.movie.year : n.year;
+    if(!yearCoords[y]) yearCoords[y] = {sum:0,count:0,movies:[]};
+    yearCoords[y].sum += n.ovX; yearCoords[y].count++; yearCoords[y].movies.push(n);
+  });
+  var yearList = Object.keys(yearCoords).map(function(y){
+    var d = yearCoords[y]; d.year = parseInt(y); d.x = d.sum / d.count; return d;
+  }).sort(function(a,b){return a.year - b.year;});
+
+  /* 邻接表 */
+  var adjacency = {};
+  nodes.forEach(function(n){ adjacency[n.id] = []; });
+  PANO_CONN.forEach(function(c){
+    if(adjacency[c[0]]) adjacency[c[0]].push({target:c[1],type:c[2]});
+    if(adjacency[c[1]]) adjacency[c[1]].push({target:c[0],type:c[2]});
+  });
+
+  var connElements = [];
+
+  /* ========== 渲染：阶段背景 ========== */
+  function renderPhaseBands(){
+    var g = el('g',{class:'phase-bg'});
+    PHASE_COLS.forEach(function(pc){
+      var x = pc.left*LAYOUT_SCALE, w = pc.width*LAYOUT_SCALE;
+      g.appendChild(el('rect',{class:'phase-band p'+pc.phase,x:x,y:0,width:w,height:MAP_HEIGHT}));
+      g.appendChild(el('line',{class:'phase-divider',x1:x+w,y1:0,x2:x+w,y2:MAP_HEIGHT}));
+      var lx=(pc.left+pc.width/2)*LAYOUT_SCALE;
+      g.appendChild(el('rect',{class:'phase-label-bg',x:lx-50,y:8,width:100,height:28,rx:14}));
+      var lt=el('text',{class:'phase-label-text',x:lx,y:22,fill:'var(--p'+pc.phase+')'});
+      lt.textContent=pc.label; g.appendChild(lt);
+      var yt=el('text',{class:'phase-year-text',x:lx,y:48});
+      yt.textContent=pc.year; g.appendChild(yt);
+    });
+    content.appendChild(g);
+  }
+
+  /* ========== 渲染：时间轴 ========== */
+  function renderTimeline(){
+    var g = el('g',{class:'timeline'});
+    g.appendChild(el('line',{class:'tl-axis-glow',x1:MAP_LEFT,y1:TIMELINE_Y,x2:MAP_RIGHT,y2:TIMELINE_Y}));
+    g.appendChild(el('line',{class:'tl-axis-line',x1:MAP_LEFT,y1:TIMELINE_Y,x2:MAP_RIGHT,y2:TIMELINE_Y}));
+    PHASE_COLS.forEach(function(pc){
+      var lx=(pc.left+pc.width/2)*LAYOUT_SCALE;
+      var lbl=el('text',{class:'tl-phase-label',x:lx,y:TIMELINE_Y+42});
+      lbl.textContent=pc.year; g.appendChild(lbl);
+    });
+    yearList.forEach(function(yd){
+      var x=yd.x, hasMovie=yd.count>0;
+      g.appendChild(el('line',{class:'tl-year-tick'+(hasMovie?' has-movie':''),x1:x,y1:TIMELINE_Y-8,x2:x,y2:TIMELINE_Y+8}));
+      var yl=el('text',{class:'tl-year-label',x:x,y:TIMELINE_Y-16});
+      yl.textContent=yd.year; g.appendChild(yl);
+      if(yd.count>1){
+        var sc=el('text',{class:'tl-year-sublabel',x:x,y:TIMELINE_Y+22});
+        sc.textContent=yd.count+' 部'; g.appendChild(sc);
+      }
+      var mark=el('g',{class:'tl-year-mark','data-year':yd.year});
+      mark.appendChild(el('circle',{class:'tl-year-dot'+(hasMovie?' has-movie':''),cx:x,cy:TIMELINE_Y,r:hasMovie?5:3}));
+      if(yd.movies.length){
+        mark.addEventListener('click',function(e){e.stopPropagation();enterFocus(yd.movies[0].id);});
+      }
+      g.appendChild(mark);
+      if(hasMovie){
+        var main=yd.movies.find(function(n){return n.ovY===BASE_Y;})||yd.movies[0];
+        g.appendChild(el('line',{class:'tl-connect-line',x1:x,y1:TIMELINE_Y-3,x2:main.x,y2:main.ovY+main.radius+4}));
+      }
+    });
+    content.appendChild(g);
+  }
+
+  /* ========== 渲染：主线轨道 ========== */
+  function renderGoldenTrack(){
+    content.appendChild(el('line',{class:'golden-track-glow',x1:MAP_LEFT,y1:BASE_Y,x2:MAP_RIGHT,y2:BASE_Y}));
+    content.appendChild(el('line',{class:'golden-track',x1:MAP_LEFT,y1:BASE_Y,x2:MAP_RIGHT,y2:BASE_Y}));
+  }
+
+  /* ========== 渲染：连线（全景模式） ========== */
+  function renderConnections(){
+    var g = el('g',{class:'connections'});
+    PANO_CONN.forEach(function(c){
+      var from=nodeMap[c[0]], to=nodeMap[c[1]];
+      if(!from||!to) return;
+      var type=c[2], x1=from.ovX, y1=from.ovY, x2=to.ovX, y2=to.ovY, path;
+      if(type==='mainline'){
+        var mx=(x1+x2)/2, my=Math.min(y1,y2)-20;
+        path=el('path',{d:'M'+x1+','+y1+' Q'+mx+','+my+' '+x2+','+y2,class:'conn conn-mainline'});
+      } else if(type==='support'){
+        path=el('line',{x1:x1,y1:y1,x2:x2,y2:y2,class:'conn conn-support'});
+      } else {
+        var dist=Math.abs(x2-x1), arcH=Math.min(dist*0.3,120);
+        var mx2=(x1+x2)/2, my2=Math.min(y1,y2)-arcH;
+        var d='M'+x1+','+y1+' Q'+mx2+','+my2+' '+x2+','+y2;
+        g.appendChild(el('path',{d:d,class:'conn conn-cross-glow'}));
+        path=el('path',{d:d,class:'conn conn-cross'});
+      }
+      path.setAttribute('data-from',c[0]);
+      path.setAttribute('data-to',c[1]);
+      path.setAttribute('data-type',type);
+      g.appendChild(path);
+      connElements.push({el:path, from:c[0], to:c[1], type:type});
+    });
+    content.appendChild(g);
+  }
+
+  /* ========== 渲染：节点 ========== */
+  /* 节点位置通过 CSS transform 设置，支持 transition 动画 */
+  function renderNodes(){
+    var g = el('g',{class:'nodes'});
+    nodes.forEach(function(n){
+      var nodeG = el('g',{
+        class:'movie-node '+n.importance+(n.upcoming?' upcoming':'')+' phase-'+n.phase,
+        'data-id':n.id
+      });
+      /* 初始位置用 CSS transform */
+      nodeG.style.transform = 'translate('+n.ovX+'px, '+n.ovY+'px)';
+
+      nodeG.appendChild(el('circle',{class:'node-glow',r:n.radius+6,fill:phaseColor(n.phase)}));
+      nodeG.appendChild(el('circle',{class:'node-poster-bg',r:n.radius}));
+
+      var clipId='clip-'+n.id;
+      var defs=el('clipPath',{id:clipId});
+      defs.appendChild(el('circle',{r:n.radius-2}));
+      nodeG.appendChild(defs);
+
+      if(n.movie){
+        var v=visual(n.movie.id);
+        if(v&&v.poster){
+          var img=el('image',{x:-(n.radius-2),y:-(n.radius-2),width:(n.radius-2)*2,height:(n.radius-2)*2,'clip-path':'url(#'+clipId+')','preserveAspectRatio':'xMidYMid slice'});
+          img.setAttributeNS('http://www.w3.org/1999/xlink','href',v.poster);
+          img.setAttribute('href',v.poster);
+          nodeG.appendChild(img);
+        } else {
+          var fb=el('text',{class:'node-badge',y:5,fill:phaseColor(n.phase)});
+          fb.textContent=(n.movie.cn||'作').slice(0,1);
+          nodeG.appendChild(fb);
+        }
+      } else {
+        var ut=el('text',{class:'node-badge',y:5,fill:'rgba(255,255,255,.4)'});
+        ut.textContent='?';
+        nodeG.appendChild(ut);
+      }
+
+      nodeG.appendChild(el('circle',{class:'node-ring',r:n.radius,stroke:phaseColor(n.phase)}));
+
+      var label=el('text',{class:'node-label',y:n.radius+16});
+      label.textContent=n.movie?n.movie.cn:n.title;
+      nodeG.appendChild(label);
+
+      var yr=el('text',{class:'node-year',y:n.radius+30});
+      yr.textContent=n.movie?n.movie.year:n.year;
+      nodeG.appendChild(yr);
+
+      /* 事件 */
+      nodeG.addEventListener('click', function(e){ e.stopPropagation(); onNodeClick(n.id); });
+      nodeG.addEventListener('mouseenter', function(){ onNodeHover(n.id); });
+      nodeG.addEventListener('mouseleave', function(){ onNodeLeave(); });
+
+      g.appendChild(nodeG);
+    });
+    content.appendChild(g);
+  }
+
+  /* ========== 渲染：聚焦模式连线 ========== */
+  var focusConnGroup = null;
+
+  /* 节点信息安全区（地图坐标）＝ 海报圆 + 名称/年份文字窄条 两个形状。
+     文字宽度运行时实测（getComputedTextLength），不做字体缩放，只靠位置避让。
+     相比单一大矩形，圆形+窄条精确贴合信息元素，避免把节点斜向/侧向的大片空白误封死。 */
+  function nodeSafeShapes(n, x, y){
+    var nodeEl = content.querySelector('.movie-node[data-id="'+n.id+'"]');
+    var label = nodeEl ? nodeEl.querySelector('.node-label') : null;
+    var textHalfW = n.radius;
+    if(label && label.getComputedTextLength){
+      try{ textHalfW = Math.max(n.radius * 0.6, label.getComputedTextLength() / 2 + 8); }catch(e){}
+    }
+    var above = label && parseFloat(label.getAttribute('y')) < 0;
+    var shapes = [{ circle:true, cx:x, cy:y, r:n.radius + 6 }];
+    shapes.push(above
+      ? { x1:x-textHalfW, y1:y-n.radius-44, x2:x+textHalfW, y2:y-n.radius-10 }
+      : { x1:x-textHalfW, y1:y+n.radius+2,  x2:x+textHalfW, y2:y+n.radius+36 });
+    return shapes;
+  }
+
+  function rectHit(a, b){
+    return a.x1 < b.x2 && a.x2 > b.x1 && a.y1 < b.y2 && a.y2 > b.y1;
+  }
+  /* 矩形与圆相交：最近点法 */
+  function rectCircleHit(rc, c){
+    var nx = Math.max(rc.x1, Math.min(c.cx, rc.x2));
+    var ny = Math.max(rc.y1, Math.min(c.cy, rc.y2));
+    var dx = nx - c.cx, dy = ny - c.cy;
+    return dx*dx + dy*dy < c.r*c.r;
+  }
+
+  function renderFocusConnections(){
+    if(focusConnGroup) focusConnGroup.remove();
+    focusConnGroup = el('g',{class:'focus-connections'});
+
+    var center = nodeMap[state.focusCenter];
+    if(!center) return;
+
+    /* ---- 安全区集合：中心节点 + 全部关联节点（海报圆 + 文字窄条） ---- */
+    var safeShapes = nodeSafeShapes(center, center.fcX, center.fcY);
+    state.focusRelated.forEach(function(rid){
+      var rn = nodeMap[rid];
+      if(rn) safeShapes = safeShapes.concat(nodeSafeShapes(rn, rn.fcX, rn.fcY));
+    });
+    var placed = [];   /* 已放置标签矩形（含安全间距） */
+
+    function labelRect(lx, ly, w){
+      return { x1:lx-w/2-5, y1:ly-11-5, x2:lx+w/2+5, y2:ly+11+5 };
+    }
+    function hitsAny(r){
+      for(var i=0;i<safeShapes.length;i++){
+        var s = safeShapes[i];
+        if(s.circle){ if(rectCircleHit(r, s)) return true; }
+        else if(rectHit(r, s)) return true;
+      }
+      for(var j=0;j<placed.length;j++){ if(rectHit(r, placed[j])) return true; }
+      return false;
+    }
+
+    state.focusRelated.forEach(function(rid){
+      var rel = nodeMap[rid];
+      if(!rel) return;
+
+      /* 找到关系类型 */
+      var adj = adjacency[center.id];
+      var conn = adj.find(function(a){return a.target === rid;});
+      var type = conn ? conn.type : 'support';
+
+      var x1 = center.fcX, y1 = center.fcY;
+      var x2 = rel.fcX, y2 = rel.fcY;
+
+      /* 弧线中点（用于绘制路径）—— 弧度与距离成比例，避免短连线过度弯曲 */
+      var arcH = Math.min(Math.abs(x2-x1)*0.15 + Math.abs(y2-y1)*0.15, 40);
+      var mx = (x1+x2)/2;
+      var my = (y1+y2)/2 - arcH;
+
+      /* 光晕 */
+      var glow = el('path',{d:'M'+x1+','+y1+' Q'+mx+','+my+' '+x2+','+y2, class:'focus-conn-glow '+type});
+      focusConnGroup.appendChild(glow);
+
+      /* 主线 */
+      var path = el('path',{d:'M'+x1+','+y1+' Q'+mx+','+my+' '+x2+','+y2, class:'focus-conn '+type});
+      focusConnGroup.appendChild(path);
+
+      /* ---- 关系标签避让定位 ----
+       * 不再固定死在中点/30% 处：沿本关系线采样（t 自中点向两端）× 法线偏移（自小到大），
+       * 贪心取第一个「不压节点信息区、不与已放置标签相交」的候选点。
+       * 多条关系按主线优先顺序放置 → 高优先级占据自然位，其余自动滑向各自线段附近的空白区。 */
+      var lblText = relTypeLabel(type);
+      var lblW = Math.max(lblText.length * 11 + 16, 60);
+
+      var dx = x2-x1, dy = y2-y1;
+      var len = Math.hypot(dx,dy) || 1;
+      var nxl = -dy/len, nyl = dx/len;
+      /* 线段有效区间：两端各让出节点安全半径，标签不落在节点身上 */
+      var lo = (center.radius + 16) / len;
+      var hi = 1 - (rel.radius + 16) / len;
+
+      var TS = [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82, 0.1, 0.9];
+      var OFFS = [0, 22, -22, 44, -44, 66, -66, 88, -88, 110, -110, 132, -132];
+      var best = null;
+      for(var oi=0; oi<OFFS.length && !best; oi++){
+        for(var ti=0; ti<TS.length; ti++){
+          var t = TS[ti];
+          if(t < lo || t > hi) continue;
+          var px = x1 + dx*t + nxl*OFFS[oi];
+          var py = y1 + dy*t + nyl*OFFS[oi];
+          if(!hitsAny(labelRect(px, py, lblW))){ best = {x:px, y:py}; break; }
+        }
+      }
+      /* 兜底：环外极坐标搜索——沿本线角度向圆环外侧找空白（θ±30° 扫描，半径逐级外扩）。
+         环内被中心文字条+相邻节点圆挤满时，环外 1.4R~2.0R 处必有空位，
+         且仍保持标签在该关系线方向附近（分散到对应关系线附近空白区）。 */
+      if(!best){
+        var baseA = Math.atan2(dy, dx);
+        for(var radK = 1.4; radK <= 2.0 && !best; radK += 0.15){
+          var rad = len * radK;
+          for(var dIdx = 0; dIdx < 7 && !best; dIdx++){
+            var dA = (dIdx % 2 === 1 ? 1 : -1) * Math.ceil(dIdx / 2) * 10 * Math.PI / 180;
+            var px3 = x1 + rad * Math.cos(baseA + dA);
+            var py3 = y1 + rad * Math.sin(baseA + dA);
+            if(!hitsAny(labelRect(px3, py3, lblW))){ best = {x:px3, y:py3}; }
+          }
+        }
+      }
+      if(!best){ best = {x:x1+dx*0.5, y:y1+dy*0.5}; } /* 理论兜底 */
+      placed.push(labelRect(best.x, best.y, lblW));
+
+      var lx = best.x, ly = best.y;
+
+      /* 标签背景 */
+      var lblBg = el('rect',{class:'focus-conn-label-bg',x:lx-lblW/2,y:ly-9,width:lblW,height:18,rx:9});
+      focusConnGroup.appendChild(lblBg);
+
+      /* 标签文字 */
+      var lbl = el('text',{class:'focus-conn-label',x:lx,y:ly});
+      lbl.textContent = lblText;
+      focusConnGroup.appendChild(lbl);
+
+      /* 延迟显示 */
+      setTimeout(function(){
+        glow.classList.add('show');
+        path.classList.add('show');
+        lblBg.classList.add('show');
+        lbl.classList.add('show');
+      }, 50);
+    });
+
+    content.appendChild(focusConnGroup);
+  }
+
+  /* ========== 渲染：全部 ========== */
+  function renderAll(){
+    content.innerHTML = '';
+    renderPhaseBands();
+    renderTimeline();
+    renderGoldenTrack();
+    renderConnections();
+    renderNodes();
+    applyTransform();
+  }
+
+  /* ========== 变换 ========== */
+  function applyTransform(){
+    content.setAttribute('transform','translate('+state.tx+','+state.ty+') scale('+state.scale+')');
+    document.getElementById('zoom-display').textContent = Math.round(state.scale*100)+'%';
+    updateMinimap();
+  }
+
+  function setViewportTransform(tx,ty,scale,smooth){
+    state.tx=tx; state.ty=ty; state.scale=scale;
+    if(smooth){
+      content.classList.add('smooth');
+      applyTransform();
+      setTimeout(function(){ content.classList.remove('smooth'); }, 520);
+    } else {
+      applyTransform();
+    }
+  }
+
+  function fitToScreen(){
+    var r = canvas.getBoundingClientRect();
+    var scaleX=(r.width-80)/MAP_WIDTH, scaleY=(r.height-80)/MAP_HEIGHT;
+    var scale=Math.min(scaleX,scaleY,1);
+    var tx=(r.width-MAP_WIDTH*scale)/2 - MAP_LEFT*scale;
+    var ty=(r.height-MAP_HEIGHT*scale)/2 - 10;
+    setViewportTransform(tx,ty,scale,true);
+  }
+
+  /* ========== 迷你导航 ========== */
+  function updateMinimap(){
+    var r = canvas.getBoundingClientRect();
+    if(!r.width) return;
+    var viewLeft = -state.tx / state.scale;
+    var viewWidth = r.width / state.scale;
+    var pct = (viewLeft - MAP_LEFT) / MAP_WIDTH * 100;
+    var w = viewWidth / MAP_WIDTH * 100;
+    if(pct < 0){ w += pct; pct = 0; }
+    if(pct + w > 100) w = 100 - pct;
+    minimapFill.style.left = pct+'%';
+    minimapFill.style.width = Math.max(3,Math.min(100,w))+'%';
+  }
+
+  /* ========== 节点位置更新 ========== */
+  function setNodePosition(node, x, y){
+    var nodeEl = content.querySelector('.movie-node[data-id="'+node.id+'"]');
+    if(nodeEl) nodeEl.style.transform = 'translate('+x+'px, '+y+'px)';
+  }
+
+  function applyOverviewPositions(){
+    nodes.forEach(function(n){ setNodePosition(n, n.ovX, n.ovY); });
+  }
+
+  function applyFocusPositions(){
+    nodes.forEach(function(n){
+      if(n.id === state.focusCenter || state.focusRelated.indexOf(n.id) >= 0){
+        setNodePosition(n, n.fcX, n.fcY);
+      }
+    });
+  }
+
+  /* ========== 聚焦模式标签位置更新 ==========
+   * 关联节点的标签（名称+年份）放在远离中心的一侧：
+   * - 节点在中心上方 → 标签在节点上方
+   * - 节点在中心下方 → 标签在节点下方
+   * - 节点在中心左右 → 标签在下方（默认）
+   * 避免标签与关系连线标签、中心节点发生重叠 */
+  function updateFocusNodeLabels(){
+    var center = nodeMap[state.focusCenter];
+    if(!center) return;
+
+    state.focusRelated.forEach(function(rid){
+      var n = nodeMap[rid];
+      if(!n) return;
+      var nodeEl = content.querySelector('.movie-node[data-id="'+rid+'"]');
+      if(!nodeEl) return;
+      var label = nodeEl.querySelector('.node-label');
+      var year = nodeEl.querySelector('.node-year');
+      if(!label || !year) return;
+
+      /* 节点相对中心的方向：dy<0 = 在上方，dy>0 = 在下方 */
+      var dy = n.fcY - center.fcY;
+      /* 阈值 10px，接近水平时默认放下方 */
+      if(dy < -10){
+        /* 节点在中心上方 → 标签放节点上方 */
+        label.setAttribute('y', -(n.radius + 16));
+        year.setAttribute('y', -(n.radius + 30));
+      } else {
+        /* 节点在中心下方或水平 → 标签放节点下方（默认） */
+        label.setAttribute('y', n.radius + 16);
+        year.setAttribute('y', n.radius + 30);
+      }
+    });
+  }
+
+  /* 退出聚焦模式时重置所有标签到默认位置 */
+  function resetFocusNodeLabels(){
+    nodes.forEach(function(n){
+      var nodeEl = content.querySelector('.movie-node[data-id="'+n.id+'"]');
+      if(!nodeEl) return;
+      var label = nodeEl.querySelector('.node-label');
+      var year = nodeEl.querySelector('.node-year');
+      if(label) label.setAttribute('y', n.radius + 16);
+      if(year) year.setAttribute('y', n.radius + 30);
+    });
+  }
+
+  /* ========== 聚焦模式布局计算 ==========
+   * 聚焦 = 位置 + 大小 + 关系 三位一体：
+   * 1. 大小：按中心节点半径自适应目标缩放（期望屏幕尺寸），只放大不缩小，上限与全局缩放一致
+   * 2. 位置：中心节点保持全景原位，由视口变换把它带到屏幕中央（保留全局空间感）
+   * 3. 关系：关联节点按目标缩放换算环绕半径，保证屏幕上环绕距离恒定
+   * 视口变换在 enterFocus/shiftFocus 中经 applyFocusViewport() 应用 */
+  function computeFocusLayout(centerId){
+    var center = nodeMap[centerId];
+    if(!center) return;
+
+    /* 1. 自适应目标缩放：中心节点呈现为 FOCUS_CENTER_R 屏幕半径；
+          不小于进入前缩放（聚焦是放大动作），clamp 到全局缩放范围 */
+    var target = FOCUS_CENTER_R / center.radius;
+    target = Math.max(1, Math.min(SCALE_MAX, target));
+    target = Math.min(SCALE_MAX, Math.max(target, state.scale));
+    state.focusScale = target;
+
+    /* 2. 中心节点保持全景原位 */
+    center.fcX = center.ovX;
+    center.fcY = center.ovY;
+
+    /* 获取关联节点 */
+    var related = (adjacency[centerId]||[]).slice();
+
+    /* 按关系类型排序：主线优先 */
+    var typeOrder = {mainline:0, support:1, cross:2, prereq:3, character:4, setup:5, event:6, world:7};
+    related.sort(function(a,b){
+      var ta = typeOrder[a.type]||8, tb = typeOrder[b.type]||8;
+      if(ta !== tb) return ta - tb;
+      /* 同类型按 X 坐标（时间顺序） */
+      var na = nodeMap[a.target], nb = nodeMap[b.target];
+      return (na?na.ovX:0) - (nb?nb.ovX:0);
+    });
+
+    state.focusRelated = related.map(function(r){return r.target;}).filter(function(id){return nodeMap[id];});
+
+    /* 放射状布局 */
+    var count = state.focusRelated.length;
+    if(count === 0) return;
+
+    /* 3. 环绕半径：屏幕像素按目标缩放换算为地图坐标；关联过多时自动扩半径防重叠 */
+    var ringScreen = count > 8 ? FOCUS_RING_R + (count - 8) * 18 : FOCUS_RING_R;
+    var R = ringScreen / target;
+
+    /* 如果只有一个关联节点，放在右侧 */
+    if(count === 1){
+      var n1 = nodeMap[state.focusRelated[0]];
+      n1.fcX = center.fcX + R;
+      n1.fcY = center.fcY;
+      return;
+    }
+
+    /* 多个节点：均匀分布在圆周上 */
+    /* 起始角度：-90°（正上方），顺时针 */
+    state.focusRelated.forEach(function(rid, i){
+      var n = nodeMap[rid];
+      if(!n) return;
+      var angle = (-90 + 360 * i / count) * Math.PI / 180;
+      n.fcX = center.fcX + R * Math.cos(angle);
+      n.fcY = center.fcY + R * Math.sin(angle);
+    });
+  }
+
+  /* 聚焦视口：把中心节点带到屏幕中央（稍右移避让左侧信息卡）并应用目标缩放 */
+  function applyFocusViewport(center){
+    var r = canvas.getBoundingClientRect();
+    var offX = Math.min(90, Math.max(40, (r.width - 560) / 4));
+    var scx = r.width / 2 + offX;
+    var scy = r.height / 2;
+    var s = state.focusScale || state.scale;
+    setViewportTransform(scx - center.ovX * s, scy - center.ovY * s, s, true);
+  }
+
+  /* ========== 进入聚焦模式 ========== */
+  function enterFocus(nodeId){
+    var n = nodeMap[nodeId];
+    if(!n || n.upcoming) return;
+
+    state.mode = 'focus';
+    state.focusCenter = nodeId;
+    state.explorePath = [{id:nodeId, title: n.movie ? n.movie.cn : n.title}];
+
+    computeFocusLayout(nodeId);
+
+    /* 视口跟随：中心节点居中 + 自适应放大 */
+    applyFocusViewport(n);
+
+    /* 标记节点角色 */
+    content.classList.add('focus-mode');
+    canvas.classList.add('focus-mode');
+    nodes.forEach(function(nn){
+      var nodeEl = content.querySelector('.movie-node[data-id="'+nn.id+'"]');
+      if(!nodeEl) return;
+      nodeEl.classList.remove('center','related','unrelated');
+      if(nn.id === nodeId) nodeEl.classList.add('center');
+      else if(state.focusRelated.indexOf(nn.id) >= 0) nodeEl.classList.add('related');
+      else nodeEl.classList.add('unrelated');
+    });
+
+    /* 移动节点到聚焦位置 */
+    applyFocusPositions();
+
+    /* 更新关联节点标签位置（远离中心方向） */
+    updateFocusNodeLabels();
+
+    /* 延迟渲染聚焦连线 */
+    setTimeout(function(){
+      renderFocusConnections();
+    }, 400);
+
+    /* 更新 UI */
+    showBreadcrumb();
+    showFocusCard(n);
+    document.getElementById('btn-back').classList.add('show');
+    resetLabel.textContent = '全景';
+    headerSubtitle.style.display = 'none';
+
+    /* 取消 hover 高亮 */
+    content.classList.remove('highlighting');
+  }
+
+  /* ========== 退出聚焦模式 ========== */
+  function exitFocus(){
+    state.mode = 'overview';
+    state.focusCenter = null;
+    state.focusRelated = [];
+    state.explorePath = [];
+
+    /* 移除聚焦模式标记 */
+    content.classList.remove('focus-mode');
+    canvas.classList.remove('focus-mode');
+
+    /* 清除节点角色标记 */
+    nodes.forEach(function(nn){
+      var nodeEl = content.querySelector('.movie-node[data-id="'+nn.id+'"]');
+      if(nodeEl) nodeEl.classList.remove('center','related','unrelated');
+    });
+
+    /* 节点回到全景位置 */
+    applyOverviewPositions();
+
+    /* 重置标签到默认位置（节点下方） */
+    resetFocusNodeLabels();
+
+    /* 清除聚焦连线 */
+    if(focusConnGroup){ focusConnGroup.remove(); focusConnGroup = null; }
+
+    /* 更新 UI */
+    hideBreadcrumb();
+    hideFocusCard();
+    document.getElementById('btn-back').classList.remove('show');
+    resetLabel.textContent = '全景';
+    headerSubtitle.style.display = '';
+
+    /* 适配屏幕 */
+    setTimeout(function(){ fitToScreen(); }, 400);
+  }
+
+  /* ========== 切换聚焦中心（聚焦模式内） ========== */
+  function shiftFocus(nodeId){
+    var n = nodeMap[nodeId];
+    if(!n || n.upcoming) return;
+
+    /* 更新探索路径 */
+    /* 如果点击的是路径中已有的节点，截断到该节点 */
+    var existingIdx = -1;
+    for(var i = 0; i < state.explorePath.length; i++){
+      if(state.explorePath[i].id === nodeId){ existingIdx = i; break; }
+    }
+    if(existingIdx >= 0){
+      state.explorePath = state.explorePath.slice(0, existingIdx + 1);
+    } else {
+      state.explorePath.push({id:nodeId, title: n.movie ? n.movie.cn : n.title});
+    }
+
+    state.focusCenter = nodeId;
+    computeFocusLayout(nodeId);
+
+    /* 视口跟随：中心节点居中 + 自适应放大 */
+    applyFocusViewport(n);
+
+    /* 更新节点角色 */
+    nodes.forEach(function(nn){
+      var nodeEl = content.querySelector('.movie-node[data-id="'+nn.id+'"]');
+      if(!nodeEl) return;
+      nodeEl.classList.remove('center','related','unrelated');
+      if(nn.id === nodeId) nodeEl.classList.add('center');
+      else if(state.focusRelated.indexOf(nn.id) >= 0) nodeEl.classList.add('related');
+      else nodeEl.classList.add('unrelated');
+    });
+
+    /* 移动节点 */
+    applyFocusPositions();
+
+    /* 更新关联节点标签位置 */
+    updateFocusNodeLabels();
+
+    /* 重绘聚焦连线 */
+    if(focusConnGroup){ focusConnGroup.remove(); focusConnGroup = null; }
+    setTimeout(function(){ renderFocusConnections(); }, 400);
+
+    /* 更新 UI */
+    showBreadcrumb();
+    showFocusCard(n);
+  }
+
+  /* ========== 面包屑 ========== */
+  function showBreadcrumb(){
+    var html = '';
+    html += '<span class="pc-crumb home" data-action="exit">全景地图</span>';
+    state.explorePath.forEach(function(p, i){
+      html += '<span class="pc-crumb-sep">›</span>';
+      var isCurrent = (i === state.explorePath.length - 1);
+      html += '<span class="pc-crumb'+(isCurrent?' current':'')+'" data-idx="'+i+'">'+esc(p.title)+'</span>';
+    });
+    breadcrumb.innerHTML = html;
+    breadcrumb.classList.add('show');
+
+    /* 绑定点击 */
+    breadcrumb.querySelectorAll('.pc-crumb').forEach(function(el2){
+      el2.onclick = function(){
+        if(el2.classList.contains('current')) return;
+        if(el2.getAttribute('data-action') === 'exit'){
+          exitFocus();
+        } else {
+          var idx = parseInt(el2.getAttribute('data-idx'));
+          if(!isNaN(idx)){
+            shiftFocus(state.explorePath[idx].id);
+          }
+        }
+      };
+    });
+  }
+
+  function hideBreadcrumb(){
+    breadcrumb.classList.remove('show');
+    breadcrumb.innerHTML = '';
+  }
+
+  /* ========== 中心节点信息卡 ========== */
+  function showFocusCard(n){
+    var m = n.movie;
+    if(!m) return;
+    var v = visual(m.id);
+
+    /* 海报 */
+    var posterEl = document.getElementById('focus-poster');
+    if(v && v.poster){
+      posterEl.innerHTML = '<img src="'+esc(v.poster)+'" alt="'+esc(m.cn)+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="pc-focus-card-poster-fallback" style="display:none;background:linear-gradient(145deg,'+phaseColor(m.phase)+',var(--surface-2,#1E2636))">'+esc((m.cn||'作').slice(0,1))+'</div>';
+    } else {
+      posterEl.innerHTML = '<div class="pc-focus-card-poster-fallback" style="background:linear-gradient(145deg,'+phaseColor(m.phase)+',var(--surface-2,#1E2636))">'+esc((m.cn||'作').slice(0,1))+'</div>';
+    }
+
+    /* 背景 */
+    var bd = document.getElementById('focus-backdrop');
+    if(v && v.backdrop){
+      bd.style.backgroundImage = 'url('+JSON.stringify(v.backdrop)+')';
+    } else {
+      bd.style.background = 'linear-gradient(135deg,'+phaseColor(m.phase)+',var(--surface,#161D2B))';
+    }
+
+    /* 关系列表 */
+    var rels = MCU.data.relationsOf(m.id)||[];
+    var relHtml = rels.slice(0,5).map(function(r){
+      var o = getMovie(r.other);
+      if(!o) return '';
+      var ov = visual(o.id);
+      var typeInfo = (MCU.data.types[r.type]||{});
+      var thumb = (ov&&ov.poster) ? '<img src="'+esc(ov.poster)+'" alt="'+esc(o.cn)+'" loading="lazy">' : '';
+      return '<div class="pc-focus-card-rel" data-id="'+esc(o.id)+'">'
+        +'<div class="pc-focus-card-rel-poster">'+thumb+'</div>'
+        +'<div class="pc-focus-card-rel-info">'
+        +'<div class="pc-focus-card-rel-name">'+esc(o.cn)+'</div>'
+        +'<div class="pc-focus-card-rel-type"><span class="type-dot" style="background:'+esc(typeInfo.color||'#7A8296')+'"></span>'+esc(typeInfo.label||'关联')+' · '+esc(o.year||'')+'</div>'
+        +'</div></div>';
+    }).join('');
+
+    var relSection = rels.length
+      ? '<div class="pc-focus-card-relations-title">关联作品 ('+rels.length+')</div>'+relHtml
+      : '';
+
+    var body = document.getElementById('focus-body');
+    body.innerHTML =
+      '<div class="pc-focus-card-meta">'
+      +(m.type==='movie'&&m.phase?'<span class="pc-focus-card-chip phase">'+esc(phaseName(m.phase))+'</span>':'')
+      +'<span class="pc-focus-card-chip">'+esc(m.year||'')+'</span>'
+      +'<span class="pc-focus-card-chip">'+esc(statusOf(m))+'</span>'
+      +'</div>'
+      +'<div class="pc-focus-card-title">'+esc(m.cn)+'</div>'
+      +'<div class="pc-focus-card-en">'+esc(m.en||'')+'</div>'
+      +'<div class="pc-focus-card-role">'+esc(m.role||m.sf||'')+'</div>'
+      +relSection
+      +'<div class="pc-focus-card-actions">'
+      +'<a class="primary" href="movie.html?id='+encodeURIComponent(m.id)+'">查看详情</a>'
+      +'<a class="secondary" href="next.html?from='+encodeURIComponent(m.id)+'">下一部</a>'
+      +'</div>';
+
+    /* 绑定关联作品点击 */
+    body.querySelectorAll('.pc-focus-card-rel').forEach(function(el2){
+      el2.onclick = function(){
+        var rid = el2.getAttribute('data-id');
+        if(rid) shiftFocus(rid);
+      };
+    });
+
+    /* 定位信息卡（在画布左侧偏上） */
+    var r = canvas.getBoundingClientRect();
+    var cardW = 280;
+    var cardH = focusCard.offsetHeight || 380;
+    var left = 24;
+    var top = r.height/2 - cardH/2;
+    if(top < 10) top = 10;
+    if(top + cardH > r.height - 10) top = r.height - cardH - 10;
+
+    focusCard.style.left = left+'px';
+    focusCard.style.top = top+'px';
+    focusCard.classList.add('show');
+  }
+
+  function hideFocusCard(){
+    focusCard.classList.remove('show');
+  }
+
+  /* ========== Hover 高亮（仅全景模式） ========== */
+  function onNodeHover(id){
+    if(state.mode !== 'overview') return;
+    if(state.isDragging) return;
+    state.hoveredNode = id;
+
+    content.classList.add('highlighting');
+    var connected = {};
+    connected[id] = true;
+    (adjacency[id]||[]).forEach(function(e){ connected[e.target] = true; });
+
+    nodes.forEach(function(n){
+      var el2 = content.querySelector('.movie-node[data-id="'+n.id+'"]');
+      if(!el2) return;
+      el2.classList.remove('highlighted','dimmed');
+      if(connected[n.id]) el2.classList.add('highlighted');
+      else el2.classList.add('dimmed');
+    });
+    connElements.forEach(function(c){
+      c.el.classList.remove('highlighted');
+      if(c.from === id || c.to === id) c.el.classList.add('highlighted');
+    });
+    canvas.style.cursor = 'pointer';
+  }
+
+  function onNodeLeave(){
+    if(state.mode !== 'overview') return;
+    if(state.hoveredNode){
+      state.hoveredNode = null;
+      content.classList.remove('highlighting');
+      nodes.forEach(function(n){
+        var el2 = content.querySelector('.movie-node[data-id="'+n.id+'"]');
+        if(el2) el2.classList.remove('highlighted','dimmed');
+      });
+      connElements.forEach(function(c){ c.el.classList.remove('highlighted'); });
+    }
+    canvas.style.cursor = 'grab';
+  }
+
+  /* ========== 节点点击 ========== */
+  function onNodeClick(id){
+    var n = nodeMap[id];
+    if(!n || n.upcoming) return;
+
+    if(state.mode === 'overview'){
+      enterFocus(id);
+    } else {
+      /* 聚焦模式：点击关联节点切换中心，点击中心无操作 */
+      if(id === state.focusCenter) return;
+      if(state.focusRelated.indexOf(id) >= 0){
+        shiftFocus(id);
+      } else {
+        /* 点击了无关节点：直接切换到该节点 */
+        shiftFocus(id);
+      }
+    }
+  }
+
+  /* ========== 拖拽（含惯性，仅全景模式） ========== */
+  function cancelInertia(){
+    if(state.inertiaRAF){
+      cancelAnimationFrame(state.inertiaRAF);
+      state.inertiaRAF = null;
+    }
+  }
+
+  canvas.addEventListener('mousedown', function(e){
+    /* 统一记录按下点（含聚焦模式）：供 click 区分「拖拽后松开」与「真实点击」 */
+    state.downX = e.clientX; state.downY = e.clientY;
+    if(e.target.closest('.movie-node') || e.target.closest('.pc-focus-card') || e.target.closest('.pc-legend') || e.target.closest('.pc-minimap')) return;
+    if(e.target.closest('.tl-year-mark')) return;
+    if(state.mode === 'focus') return; /* 聚焦模式不允许拖拽 */
+    cancelInertia();
+    content.classList.remove('smooth');
+    state.isDragging = true;
+    state.dragStartX = e.clientX; state.dragStartY = e.clientY;
+    state.dragStartTX = state.tx; state.dragStartTY = state.ty;
+    state.lastMoveX = e.clientX; state.lastMoveY = e.clientY;
+    state.lastMoveTime = Date.now();
+    state.velocityX = 0; state.velocityY = 0;
+    canvas.classList.add('grabbing');
+  });
+
+  window.addEventListener('mousemove', function(e){
+    if(!state.isDragging) return;
+    var dx = e.clientX - state.dragStartX;
+    var dy = e.clientY - state.dragStartY;
+    state.tx = state.dragStartTX + dx;
+    state.ty = state.dragStartTY + dy;
+    var now = Date.now();
+    var dt = now - state.lastMoveTime;
+    if(dt > 0){
+      state.velocityX = (e.clientX - state.lastMoveX) / dt;
+      state.velocityY = (e.clientY - state.lastMoveY) / dt;
+    }
+    state.lastMoveX = e.clientX; state.lastMoveY = e.clientY; state.lastMoveTime = now;
+    applyTransform();
+  });
+
+  window.addEventListener('mouseup', function(){
+    if(state.isDragging){
+      state.isDragging = false;
+      canvas.classList.remove('grabbing');
+      var speed = Math.sqrt(state.velocityX*state.velocityX + state.velocityY*state.velocityY);
+      if(speed > 0.3){
+        var decay = 0.95;
+        var animate = function(){
+          var dt = 16;
+          state.tx += state.velocityX * dt;
+          state.ty += state.velocityY * dt;
+          state.velocityX *= decay; state.velocityY *= decay;
+          applyTransform();
+          var newSpeed = Math.sqrt(state.velocityX*state.velocityX + state.velocityY*state.velocityY);
+          if(newSpeed > 0.05 && !state.isDragging){
+            state.inertiaRAF = requestAnimationFrame(animate);
+          } else {
+            state.inertiaRAF = null;
+          }
+        };
+        state.inertiaRAF = requestAnimationFrame(animate);
+      }
+    }
+  });
+
+  /* ========== 缩放（全景 + 探索模式均可用） ========== */
+  canvas.addEventListener('wheel', function(e){
+    e.preventDefault();
+    cancelInertia();
+    content.classList.remove('smooth');
+    var rect = canvas.getBoundingClientRect();
+    var mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    var delta = e.deltaY > 0 ? 0.88 : 1.12;
+    var newScale = Math.max(0.25, Math.min(3.5, state.scale * delta));
+    var ratio = newScale / state.scale;
+    state.tx = mx - (mx - state.tx) * ratio;
+    state.ty = my - (my - state.ty) * ratio;
+    state.scale = newScale;
+    applyTransform();
+  }, {passive:false});
+
+  function smoothZoom(factor){
+    var rect = canvas.getBoundingClientRect();
+    var cx = rect.width/2, cy = rect.height/2;
+    var newScale = Math.max(0.25, Math.min(3.5, state.scale * factor));
+    var ratio = newScale / state.scale;
+    setViewportTransform(cx-(cx-state.tx)*ratio, cy-(cy-state.ty)*ratio, newScale, true);
+  }
+
+  document.getElementById('btn-zoom-in').onclick = function(){
+    cancelInertia(); smoothZoom(1.25);
+  };
+  document.getElementById('btn-zoom-out').onclick = function(){
+    cancelInertia(); smoothZoom(0.8);
+  };
+  document.getElementById('btn-reset').onclick = function(){
+    if(state.mode === 'focus'){
+      exitFocus();
+    } else {
+      cancelInertia(); fitToScreen();
+    }
+  };
+  document.getElementById('btn-back').onclick = function(){
+    if(state.mode !== 'focus') return;
+    if(state.explorePath.length > 1){
+      shiftFocus(state.explorePath[state.explorePath.length - 2].id);
+    } else {
+      exitFocus();
+    }
+  };
+
+  /* ========== 点击空白 ========== */
+  canvas.addEventListener('click', function(e){
+    if(e.target.closest('.movie-node') || e.target.closest('.pc-focus-card') || e.target.closest('.pc-legend') || e.target.closest('.pc-minimap') || e.target.closest('.tl-year-mark')) return;
+    /* 拖拽后的 click：与按下点位移超阈值视为拖动，不触发点击 */
+    var moved = Math.hypot(e.clientX - (state.downX || e.clientX), e.clientY - (state.downY || e.clientY)) > 6;
+    if(moved) return;
+    if(state.mode === 'focus'){
+      /* 探索模式点击空白直接退出，回到全景 */
+      exitFocus();
+    }
+  });
+
+  /* ========== 图例折叠 ========== */
+  var legend = document.getElementById('legend');
+  document.getElementById('legend-toggle').onclick = function(){
+    legend.classList.toggle('collapsed');
+    this.textContent = legend.classList.contains('collapsed') ? '+' : '−';
+  };
+
+  /* ========== 筛选面板 ========== */
+  var filterPanel = document.getElementById('filter-panel');
+  var filterMask = document.getElementById('filter-mask');
+
+  document.getElementById('btn-filter').onclick = function(){
+    filterPanel.classList.add('show'); filterMask.classList.add('show');
+  };
+  document.getElementById('filter-close').onclick = closeFilter;
+  document.getElementById('filter-apply').onclick = closeFilter;
+  filterMask.onclick = closeFilter;
+  function closeFilter(){
+    filterPanel.classList.remove('show'); filterMask.classList.remove('show');
+  }
+
+  var phaseColors = {1:'#5B8DEF',2:'#28B487',3:'#F0A932',4:'#8B6FE8',5:'#E8483F',6:'#C25B8E'};
+  var phaseLabels = {1:'第一阶段',2:'第二阶段',3:'第三阶段',4:'第四阶段',5:'第五阶段',6:'第六阶段'};
+  var sagaLabels = {infinity:'无限传奇',multiverse:'多元宇宙传奇'};
+  var relTypeLabels = {mainline:'主线承接',support:'关键关联',cross:'跨阶段/多元宇宙'};
+  var filterState = {phases:[1,2,3,4,5,6], sagas:['infinity','multiverse'], relTypes:['mainline','support','cross']};
+
+  function renderFilterChips(){
+    var pc2 = document.getElementById('filter-phases');
+    pc2.innerHTML = [1,2,3,4,5,6].map(function(p){
+      var a = filterState.phases.indexOf(p)>=0;
+      return '<span class="pc-chip p'+p+(a?' active':'')+'" data-filter="phase" data-value="'+p+'"><span class="pc-chip-dot" style="background:'+phaseColors[p]+'"></span>'+phaseLabels[p]+'</span>';
+    }).join('');
+    var sc2 = document.getElementById('filter-sagas');
+    sc2.innerHTML = ['infinity','multiverse'].map(function(s){
+      var a = filterState.sagas.indexOf(s)>=0;
+      return '<span class="pc-chip'+(a?' active':'')+'" data-filter="saga" data-value="'+s+'" style="'+(a?'border-color:var(--gold);background:rgba(242,178,51,.08);color:var(--gold)':'')+'">'+sagaLabels[s]+'</span>';
+    }).join('');
+    var rc2 = document.getElementById('filter-rel-types');
+    rc2.innerHTML = ['mainline','support','cross'].map(function(t){
+      var a = filterState.relTypes.indexOf(t)>=0;
+      return '<span class="pc-chip'+(a?' active':'')+'" data-filter="relType" data-value="'+t+'" style="'+(a?'border-color:var(--gold);background:rgba(242,178,51,.08);color:var(--gold)':'')+'">'+relTypeLabels[t]+'</span>';
+    }).join('');
+    pc2.querySelectorAll('.pc-chip').forEach(function(el2){ el2.onclick=function(){ toggleFilter('phases',parseInt(el2.getAttribute('data-value')),el2); }; });
+    sc2.querySelectorAll('.pc-chip').forEach(function(el2){ el2.onclick=function(){ toggleFilter('sagas',el2.getAttribute('data-value'),el2); }; });
+    rc2.querySelectorAll('.pc-chip').forEach(function(el2){ el2.onclick=function(){ toggleFilter('relTypes',el2.getAttribute('data-value'),el2); }; });
+  }
+
+  function toggleFilter(key,value,el2){
+    var arr = filterState[key];
+    var idx = arr.indexOf(value);
+    if(idx >= 0){ arr.splice(idx,1); el2.classList.remove('active'); el2.style.cssText=''; }
+    else {
+      arr.push(value); el2.classList.add('active');
+      if(key==='phases'){ el2.style.cssText='border-color:'+phaseColors[value]+'40;background:'+phaseColors[value]+'26;color:'+phaseColors[value]; }
+      else { el2.style.cssText='border-color:var(--gold);background:rgba(242,178,51,.08);color:var(--gold)'; }
+    }
+    applyFilters();
+  }
+
+  function applyFilters(){
+    nodes.forEach(function(n){
+      var el2 = content.querySelector('.movie-node[data-id="'+n.id+'"]');
+      if(!el2) return;
+      var phaseOk = filterState.phases.indexOf(n.phase)>=0;
+      var sagaOk = filterState.sagas.indexOf(n.saga)>=0;
+      var show = phaseOk && sagaOk;
+      el2.style.opacity = show ? '' : '0.08';
+      el2.style.pointerEvents = show ? '' : 'none';
+    });
+    connElements.forEach(function(c){
+      var typeOk = filterState.relTypes.indexOf(c.type)>=0;
+      var fn = nodeMap[c.from], tn = nodeMap[c.to];
+      var phaseOk = fn && tn && filterState.phases.indexOf(fn.phase)>=0 && filterState.phases.indexOf(tn.phase)>=0;
+      c.el.style.opacity = (typeOk && phaseOk) ? '' : '0.02';
+    });
+  }
+
+  document.getElementById('filter-clear').onclick = function(){
+    filterState = {phases:[1,2,3,4,5,6], sagas:['infinity','multiverse'], relTypes:['mainline','support','cross']};
+    renderFilterChips(); applyFilters();
+  };
+
+  /* ========== 星空背景 ========== */
+  function renderStarfield(){
+    var sf = document.getElementById('starfield');
+    var html = '';
+    for(var i=0; i<80; i++){
+      var x=Math.random()*100, y=Math.random()*100, size=Math.random()*2+0.5, delay=Math.random()*4;
+      html += '<div class="pc-star" style="left:'+x+'%;top:'+y+'%;width:'+size+'px;height:'+size+'px;animation-delay:'+delay+'s"></div>';
+    }
+    sf.innerHTML = html;
+  }
+
+  /* ========== 键盘快捷键 ========== */
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      if(filterPanel.classList.contains('show')){ closeFilter(); }
+      else if(state.mode === 'focus'){
+        if(state.explorePath.length > 1){
+          shiftFocus(state.explorePath[state.explorePath.length - 2].id);
+        } else {
+          exitFocus();
+        }
+      }
+    } else if(e.key === 'Backspace' && state.mode === 'focus'){
+      e.preventDefault();
+      if(state.explorePath.length > 1){
+        shiftFocus(state.explorePath[state.explorePath.length - 2].id);
+      } else {
+        exitFocus();
+      }
+    } else if(state.mode === 'overview'){
+      if(e.key === '+' || e.key === '='){ cancelInertia(); smoothZoom(1.25); }
+      else if(e.key === '-'){ cancelInertia(); smoothZoom(0.8); }
+      else if(e.key === '0'){ cancelInertia(); fitToScreen(); }
+    }
+  });
+
+  /* ========== 窗口大小变化 ========== */
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function(){
+      if(state.mode === 'overview'){
+        fitToScreen();
+      } else if(state.focusCenter){
+        /* 聚焦模式重新计算布局 */
+        computeFocusLayout(state.focusCenter);
+        applyFocusPositions();
+        updateFocusNodeLabels();
+        if(focusConnGroup){ focusConnGroup.remove(); focusConnGroup = null; }
+        setTimeout(function(){ renderFocusConnections(); }, 400);
+        var n = nodeMap[state.focusCenter];
+        if(n) showFocusCard(n);
+      }
+    }, 200);
+  });
+
+  /* ========== 初始化 ========== */
+  renderStarfield();
+  renderAll();
+  renderFilterChips();
+  setTimeout(function(){ fitToScreen(); }, 50);
+
+})();
+</script>
+</body></html>
