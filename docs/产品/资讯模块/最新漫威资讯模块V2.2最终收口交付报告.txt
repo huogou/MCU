@@ -1,0 +1,275 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU 宇宙导航｜最新漫威资讯模块 V2.2 · 最终收口交付报告》
+执行时间：2026-09-22 14:40–15:0x（GMT+8）
+执行依据：《MCU 宇宙导航｜最新漫威资讯模块 V2.2 最终开发收口指令》（20 节，P1–P5）
+本阶段性质：代码级收口 + 核验 + 回归 + 截图，**未接入真实资讯抓取**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+============================================================
+0. 关联文件索引（★ 供策划 / 设计顺着路径查阅）
+============================================================
+
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2.2最终收口交付报告.txt
+
+【本轮执行依据（收口指令）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\H5\MCU宇宙导航_最新漫威资讯模块V2.2_最终开发收口指令.txt
+
+【被核验 / 被修复的实现（6 个指定文件）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\news.html
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\news-detail.html
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\index.html
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\assets\js\components.js
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\assets\css\v2n-news.css
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\data\news.js
+
+【★ 截图目录（20 张，本轮重新生成）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\shots\
+    首页：home_pc_section / home_pc_full / home_390_section / home_390_full / home_375_section
+    列表页：news_pc_batch1 / news_pc_all / news_pc_footer_more / news_pc_footer_end /
+            news_390_batch1 / news_390_footer_more / news_375_batch1
+    详情页 PC：detail_pc_official / detail_pc_multi / detail_pc_conflict /
+               detail_pc_denied / detail_pc_corrected
+    详情页移动端：detail_390_official / detail_390_conflict / detail_390_corrected /
+                  detail_375_corrected
+
+【测试与截图脚本（可重跑）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\test-news-rules.cjs    规则与数据断言
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\regression-news.cjs    全站回归 + 页面实测
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\shots.cjs              截图产出 + 视觉规则校验
+  运行：node <脚本绝对路径>；输出 test-out.txt / regression-out.txt / shots-out.txt
+
+【上游文档】
+  产品规范 R2.2 收口件 D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2.2施工规范-R6至R8收口件.txt
+  产品规范 R1-R5   D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2规范-修订版R1-R5.txt
+  设计规范         D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\H5-V2.0\news-module-design-spec.md
+  设计交接书       D:\SEO\发挥余热\漫威电影宇宙导航\AI生成文件\设计\H5-V2.0\news-module-dev-handoff.md
+  施工报告         D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2.2施工报告.txt
+  施工方案         D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2.2施工方案.txt
+  人工视觉验收材料 D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\最新漫威资讯模块V2.2人工视觉验收材料.txt
+
+【同步文件】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\同步\给策划AI同步文件.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\同步\给开发AI同步文件.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\同步\给设计AI同步文件.txt
+
+
+============================================================
+1. 修改文件（本轮实际改动）
+============================================================
+
+┌──────────────────────────────────┬──────────────────────────────────────────┬────────┐
+│ 文件路径                          │ 修改内容                                  │ 性质    │
+├──────────────────────────────────┼──────────────────────────────────────────┼────────┤
+│ h5/news.html                     │ 1 处：加载更多按钮 class                  │ HTML   │
+│                                  │ `v2-btn-ghost v2n-list-more`              │        │
+│                                  │ → `v2-btn v2-btn-ghost v2n-list-more`     │        │
+│                                  │ （补 `.v2-btn` 基类，恢复设计系统按钮尺寸）│       │
+├──────────────────────────────────┼──────────────────────────────────────────┼────────┤
+│ h5/data/news.js                  │ 1 处：news-2026-09-22-005 的              │ 数据   │
+│                                  │ status_change_reason 文案                 │        │
+│                                  │ 「owner_group 未确认」→「owner_group 为    │        │
+│                                  │ 『待核』」（P5.2 术语统一；**非数据值**）  │        │
+├──────────────────────────────────┼──────────────────────────────────────────┼────────┤
+│ workspace/news/shots.cjs         │ 新增 2 张 375px 截图（列表页 + 详情页），  │ 测试   │
+│                                  │ 补齐 §十八 对 375/390 双档的要求           │ 脚本   │
+├──────────────────────────────────┼──────────────────────────────────────────┼────────┤
+│ docs/…/人工视觉验收材料.txt       │ A1 条目标记「已修复」，与代码状态对齐      │ 文档   │
+└──────────────────────────────────┴──────────────────────────────────────────┴────────┘
+
+■ §十六 要求的逐项回答
+
+| 问题 | 回答 |
+|---|---|
+| 是否修改 HTML | **是** —— 仅 h5/news.html 1 处 class 字符串 |
+| 是否修改 CSS | **否** —— v2n-news.css / v2.css / style.css 全部零改动 |
+| 是否修改 JS | **否**（生产 JS 零改动）—— index.html、components.js 未动；仅测试脚本 shots.cjs 有改动 |
+| 是否修改 news.js 数据 | **是，但仅 1 处说明性文案**；关联 id、owner_group 取值、independent_group_count、状态值 **均未改动** |
+| 是否修改资讯状态逻辑 | **否** |
+| 是否修改来源 / 交叉验证逻辑 | **否** |
+
+■ 本轮未修改（明确声明）
+  h5/news-detail.html、h5/index.html、h5/assets/js/components.js、h5/assets/css/v2n-news.css
+  一行未动 —— 因这四处经核验**已完全符合收口指令要求**，按 §十四「不要为了重新实现而重写」未做任何改动。
+
+
+============================================================
+2. P1–P5 修复结果
+============================================================
+
+P1 PASS  脚本清单不完整 —— 必须修
+  实际状态：**已符合，本轮零改动**
+  证据（逐行核对）：
+    h5/news.html      第 39–53 行：movies / upcoming / relations / routes / characters /
+                      series / special / short / content / posters / stills / visuals /
+                      news / app.js / components.js
+    h5/news-detail.html 第 33–47 行：**与上完全一致**
+  确认：12 个 MCU 数据脚本齐全；news.js 位于全部 MCU 数据脚本之后、app.js 之前；
+        app.js → components.js 初始化顺序未变；未引入 community.js；无其他无关脚本。
+
+P2 PASS  related_characters 跳转参数错误 —— 必须修
+  实际状态：**已符合，本轮零改动**
+  证据：components.js 的 relatedNodes() 生成 `map.html?focus=` + encodeURIComponent(char id)
+  全局检查：仓库内 `map.html?char=` 出现次数 = **0**
+  运行实测：news-detail.html?id=news-2026-09-17-015 渲染的 2 个角色节点均为 `<a>`，
+            href 以 `map.html?focus=` 开头（见 regression-news.cjs 第 5 组）。
+
+P3 PASS  related_phases 不存在可用深链 —— 最终采用 A（纯展示不可点击）
+  实际状态：**已符合，本轮零改动**
+  证据：阶段节点渲染为
+        `<span class="v2n-related-node v2n-related-node--static">` + 无 href
+        CSS `.v2n-related-node--static { cursor: default; }`（无手型提示）
+  全局检查：`routes.html?phase=` = **0**；`index.html?phase=` = **0**；资讯模块自造 phase 路由 = 0
+  未修改现有资料库筛选机制（index.html 资料库区 data-phase 按钮逻辑零改动）。
+
+P4 PASS  CSS 命名冲突 —— 最终使用 v2n-news.css
+  实际状态：**已符合，本轮零改动**
+  证据：h5/assets/css/v2n-news.css 存在；news.html 与 news-detail.html 均正确引入；
+        资讯模块全部类名使用 v2n- 前缀
+  全局检查：**生产代码中 `v4-news.css` 引用 = 0，文件不存在**
+        （仓库中该串仅出现在三处禁止性文字与测试断言里：设计规范 R12.10 / 交接书 §6.2 /
+          收口指令 §六、§十五、§十六，以及 test-out.txt 的两条 PASS 断言）
+  v2.css 零改动、style.css 零改动、全局 Token 零新增。
+
+P5 PASS  R12.2 示例数据违反核心规则 —— 必须修
+  实际状态：**该四处示例已由设计 AI（豆包）在 V2.2 最终修复轮修正**（记录于设计规范附录 C 的 D19）
+  证据（设计规范 R12.2 现值）：
+    P5.1 `independent_group_count: 1`（原为 2；并注明「The Direct 为待核 → 计 1」）
+    P5.2 `owner_group: "待核"`（原为「未确认」）
+    P5.3 `related_movies: ["avengers"]`（原为 avengers_doomsday）
+    P5.4 `related_characters: ["steve"]`（原为 captain_america）
+  生产数据侧另行核验：
+    · news.js 的 owner_group 实际取值 = Disney / Marvel、The Walt Disney Company、
+      Penske Media Corporation、People Inc.、Valnet、待核、unknown
+      —— **无「未确认」作为字段值**
+    · 全局检查 `avengers_doomsday` = **0**、`captain_america` = **0**
+    · 全部 related_characters / related_movies（除下条披露的负向用例）均命中现有真实 id
+
+  ※ 需负责人知悉（唯一披露项）：news.js 中 news-2026-09-17-015 的
+    `related_movies: ['avengers-5']` 是**刻意保留的负向用例** —— `avengers-5` 真实存在于
+    MCU_UPCOMING，但不在 MCU_CONTENT，用于验证「关联未命中一律丢弃」这条规则，
+    该断言在回归测试第 5 组通过（浏览器级实测未渲染该节点）。
+    它不是凭空编造的 id（≠ avengers_doomsday），但会被「不出现无效实体 ID」字面扫到。
+    如需生产数据零无效 id，删除该 1 处即可（代价：失去对应的浏览器级丢弃验证）。
+
+
+============================================================
+3. 产品口径确认
+============================================================
+首页：前 5–8 条 ✅
+  实现为常量 HOME_NEWS_COUNT = 6（属于 5–8 合法区间）；
+  代码注释明确写「产品规范 R5.2 Step 5『首页取前 5–8 条』，本处取 6 条」，
+  **未把 6 表述为产品硬规则**；不足 5 条按实际数量展示，无凑数逻辑。
+
+列表：每批 10 条 + 加载更多 ✅
+  BATCH = 10；点击追加下一批；全量 15 条一次加载到 MCU_NEWS；纯前端切片；
+  无网络请求；file:// 可运行；加载中显示「加载中...」并禁用按钮；
+  无更多时显示「— 已展示全部 —」。
+
+phase：纯展示，不跳转 ✅
+
+资讯权威源：h5/data/news.js ✅
+  未创建 shared/data/news.js；未复制到 wechat/ douyin/；无第二套 MCU_NEWS。
+
+
+============================================================
+4. 自动化测试
+============================================================
+test-news-rules.cjs：**78 / 78 PASS**
+regression-news.cjs：**55 / 55 PASS**
+shots.cjs（视觉规则机器校验）：**11 / 11 PASS**
+
+（均为本轮 15:0x 重新执行的实测结果，输出留档 workspace\news\test-out.txt /
+  regression-out.txt / shots-out.txt，可复现。）
+
+
+============================================================
+5. 全局检查结果（§十六 要求）
+============================================================
+map.html?char=        ：**0**
+routes.html?phase=    ：**0**
+index.html?phase=     ：**0**
+v4-news.css 引用      ：**0**（文件亦不存在）
+avengers_doomsday     ：**0**
+captain_america       ：**0**
+
+
+============================================================
+6. 回归结果
+============================================================
+MCU_CONTENT           ：**59** ✅
+MCU_RELATIONS         ：**92** ✅
+MCU_ROUTES            ：**11** ✅
+MCU_CHARACTERS        ：**24** ✅
+既有页面 JS 异常      ：**0**（7 个既有页面：index / routes / map / movie?id= /
+                        next / route-detail?id= / community 全部无新增异常）
+v2.css 污染           ：**0**（.v2-section 计算背景仍为 transparent）
+file://               ：**PASS**
+
+※ 说明：file:// 下 app.js 的 CloudBase 统计请求会被 CORS 拦截，属**改动前既有的环境噪声**，
+  本次共滤除 20 条；过滤后断言「无其他任何 JS 异常」。
+
+
+============================================================
+7. 截图（本轮重新生成，20 张）
+============================================================
+目录：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\shots\
+
+PC（1440px）
+  · 列表页：news_pc_batch1.png（首批 10 条）、news_pc_all.png（15 条 + 已展示全部）、
+            news_pc_footer_more.png（加载更多按钮）、news_pc_footer_end.png（到底提示）
+  · 详情页：detail_pc_official / detail_pc_multi / detail_pc_conflict /
+            detail_pc_denied / detail_pc_corrected
+  · 首页：home_pc_section.png（资讯 Section）、home_pc_full.png（整页）
+
+390px
+  · 首页：home_390_section.png / home_390_full.png
+  · 列表页：news_390_batch1.png / news_390_footer_more.png
+  · 详情页：detail_390_official / detail_390_conflict / detail_390_corrected
+
+375px
+  · 首页：home_375_section.png
+  · 列表页：news_375_batch1.png
+  · 详情页：detail_375_corrected.png
+
+重点确认项（§十八 第 1–10 条）实测结论：
+  1. 加载更多按钮恢复正常按钮尺寸 ✅（本次已修，见第 1 节）
+  2. 资讯首页 Section 正常 ✅
+  3. 状态标签颜色正确 ✅（corrected 暗金灰 rgb(201,144,30)；全站无绿色状态标签）
+  4. 关联节点正常 ✅
+  5. 阶段节点不可点击 ✅
+  6. 角色节点可正常跳转 ✅
+  7. 来源卡正常 ✅
+  8. 页面未因脚本补齐出现视觉 / JS 异常 ✅（12 脚本齐全，回归无异常）
+  9. 不出现 v4-news.css ✅
+ 10. 不出现旧参数 ✅
+
+
+============================================================
+8. 是否可以进入下一阶段
+============================================================
+
+收口条件逐项核对：
+
+| 条件 | 结果 |
+|---|---|
+| P1–P5 全部 PASS | ✅ |
+| 自动化测试 PASS | ✅ 78/78 + 55/55 + 11/11 |
+| 回归 PASS | ✅ 59 / 92 / 11 / 24 计数不变，既有页面 0 异常 |
+| file:// PASS | ✅ |
+| 无新增 JS 错误 | ✅ |
+
+> **V2.2 视觉/实现收口完成，可以进入真实资讯接入阶段。**
+
+■ 待产品确认（不在本次 P1–P5 范围内，仍挂账，未自行决定）
+  ① 状态标签文案最终定稿（当前为「多家媒体报道」，与产品 R4.2 / 设计 D14 一致）
+  ② news.js 负向用例 `['avengers-5']` 是否保留（见第 2 节 P5 披露项）
+  ③ 上一轮《V2.2 最终视觉收口修复指令》中被截断的 **P2–P6** 仍未收到；
+     该指令的 P1 已在本轮修复（加载更多按钮），其余 5 项与本轮 P1–P5 不是同一批事项
+  ④ 人工视觉验收材料中记录的 B1 / B2 / B3 / C1 / C2 / C3 六项仍待决策
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段未接入真实资讯抓取，未写任何爬虫脚本，未部署到生产。
+下一步由项目负责人决定是否启动真实资讯接入阶段。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

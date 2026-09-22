@@ -346,7 +346,7 @@ window.MCU_NEWS = [
       }
     ],
     status_changed_at: '2026-09-21T22:30:00Z',
-    status_change_reason: 'R8.3 Step 8 命中：owner_group 未确认，不满足任何更高层级条件',
+    status_change_reason: 'R8.3 Step 8 命中：owner_group 为「待核」，不满足任何更高层级条件',
     status_change_evidence_url: 'https://thedirect.com/rss',
 
     supersedes_id: null,

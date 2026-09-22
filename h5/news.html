@@ -92,7 +92,7 @@
   function renderFooter() {
     if (sorted.length === 0) { footEl.innerHTML = ''; return; }
     if (shown < sorted.length) {
-      footEl.innerHTML = '<button class="v2-btn-ghost v2n-list-more" type="button" id="news-more">加载更多</button>';
+      footEl.innerHTML = '<button class="v2-btn v2-btn-ghost v2n-list-more" type="button" id="news-more">加载更多</button>';
       document.getElementById('news-more').addEventListener('click', function () {
         var btn = this;
         btn.disabled = true;
