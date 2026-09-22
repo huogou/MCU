@@ -1,0 +1,55 @@
+/* v23-token.css · 抖音端视觉 Token 还原（对齐 app.wxss） */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0B0F17; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; padding: 0 0 30px; }
+.frame-note { max-width: 375px; margin: 14px auto 8px; font-size: 11px; color: #6E7889; text-align: center; }
+.phone { width: 375px; margin: 0 auto; background: #080B12; min-height: 812px; border-radius: 18px; overflow: hidden; border: 1px solid #1E2636; }
+/* 系统导航栏还原 */
+.navbar { display: flex; align-items: center; height: 44px; padding: 0 12px; background: #080B12; position: sticky; top: 0; z-index: 5; }
+.nv-back { color: #E8ECF4; font-size: 22px; width: 28px; }
+.nv-title { flex: 1; text-align: center; color: #E8ECF4; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nv-capsule { color: #8E98AA; font-size: 12px; letter-spacing: 2px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 2px 8px; }
+.page { padding: 16px 16px 0; }
+/* 节点名 + 阶段 */
+.mv-cn { margin-top: 8px; font-size: 22px; font-weight: 700; color: #E8ECF4; line-height: 1.35; }
+.pills { margin-top: 10px; display: flex; }
+.pill { padding: 3px 9px; font-size: 11px; border-radius: 999px; color: #F2B233; background: rgba(242,178,51,.10); border: 1px solid rgba(242,178,51,.25); }
+/* 分组标签 */
+.section-label { margin: 18px 0 8px; font-size: 12px; color: #8E98AA; font-weight: 600; }
+/* 卡片与信息行 */
+.card { background: #161D2B; border-radius: 16px; padding: 0 12px; }
+.mi-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #1E2636; }
+.mi-row:last-child { border-bottom: none; }
+.k { font-size: 12px; color: #6E7889; }
+.v { font-size: 12px; color: #E8ECF4; }
+/* 关联节点 */
+.rel-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 0; border-bottom: 1px solid #1E2636; }
+.rel-item:last-child { border-bottom: none; }
+.rel-main { flex: 1; }
+.rel-name { font-size: 14px; font-weight: 600; color: #E8ECF4; }
+.rel-phase { margin-top: 2px; font-size: 11px; color: #6E7889; }
+.rel-arrow { margin-left: 8px; color: #6E7889; font-size: 15px; }
+/* 底部导航按钮 */
+.nav-btn { margin: 18px 0 0; height: 44px; line-height: 44px; text-align: center; font-size: 14px; font-weight: 600; background: #F2B233; color: #1A1206; border-radius: 8px; box-shadow: 0 4px 12px rgba(242,178,51,.12); }
+/* H5 引导 */
+.h5guide { margin: 14px 0 0; padding: 12px 14px; border: 1px dashed rgba(242,178,51,.35); border-radius: 12px; display: flex; flex-direction: column; gap: 2px; }
+.h5guide b { font-size: 13px; color: #F2B233; font-weight: 600; }
+.h5guide span { font-size: 11px; color: #8E98AA; }
+.bottom-space { height: 24px; }
+/* journey 页元素 */
+.seg { display: flex; background: #161D2B; border-radius: 999px; padding: 3px; margin-top: 8px; }
+.seg-item { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; color: #8E98AA; border-radius: 999px; }
+.seg-item.on { background: #F2B233; color: #1A1206; font-weight: 600; }
+.progress { display: flex; align-items: center; gap: 10px; margin: 14px 0; }
+.pl { font-size: 12px; color: #8E98AA; white-space: nowrap; }
+.bar { flex: 1; height: 6px; background: #1E2636; border-radius: 3px; overflow: hidden; }
+.fill { height: 100%; background: #F2B233; }
+.pt { font-size: 11px; color: #6E7889; }
+.route-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1E2636; }
+.route-item:last-child { border-bottom: none; }
+.ri-order { width: 22px; font-size: 15px; font-weight: 800; color: #F2B233; }
+.ri-info { flex: 1; }
+.ri-name { font-size: 14px; font-weight: 600; color: #E8ECF4; }
+.ri-meta { display: flex; gap: 8px; margin-top: 3px; align-items: center; }
+.ri-type { font-size: 10px; color: #8E98AA; background: #263043; padding: 1px 8px; border-radius: 999px; }
+.ri-phase { font-size: 11px; color: #6E7889; }
+.ri-status { color: #28B487; font-size: 15px; }
