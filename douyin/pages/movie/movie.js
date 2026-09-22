@@ -1,22 +1,18 @@
 /* ============================================================
- * 作品节点页 movie · V2.0.0 降级为「作品节点」
+ * 宇宙节点信息页 movie · V2.3 轻量化
  * ------------------------------------------------------------
- * V2.0 变更（降级）：
- *   - 删除作品简介 synopsis（禁止剧情介绍）
- *   - 删除相关作品 why 描述（仅保留作品名+类型）
- *   - 删除 backdrop 大图
- *   - 删除所属篇章、故事时间、篇幅
- *   - 海报缩小为识别用（非影视宣传）
- *   - 核心视觉改为「观看状态 + 顺序位置」
- *   - 新增 H5 引导
- *
- * 定位：观看路线中的作品节点
- * 允许：中文名、英文名、单张海报、类型、阶段、上映日期、上映顺序、
- *       当前观看状态、记录时间、相关作品 ≤4
+ * V2.3 变更（结构性删除，非文案替换）：
+ *   - 删除海报、英文片名、内容类型标签
+ *   - 删除观看状态卡、标记已看、收藏
+ *   - 删除上映日期；「上映顺序」改「宇宙序号」
+ *   - 相关作品 → 关联节点（名称 + 所属阶段）
+ *   - 新增底部「进入宇宙导航」按钮
+ * 定位：MCU 宇宙节点查询/导航页
+ * 展示字段仅：中文名、阶段、时间节点、宇宙序号、关联节点
+ * 纪律：颜色一律引用 app.wxss 变量，零 raw hex 泄漏
  * ============================================================ */
 
 const mcuData = require('../../models/mcuData.js');
-const userState = require('../../models/userState.js');
 const { PHASE_LABEL } = require('../../data/constants.js');
 
 const REL_MAX = 4;
@@ -25,25 +21,14 @@ Page({
   data: {
     id: '',
     cn: '',
-    en: '',
-    letter: '',
-    poster: '',
     phase: 1,
-    typeLabel: '',
-    typeKey: '',
     phaseText: '',
-    orderText: '',
     year: '',
     infoRows: [],
-    watched: false,
-    favored: false,
-    watchedLabel: '标记为已看',
-    favorLabel: '收藏这部作品',
     relations: [],
     relCount: 0,
     hasRelations: false,
-    notFound: false,
-    seenAtText: ''
+    notFound: false
   },
 
   onLoad(options) {
@@ -61,91 +46,49 @@ Page({
     const c = mcuData.get(this.data.id);
     if (!c) { this.setData({ notFound: true }); return; }
 
-    const v = mcuData.visual(c.id) || {};
-    const state = userState.getState();
-    const watchedAt = (state.watched || {})[c.id];
-
-    /* ── 基础信息表（V2.0 精简：删除篇章/故事时间/篇幅） ── */
+    /* ── 宇宙节点信息（仅节点维度字段，无影视内容） ── */
     const rows = [
-      { k: '内容类型', v: mcuData.typeLabel[c.type] || '作品' },
-      { k: '上映日期', v: c.date || (c.year ? String(c.year) : '—') }
+      { k: '时间节点', v: c.year ? (c.year + '年') : '—' },
+      { k: 'MCU 阶段', v: PHASE_LABEL[c.phase] || ('第' + c.phase + '阶段') },
+      { k: '宇宙序号', v: String(c.ro || '—') }
     ];
-    if (c.phase) rows.push({ k: 'MCU 阶段', v: PHASE_LABEL[c.phase] || ('第' + c.phase + '阶段') });
-    rows.push({ k: '上映顺序', v: '第 ' + c.ro + ' 部' });
 
-    /* ── 相关作品（V2.0 删除 why 描述，仅保留作品名+类型） ── */
+    /* ── 关联节点（仅名称 + 所属阶段；点击进入对应节点页） ── */
     const relRaw = mcuData.relationsOf(c.id) || [];
     const relations = relRaw.slice(0, REL_MAX).map(function (r) {
       const other = mcuData.get(r.other);
-      const t = (mcuData.types && mcuData.types[r.type]) || {};
       return {
         id: r.other,
         cn: other ? other.cn : r.other,
-        phase: other ? (other.phase || 1) : 1,
-        typeLabel: t.label || '关联',
-        typeKey: other ? other.type : '',
-        watched: userState.isSeen(r.other)
+        phaseLabel: other ? (PHASE_LABEL[other.phase || 1] || '') : ''
       };
     });
-
-    const watched = !!watchedAt;
-    const favored = !!((state.favorite || {})[c.id]);
 
     this.setData({
       notFound: false,
       cn: c.cn,
-      en: c.en || '',
-      letter: (c.cn || '').charAt(0),
-      poster: v.poster || '',
       phase: c.phase || 1,
-      typeLabel: mcuData.typeLabel[c.type] || '',
-      typeKey: c.type,
       phaseText: PHASE_LABEL[c.phase] || '',
-      orderText: '第 ' + c.ro + ' 部',
       year: c.year ? String(c.year) : '',
       infoRows: rows,
-      watched: watched,
-      favored: favored,
-      watchedLabel: watched ? '取消已看' : '标记为已看',
-      favorLabel: favored ? '取消收藏' : '收藏这部作品',
       relations: relations,
       relCount: relRaw.length,
-      hasRelations: relations.length > 0,
-      seenAtText: watchedAt ? ('记录于 ' + this.fmtDate(watchedAt)) : ''
+      hasRelations: relations.length > 0
     });
 
-    tt.setNavigationBarTitle({ title: c.cn || '作品节点' });
+    tt.setNavigationBarTitle({ title: c.cn || '宇宙节点' });
   },
 
-  fmtDate(ts) {
-    const d = new Date(ts);
-    const p = function (n) { return n < 10 ? '0' + n : String(n); };
-    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
-  },
-
-  /* ---- 标记已看 ---- */
-  onToggleWatched() {
-    const id = this.data.id;
-    if (!id) return;
-    const seen = userState.toggle(id);
-    tt.showToast({ title: seen ? '已标记为已看' : '已取消已看', icon: 'none' });
-    this.refresh();
-  },
-
-  /* ---- 收藏 ---- */
-  onToggleFav() {
-    const id = this.data.id;
-    if (!id) return;
-    const fav = userState.toggleFav(id);
-    tt.showToast({ title: fav ? '已加入收藏' : '已取消收藏', icon: 'none' });
-    this.refresh();
-  },
-
-  /* ---- 相关作品 → 跳转 ---- */
+  /* ---- 关联节点 → 节点间导航 ---- */
   goRelated(e) {
     const id = e.currentTarget.dataset.id;
     if (!id || id === this.data.id) return;
     tt.redirectTo({ url: '/pages/movie/movie?id=' + id });
+  },
+
+  /* ---- 底部：进入宇宙导航（现有路线页） ---- */
+  goJourney() {
+    tt.switchTab({ url: '/pages/journey/journey' });
   },
 
   /* ---- 异常兜底 ---- */
