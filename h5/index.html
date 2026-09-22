@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="stylesheet" href="assets/css/v2.css">
 <link rel="stylesheet" href="assets/css/v3-forum.css">
+<link rel="stylesheet" href="assets/css/v2n-news.css">
 </head>
 <body>
 
@@ -98,7 +99,15 @@
     </div>
   </section>
 
-  <!-- ============ 7. 快捷入口 + 小程序入口 ============ -->
+  <!-- ============ 7. 最新漫威资讯（V2.2 新增） ============ -->
+  <section class="v2-section" id="v2-news" data-section-label="最新漫威资讯">
+    <div class="v2-inner">
+      <div id="news-title"></div>
+      <div class="v2n-home-list" id="news-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 8. 快捷入口 + 小程序入口 ============ -->
   <section class="v2-section" id="v2-entry" data-section-label="小程序">
     <div class="v2-inner">
       <div class="v2-quick">
@@ -144,6 +153,7 @@
 <script src="data/stills.js"></script>
 <script src="data/visuals.js"></script>
 <script src="data/community.js"></script>
+<script src="data/news.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/components.js"></script>
 <script>
@@ -446,6 +456,45 @@
             + '</div>';
         }).join('');
       }).catch(function () { /* 静默：预览失败不影响入口 */ });
+  })();
+
+  /* ==========================================================
+   * 模块 7：最新漫威资讯（V2.2 新增）
+   * 设计基准：news-module-design-spec.md R1（首页 Section）+ R12.9（排序）
+   * 排序：MCU.v2.sortNews（产品规范 R5.2 五步：过滤 → 置顶有效性 →
+   *       分层 → 置顶组内 → 并列打破）
+   * 条数：产品规范 R5.2 Step 5「首页取前 5–8 条」，本处取 6 条
+   *       （区间内取值，PC 两列可整除）；不足 5 条时按实际数量展示，
+   *       不为凑数纳入低质量条目。
+   * 变更范围：仅本区块 + head 引入样式 + 数据脚本；不改 NAV、不改其他模块
+   * ========================================================== */
+  var HOME_NEWS_COUNT = 6;
+  document.getElementById('news-title').innerHTML = V2.sectionTitle({
+    eyebrow: 'LATEST MCU NEWS',
+    title: '最新漫威资讯',
+    sub: '关注 MCU 最新动态，来源透明可追溯',
+    moreHref: 'news.html',
+    moreText: '查看全部'
+  });
+
+  (function renderHomeNews() {
+    var box = document.getElementById('news-list');
+    if (!box) return;
+    var sorted = V2.sortNews(window.MCU_NEWS || []);
+    if (!sorted.length) { box.innerHTML = ''; return; }
+
+    box.innerHTML = sorted.slice(0, HOME_NEWS_COUNT).map(function (it) {
+      return V2.newsCard(it, { variant: 'compact' });
+    }).join('');
+
+    /* 卡片整体可点击进入详情；卡片内的外链（来源查看等）不触发跳转 */
+    box.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest && t.closest('a')) return;
+      var card = t && t.closest ? t.closest('.v2n-news-card') : null;
+      if (!card) return;
+      location.href = 'news-detail.html?id=' + encodeURIComponent(card.getAttribute('data-id'));
+    });
   })();
 })();
 </script>

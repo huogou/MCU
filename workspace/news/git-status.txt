@@ -1,0 +1,30 @@
+﻿--- git status --short ---
+ M "MCU\351\241\271\347\233\256\346\200\273\350\247\210.md"
+ M README.md
+ M VERSION.md
+ M "docs/\347\211\210\346\234\254/CHANGELOG.md"
+ M h5/assets/js/components.js
+ M h5/index.html
+?? "docs/\344\272\247\345\223\201/\350\265\204\350\256\257\346\250\241\345\235\227/"
+?? "docs/\345\220\214\346\255\245/"
+?? "docs/\345\244\226\345\256\243\347\211\251\346\226\231/"
+?? h5/assets/css/v2n-news.css
+?? h5/data/news.js
+?? h5/news-detail.html
+?? h5/news.html
+?? workspace/map-shots/
+?? workspace/news/
+?? workspace/sources-probe-2.txt
+?? workspace/sources-probe-3.txt
+?? workspace/sources-probe-4.txt
+?? workspace/sources-probe-5.txt
+?? workspace/sources-probe-6.txt
+?? workspace/sources-probe.txt
+?? workspace/sync-archive-log-2.txt
+?? workspace/sync-archive-log.txt
+?? workspace/v23-preview/
+?? workspace/verify-default-branch.cjs
+--- git log -3 ---
+14bb0ee docs: README+总览+VERSION+CHANGELOG 校正至 2026-09-22 当前态——抖音V2.3冻结提审/微信V1.2.2待上传/PC-V3.1上线/git双分支收口
+eca2e66 merge: 合并 main 孤本内容（f63f2ec 部署/冒烟测试/OCR + 8b7c60d 凭据忽略强化）——协议/隐私文案 master 已含等价内容
+d6a54df chore(douyin): V2.3 验收脚本+结构还原预览工具入库（验收报告在 design/本地不入库）

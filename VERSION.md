@@ -1,5 +1,52 @@
 # MCU小程序版本记录
 
+## H5 资讯模块 V2.2（H5 端 · 模拟数据施工完成，未部署）
+
+版本：
+H5 资讯模块 V2.2（最新漫威资讯 · 模拟数据阶段）
+
+时间：2026-09-22
+
+范围：H5 端新增「最新漫威资讯」模块。本阶段**只完成产品与模拟数据施工，未接入真实资讯抓取**。
+
+新增文件：
+- h5/data/news.js（资讯数据唯一权威源，window.MCU_NEWS，15 条模拟数据）
+- h5/news.html（资讯列表页，首批 10 条 + 加载更多）
+- h5/news-detail.html（资讯详情页，10 个信息块）
+- h5/assets/css/v2n-news.css（v2n- 前缀，零新增 Token）
+- workspace/news/test-news-rules.cjs（规则与数据断言，78 断言）
+- workspace/news/regression-news.cjs（全站回归 + 页面实测，55 断言）
+
+修改文件：
+- h5/index.html（引入 v2n-news.css 与 data/news.js；新增「最新漫威资讯」Section，位于社区入口之后）
+- h5/assets/js/components.js（MCU.v2 内新增资讯组件与规则函数：statusBadge / sortNews /
+  newsCard / newsDetail / sourceItem / relatedNode / calcIndependentGroupCount 等）
+
+核心规则：
+- verification_status 严格实现 8 态（official_confirmed / multi_source_reported / single_source /
+  rumor / unverified / conflicting / officially_denied / corrected），未新增状态
+- independent_group_count 为派生字段，按 owner_group 去重运行时计算，禁止手写；
+  「待核 / unknown」不计入独立证据组
+- 同 owner_group 多家媒体只计 1 个独立证据（如 Variety / Deadline / THR 同属
+  Penske Media Corporation → 计 1）
+- 官方确认须通过官方来源登记表校验（host + path + 内容对应 + 人工复核）
+- 排序按 R5.2 五步（过滤 → 置顶有效性 → 分层 → 置顶组内 → 并列打破）；
+  官方确认不自动置顶
+- 关联只引用 MCU_CONTENT / MCU_CHARACTERS 既有 id，未命中一律丢弃；
+  角色跳 map.html?focus=，阶段本期只展示不可点击
+
+验收：
+- 本地 file:// 可运行；无新增运行时依赖、无后端、无第二套数据源
+- 规则与数据断言 78 PASS / 0 FAIL
+- 全站回归 55 PASS / 0 FAIL（7 个既有页面无新增 JS 异常；MCU_CONTENT 59 /
+  MCU_RELATIONS 92 / MCU_ROUTES 11 / MCU_CHARACTERS 24 计数未变；v2.css 零改动、无 CSS 污染）
+
+状态：**未部署**。待项目负责人确认（① 状态标签文案定稿 ② 人工视觉验收）后进入真实资讯接入阶段。
+
+交付文档：docs/产品/资讯模块/ 下《V2.2 施工报告》《V2.2 施工方案》《V2.2 施工规范 R6-R8》《V2.1 规范 R1-R5》
+
+---
+
 ## V2.3（抖音小程序 · 代码冻结提审中）
 
 版本：

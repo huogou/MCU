@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>资讯详情 - MCU 宇宙导航</title>
+<meta name="description" content="MCU 资讯详情：当前信息状态、来源情况、官方确认情况与可回链的原始来源。本页展示的是截至当前已获得的证据与来源层级。">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/v2.css">
+<link rel="stylesheet" href="assets/css/v2n-news.css">
+</head>
+<body>
+
+<!-- ============ sticky 返回栏 ============ -->
+<div class="v2n-detail-bar">
+  <button class="v2n-detail-bar__btn" type="button" id="detail-back">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    返回
+  </button>
+</div>
+
+<div id="app-nav"></div>
+
+<main class="v2">
+  <article class="v2n-detail" id="detail-body"></article>
+</main>
+
+<div id="app-foot"></div>
+
+<!-- 数据文件：与既有页面（route-detail.html / index.html）同款 12 个 + news.js
+     顺序不可颠倒：content.js 与 characters.js 必须先于 news.js 加载 -->
+<script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/stills.js"></script>
+<script src="data/visuals.js"></script>
+<script src="data/news.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+(function () {
+  var V2 = window.MCU.v2;
+  MCU.ui.mount('news-detail.html');
+
+  /* ==========================================================
+   * 资讯详情页
+   * 设计基准：news-module-design-spec.md R3（10 个信息块）+ R11.3（返回）
+   * 信息块顺序：①标题 ②状态 ③时间 ④摘要 ⑤关联MCU ⑥来源信息
+   *             ⑦交叉验证(仅 conflicting) ⑧真实性提醒 ⑨原始来源 ⑩更正/状态变化
+   * ========================================================== */
+  var body = document.getElementById('detail-body');
+  var back = document.getElementById('detail-back');
+
+  if (back) {
+    back.addEventListener('click', function () {
+      if (window.history.length > 1) window.history.back();
+      else location.href = 'news.html';
+    });
+  }
+
+  function notFound() {
+    return '<div class="v2n-empty">'
+         + '<svg class="v2n-empty__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" '
+         + 'stroke-width="1.6" stroke-linecap="round" aria-hidden="true">'
+         + '<rect x="7" y="11" width="34" height="26" rx="3"/><path d="M13 19h22M13 26h14"/></svg>'
+         + '<div class="v2n-empty__title">资讯不存在</div>'
+         + '<div class="v2n-empty__sub">该条资讯可能已下线，或链接不完整</div>'
+         + '<div style="margin-top:16px"><a class="v2n-chain" href="news.html" style="color:var(--gold);text-decoration:none">返回资讯列表 →</a></div>'
+         + '</div>';
+  }
+
+  var id = '';
+  try { id = new URLSearchParams(location.search).get('id') || ''; } catch (e) { id = ''; }
+
+  var item = null;
+  if (id) {
+    (window.MCU_NEWS || []).forEach(function (n) { if (n.id === id) item = n; });
+  }
+
+  body.innerHTML = item ? V2.newsDetail(item) : notFound();
+
+  if (item) {
+    document.title = item.title + ' - MCU 宇宙导航';
+    var md = document.querySelector('meta[name="description"]');
+    if (md && item.summary) md.setAttribute('content', item.summary.slice(0, 120));
+  }
+})();
+</script>
+</body>
+</html>

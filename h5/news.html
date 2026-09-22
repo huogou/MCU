@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>最新漫威资讯 - MCU 宇宙导航</title>
+<meta name="description" content="MCU 最新动态与来源状态说明：每条资讯标注来源、独立来源数量与是否获得官方确认，来源透明、证据可追溯。">
+<meta name="keywords" content="漫威资讯,MCU最新消息,漫威电影新闻,MCU动态">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/v2.css">
+<link rel="stylesheet" href="assets/css/v2n-news.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="v2">
+
+  <!-- ============ ① 轻量 Hero ============ -->
+  <section class="v2n-list-hero">
+    <span class="v2n-list-eyebrow">MCU NEWS</span>
+    <h1 class="v2n-list-title">最新漫威资讯</h1>
+    <div class="v2n-list-sub">来源透明 · 证据透明 · 状态透明</div>
+    <hr class="v2n-list-hero__hr">
+  </section>
+
+  <!-- ============ ② 资讯列表（首批 10 条，加载更多每批 10 条） ============ -->
+  <section class="v2n-list" id="news-list"></section>
+
+  <!-- ============ ③ 加载更多 / 到底提示 ============ -->
+  <div class="v2n-list-footer" id="news-footer"></div>
+
+</main>
+
+<div id="app-foot"></div>
+
+<!-- 数据文件：与既有页面（route-detail.html / index.html）同款 12 个 + news.js
+     顺序不可颠倒：content.js 与 characters.js 必须先于 news.js 加载 -->
+<script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/stills.js"></script>
+<script src="data/visuals.js"></script>
+<script src="data/news.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/components.js"></script>
+<script>
+(function () {
+  var V2 = window.MCU.v2;
+  MCU.ui.mount('news.html');
+
+  /* ==========================================================
+   * 资讯列表页
+   * 设计基准：news-module-design-spec.md R2（页面）+ R11.6（加载更多）
+   * 排序：MCU.v2.sortNews（产品规范 R5.2 五步）
+   * 分页：每批 10 条，前端切片，零网络依赖（保持 file:// 可用）
+   * ========================================================== */
+  var BATCH = 10;
+
+  var listEl = document.getElementById('news-list');
+  var footEl = document.getElementById('news-footer');
+  var sorted = V2.sortNews(window.MCU_NEWS || []);
+  var shown = 0;
+
+  function emptyState() {
+    return '<div class="v2n-empty">'
+         + '<svg class="v2n-empty__icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" '
+         + 'stroke-width="1.6" stroke-linecap="round" aria-hidden="true">'
+         + '<rect x="7" y="11" width="34" height="26" rx="3"/><path d="M13 19h22M13 26h14"/></svg>'
+         + '<div class="v2n-empty__title">暂无资讯</div>'
+         + '<div class="v2n-empty__sub">资讯更新后将在此展示</div>'
+         + '</div>';
+  }
+
+  function renderBatch() {
+    var next = sorted.slice(shown, shown + BATCH);
+    if (!next.length) return;
+    listEl.insertAdjacentHTML('beforeend', next.map(function (it) {
+      return V2.newsCard(it, { variant: 'standard' });
+    }).join(''));
+    shown += next.length;
+    renderFooter();
+  }
+
+  function renderFooter() {
+    if (sorted.length === 0) { footEl.innerHTML = ''; return; }
+    if (shown < sorted.length) {
+      footEl.innerHTML = '<button class="v2-btn-ghost v2n-list-more" type="button" id="news-more">加载更多</button>';
+      document.getElementById('news-more').addEventListener('click', function () {
+        var btn = this;
+        btn.disabled = true;
+        btn.textContent = '加载中...';
+        renderBatch();
+      });
+    } else {
+      footEl.innerHTML = '<div class="v2n-list-end">— 已展示全部 —</div>';
+    }
+  }
+
+  if (!sorted.length) {
+    listEl.innerHTML = emptyState();
+    footEl.innerHTML = '';
+  } else {
+    renderBatch();
+  }
+
+  /* 卡片整体可点击进入详情；卡片内的外链不触发跳转 */
+  listEl.addEventListener('click', function (e) {
+    var t = e.target;
+    if (t && t.closest && t.closest('a')) return;
+    var card = t && t.closest ? t.closest('.v2n-news-card') : null;
+    if (!card) return;
+    location.href = 'news-detail.html?id=' + encodeURIComponent(card.getAttribute('data-id'));
+  });
+})();
+</script>
+</body>
+</html>

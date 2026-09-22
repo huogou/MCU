@@ -1,0 +1,737 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU 宇宙导航｜最新漫威资讯模块 V2 规范 · 修订版》
+文件版本：V2.1（修订版）
+修订日期：2026-09-22
+
+⚠ 版本提示（2026-09-22 追加）
+本文件为 V2.1 基础规范，R1–R5 主体继续有效。
+但以下三条已被 V2.2 正式覆盖，施工时必须以 V2.2 为准，不得引用本文件原条款：
+  · R2.4（THR / EW / Collider 合规待决）→ V2.2 R6.3 已定为正式规则
+  · R3.3 中「conflicting → 任一非冲突状态」→ 已作废，见 V2.2 R8.4
+  · R3.5 官方域名白名单（仅域名级）→ 已升级为 V2.2 R7 官方来源登记表
+配套文件：最新漫威资讯模块V2.2施工规范-R6至R8收口件.txt
+修订依据：《开发侧评审回执》2026-09-22（docs/同步/给策划AI同步文件.txt）
+修订范围：补齐运行架构 / 重定义多源交叉验证 / 修订状态机 / 重设 AI 判断边界 /
+          11 来源可行性实测 / 统一状态文案 / 拆分 unverified 与 conflicting /
+          排序与置顶规则 / 图片规则 / 数据单一源纪律
+本阶段状态：待项目负责人审核。审核通过前禁止开发、禁止修改 H5、禁止开始抓取。
+探活基准时间：2026-09-22 上午 GMT+8（原始输出留档 workspace/sources-probe.txt ~ sources-probe-6.txt）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+============================================================
+R1｜运行架构
+============================================================
+
+■ R1.1 最终选型
+
+采用 C：AI 半自动静态产出。
+A（独立采集服务）与 B（CloudBase 云函数）本期不予采用。
+
+
+■ R1.2 选型理由
+
+1) 为什么选择 C
+   a. 数据纪律：C 是唯一不破坏「h5/data/*.js 单一可信源 + file:// 可直接打开」的方案。
+   b. 量级匹配：实测各来源 MCU 相关日产出很低（见 R2.5），C 的处理能力有充足冗余。
+   c. 风险可控：每个环节都可人工拦截，符合「宁可少展示一条，也不把未验证消息当事实」。
+   d. 与现有部署形态一致：项目为 Nginx 静态托管，无后端运维负担。
+
+2) 为什么不选 A
+   需要 Node 常驻进程 + 数据库 + 后台管理页，把项目从「纯静态站」变成「有后端的站」；
+   运维责任、故障面、安全面同时上升，与现有部署条件与项目治理铁律不匹配。
+
+3) 为什么不选 B
+   虽然可复用现有 CloudBase 环境（mcu-d6gw0brqoa9521b58），但存在两处硬冲突：
+   a. H5 取数需改为异步 fetch，直接破坏「file:// 可本地直接打开」这条现有特性；
+   b. 数据源从「仓库里的 js 文件」变成「云上数据库」，与「数据单一可信源、可被 git 追溯」的纪律冲突。
+   保留 B 作为后续升级目标（见 R1.2-9）。
+
+4) 对现有 H5 架构的影响（穷举）
+   新增：
+     - h5/data/news.js（与 content.js 同构，挂 window.MCU_NEWS）
+     - h5/news.html（资讯列表页，第二阶段）
+     - h5/news-detail.html（详情页，第二阶段，可延后）
+   修改：
+     - index.html 增加 1 行 <script src="data/news.js">（加载顺序：content.js 之后、app.js 之前）
+   不改动：
+     - 任何既有数据文件（movies/series/special/short/relations/routes/upcoming/community 等）
+     - 任何既有页面结构与样式基线
+     - 不新增任何运行时依赖、不新增网络请求
+
+5) 数据如何进入 h5/data/news.js
+   唯一入口是「人工提交 git」。
+   - 产线在仓库之外运行，产出候选文件（候选 news.js）
+   - 人工复核通过后，覆盖 h5/data/news.js 并提交
+   - H5 运行时只读静态 js，不发任何请求
+   由此保证：线上内容 100% 经过人工放行，且每次变更都有 git 记录可回溯。
+
+6) 谁负责抓取
+   由 AI 管线执行抓取与信息提取，不部署常驻爬虫。
+   - 有真实 feed 的来源：轮询 feed（R2 已逐个实测）
+   - Marvel 官方：无 feed，改为解析 /news 列表页 HTML（实测有效，见 R2.3-1）
+   - 抓取节奏：每日 1 次（见 R1.2-7）
+
+7) 谁负责审核
+   三层机制（详见 R3.5）：
+   第一层 AI 出建议值 → 第二层 规则硬校验 → 第三层 项目负责人人工复核
+   必须人工确认的状态：official_confirmed、officially_denied、conflicting，
+   以及任何 multi_source_reported 但 original_source 无法确定者。
+
+8) 更新频率
+   建议每日 1 次，建议时点为北京时间 09:00 前后；必要时由负责人手工触发。
+   ★ 必须写明：这不是实时资讯系统。从事件发生到 H5 可见，延迟以「天」为单位。
+
+9) 是否需要后端
+   不需要。无服务器、无云函数、无数据库、无定时服务。
+
+10) 是否保持 file:// 可运行
+    保持。此条列为硬验收项，任何方案变更不得破坏。
+
+11) 规模扩大后如何升级
+    升级触发条件（满足任一条即启动评估）：
+      a. 单次人工复核耗时稳定超过 30 分钟；
+      b. 待审候选稳定超过 40 条/日；
+      c. 出现「日级延迟不可接受」的产品需求（如首映实时追踪）。
+    升级路径：C → B（数据通道改为 fetch 读取云数据库）→ A（独立采集服务 + 后台监控页）。
+    为降低升级成本，news.js 的字段结构从第一版起即按最终结构设计：
+    升级时只替换数据通道，不更换数据结构，H5 展示层零改动。
+
+
+■ R1.3 更新延迟与人工复核成本（必须明确，不得回避）
+
+更新延迟：
+  每日一跑 → 平均延迟约 12 小时，最坏延迟约 24 小时。
+  任何文案不得暗示实时性，不得使用「刚刚」「最新更新于 N 分钟前」类表述。
+
+人工复核成本估算（需以连续 7 天实测校准）：
+  每日候选条目：5–20 条（依据 R2.5 实测推算）
+  单条复核耗时：状态判定 30–60 秒 + 关联 id 校对 20–30 秒 + 文案检查约 10 秒 ≈ 1–2 分钟
+  合计：约 10–30 分钟/日
+  ★ 前置依赖：必须启用分类 feed。若仍用主 feed，候选噪音上升 3–5 倍（实测 ComicBook 主 feed
+    MCU 命中仅 9/52，分类 feed 为 47/52），人工复核成本同比例上升。
+
+
+============================================================
+R2｜修订版来源清单
+============================================================
+
+■ R2.1 探活方法与基准
+  时间：2026-09-22 上午 GMT+8
+  方法：对每个候选出口发起真实 HTTP 请求，记录状态码、Content-Type、字节数、
+        条目数、发布时间分布；并读取各站 robots.txt。
+  留档：workspace/sources-probe.txt、-2、-3、-4、-5、-6
+  声明：以下结论具有「当日快照」性质，来源随时可能变化。建议产线每次运行前先做健康度复核；
+        任一来源连续 3 次抓取失败即自动降级为「暂停」并提示人工确认。
+
+
+■ R2.2 来源登记表字段定义（按 §五 建立，此表为必填）
+
+  source_name                来源名称
+  source_type                官方 / 权威媒体 / MCU 垂直媒体 / 公告平台
+  official_or_media          official | media
+  owner_group                所属集团（必填；无法确认时填 unknown，禁止猜测）
+  official_domain            官方域名（用于 R3.5 白名单校验）
+  feed_type                  rss | atom | html-parse | none
+  feed_url                   实际可用的抓取出口（必须是实测通过的 URL）
+  structured_output_available  是 / 否（RSS/Atom/JSON-LD 之一即为是）
+  crawl_available            robots.txt 是否允许（允许 / 具名封禁 / 注释反对）
+  stability                  高 / 中 / 低
+  source_quality             高 / 中 / 低（权威度）
+  notes                      备注（陷阱、解析细节、待核项）
+
+
+■ R2.3 11 个来源逐条探活结果
+
+【1】Marvel 官方（marvel.com）
+  owner_group        : Disney / Marvel
+  source_type        : 官方
+  feed_type          : html-parse（无可用 feed）
+  feed_url           : https://www.marvel.com/news
+  structured_output  : 部分（页面含 1 处 application/ld+json）
+  crawl_available    : 允许（robots 仅 Disallow /image*、/comics/unlimited/*、/my_account/*、/responder*）
+  stability          : 中（HTML 结构可能变化，需解析失败告警）
+  source_quality     : 最高
+  实测证据：
+    · RSS 不存在——/feed、/rss、/articles/rss、/rss/news、/feed/news、/news/feed 全部 404
+    · /news-sitemap.xml 返回 404
+    · sitemap.xml 存在（sitemapindex，含 sitemap-1..23），但抽样 sitemap-1~6 的 maxLastmod
+      落在 2025-04 ~ 2025-09，**不能作为新闻发现通道**
+    · /news 与 /articles 均为服务端渲染 HTML（约 167KB），实测从 /news 提取到 20 条
+      /articles/* 链接，且包含 2026 年 9 月内容 → 判定为可用出口
+  结论：无 RSS，采用 HTML 列表页解析；robots 允许使用。
+  ⚠ 陷阱：/news 列表约 75% 为 comics / games / live-events 内容，必须做内容类型过滤，
+     只保留 movies、tv-shows 及影视相关 live-events。
+
+【2】Marvel Studios 官方
+  owner_group        : 未确认
+  feed_type          : 未确认
+  实测证据：本次探活**未能证实**存在独立于 marvel.com 的官方数据出口。
+  结论：标记「未确认」，**不作为独立来源计数**。
+       若经核实其内容出口仍在 marvel.com 域名内，则与【1】同属 1 个 owner_group，
+       原有「官方来源 4 个」的计数需相应下调。此条请策划核实后再定稿。
+
+【3】Disney 官方（企业与新闻室）
+  owner_group        : The Walt Disney Company
+  feed_type          : rss
+  feed_url           : https://thewaltdisneycompany.com/feed/
+  structured_output  : 是
+  crawl_available    : 允许（有 sitemap）
+  stability          : 高
+  source_quality     : 最高
+  实测证据：/feed/ 与 /news/feed/ 均 200、application/rss+xml，但体积约 3.6MB / 100 条，
+           覆盖 2026-05-18 ~ 2026-09-18（约 4 个月）；MCU 关键词标题命中仅 1/102。
+  结论：保留，但**降级定位为「官方公告核实器」**，不作为日常发现源。
+
+【4】Marvel 日本官方（marvel.disney.co.jp）
+  crawl_available    : 受阻
+  实测证据：/news 与 /robots.txt 均返回 403（普通 UA 与 Googlebot UA 实测均 403）。
+  结论：**自动获取不可行，标记「受阻 / 未确认」**。第一阶段不纳入自动产线；如需，改为人工巡检。
+  ⚠ 严重纠错：www.marvel.co.jp 是日本「株式会社マーベルコンピュータ」（一家 IT 公司），
+     **不是漫威官方**，严禁误采。
+
+【5】Variety
+  owner_group        : Penske Media Corporation（PMC）
+  feed_type          : rss
+  feed_url           : https://variety.com/feed/
+  structured_output  : 是
+  crawl_available    : 允许（WordPress 标准 robots，仅 Disallow 后台与搜索；有 sitemap 与 news-sitemap）
+  stability          : 高
+  source_quality     : 高
+  实测证据：/feed/ 200、18KB、10 条；分类 /v/film/feed/ 200、10 条。
+           MCU 标题命中：主 feed 1/12、分类 feed 0/12。
+  结论：可用，但定位为**验证器**而非发现器（见 R2.6）。
+
+【6】The Hollywood Reporter（THR）
+  owner_group        : Penske Media Corporation（PMC）
+  feed_type          : rss（技术可用）
+  feed_url           : https://www.hollywoodreporter.com/feed/
+  structured_output  : 是
+  crawl_available    : **具名 AI 爬虫封禁**
+  stability          : 高
+  source_quality     : 高
+  实测证据：/feed/ 200、11KB、10 条；MCU 标题命中 1/12。
+           robots.txt 实测包含明确指令块：
+             User-agent: anthropic-ai / cohere-ai / omgili / omgilibot / Applebot-Extended /
+             Bytespider / CCBot / ChatGPT / ChatGPT-User / DeepSeek / DeepSeekBot / GPTBot /
+             OAI-SearchBot / ClaudeBot / Claude-Web / Diffbot / FacebookBot / Google-Extended /
+             Meta-ExternalAgent / Meta-ExternalFetcher …
+             → Allow: /lifestyle/shopping/
+             → Disallow: /
+  结论：RSS 技术可用，但与「AI 管线抓取」存在明确冲突。标记「合规待决」，见 R2.4。
+
+【7】Deadline
+  owner_group        : Penske Media Corporation（PMC）
+  feed_type          : rss
+  feed_url           : https://deadline.com/feed/
+  structured_output  : 是
+  crawl_available    : 允许
+  stability          : 高
+  source_quality     : 高
+  实测证据：/feed/ 200、24KB、12 条；分类 /v/film/feed/ 200、12 条。
+           MCU 标题命中：主 2/14、分类 1/14。
+  结论：可用，定位为**验证器**。
+
+【8】Entertainment Weekly（EW）
+  owner_group        : People Inc.（原 Dotdash Meredith；robots 自述 "People Inc. content"）
+  feed_type          : none（feed 不可用）
+  crawl_available    : 注释明确反对
+  实测证据：/feed/、/feed/atom/、/rss/ 全部返回 **402 Payment Required** → feed 不可用。
+           robots.txt 注释明确禁止：文本与数据挖掘；开发或运营任何 AI/ML/LLM 技术
+           （含训练、微调，或**用于检索增强生成 RAG**）；创建含其内容的数据集。
+  结论：**第一阶段不可用（feed 不可达 + robots 明确反对 AI 使用），建议移出清单。**
+
+【9】The Direct
+  owner_group        : **未确认**（本次探活未能从站点确认母公司归属）→ 标「待核」
+  feed_type          : rss
+  feed_url           : **https://thedirect.com/rss**   ← 注意：不是 /feed
+  structured_output  : 是
+  crawl_available    : 允许（仅 Disallow /testHome/*、/user-info/、/articles/article-api-info/、/accounts/）
+  stability          : 中
+  source_quality     : 中
+  实测证据：/rss 200、text/xml、73KB、20 条。
+           /feed 返回 HTML（无效路径）。
+           ⚠ 关键实现细节：条目级时间戳在 `<dc:date>`（实测 21 条）；
+             `<pubDate>` 仅出现在频道级（实测 1 条）。解析器必须读 dc:date，
+             否则时间字段会全部为空，直接导致 R5 排序失效。
+           MCU 标题命中：**11/21（约 52%）**，为本次探活中信噪比最高者之一。
+  结论：**可用，且为主力「发现器」**。
+
+【10】ComicBook（comicbook.com）
+  owner_group        : **未确认**（开发侧此前疑为 Paramount 旗下，本次探活未证实）→ 标「未确认」
+  feed_type          : rss
+  feed_url           : **https://comicbook.com/category/marvel/feed/**   ← 必须用此路径
+  structured_output  : 是
+  crawl_available    : 允许（robots 的 Disallow 列表为空）
+  stability          : 中高
+  source_quality     : 中
+  实测证据：
+    · 主 feed /feed/ 200、639KB、50 条 → MCU 标题命中 9/52（约 17%）
+    · /marvel/feed/ 200、**639KB、与主 feed 完全一致（同字节数、同条目）**
+      → 该路径无效，会回落到主 feed，**禁止使用**
+    · /category/marvel/feed/ 200、737KB、50 条 → **MCU 标题命中 47/52（约 90%）**
+  结论：可用；**必须使用 /category/marvel/feed/**。列表内含大量漫画/游戏内容，需二次过滤
+       为影视类。
+
+【11】Collider（collider.com）
+  owner_group        : **Valnet**（robots 自述 "Valnet content"；与 ScreenRant / CBR / MovieWeb 同集团）
+  feed_type          : rss
+  feed_url           : https://collider.com/feed/
+  structured_output  : 是
+  crawl_available    : 注释明确反对
+  实测证据：/feed/ 200、22KB、10 条。
+           /movies/feed/ 与 /category/movies/feed/ **返回 HTML 而非 feed** → 无分类 feed。
+           MCU 标题命中 **0/11**。
+           robots.txt 注释禁止：自动抓取 / harvest / extract；TDM；开发或运营 AI/ML 软件
+           （含训练、微调、embedding、RAG）；创建数据集；任何商业用途。
+  结论：**命中最差 + 合规声明最严 → 建议第一阶段移出清单。**
+
+
+■ R2.4 合规待决项（须项目负责人拍板；本规范不下结论，只列事实与双方论据）
+
+涉及来源：THR【6】、EW【8】、Collider【11】
+
+客观事实：
+  a. THR：robots.txt 对具名 AI 爬虫（含 GPTBot / ClaudeBot / CCBot / ChatGPT /
+     DeepSeek / Google-Extended / Meta-ExternalAgent 等）使用真正的 `Disallow: /` 指令，
+     机器可读、语义明确。
+  b. EW（People Inc.）与 Collider（Valnet）：在 robots.txt 中以**注释**形式声明禁止自动抓取
+     与 AI 使用（含 RAG），但其 Disallow 指令列表中**未封禁**文章路径与 feed 路径。
+     注释是使用条款立场的表达，不具备 robots 协议的机器强制力。
+  c. 三站的 `User-agent: *` 通配规则均**未封禁**文章与 feed 路径。
+
+支持「可继续使用」的论据：
+  · 本方案只保存标题、来源名、原文 URL、发布时间与自撰摘要，不复制全文（符合原 §20 版权策略），
+    详情页回链原文，实际效果是导流而非替代；
+  · 事实性信息（谁出演、何时上映）本身通常不受版权保护；
+  · 通配规则未禁止，注释不构成技术拒绝。
+
+支持「应移除或降级为人工」的论据：
+  · People Inc. 与 Valnet 的声明文本明确点名 AI 与 RAG，而我们的产线正是 AI + RAG 形态，
+    落入其明确排除的行为描述；
+  · THR 的具名黑名单包含同类 AI UA，继续抓取在事实层面违背其明确声明；
+  · 违规后果是域名级封禁乃至法务交涉，而收益仅为「多 1–3 个信噪比很低的来源」
+    （实测 MCU 命中 0–1/10~12），收益/风险比明显不利。
+
+建议（供拍板，非结论）：
+  第一阶段将 THR、EW、Collider 移出自动抓取清单。
+  如需保留其权威性，改为**人工录入通道**：人工阅读 → 手工新增一条 news 条目 →
+  official_source 留空、状态最高只能到 media 级。
+  待负责人对合规边界给出明确意见后再调整。
+
+
+■ R2.5 产出量推算（决策依据）
+  基于本次探活的 MCU 相关命中：
+    · The Direct：约 20 条/24h 中 11 条相关
+    · ComicBook /category/marvel/：约 50 条/11h 中 47 条相关（含大量漫画/游戏内容，需二次过滤）
+    · Variety / Deadline：各 1–2 条/日
+    · 其余：0–1 条/日
+  粗估：**每日 MCU 相关候选 10–25 条**，经去重与「影视类」过滤后**每日可用 5–10 条**。
+  与原 §18「首页 5–8 条」的量级匹配，**支持 C 方案的可行性**。
+  ※ 此为单日快照，不代表长期均值，须以连续 7 天观测校准后再定人工成本预算。
+
+
+■ R2.6 来源角色重定义（对原 §3 的修订）
+  实测显示权威媒体的 MCU 命中率极低（0–2 / 10~12 条），据此把来源按**角色**重新划分：
+
+  发现器（高频、MCU 占比高）
+    · The Direct（/rss，命中约 52%）
+    · ComicBook（/category/marvel/feed/，命中约 90%）
+    · Marvel 官方（/news 列表页，需影视类过滤）
+
+  验证器（低频、权威）
+    · Variety、Deadline —— 二者同属 PMC，**计 1 个独立 owner_group**
+    · 作用：当 MCU 消息出现时提供权威背书；不承担日常发现职责
+
+  公告核实器
+    · thewaltdisneycompany.com（仅在需要核实官方公告时检索）
+
+  受阻 / 建议移出
+    · Marvel 日本（403 受阻）
+    · EW（feed 402 + robots 反对 AI）
+    · THR（robots 具名封禁 AI 爬虫）
+    · Collider（MCU 命中 0 + robots 反对 AI）
+
+
+============================================================
+R3｜修订版状态机
+============================================================
+
+■ R3.1 判定输入字段（新增 / 重定义）
+
+新增字段：
+  owner_group                   来源所属集团（来源登记表必填项）
+  original_source               原始消息源名称（无法判断时填 unknown，禁止猜测）
+  original_source_url           原始消息源 URL
+  reported_by                   报道方数组（每项含 source_name 与 source_url）
+  independent_group_count       派生字段：reported_by 去重 owner_group 后的数量
+  official_source               官方来源名称
+  official_source_url           官方来源 URL
+  official_domain_whitelisted   布尔：URL 是否命中官方域名白名单
+  status_changed_at             最近一次状态变更时间
+  status_change_reason          状态变更依据说明
+  status_change_evidence_url    状态变更证据 URL（必须可回链）
+  supersedes_id / superseded_by_id   更正与辟谣的链式引用
+  pinned / pinned_until / pinned_order / pinned_reason   置顶控制字段（见 R5）
+
+重定义：
+  ★ multi_source_reported 的判定**不再基于「报道网站数量」**，
+    改为基于 `independent_group_count`。
+
+核心原则（写入规范正文，不可协商）：
+  1. 同一 owner_group 下的多个媒体，无论多少家，一律只计 1 个独立证据。
+  2. 无法确认 owner_group 或无法确认 original_source 时，
+     **不允许 AI 自行假设其独立性**，一律降级为 single_source 或 unverified。
+
+真实案例（本次探活即捕获，可直接作为验收样例）：
+  2026-09-21/22，「Daredevil: Born Again 将在第三季完结」一条消息同时出现在
+  Variety、Deadline、THR 三家。THR 标注 Exclusive。
+  按原规则（站点计数）→ 会被判为 multi_source_reported（3 家）。
+  按本修订规则 → 三家同属 Penske Media Corporation，independent_group_count = 1，
+  只能判为 single_source。
+
+  ⚠ 待核（置信度中/低，未采信）：ComicBook 归属（疑 Paramount 旗下）、
+    The Direct 归属。二者均为「未确认」状态，请策划核实后补入登记表。
+
+
+■ R3.2 状态清单（共 8 态）
+
+  ┌──────────────────────────┬────────────────────────────────────────────┐
+  │ 状态                      │ 含义与判定输入                              │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ official_confirmed        │ 存在可回链的官方来源，且 URL 命中官方域名   │
+  │ 官方确认                  │ 白名单，并经人工复核                        │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ multi_source_reported     │ independent_group_count ≥ 2，且这些来源     │
+  │ 多家媒体报道              │ 的信息内容彼此一致，且来源质量不低          │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ single_source             │ independent_group_count = 1                 │
+  │ 单一来源报道              │                                            │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ rumor                     │ 原始来源属爆料人 / 消息人士 / 未公开来源 /  │
+  │ 传闻 · 爆料               │ 行业传闻 / 社交媒体爆料                    │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ unverified                │ 来源不足、无法判断来源层级                  │
+  │ 信息待核实                │（≠ 冲突，冲突另立 conflicting）             │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ conflicting               │ 两个及以上可靠来源对同一要素给出**互斥**    │
+  │ 信息存在冲突              │ 表述（如 A 说延期、B 说按期）               │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ officially_denied         │ 官方明确否认该消息                          │
+  │ 官方已否认                │                                            │
+  ├──────────────────────────┼────────────────────────────────────────────┤
+  │ corrected                 │ 原发布方发布更正声明，内容以更正后为准      │
+  │ 来源已更正                │                                            │
+  └──────────────────────────┴────────────────────────────────────────────┘
+
+  ※ 是否采用 conflicting 已决策：**采用**。理由见 R3.6。
+
+
+■ R3.3 完整状态转换规则
+
+【升级路径】（依据增强时）
+
+  unverified            → single_source         条件：出现 1 个可靠媒体来源
+  unverified            → rumor                条件：确认原始来源为爆料类
+  single_source         → multi_source_reported 条件：independent_group_count ≥ 2
+                                                且各来源信息一致
+  single_source         → official_confirmed   条件：找到官方来源且通过白名单校验 + 人工复核
+  rumor                 → multi_source_reported 条件：爆料被多家**不同 owner_group**的
+                                                可靠媒体独立证实
+  rumor                 → official_confirmed   条件：官方确认
+  multi_source_reported → official_confirmed   条件：官方确认
+  conflicting           → 任一非冲突状态      条件：冲突被消除（官方表态或一方更正）
+
+【降级路径】（依据减弱或反转时）
+
+  official_confirmed    → officially_denied    条件：官方明确否认（官方信息此后仍可能变更）
+  official_confirmed    → corrected            条件：官方自身发布更正
+  official_confirmed    → conflicting          条件：官方与其他官方来源表述互斥（如不同地区
+                                                官方口径不一致）
+  multi_source_reported → single_source        条件：复核发现 reported_by 实际同属 1 个
+                                                owner_group（伪多源被识别）
+  multi_source_reported → rumor                条件：追溯发现原始来源为同一爆料人
+  multi_source_reported → corrected            条件：主要来源发布更正
+  single_source         → corrected            条件：该来源发布更正
+  single_source         → rumor                条件：追溯发现原始来源为爆料类
+  任一状态              → conflicting          条件：出现互斥的可靠来源
+  任一状态              → unverified           条件：来源被删除/撤稿且无其他依据
+
+【六个必须回答的问题】
+
+  1) 什么情况升级？
+     见上述升级路径。统一门槛：新增独立 owner_group 或出现可回链的官方来源。
+
+  2) 什么情况降级？
+     见上述降级路径。统一门槛：独立证据减少、来源更正、或出现官方否认 / 互斥表述。
+     ★ 特别注意「伪多源」降级：复核发现多家媒体同属 1 个 owner_group 时必须降级。
+
+  3) 官方确认后是否仍可能变更？
+     **会。**官方信息会改档、改口、更正。因此 official_confirmed 的语义是
+     「截至当前已获得官方层级的确认」，而不是「此事永远不会变」。
+     该状态可转往 officially_denied、corrected 或 conflicting。
+
+  4) 官方否认后如何处理旧新闻？
+     **保留，不删除。**状态改为 officially_denied，保留原有 reported_by 与历史状态记录；
+     卡片与详情页显著展示「官方已否认」。旧新闻不得静默消失，否则用户会失去判断依据。
+     默认不进首页列表（见 R5），但保留全文可访问。
+
+  5) 媒体发布更正后如何处理旧数据？
+     保留原记录，新增更正后记录，二者以 supersedes_id / superseded_by_id 互链；
+     H5 以最新记录为准，并在卡片与详情页显示「该报道已被来源更正」及更正方向。
+     corrected 状态最高只能到 media 级，**不得因更正而升级为 official_confirmed**。
+
+  6) corrected 是否保留原始报道？
+     **保留**。理由：用户需要看到「原来怎么说、后来改成什么」，这正是可追溯性的核心价值。
+     但两条记录**不作为两个独立条目在列表中重复展示**，须合并到同一事件下。
+
+  7) 状态变化是否记录时间和依据？
+     **必须记录，缺一不可。**三个字段强制填写：
+       status_changed_at（时间）
+       status_change_reason（依据说明）
+       status_change_evidence_url（证据 URL，必须可回链）
+     缺失任一项的状态变更不得入库。同时保留完整状态变更历史（不做覆盖写）。
+
+
+■ R3.4 数据单一源纪律（对原 §10 的强化）
+
+  · 所有新资讯最终只能进入 h5/data/news.js，并与 content.js 数据体系兼容。
+  · related_movies / related_series / related_characters / related_phases
+    **全部引用现有 MCU_CONTENT 的原始 id**。
+  · 禁止：新造 MCU id；修改已有 id；建立第二套 MCU 内容数据源。
+  · 资讯只做引用，不复制、不派生 MCU 元数据。
+  · 关联必须以明确信息为依据，不得因标题出现某名称就强行关联。
+  · 关联 id 校验：写入前必须与现有 MCU_CONTENT id 集合做交集校验，
+    未命中的关联一律丢弃（不得留空字符串占位、不得静默新建）。
+
+
+■ R3.5 判定执行机制（三层，替代原 §14 的单层表述）
+
+【第一层：AI 提取与建议】
+  AI 可以做：
+    · 提取 reported_by 与候选 original_source
+    · 判断是否疑似转载 / 转引
+    · 判断来源关系（是否同集团、是否互相引用）
+    · 提取报道对象（影片、角色、剧集、阶段）
+    · 识别相似新闻并给出合并建议
+    · 提出 verification_status **建议值**
+    · 生成摘要与提醒文案
+  AI 不可以做（硬禁止）：
+    · 自行认定 official_confirmed
+    · 自行制造来源、补充不存在的事实
+    · 把传闻写成确定事实
+    · 因多家网站转载而认定为真实
+    · 在 owner_group 未确认时假设来源独立性
+
+【第二层：规则硬校验】
+  · official_confirmed 的硬门槛：official_source_url **必须命中预先登记的官方域名白名单**，
+    否则无论 AI 如何建议，一律不得置为该状态。
+  · 媒体写「Marvel confirms...」**不能**单独构成 official_confirmed 依据。
+  · 建议白名单（需负责人确认后生效）：
+      marvel.com、disney.com、thewaltdisneycompany.com、d23.com、disneyplus.com
+  · 官方社交账号（X / Instagram / YouTube 等）无法做域名白名单校验，
+    因此**不得单独构成 official_confirmed**；如需采信，必须由人工附上原始发布链接作为证据。
+  · independent_group_count 由 reported_by 按 owner_group 去重自动计算，
+    禁止人工直接填写该数值。
+  · 校验不通过时，状态自动回落至 multi_source_reported 或 single_source。
+
+【第三层：人工复核】
+  必须人工确认的状态：
+    · official_confirmed
+    · officially_denied
+    · conflicting
+    · 任何 multi_source_reported 但 original_source 无法确定者
+    · 任何涉及 supersedes / superseded_by（更正、辟谣）的记录
+  人工复核动作：核对 official_source_url 可访问且确为官方；核对关联 id 有效；
+  核对提醒文案与状态一致；确认后方可写入 news.js。
+
+
+============================================================
+R4｜统一状态文案表
+============================================================
+
+■ R4.1 措辞红线（强制）
+  1. 禁止出现真实性 / 可信度百分比（如「真实性 87%」「可信度 92%」）。
+  2. 禁止绝对化措辞：不写「已证实为真」「确定」「100%」「铁定」。
+  3. 官方确认也不得暗示「永远不会变化」，须体现「截至当前所属来源层级」。
+  4. 非官方状态一律带「尚未获得 Marvel / Disney 官方确认」类提醒。
+  5. 不得使用实时性措辞（「刚刚」「N 分钟前」）。
+
+
+■ R4.2 完整文案表
+
+  ┌───────────────┬────────────┬──────────────────────────┬──────────────────────┬──────────┐
+  │ 状态          │ H5 展示    │ 提醒语                    │ 触发条件              │ 人工复核 │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ official_     │ 官方已确认 │ 该消息已获得 Marvel /      │ 官方来源 URL 命中白   │ 必须     │
+  │ confirmed     │            │ Disney 官方发布确认。      │ 名单 + 人工复核       │          │
+  │               │            │ 官方信息此后仍可能调整或   │                       │          │
+  │               │            │ 更正，请以官方最新发布为准。│                      │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ multi_source_ │ 多家媒体   │ 已有多家媒体报道该消息，   │ independent_group_    │ 部分必   │
+  │ reported      │ 报道       │ 但目前尚未获得 Marvel /    │ count ≥ 2 且信息一致  │ 须（见下）│
+  │               │            │ Disney 官方确认。          │                       │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ single_source │ 单一来源   │ 目前仅有单一媒体报道，     │ independent_group_    │ 否       │
+  │               │ 报道       │ 尚未获得 Marvel / Disney   │ count = 1             │          │
+  │               │            │ 官方确认。                 │                       │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ rumor         │ 传闻 · 爆料│ 该信息来自非官方消息源，   │ 原始来源为爆料 / 消息 │ 否       │
+  │               │            │ 目前尚未获得 Marvel /      │ 人士 / 社交爆料       │          │
+  │               │            │ Disney 官方确认，请谨慎参考。│                     │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ unverified    │ 信息待核实 │ 目前来源不足，暂无法判断   │ 来源数量与层级均不足  │ 否       │
+  │               │            │ 该消息的来源层级。         │                       │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ conflicting   │ 信息存在   │ 目前不同来源存在明确差异， │ 两个及以上可靠来源对  │ 必须     │
+  │               │ 冲突       │ 暂无法确认该消息是否属实。 │ 同一要素表述互斥      │          │
+  │               │            │ 相关来源及其表述已列于详情页。│                    │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ officially_   │ 官方已否认 │ 该消息已被 Marvel / Disney │ 官方明确否认          │ 必须     │
+  │ denied        │            │ 官方否认。                │                       │          │
+  ├───────────────┼────────────┼──────────────────────────┼──────────────────────┼──────────┤
+  │ corrected     │ 来源已更正 │ 原发布方已发布更正声明，   │ 原发布方发布更正      │ 必须     │
+  │               │            │ 当前内容以更正后为准。     │                       │          │
+  └───────────────┴────────────┴──────────────────────────┴──────────────────────┴──────────┘
+
+  人工复核列的「部分必须」含义：multi_source_reported 在 original_source 可确定时免人工复核；
+  无法确定时必须人工复核。
+
+
+■ R4.3 首页卡片结构（沿用原 §15，补充状态行与日期口径）
+
+  官方确认卡片示例
+    [官方已确认]
+    《复仇者联盟：毁灭日》最新消息
+    Marvel Studios 公布……
+    Marvel Studios · 2026-09-22
+    相关：Avengers: Doomsday · Phase 6
+                                            查看 →
+
+  非官方卡片示例
+    [多家媒体报道]
+    某角色或将回归 MCU
+    Variety、Deadline 等出现相关报道。
+    ⚠ 尚未获得 Marvel / Disney 官方确认
+    2026-09-22
+                                            查看 →
+
+  日期口径统一：一律展示 publish_time 的日期部分（不展示时分），避免暗示实时性。
+
+
+■ R4.4 详情页信息块（沿用原 §16，字段名对齐 R3.1）
+  标题 / 信息状态 / AI 摘要 / 相关报道（reported_by 列表）/ 官方确认情况 /
+  原始来源（可识别则列出，无法识别写「暂无法确认」，禁止猜测）/
+  状态变更记录（status_changed_at + reason，仅在发生过变更时展示）/ 查看原文
+
+
+■ R4.5 冲突展示规则（沿用原 §21）
+  发生 conflicting 时，不自行判断谁是真的，改为并列展示：
+    来源 A：表述甲
+    来源 B：表述乙
+    官方确认：暂未发现
+  并标注「信息存在分歧，目前待核实」。
+
+
+■ R4.6 封面图规则（对原 §20 的收敛）
+  第一阶段确定采用：**统一自绘占位图**。
+  理由：第三方媒体封面版权边界无法确认；官方海报的使用授权边界同样无法确认。
+  在授权边界确认之前，统一占位图是唯一无争议选项。
+  后续若确认官方素材可合规使用，再按「官方海报 → 授权素材 → 占位图」的优先级替换。
+  ★ 明确禁止：第一阶段不抓取任何第三方媒体封面图。
+
+
+============================================================
+R5｜排序与置顶规则
+============================================================
+
+■ R5.1 字段职责
+  publish_time          主排序依据（缺失时回落到 first_seen_at；两者皆缺则不入首页）
+  pinned                置顶开关（布尔）
+  pinned_until          置顶失效时间（ISO 时间戳）
+  pinned_order          置顶组内显式序号（整数，越小越靠前）
+  pinned_reason         置顶理由（必填，便于事后复盘）
+  verification_status   **不参与主排序**，仅作为并列打破器
+
+
+■ R5.2 执行逻辑（开发可直接实现）
+
+  Step 0  过滤
+          剔除 status = officially_denied 的条目（除非 pinned = true）
+          剔除 publish_time 与 first_seen_at 皆缺失的条目
+          剔除 status = archived 的条目
+
+  Step 1  置顶有效性判定
+          有效置顶 = (pinned = true) AND (pinned_until 为空 OR pinned_until > 当前时间)
+          失效置顶视为 pinned = false
+
+  Step 2  分层排序
+          第一层：有效置顶条目排在最前
+          第二层：其余条目按 publish_time 降序
+
+  Step 3  置顶组内排序
+          先按 pinned_order 升序；pinned_order 相同时按 publish_time 降序；
+          仍相同则按 id 升序（保证排序稳定、可复现）
+
+  Step 4  并列打破
+          publish_time 完全相同时，按 verification_status 优先级：
+            official_confirmed > multi_source_reported > single_source
+            > rumor > unverified > conflicting > officially_denied > corrected
+          再相同则按 id 升序
+
+  Step 5  截取
+          首页取前 5–8 条；不足 5 条时按实际数量展示，**不得为凑数纳入低质量条目**
+
+
+■ R5.3 六个必须明确的问题
+
+  1) pinned 是否优先于时间排序？
+     是。有效的 pinned 条目无条件排在任何非置顶条目之前。
+     但它不改变条目自身的 publish_time，卡片仍显示真实发布时间。
+
+  2) 置顶是否有有效期？
+     有。pinned_until 为必填项，默认建议 72 小时。
+     如需长期置顶，须显式填写更长的 pinned_until 并在 pinned_reason 中说明理由。
+     过期后自动回到时间序，无需人工干预。
+
+  3) 多条置顶如何排序？
+     严格按 pinned_order 升序。pinned_order 为必填整数，由人工指定，禁止留空。
+
+  4) 官方确认是否自动置顶？
+     **不自动置顶。**理由：自动置顶会造成旧新闻长期压顶，
+     直接违反原 §18「不能因为可信度高就让旧新闻一直排在最新新闻前面」的精神。
+     如确需突出某条官方消息，由人工设置 pinned 并填写理由与有效期。
+     （备选方案，默认关闭：official_confirmed 的**新增**条目可在发布后 24 小时内获得一次性
+      时效加权。此方案会引入更复杂的排序状态，建议一期不做。）
+
+  5) verification_status 在排序中的角色？
+     仅作并列打破器（Step 4），不参与主排序，不产生跨时间的压顶效果。
+
+  6) 已被官方否认的条目如何处理？
+     默认不进首页列表（Step 0 已剔除），但保留全部可访问性；
+     如需在首页警示，由人工 pinned 并填写理由。
+
+
+============================================================
+附：本修订相对原 V2 的变更清单
+============================================================
+  + 新增「运行架构」章节（原规范缺失）——选型 C，含 11 项必须明确的问题
+  + 新增 owner_group 字段与 independent_group_count 派生字段
+  + multi_source_reported 判定基准由「站点数」改为「独立 owner_group 数」
+  ~ 状态数由 5 增至 8（新增 officially_denied、corrected、conflicting，拆分原 unverified）
+  + 新增完整降级路径（原规范仅有升级）
+  + 新增状态变更三字段留痕要求
+  + 新增三层判定机制（AI 建议 / 规则硬校验 / 人工复核）替代原单层边界表述
+  + 新增官方域名白名单机制
+  + 新增来源登记表 13 个字段定义与 11 来源实测结论
+  ~ 来源角色重定义：发现器 / 验证器 / 公告核实器 / 移出
+  ~ 封面图规则收敛为「统一占位图」
+  ~ 排序规则细化为 6 步可执行逻辑
+  ~ unverified 与 conflicting 正式拆分
+  ! 合规待决项：THR、EW、Collider 三家涉及 AI 抓取禁止声明，待负责人拍板
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+R1–R5 至此完成。按指令要求在此停止：
+不写代码、不修改 H5、不开始抓取、不进入开发。
+下一步：交回项目负责人审核。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

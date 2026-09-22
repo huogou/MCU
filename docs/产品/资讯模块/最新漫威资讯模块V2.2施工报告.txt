@@ -1,0 +1,305 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU 宇宙导航｜最新漫威资讯模块 V2.2 · 施工报告》
+施工时间：2026-09-22 13:43–14:5x（GMT+8）
+施工依据：设计规范 news-module-design-spec.md（豆包 V2.2 最终修复版）+ 产品规范 V2.2 R1–R8
+本阶段范围：**仅完成产品与模拟数据施工，不接入真实资讯抓取**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+============================================================
+1. 修改文件清单
+============================================================
+
+■ 新增（6 个）
+  h5/data/news.js                                  资讯数据权威源（window.MCU_NEWS，15 条模拟数据）
+  h5/news.html                                     资讯列表页
+  h5/news-detail.html                              资讯详情页
+  h5/assets/css/v2n-news.css                       资讯模块样式（v2n- 前缀）
+  workspace/news/test-news-rules.cjs               规则与数据断言测试（78 断言）
+  workspace/news/regression-news.cjs               全站回归 + 页面实测（55 断言，headless Chrome）
+
+■ 修改（2 个）
+  h5/index.html      ① head 引入 v2n-news.css
+                     ② 新增「最新漫威资讯」Section（位于社区入口之后、快捷入口之前）
+                     ③ 引入 data/news.js（community.js 之后、app.js 之前）
+                     ④ 内联脚本新增 Section 渲染（排序 → 取前 6 条 → 卡片点击跳转）
+                     ⑤ 原「快捷入口」注释序号 7 → 8
+  h5/assets/js/components.js
+                     在 MCU.v2 命名空间内新增资讯组件与规则函数（约 330 行，追加在 toast 之后）
+                     · NEWS_LABEL / NEWS_NOTICE / NEWS_ICON / NEWS_STATUS_RANK
+                     · isGroupConfirmed / calcIndependentGroupCount / independentCountText
+                     · newsDate / safeUrl / statusBadge / sortNews
+                     · relatedNodes / relatedSummary / sourceLine / newsCard
+                     · sourceItem / relatedNode / originalSourceUrl / newsDetail
+
+■ 删除
+  无。既有文件零删除、零重命名。
+
+■ 未触碰（明确列出）
+  h5/data/ 其余 13 个既有数据文件、h5/assets/js/app.js、components.js 既有组件、
+  h5/assets/css/{style,v2,v3-forum}.css、h5/assets/js/forum.js、
+  既有 9 个页面、shared/ 全部、wechat/ 全部、douyin/ 全部
+
+
+============================================================
+2. 数据层
+============================================================
+
+■ 2.1 权威源
+  h5/data/news.js 为资讯数据**唯一权威源**（产品 §一 拍板）：
+  未创建 shared/data/news.js，未复制到 wechat/douyin，无第二套资讯数据。
+  文件为纯静态全局变量挂载，无 fetch、无 import、无 require（测试第 9 组断言）。
+
+■ 2.2 数据结构
+  每条资讯含设计规范 R12.2 全部字段（测试已逐条校验字段完整性）：
+  基础 id/title/summary/publish_time/first_seen_at/category；
+  状态 verification_status；
+  来源 reported_by[{source_name, source_url, owner_group}]、original_source(_url)、
+       official_source(_url)、independent_group_count；
+  关联 related_movies/related_series/related_characters/related_phases；
+  置顶 pinned/pinned_until/pinned_order/pinned_reason；
+  留痕 status_history[]、status_changed_at、status_change_reason、
+       status_change_evidence_url、judged_by、chain_steps_hit；
+  链式 supersedes_id / superseded_by_id；
+  conflicting 专用 conflict_statements[]、conflict_resolved_at(_url)。
+
+■ 2.3 verification_status
+  严格实现 8 态，**未新增任何状态**（测试断言状态键位与 8 态完全一致）：
+  official_confirmed / multi_source_reported / single_source / rumor /
+  unverified / conflicting / officially_denied / corrected
+  15 条模拟数据覆盖全部 8 态。状态并非字段覆盖式赋值：每条都带
+  status_history（含 from/to/at/reason/evidence_url）与判定链命中步骤
+  （chain_steps_hit，如 Step 1 / Step 2 / Step 4 / Step 5 / Step 6 / Step 7 / Step 8）。
+
+■ 2.4 owner_group
+  登记在 reported_by[].owner_group，本阶段实际取值：
+  「Disney / Marvel」「The Walt Disney Company」「Penske Media Corporation」
+  「People Inc.」「Valnet」「待核」「unknown」。
+  独立性判定由运行时函数 isGroupConfirmed 执行：「待核」「unknown」「未确认」及空值
+  一律不计入独立证据组。
+
+■ 2.5 independent_group_count
+  **派生字段，运行时计算，禁止手写**。components.js 提供
+  calcIndependentGroupCount(item)：按 owner_group 去重计数，未确认组跳过。
+  数据文件中存储的同名字段被测试脚本逐条与运行时计算结果比对，
+  断言「全部一致」，从机制上杜绝人为改大。
+
+■ 2.6 status_history
+  每条均保存。第一阶段仅保存数据 + 详情页展示最近一次变更的**轻量提示**
+  （按设计 D8 不展开时间轴）。
+
+■ 2.7 模拟数据说明（诚实标注）
+  news.js 头部含 window.MCU_NEWS_META = { stage:'mock', ... }，
+  明确本阶段为模拟数据、未接入真实抓取。
+  全部 related_* 引用 MCU_CONTENT / MCU_CHARACTERS 中真实存在的 id；
+  未使用任何编造 id（已剔除设计初稿中的 avengers_doomsday / captain_america）。
+
+
+============================================================
+3. 页面
+============================================================
+
+■ 3.1 首页 index.html
+  位置：社区入口之后、快捷入口之前（第 ⑦ 位），复用 .v2-section + MCU.v2.sectionTitle。
+  标题：eyebrow「LATEST MCU NEWS」/ 标题「最新漫威资讯」/
+        sub「关注 MCU 最新动态，来源透明可追溯」/ 「查看全部」→ news.html。
+  条数：取排序后前 6 条（产品 R5.2「前 5–8 条」区间内取值，PC 两列可整除），
+        不足 5 条按实际展示，无凑数逻辑。常量 HOME_NEWS_COUNT 一处可调。
+  卡片：compact 变体（无摘要行）。每张含状态标签、标题、来源行、独立来源数+日期、关联行。
+  实测：6 条卡片、6 个状态标签、首条为 pinned_order=1 的置顶条目。
+
+■ 3.2 news.html
+  轻量 Hero（eyebrow / 标题 / 副说明 / 分割线）+ 列表 + 底部区。
+  无筛选器（按设计 D2）。
+  分页：首批 10 条，点「加载更多」追加 10 条，前端切片，零网络依赖；
+        加载中按钮禁用并显示「加载中...」；到底显示「— 已展示全部 —」。
+  空状态：内置「暂无资讯 / 资讯更新后将在此展示」。
+  实测：首批 10 条 → 点击后 15 条（全部可展示）→ 到底提示；无 JS 异常。
+  说明：15 条中 officially_denied 那条 pinned=true 故保留、publish_time 缺失那条
+        first_seen_at 存在故回落保留，因此 Step 0 不剔除任何条目。
+
+■ 3.3 news-detail.html
+  sticky 返回栏（history.back()，无历史则回 news.html）。
+  十个信息块按设计顺序：①标题 ②状态 ③时间 ④摘要 ⑤关联 MCU ⑥来源信息
+  ⑦交叉验证（仅 conflicting）⑧真实性提醒 ⑨原始来源 ⑩更正/状态变化。
+  实测：10 项全部命中；来源区块含 3 个来源项、独立来源数文案、
+  原始消息源说明；外链均 target=_blank + rel=noopener noreferrer；
+  详情页标题与 meta description 按条目动态更新。
+  「资讯不存在」空状态已实现。
+
+
+============================================================
+4. 跳转（逐项确认）
+============================================================
+
+■ related_characters → `map.html?focus={char_id}` ✅
+  实测：news-detail.html?id=news-2026-09-17-015 渲染 2 个角色节点，
+  均为 <a> 且 href 以 `map.html?focus=` 开头。
+  未出现 `map.html?char=`（测试脚本对该串有断言，且已全局检索确认无残留）。
+
+■ related_phases → 只展示、不可点击 ✅ **无死链**
+  实测：阶段节点渲染为 `<span class="v2n-related-node v2n-related-node--static">`，
+  href 为空字符串，不可点击。
+  未实现 `routes.html?phase=`，未新增 `index.html?phase=`，未改动首页资料库区。
+
+■ related_movies / related_series → `movie.html?id=` ✅
+■ 资讯卡片 → `news-detail.html?id={news_id}` ✅
+■ 关联 id 未命中 → 丢弃 ✅
+  实测：news-2026-09-17-015 中的 `avengers-5`（存在于 MCU_UPCOMING，不在 MCU_CONTENT）
+  未被渲染为关联节点，且该条其余合法关联（角色、阶段）正常渲染。
+  渲染前统一经 MCU.data.get() / MCU.data.getChar() 校验。
+
+
+============================================================
+5. 样式
+============================================================
+
+■ 文件：h5/assets/css/v2n-news.css ✅（未创建 v4-news.css，已全局检索确认无该串）
+■ 前缀：全部 .v2n-，未新增任何 .v2- 类，未修改 v2.css（零改动）
+■ Token：**零新增 Token**。全部取值引用 style.css :root 既有变量
+  （--surface-0/1/2/3/4、--gold、--gold-dark、--gold-a10/a30、--blue、--red、
+   --purple、--p1~--p6、--r-sm/md/lg/full、--shadow-card、--fs-body/caption/mini、
+   --font-display、--page-x）。未定义新 CSS 变量。
+■ 8 态徽章：类名 `.v2n-status-badge--{status}`，颜色与设计规范 R5.6 一致。
+  其中 corrected 使用 `--gold-dark` + rgba(201,144,30,0.08) 背景（**暗金灰，非绿色**）；
+  officially_denied 背景 0.15 / 边框 0.40（浓度高于 conflicting 的 0.10 / 0.30）。
+■ 卡片变体：compact（首页）/ standard（列表）/ --conflict（左侧红条）/
+  --denied（左侧红条 + 标题删除线 + opacity .8）/ --corrected（更正提示行）。
+■ CSS 污染检查：实测 .v2-section 计算后背景仍为 transparent，未被注入任何样式。
+■ 响应式：320px 窄屏微调；<720 单列；720–1023 首页两列；≥1024 完整 PC
+  （首页两列、列表与详情 840px 居中、来源项与交叉验证 2 列网格、关联节点 flex-wrap）。
+  实测：390px 单列无横向溢出；1440px 首页 2 列；列表页两端均无横向溢出。
+
+
+============================================================
+6. 测试（对照 §十三 测试清单，逐项打勾）
+============================================================
+
+■ 6.1 规则与数据断言（workspace/news/test-news-rules.cjs）
+  结果：**78 PASS / 0 FAIL**
+  测法：在 Node vm 沙箱加载**真实的 h5/data/*.js 与 h5/assets/js/components.js**，
+        对实际导出函数断言，不复刻逻辑。
+
+  ✅ 官方确认        —— 存在用例；official_source_url 命中 host=marvel.com + allowed_paths
+  ✅ 单一来源        —— 存在用例；独立来源数 = 1
+  ✅ 多源报道        —— 存在用例；PMC + People Inc. → 独立来源数 = 2
+  ✅ 信息待核        —— 存在用例（含 reported_by 为空的极端场景）
+  ✅ 传闻            —— 存在用例；原始来源属爆料类
+  ✅ 存在分歧        —— 存在用例；带 2 条并列表述
+  ✅ 官方否认        —— 存在用例；默认不进列表、仅 pinned 时出现
+  ✅ corrected       —— 事件级与报道级两种用例均覆盖
+  ✅ owner_group 未确认 —— 两家「待核」→ 计数 0（**不出现「未确认但 count=2」**）；
+                          且不展示独立来源数（D11）
+  ✅ 多源数量计算    —— 三家同属 PMC → 计数 1（伪多源识别），状态降为 single_source；
+                          全部条目存储值 = 运行时计算值
+  ✅ 关联角色        —— 4 条含角色关联，全部命中 MCU_CHARACTERS
+  ✅ 关联阶段        —— 取值 1–6 整数校验通过；渲染为不可点击静态节点
+  ✅ 加载更多        —— 见 6.2（浏览器实测）
+  ✅ 移动端 / PC     —— 见 6.3（浏览器实测）
+  ✅ 措辞红线        —— 无百分比、无绝对化、无实时性措辞、无星级评分；
+                          标签沿用产品 R4.2「多家媒体报道」；corrected 非绿色
+  ✅ 日期口径        —— 一律 YYYY-MM-DD；publish_time 缺失回落 first_seen_at
+  ✅ file:// 纪律    —— news.js 与资讯组件均无 fetch / import / require；
+                          news.js 位于 content.js 之后、app.js 之前
+
+■ 6.2 全站回归 + 页面实测（workspace/news/regression-news.cjs，headless Chrome + CDP）
+  结果：**55 PASS / 0 FAIL**
+  测法：以 file:// 真实加载页面，收集 JS 异常与 console error，并对 DOM 断言。
+
+  ✅ 既有 7 个页面（index / routes / map / movie?id= / next / route-detail?id= / community）
+     全部无 JS 异常，关键渲染节点均在
+  ✅ 数据计数未被破坏：MCU_CONTENT 59 / MCU_RELATIONS 92 / MCU_ROUTES 11 /
+     MCU_CHARACTERS 24 / MCU_NEWS 15
+  ✅ 首页 Section 6 条 + 状态标签 + 置顶首条
+  ✅ 列表页 10 → 15 → 到底提示
+  ✅ 详情页十块齐备 + 交叉验证区块 + 更正区块 + 链式引用
+  ✅ 关联跳转参数与阶段不可点击（见第 4 节）
+  ✅ 响应式 390 / 1440 两端
+  ✅ CSS 无污染
+
+■ 6.3 关于 file:// 下的 CORS 噪声（必须说明，非本次引入）
+  本地以 file:// 打开时，app.js 的 CloudBase 统计/反馈请求会被浏览器 CORS 拦截，
+  控制台出现 tcloudbasegateway 相关 error。**改动前既已存在**（与本地打开方式有关），
+  本次回归在过滤该类噪声后断言「无其他任何 JS 异常」，共滤除 20 条。
+
+
+============================================================
+7. 施工中发现的问题与处理（§十二 要求的冲突记录）
+============================================================
+
+■ 冲突 1（已按两处封版规范执行，未暂停：属一行常量可切换）
+  位置：状态标签 multi_source_reported 的 H5 文案
+  当前代码实际行为：显示「多家媒体报道」
+  设计规范要求：R5.4 / 附录 A / D14 = 「多家媒体报道」（明确保留产品 R4.2 原文）
+  产品规范要求：V2.1 R4.2 = 「多家媒体报道」
+  本次策划指令 §十 写：使用「多源报道」
+  → 判定：产品规范与设计规范两处封版口径一致，且本次指令 §十 首句要求
+    「严格按照设计规范实现」，故按「多家媒体报道」执行。
+    独立来源数量另由「已由 N 个独立来源报道」承担（D10 已解决误导风险）。
+    如需改为「多源报道」：components.js 的 NEWS_LABEL.multi_source_reported 一行即可。
+
+■ 冲突 2（设计未定义承载字段，已按最小必要新增并在此声明）
+  位置：conflicting 的各方表述、corrected 的更正内容在数据结构中的承载方式
+  当前代码实际行为：新增两个可选字段
+    · conflict_statements[{source_name, statement, source_url}]（conflicting 用）
+    · report_corrections[{source_name, corrected_at, original_statement,
+                          corrected_statement, evidence_url}]（corrected 用）
+  设计规范要求：R3.4⑦ / R6.6 / R8.2.3 要求展示这些内容，但 R12.2 未定义其字段
+  → 判定：属设计规范未覆盖的必填数据缺口，按最小必要补充，未改动任何既有字段语义，
+    未新增状态、未新增功能。如设计/产品另有命名口径，改名即可（仅影响 2 处引用）。
+
+■ 冲突 3（设计内部两处表述的轻微张力，已择一并声明）
+  位置：报道级 corrected 的状态标签呈现
+  设计要求：R8.2.1 称「事件级状态可能仍为 multi_source_reported」，
+            而 R12.6 称「报道级 corrected → 状态标签变暗金灰」
+  当前代码实际行为（择一）：**状态标签始终按事件级 status 渲染**；
+            只要存在 report_corrections，卡片额外显示「该报道已被来源更正」提示行
+            （--corrected 变体）。即：报道级有更正 → 提示行出现；事件级为 corrected
+            → 暗金灰标签 + 提示行。
+  → 理由：这样与 V2.2 R8.5「corrected 是报道级标记、事件级独立按判定链计算」的核心规则一致。
+    如设计另有取舍，改 newsCard 中一处判断即可。
+
+■ 非冲突项（实现取值说明）
+  · 首页条数取 6（产品给的是 5–8 区间，任取合规；常量 HOME_NEWS_COUNT 一处可调）
+  · pending 无
+
+■ 未完成 / 遗留
+  · 真实来源抓取、去重与交叉验证流程：按指令**本阶段不做**，未写任何爬虫脚本
+  · 无
+    （注：本次未发现任何「必须暂停」的规范与代码冲突）
+
+
+============================================================
+8. 最终结论
+============================================================
+
+■ 是否可以进入真实资讯接入阶段？
+
+**可以进入下一阶段的前提条件已达成，但建议先做一次人工视觉验收再启动抓取。**
+依据：
+  · 数据结构对齐产品 V2.2 R12.2，8 态状态机、owner_group 独立性、派生计数、
+    状态留痕、链式引用全部落地并有断言覆盖（78/78）
+  · 三处页面按设计规范实现，浏览器实测通过（55/55），
+    关联跳转与阶段不可点击均无死链
+  · 既有页面零回归：7 个既有页面无新增 JS 异常、三项数据计数未变、
+    v2.css 零改动、无 CSS 污染
+  · file:// 可运行性保持；无新增运行时依赖、无后端、无第二套数据源
+
+需要项目负责人确认的两点：
+  ① 冲突 1 的标签文案最终定稿（「多家媒体报道」还是「多源报道」）
+  ② 在真实抓取开始前，是否需要先做一轮人工视觉验收（建议需要：
+     当前为模拟数据，卡片密度、PC 两列节奏、详情页信息块顺序
+     适合在真实内容量级下再确认一次）
+
+■ 真实抓取阶段的前置输入（供下一阶段启动时使用）
+  · 来源清单与抓取出口：V2.2 R6 已定稿（A 档 6 个 / B 档人工 3 个）
+  · 官方来源登记表：V2.2 R7 已定稿
+  · 数据落点：仍为 h5/data/news.js（本阶段结构可直接复用，无需改数据结构）
+  · 现场事实提醒（实测所得，抓取实现时直接使用）：
+      Marvel 官方无 RSS，走 /news 列表页 HTML 解析，需过滤 comics/games；
+      The Direct 用 /rss 且时间戳在 <dc:date>；
+      ComicBook 必须用 /category/marvel/feed/（/marvel/feed/ 会回落主 feed）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+施工报告完。本阶段未接入真实资讯抓取，未抓取任何外部内容。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
