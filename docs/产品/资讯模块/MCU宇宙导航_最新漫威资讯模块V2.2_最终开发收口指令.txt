@@ -1,0 +1,996 @@
+# MCU 宇宙导航｜最新漫威资讯模块 V2.2 最终开发收口指令
+
+## 0. 指令性质
+
+本指令用于接替“设计 AI（豆包）已经完成 V2.2 最终修订”之后的开发 AI 收口施工。
+
+你现在收到的不是新的设计任务，也不是重新评审产品方案。
+
+你的任务只有一个：
+
+> **严格按照已经完成的 V2.2 产品/设计修订结果，对当前 H5 资讯模块做最后的代码级修复、回归测试和交付。**
+
+禁止重新设计、禁止自行增加产品规则、禁止因为发现旧文档文字而反向修改已封版规则。
+
+---
+
+# 一、当前真实状态
+
+V2.2 资讯模块此前已经完成：
+
+- `h5/data/news.js`
+- `h5/news.html`
+- `h5/news-detail.html`
+- `h5/index.html`
+- `h5/assets/js/components.js`
+- `h5/assets/css/v2n-news.css`
+
+此前施工报告显示：
+
+- 规则测试 78/78 PASS
+- 页面/回归测试 55/55 PASS
+- 15 条模拟资讯
+- 覆盖 8 种 verification_status
+- `related_characters` 已验证使用 `map.html?focus=`
+- `related_phases` 已采用“纯展示、不可点击”
+- file:// 运行方式保持
+- 未接入真实资讯抓取
+
+当前阶段不是重新开发资讯模块，而是：
+
+> **修正开发侧实测发现的 5 个必须问题 + 既定口径 + 数据权威源规则，并完成最终回归。**
+
+---
+
+# 二、权威依据与优先级
+
+按以下优先级执行：
+
+### 第一优先级：产品规范
+
+1. `docs/产品/资讯模块/最新漫威资讯模块V2规范-修订版R1-R5.txt`
+2. `docs/产品/资讯模块/最新漫威资讯模块V2.2施工规范-R6至R8收口件.txt`
+
+产品规范已经封版。
+
+### 第二优先级：设计 AI 最终交接
+
+`AI生成文件/设计/H5-V2.0/news-module-dev-handoff.md`
+
+其中 V2.2 最终修复轮 D15-D19 已明确：
+
+- 数据脚本补齐
+- character 参数使用 `focus`
+- phase 不做 URL 深链
+- 首页前 5–8 条
+- 列表每批 10 条
+- 示例数据 ID / owner_group / independent_group_count 修正
+- `h5/data/news.js` 为资讯唯一权威源
+
+### 第三优先级：设计规范
+
+`AI生成文件/设计/H5-V2.0/news-module-design-spec.md`
+
+注意：
+
+如果设计规范正文中存在早期版本遗留文字，与最终交接书 D15-D19 或产品封版规则冲突时：
+
+> **以最终修订后的明确结论为准，不要把旧文字重新当成新需求。**
+
+尤其不要恢复：
+
+- `routes.html?phase=`
+- `map.html?char=`
+- `v4-news.css`
+- 首页固定前 5 条
+- 第二套资讯数据源
+- 旧的示例 ID
+- 已被 V2.2 收口修正的旧状态口径
+
+---
+
+# 三、必须修复的 5 处
+
+## P1｜脚本清单不完整 —— 必须修
+
+### 问题
+
+此前规范中部分位置只列出了：
+
+- movies
+- series
+- special
+- short
+- content
+- news
+
+但实际资讯页面需要与现有标准页面一致，完整加载 MCU 数据脚本。
+
+如果缺少：
+
+- `characters.js`
+
+则 `related_characters` 渲染时可能出现 `MCU_CHARACTERS` 未定义。
+
+如果缺少：
+
+- `posters.js`
+- `stills.js`
+- `visuals.js`
+
+则相关数据访问/组件取图函数存在运行风险。
+
+### 正确最终顺序
+
+`news.html` 和 `news-detail.html` 均使用：
+
+```html
+<script src="data/movies.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/relations.js"></script>
+<script src="data/routes.js"></script>
+<script src="data/characters.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/stills.js"></script>
+<script src="data/visuals.js"></script>
+<script src="data/news.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/components.js"></script>
+```
+
+### 要求
+
+- 两个资讯页面都核对
+- 顺序保持一致
+- `news.js` 必须在上述 MCU 数据脚本之后
+- `app.js` / `components.js` 保持现有初始化顺序
+- 不引入 `community.js`
+- 不增加其他无关数据脚本
+
+---
+
+# 四、P2｜related_characters 跳转参数错误 —— 必须修
+
+## 错误
+
+旧规则：
+
+```text
+map.html?char={char_id}
+```
+
+## 正确
+
+```text
+map.html?focus={char_id}
+```
+
+### 原因
+
+现有：
+
+- `map.html`
+- `next.html`
+
+实际读取的是：
+
+```text
+?focus=
+```
+
+不是：
+
+```text
+?char=
+```
+
+### 要求
+
+资讯详情页所有 `related_characters`：
+
+```text
+map.html?focus={char_id}
+```
+
+必须确保：
+
+- 不再生成 `map.html?char=`
+- 不残留旧写法
+- 实际点击能够进入现有地图页面并聚焦对应角色
+
+---
+
+# 五、P3｜related_phases 不存在可用深链 —— 最终采用 A
+
+## 最终产品决定
+
+### A：阶段卡纯信息展示，不可点击
+
+这是最终执行口径。
+
+不要：
+
+```text
+routes.html?phase=x
+```
+
+也不要新增：
+
+```text
+index.html?phase=x
+```
+
+也不要为了资讯模块给现有首页资料库增加新的 URL 深链机制。
+
+### 正确行为
+
+阶段节点：
+
+- 可以显示
+- 可以展示 `Phase N`
+- 不产生 href
+- 不响应点击
+- 不跳转
+- 不出现手型点击暗示
+
+推荐结构：
+
+```html
+<span class="v2n-related-node v2n-related-node--static">
+```
+
+### 要求
+
+全局检查：
+
+- 不得出现 `routes.html?phase=`
+- 不得出现 `index.html?phase=`
+- 不得出现资讯模块自造 phase 路由
+- 不修改现有资料库筛选机制
+
+---
+
+# 六、P4｜CSS 命名冲突 —— 最终使用 v2n-news.css
+
+## 正确文件
+
+```text
+h5/assets/css/v2n-news.css
+```
+
+## 禁止
+
+```text
+v4-news.css
+```
+
+### 要求
+
+资讯模块所有样式统一使用：
+
+```text
+v2n-
+```
+
+前缀。
+
+必须确认：
+
+- `news.html` 引入 `v2n-news.css`
+- `news-detail.html` 引入 `v2n-news.css`
+- 不创建 `v4-news.css`
+- 不引用 `v4-news.css`
+- 不污染 `v2.css`
+- 不修改 `style.css`
+- 不为了修资讯模块改全局 Token
+
+如果仓库中存在旧的施工文档写着 `v4-news.css`：
+
+> 文档旧记录不是施工指令，不要据此重新创建文件。
+
+---
+
+# 七、P5｜R12.2 示例数据违反核心规则 —— 必须修
+
+设计规范中的示例不能继续保留会被开发误抄的错误。
+
+## P5.1 independent_group_count
+
+如果：
+
+```text
+reported_by
+```
+
+中存在 `owner_group` 为“待核”的来源：
+
+> 待核 owner_group 不得计为独立证据组。
+
+因此示例：
+
+```text
+independent_group_count: 2
+```
+
+必须改为：
+
+```text
+independent_group_count: 1
+```
+
+---
+
+## P5.2 owner_group 文案
+
+统一使用：
+
+```text
+待核
+```
+
+不要继续写：
+
+```text
+未确认
+```
+
+不要自行猜测 The Direct / ComicBook 的集团归属。
+
+---
+
+## P5.3 示例 related_movies
+
+错误：
+
+```text
+avengers_doomsday
+```
+
+正确：
+
+```text
+avengers
+```
+
+不得制造不存在的 MCU content id。
+
+---
+
+## P5.4 示例 related_characters
+
+错误：
+
+```text
+captain_america
+```
+
+正确：
+
+```text
+steve
+```
+
+不得制造不存在的角色 id。
+
+---
+
+# 八、已确定的产品口径，不要重新讨论
+
+## 8.1 首页条数
+
+最终口径：
+
+> **首页取排序后的前 5–8 条。**
+
+要求：
+
+- 不足 5 条按实际数量展示
+- 不得凑数
+- 不得重新改成固定 5 条
+- 不得因为当前 mock 数据是 6 条就把产品规则写死为 6 条
+
+当前实现如果使用：
+
+```js
+HOME_NEWS_COUNT = 6
+```
+
+可以保留。
+
+原因：
+
+6 属于 5–8 的合法实现值。
+
+但代码/注释不能把“6”表述为产品硬规则。
+
+---
+
+# 九、列表分页口径
+
+最终采用：
+
+> **每批 10 条 + 加载更多**
+
+要求：
+
+- 第一批最多 10 条
+- 点击后追加下一批
+- 继续点击直到全部展示
+- 全量数据仍然一次加载到 `MCU_NEWS`
+- 分页只是前端切片
+- 不引入网络请求
+- 不破坏 file://
+
+无更多数据时：
+
+```text
+— 已展示全部 —
+```
+
+加载过程中：
+
+```text
+加载中...
+```
+
+并禁用按钮。
+
+---
+
+# 十、资讯数据唯一权威源
+
+最终口径已经拍板：
+
+```text
+h5/data/news.js
+```
+
+是本资讯模块的数据唯一权威源。
+
+### 禁止
+
+不要创建：
+
+```text
+shared/data/news.js
+```
+
+不要复制到：
+
+```text
+wechat/
+douyin/
+```
+
+不要建立第二套 `MCU_NEWS`。
+
+不要因为现有三端数据架构而擅自扩大本次任务范围。
+
+本模块现阶段只服务 H5 资讯模块。
+
+---
+
+# 十一、不要误改已经正确的内容
+
+以下内容已经验证正确，不要因为旧文档或旧截图重新修改。
+
+## 11.1 corrected
+
+最终视觉口径：
+
+- 暗金灰系
+- 不使用绿色
+- 不得重新改成绿色
+
+最终值：
+
+```text
+文字：--gold-dark
+背景：rgba(201,144,30,0.08)
+边框：rgba(201,144,30,0.20)
+```
+
+语义：
+
+```text
+来源已更正
+```
+
+不要把 corrected 理解成：
+
+```text
+事件为假
+```
+
+也不要使用：
+
+```text
+正确
+可信
+已证实
+```
+
+等暗示性文案。
+
+---
+
+# 十二、不要误改 multi_source_reported
+
+最终标签：
+
+```text
+多家媒体报道
+```
+
+不要改成：
+
+```text
+多源报道
+```
+
+原因：
+
+产品 R4.2 已固定“多家媒体报道”。
+
+但独立来源计数必须使用：
+
+```text
+N 个独立来源
+```
+
+而不是：
+
+```text
+N 家媒体
+```
+
+媒体数量 ≠ 独立 owner_group 数量。
+
+---
+
+# 十三、related_phases 最终行为再次强调
+
+必须：
+
+```text
+Phase N
+```
+
+作为信息展示。
+
+不要：
+
+```text
+<a href="routes.html?phase=N">
+```
+
+不要新增 phase URL。
+
+阶段节点不能点击。
+
+---
+
+# 十四、代码修改范围
+
+本轮只允许围绕上述最终要求修改必要文件。
+
+优先检查：
+
+```text
+h5/news.html
+h5/news-detail.html
+h5/index.html
+h5/assets/js/components.js
+h5/assets/css/v2n-news.css
+h5/data/news.js
+```
+
+如果只是修正设计规范示例，则不要为了示例修改生产页面。
+
+如果某一处代码已经符合要求：
+
+> 不要为了“重新实现”而重写。
+
+---
+
+# 十五、严禁事项
+
+本轮严禁：
+
+1. 重新设计资讯 UI
+2. 自行增加筛选器
+3. 自行增加搜索
+4. 自行增加订阅
+5. 自行增加通知
+6. 增加后端
+7. 增加数据库
+8. 写真实资讯爬虫
+9. 接入 RSS
+10. 接入第三方 CDN
+11. 引入第三方前端库
+12. 修改现有 `style.css`
+13. 修改现有 `v2.css`
+14. 修改既有 MCU 数据文件
+15. 修改微信小程序
+16. 修改抖音小程序
+17. 创建 `shared/data/news.js`
+18. 创建第二套 `MCU_NEWS`
+19. 新增 `routes.html?phase=`
+20. 恢复 `map.html?char=`
+21. 创建 `v4-news.css`
+22. 把首页条数写死为产品规则“6条”
+23. 把待核 owner_group 当成独立来源
+24. 修改产品规范来迁就代码
+25. 因发现旧版设计文档文字而恢复旧规则
+
+---
+
+# 十六、必须执行的代码级核验
+
+完成修改后，必须实际执行检查，不接受“看起来没问题”。
+
+## 16.1 脚本加载
+
+检查：
+
+- news.html
+- news-detail.html
+
+都存在完整 12 个 MCU 数据脚本 + news.js。
+
+确认：
+
+```text
+movies
+upcoming
+relations
+routes
+characters
+series
+special
+short
+content
+posters
+stills
+visuals
+news
+```
+
+---
+
+## 16.2 URL 全局检查
+
+必须确认：
+
+```text
+map.html?char=
+```
+
+为 0。
+
+必须确认：
+
+```text
+routes.html?phase=
+```
+
+为 0。
+
+必须确认：
+
+```text
+index.html?phase=
+```
+
+为 0。
+
+---
+
+## 16.3 CSS 文件检查
+
+确认：
+
+```text
+v2n-news.css
+```
+
+存在并被两个资讯页面正确加载。
+
+确认：
+
+```text
+v4-news.css
+```
+
+没有被引用。
+
+---
+
+## 16.4 数据 ID 检查
+
+确认示例和 mock 数据中的：
+
+```text
+avengers_doomsday
+captain_america
+```
+
+不再作为关联 id 使用。
+
+确认对应正确 id：
+
+```text
+avengers
+steve
+```
+
+---
+
+## 16.5 owner_group 检查
+
+确认：
+
+```text
+待核
+```
+
+才是待确认口径。
+
+确认：
+
+- 待核
+- unknown
+- 未确认
+- 空值
+
+均不得被当成独立 owner_group。
+
+---
+
+## 16.6 首页条数
+
+确认首页实际实现属于：
+
+```text
+5–8
+```
+
+的合法范围。
+
+当前可以是 6。
+
+不得出现：
+
+```text
+固定只能 5
+```
+
+或：
+
+```text
+必须固定 6
+```
+
+的错误产品逻辑。
+
+---
+
+## 16.7 列表分页
+
+使用 mock 数据至少验证：
+
+```text
+15 条数据
+→ 首屏 10 条
+→ 点击加载更多
+→ 追加剩余 5 条
+→ 显示“— 已展示全部 —”
+```
+
+---
+
+# 十七、必须回归验证
+
+完成后运行现有资讯测试：
+
+```text
+workspace/news/test-news-rules.cjs
+```
+
+以及：
+
+```text
+workspace/news/regression-news.cjs
+```
+
+如果脚本名称已经存在并能运行，直接运行现有脚本，不要另造一套测试体系。
+
+目标：
+
+- 规则测试全部 PASS
+- 页面回归全部 PASS
+- 既有页面不新增 JS 报错
+- `MCU_CONTENT` 仍为 59
+- `MCU_RELATIONS` 仍为 92
+- `MCU_ROUTES` 仍为 11
+- `v2.css` 不被污染
+- file:// 仍可运行
+
+---
+
+# 十八、人工视觉复核
+
+代码修复完成后，重新生成资讯模块截图。
+
+至少检查：
+
+### PC
+
+- news.html
+- news-detail.html
+- 首页资讯 Section
+
+### 移动端
+
+- 390px
+- 375px
+
+重点确认：
+
+1. “加载更多”按钮恢复正常按钮尺寸
+2. 资讯首页 Section 正常
+3. 状态标签颜色正确
+4. 关联节点正常
+5. 阶段节点不可点击
+6. 角色节点可正常跳转
+7. 来源卡正常
+8. 页面没有因脚本补齐出现视觉/JS异常
+9. 不出现 `v4-news.css`
+10. 不出现旧参数
+
+---
+
+# 十九、交付要求
+
+完成后不要只回复“已完成”。
+
+请输出一份完整的开发交付报告，至少包含：
+
+## 1. 修改文件
+
+列出：
+
+```text
+文件路径
+修改内容
+```
+
+## 2. P1–P5 修复结果
+
+逐项写：
+
+```text
+P1 PASS/FAIL
+P2 PASS/FAIL
+P3 PASS/FAIL
+P4 PASS/FAIL
+P5 PASS/FAIL
+```
+
+并说明实际修改位置。
+
+## 3. 产品口径
+
+明确确认：
+
+```text
+首页：前 5–8 条
+列表：每批 10 条 + 加载更多
+phase：纯展示，不跳转
+资讯权威源：h5/data/news.js
+```
+
+## 4. 自动化测试
+
+给出：
+
+```text
+test-news-rules.cjs：XX/XX
+regression-news.cjs：XX/XX
+```
+
+不要只写“通过”。
+
+## 5. 全局检查结果
+
+至少报告：
+
+```text
+map.html?char=：0
+routes.html?phase=：0
+index.html?phase=：0
+v4-news.css 引用：0
+avengers_doomsday：0
+captain_america：0
+```
+
+## 6. 回归结果
+
+确认：
+
+```text
+MCU_CONTENT：59
+MCU_RELATIONS：92
+MCU_ROUTES：11
+既有页面 JS 异常：0
+v2.css 污染：0
+file://：PASS
+```
+
+## 7. 截图
+
+给出本轮重新生成的截图路径，并注明：
+
+- PC
+- 390px
+- 375px
+
+## 8. 是否可以进入下一阶段
+
+只有在：
+
+- P1–P5 全部 PASS
+- 自动化测试 PASS
+- 回归 PASS
+- file:// PASS
+- 无新增 JS 错误
+
+之后，才可以给出：
+
+```text
+V2.2 视觉/实现收口完成，可以进入真实资讯接入阶段。
+```
+
+如果任何一项失败：
+
+> 明确列出失败项和原因，不要用“基本完成”代替。
+
+---
+
+# 二十、最终执行原则
+
+再次强调：
+
+> **设计 AI 已经完成设计收口，你现在不是设计师。**
+
+你是开发执行方。
+
+本轮只做：
+
+```text
+最终设计/产品结论
+        ↓
+代码修复
+        ↓
+自动化测试
+        ↓
+全局回归
+        ↓
+视觉截图复核
+        ↓
+交付报告
+```
+
+不要重新讨论产品方向。
+
+不要重新设计。
+
+不要自行增加需求。
+
+不要因为旧文档残留内容而推翻已经完成的 V2.2 最终结论。
+
+请直接开始执行。

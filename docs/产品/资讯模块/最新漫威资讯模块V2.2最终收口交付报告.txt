@@ -24,7 +24,7 @@
   D:\SEO\发挥余热\漫威电影宇宙导航\h5\assets\css\v2n-news.css
   D:\SEO\发挥余热\漫威电影宇宙导航\h5\data\news.js
 
-【★ 截图目录（20 张，本轮重新生成）】
+【★ 截图目录（21 张，本轮重新生成）】
   D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\shots\
     首页：home_pc_section / home_pc_full / home_390_section / home_390_full / home_375_section
     列表页：news_pc_batch1 / news_pc_all / news_pc_footer_more / news_pc_footer_end /
@@ -212,7 +212,7 @@ file://               ：**PASS**
 
 
 ============================================================
-7. 截图（本轮重新生成，20 张）
+7. 截图（本轮重新生成，21 张）
 ============================================================
 目录：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\shots\
 
