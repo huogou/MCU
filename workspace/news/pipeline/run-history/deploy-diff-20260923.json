@@ -1,0 +1,42 @@
+{
+  "local_count": 174,
+  "server_count": 144,
+  "add": [
+    "assets/css/v2n-news.css",
+    "data/news.js",
+    "news-detail.html",
+    "news.html",
+    "project.config.json",
+    "project.private.config.json",
+    "review/index.html",
+    "review/screenshots/_ach-popup-preview.png",
+    "review/screenshots/_ach-wall-preview.png",
+    "review/screenshots/_character-detail-preview.png",
+    "review/screenshots/_characters-list-preview.png",
+    "review/screenshots/_home-preview.png",
+    "review/screenshots/_home-v11-new-preview.png",
+    "review/screenshots/_home-v11-old-preview.png",
+    "review/screenshots/_my-mcu-v11-new-preview.png",
+    "review/screenshots/_my-mcu-v11-old-preview.png",
+    "review/screenshots/_overview.png",
+    "review/screenshots/_page-browse.png",
+    "review/screenshots/_page-explore.png",
+    "review/screenshots/_page-feedback.png",
+    "review/screenshots/_page-movie.png",
+    "review/screenshots/_page-panorama.png",
+    "review/screenshots/_page-route-detail.png",
+    "review/screenshots/_page-routes.png",
+    "review/screenshots/_preview.png",
+    "review/screenshots/_share-poster-movie.png",
+    "review/screenshots/_share-poster-progress.png",
+    "review/screenshots/_share-poster-route.png",
+    "workspace-tokenize-map6.js",
+    "_redirects"
+  ],
+  "diff": [
+    "assets/js/components.js",
+    "index.html"
+  ],
+  "same_count": 142,
+  "server_only": []
+}
