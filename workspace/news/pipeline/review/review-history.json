@@ -1,0 +1,238 @@
+{
+  "schema_version": "1.0",
+  "entries": [
+    {
+      "review_id": "rev-20260923-001",
+      "event_id": "evt1-f973b7a9f253218b",
+      "candidate_id": "cand-f253218b-077",
+      "operator": "simulated-g7-reviewer",
+      "action": "reject",
+      "before": {
+        "gate_status": "pending",
+        "title": "迪士尼加速器公布2026年度入选企业",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "rejected",
+        "title": "迪士尼加速器公布2026年度入选企业",
+        "category": "industry"
+      },
+      "reason": "纯行业名录公告，无 MCU 作品关联且无实体，信息价值低",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-002",
+      "event_id": "evt1-09cc6cf6bc952bc5",
+      "candidate_id": "cand-bc952bc5-001",
+      "operator": "simulated-g7-reviewer",
+      "action": "modify",
+      "before": {
+        "gate_status": "pending",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为首任首席技术官",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "pending",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+        "category": "industry"
+      },
+      "modifications": {
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位"
+      },
+      "reason": "同公告双出口统一措辞（G5.5 统一措辞建议的首次落地）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-003",
+      "event_id": "evt1-09cc6cf6bc952bc5",
+      "candidate_id": "cand-bc952bc5-001",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+        "category": "industry"
+      },
+      "reason": "修改后通过",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-004",
+      "event_id": "evt1-30235589022ae1d5",
+      "candidate_id": "cand-022ae1d5-010",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "《复联4》重映版独家片段据报聚焦两位MCU角色会面",
+        "category": "movie"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "《复联4》重映版独家片段据报聚焦两位MCU角色会面",
+        "category": "movie"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-005",
+      "event_id": "evt1-3db51c4008f68650",
+      "candidate_id": "cand-08f68650-014",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "《复联4》为Encore重映更换全新海报",
+        "category": "movie"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "《复联4》为Encore重映更换全新海报",
+        "category": "movie"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-006",
+      "event_id": "evt1-5564530018aa7175",
+      "candidate_id": "cand-18aa7175-079",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "漫威影业SDCC震撼官宣：《毁灭之日》《恶灵骑士》《黑豹3》",
+        "category": "movie"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "漫威影业SDCC震撼官宣：《毁灭之日》《恶灵骑士》《黑豹3》",
+        "category": "movie"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-007",
+      "event_id": "evt1-788238e4eaa53c91",
+      "candidate_id": "cand-eaa53c91-013",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "《毁灭之日》新剧照为猩红女巫回归传闻增添可信度",
+        "category": "movie"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "《毁灭之日》新剧照为猩红女巫回归传闻增添可信度",
+        "category": "movie"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-008",
+      "event_id": "evt1-cf15a00b8f8255fa",
+      "candidate_id": "cand-8f8255fa-011",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "漫威官方确认蜘蛛侠最不受欢迎的反派已存在于MCU",
+        "category": "movie"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "漫威官方确认蜘蛛侠最不受欢迎的反派已存在于MCU",
+        "category": "movie"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-009",
+      "event_id": "evt1-54459844ba5cff3f",
+      "candidate_id": "cand-ba5cff3f-007",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "《旺达幻视》续作公布第三位主要超级英雄",
+        "category": "series"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "《旺达幻视》续作公布第三位主要超级英雄",
+        "category": "series"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-010",
+      "event_id": "evt1-09cc6cf6bc952bc5",
+      "candidate_id": "cand-bc952bc5-034",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+        "category": "industry"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-011",
+      "event_id": "evt1-3f11349fe08145f3",
+      "candidate_id": "cand-e08145f3-123",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "泰勒·斯威夫特为《玩具总动员5》创作新歌《我知道是你》",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "泰勒·斯威夫特为《玩具总动员5》创作新歌《我知道是你》",
+        "category": "industry"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    },
+    {
+      "review_id": "rev-20260923-012",
+      "event_id": "evt1-e2330fe443e90e47",
+      "candidate_id": "cand-43e90e47-055",
+      "operator": "simulated-g7-reviewer",
+      "action": "approve",
+      "before": {
+        "gate_status": "pending",
+        "title": "《王国之心》获批准开拍首部原创剧集登陆Disney频道与Disney+",
+        "category": "industry"
+      },
+      "after": {
+        "gate_status": "approved",
+        "title": "《王国之心》获批准开拍首部原创剧集登陆Disney频道与Disney+",
+        "category": "industry"
+      },
+      "reason": "G7-4 首批上线模拟（负责人视角演练）",
+      "created_at": "2026-09-23T00:00:00Z"
+    }
+  ],
+  "updated_at": "2026-09-23T00:00:00Z",
+  "count": 12
+}

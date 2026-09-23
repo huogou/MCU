@@ -1,0 +1,547 @@
+{
+  "schema_version": "1.0",
+  "layer": "L3-DELIVERY-PREVIEW",
+  "generated_at": "2026-09-23T00:00:00Z",
+  "nature": "G7-5 写入模拟预览（预计写入 news.js 的数据）；未写入 h5/data/news.js",
+  "count": 10,
+  "diff": {
+    "existing_count": 15,
+    "preview_count": 10,
+    "to_add": [
+      "news-2026-09-23-001",
+      "news-2026-09-23-002",
+      "news-2026-09-23-003",
+      "news-2026-09-23-004",
+      "news-2026-09-23-005",
+      "news-2026-09-23-006",
+      "news-2026-09-23-007",
+      "news-2026-09-23-008",
+      "news-2026-09-23-009",
+      "news-2026-09-23-010"
+    ],
+    "to_update": [],
+    "unchanged": [],
+    "to_delete_reported": [],
+    "delete_semantics": "追加写入：现网 15 条全部保留，写入后总库 25 条；管道无删除语义，下线/归档属另行流程",
+    "supersedes_protection": "现网互链对 news-2026-09-20-010 ← news-2026-09-19-014 不在本批，保持原状"
+  },
+  "review_summary": {
+    "decisions": 12,
+    "approved": 10,
+    "rejected": 1,
+    "modified": 1,
+    "operator": "simulated-g7-reviewer"
+  },
+  "items": [
+    {
+      "id": "news-2026-09-23-001",
+      "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+      "summary": "华特迪士尼公司宣布新设首席技术官（CTO）职位并任命卡兰迪普·阿南德出任，这是公司层面技术治理架构的重大调整。",
+      "publish_time": "2026-09-18",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/karandeep-anand-chief-technology-officer/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/karandeep-anand-chief-technology-officer/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/karandeep-anand-chief-technology-officer/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-002",
+      "title": "《复联4》重映版独家片段据报聚焦两位MCU角色会面",
+      "summary": "在《复仇者联盟4：终局之战》Encore 重映上映前几天，其独家新片段的报道暗示片中将呈现两位备受期待的MCU角色的会面。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "endgame"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        3
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-003",
+      "title": "《复联4》为Encore重映更换全新海报",
+      "summary": "漫威为《复仇者联盟4：终局之战》Encore 重映更换全新海报，这一营销调整被视为重映版票房动员策略的重要一环。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "endgame"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        3
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-004",
+      "title": "漫威影业SDCC震撼官宣：《毁灭之日》《恶灵骑士》《黑豹3》",
+      "summary": "漫威影业在圣迭戈动漫展（SDCC）重磅官宣多部新作，包括《复仇者联盟5：毁灭之日》新情报、《恶灵骑士》与《黑豹3》项目，现场反响热烈。",
+      "publish_time": "2026-07-26",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-005",
+      "title": "《毁灭之日》新剧照为猩红女巫回归传闻增添可信度",
+      "summary": "漫威虽未正式确认猩红女巫回归MCU，但《复仇者联盟5：毁灭之日》释出的新剧照，让伊丽莎白·奥尔森回归的报道更具可信度。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "wanda"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-006",
+      "title": "漫威官方确认蜘蛛侠最不受欢迎的反派已存在于MCU",
+      "summary": "一位口碑两极的蜘蛛侠反派被漫威官方确认为MCU正史的一部分，尽管粉丝评价不高，这一确认仍为未来蜘蛛侠电影埋下伏笔。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "peter"
+      ],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-007",
+      "title": "《旺达幻视》续作公布第三位主要超级英雄",
+      "summary": "《旺达幻视》续集剧集在2026年Disney+开播前继续扩充阵容，正式揭开第三位主要超级英雄的面纱，延续该系列的悬疑喜剧风格。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "wandavision"
+      ],
+      "related_characters": [],
+      "related_phases": [
+        4
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-008",
+      "title": "华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位",
+      "summary": "华特迪士尼公司宣布新设首席技术官（CTO）职位并任命卡兰迪普·阿南德出任，这是公司层面技术治理架构的重大调整。",
+      "publish_time": "2026-09-18",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-karandeep-anand-to-newly-created-role-of-chief-technology-officer/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-karandeep-anand-to-newly-created-role-of-chief-technology-officer/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-karandeep-anand-to-newly-created-role-of-chief-technology-officer/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-009",
+      "title": "泰勒·斯威夫特为《玩具总动员5》创作新歌《我知道是你》",
+      "summary": "泰勒·斯威夫特宣布为迪士尼与皮克斯的《玩具总动员5》创作全新歌曲《I Knew It, I Knew You》，为影片注入重磅音乐亮点。",
+      "publish_time": "2026-06-01",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-010",
+      "title": "《王国之心》获批准开拍首部原创剧集登陆Disney频道与Disney+",
+      "summary": "迪士尼宣布游戏IP《王国之心》（Kingdom Hearts）将推出首部原创真人剧集，登陆 Disney 频道与 Disney+，为该IP首次影视化。",
+      "publish_time": "2026-08-15",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+============================================================
+G7 审核队列 / 动作 / 日志 / 写入模拟 测试
+============================================================
+
+■ G7-1 审核队列
+  PASS  T1.1 队列条数 = 输入候选数（133）
+  PASS  T1.2 全部 pending（禁止自动 approved）
+  PASS  T1.3 投影字段齐全（candidate_id/event_key/title/summary/category/related_entities/source/capture_refs/gate_status）
+  PASS  T1.4 签名重算映射留档 = 133 条
+  PASS  T1.5 队列 candidate_id 与签名重算结果一致
+
+■ G7-2 审核动作（approve / reject / modify）
+  PASS  T2.1 approve → gate_status=approved
+  PASS  T2.2 reject 缺原因 → REASON_REQUIRED
+  PASS  T2.3 reject → rejected + 原因入日志
+  PASS  T2.4 modify 返回新对象（输入候选未被就地修改）
+  PASS  T2.5 modify 后 L1 合法且 key/id 重算
+  PASS  T2.6 modify 白名单外字段 → MODIFY_FIELD_FORBIDDEN
+  PASS  T2.7 modify 不得触碰状态字段（verification_status）
+  PASS  T2.8 history 条目八字段齐全
+
+■ G7-3 审核日志（review-history.json）
+  PASS  T3.1 模拟日志 12 条（10 approve + 1 reject + 1 modify）
+  PASS  T3.2 动作分布 approve=10 / reject=1 / modify=1
+  PASS  T3.3 review_id 唯一且按序递增（rev-20260923-001…012）
+  PASS  T3.4 每条日志 operator/created_at 非空
+  PASS  T3.5 reject 决策带原因、modify 决策带 modifications
+
+■ G7-4/5 写入预览与 diff
+  PASS  T4.1 preview 10 条（首批模拟批准）
+  PASS  T4.2 逐条恰 33 字段
+  PASS  T4.3 id 形态全部合法（news-YYYY-MM-DD-NNN）
+  PASS  T5.1 diff：新增 10
+  PASS  T5.2 diff：修改 0
+  PASS  T5.3 diff：删除 0（追加写入，现网 15 条全部保留）
+  PASS  T5.4 现网 supersedes 互链对不在本批（保持原状）
+  PASS  T5.5 覆盖核对：MCU 新闻 ≥5 / 同事件双条 2 / 单来源事件全部（igc 均=1）
+
+■ 基线不破坏
+  PASS  T6.1 news.js SHA256 前后一致（全程只读）
+  INFO  news.js SHA256 = 589A39347EF6BEEA…
+  PASS  T6.2 全部输出无状态字段泄漏（preview 深扫）
+
+============================================================
+结果：28 PASS / 0 FAIL
+============================================================

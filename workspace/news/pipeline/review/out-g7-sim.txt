@@ -1,0 +1,51 @@
+============================================================
+G7 首批上线模拟（审核 → Gate → DeliveryItem → 写入预览）
+============================================================
+审核队列：133 条（全部 pending）→ D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\review-queue-20260923.json
+
+■ 模拟决策（operator=simulated-g7-reviewer）
+  REJECT  cand-f253218b-077 ← 迪士尼加速器公布2026年度入选企业
+  MODIFY  cand-bc952bc5-001 → cand-bc952bc5-001（title 统一）→ APPROVE
+  APPROVE cand-022ae1d5-010 ← 《复联4》重映版独家片段据报聚焦两位MCU角色会面
+  APPROVE cand-08f68650-014 ← 《复联4》为Encore重映更换全新海报
+  APPROVE cand-18aa7175-079 ← 漫威影业SDCC震撼官宣：《毁灭之日》《恶灵骑士》《黑豹3》
+  APPROVE cand-eaa53c91-013 ← 《毁灭之日》新剧照为猩红女巫回归传闻增添可信度
+  APPROVE cand-8f8255fa-011 ← 漫威官方确认蜘蛛侠最不受欢迎的反派已存在于MCU
+  APPROVE cand-ba5cff3f-007 ← 《旺达幻视》续作公布第三位主要超级英雄
+  APPROVE cand-bc952bc5-034 ← 华特迪士尼公司任命卡兰迪普·阿南德为新设首席技术官职位
+  APPROVE cand-e08145f3-123 ← 泰勒·斯威夫特为《玩具总动员5》创作新歌《我知道是你》
+  APPROVE cand-43e90e47-055 ← 《王国之心》获批准开拍首部原创剧集登陆Disney频道与Disney+
+  PASS  审核决策总数 = 12
+  PASS  approved 总数 = 10（含 modify 后批准 1 条）
+
+审核日志（追加）：+12 条 → 总 12 条 → D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\review-history.json
+
+■ Gate → DeliveryItem
+  Gate：approved=10 rejected=0（supersedes_pairs=0）
+  DeliveryItem：10 条
+    news-2026-09-23-001  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-002  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-003  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-004  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-005  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-006  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-007  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-008  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-009  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+    news-2026-09-23-010  33字段=OK  vs=single_source  igc=1  judged_by=rule_validated
+
+■ 写入模拟（不写 h5）
+  diff（old news.js × 15 vs delivery-preview × 10，写入后总库 25）：
+    新增 10 条：news-2026-09-23-001, news-2026-09-23-002, news-2026-09-23-003, news-2026-09-23-004, news-2026-09-23-005, news-2026-09-23-006, news-2026-09-23-007, news-2026-09-23-008, news-2026-09-23-009, news-2026-09-23-010
+    修改 0 条：（无）
+    一致 0 条
+    删除 0 条（追加写入，现网 15 条全部保留）
+  现网 supersedes 互链保护：news-2026-09-20-010 / news-2026-09-19-014 不在本批 → 保持原状 ✅
+
+  写入预览：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\deliveries\20260923.delivery-preview.json
+
+  news.js SHA256：未变 ✅（589A39347EF6BEEA…）
+
+============================================================
+G7 模拟编排完成。
+============================================================
