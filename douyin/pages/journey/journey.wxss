@@ -77,15 +77,6 @@
   color: var(--gold);
   margin-bottom: var(--space-sm);
 }
-.ad-share {
-  display: inline-block;
-  padding: 12rpx 40rpx;
-  font-size: var(--fs-caption);
-  color: var(--gold);
-  background: var(--gold-a10);
-  border: 1rpx solid var(--gold-a40);
-  border-radius: var(--radius-full);
-}
 
 /* ═══ 路线列表 ═══ */
 .route-list { margin-bottom: var(--space-lg); }

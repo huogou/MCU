@@ -59,13 +59,7 @@ Page({
     nextStep: null,
 
     /* ④ 最近标记 */
-    recent: [],
-
-    /* ⑤ H5 引导 */
-    h5Guide: {
-      title: '想深入探索 MCU 宇宙？',
-      desc: '查看完整宇宙关系'
-    }
+    recent: []
   },
 
   onShow() { this.refresh(); },
@@ -129,14 +123,6 @@ Page({
         desc: '上映顺序 / 主线必看',
         action: 'switchTab',
         targetUrl: '/pages/journey/journey'
-      },
-      {
-        key: 'universe',
-        icon: '◈',
-        iconColor: 'orange',
-        title: '宇宙关系',
-        desc: '前往 H5 →',
-        action: 'h5'
       }
     ];
 
@@ -201,8 +187,6 @@ Page({
       tt.navigateTo({ url: '/pages/movie/movie?id=' + entry.targetId });
     } else if (entry.action === 'switchTab') {
       tt.switchTab({ url: entry.targetUrl });
-    } else if (entry.action === 'h5') {
-      this.goH5();
     }
   },
 
@@ -216,10 +200,5 @@ Page({
   /* ---- 进度 Hero → 路线页 ---- */
   goJourney() {
     tt.switchTab({ url: '/pages/journey/journey' });
-  },
-
-  /* ---- H5 引导（V2.0.0 真机修复：弹窗回调内复制会 fail，收敛到 h5Link 直调） ---- */
-  goH5() {
-    require('../../models/h5Link.js').copy();
   }
 });

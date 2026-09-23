@@ -78,10 +78,5 @@ Page({
     const id = e.currentTarget.dataset.id;
     if (!id) return;
     tt.navigateTo({ url: '/pages/movie/movie?id=' + id });
-  },
-
-  /* ---- H5 引导（V2.0.0 真机修复：弹窗回调内复制会 fail，收敛到 h5Link 直调） ---- */
-  goH5() {
-    require('../../models/h5Link.js').copy();
   }
 });

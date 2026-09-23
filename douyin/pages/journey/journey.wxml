@@ -25,7 +25,6 @@
   <!-- ═══ 全部完成庆祝 ═══ -->
   <view wx:if="{{allDone}}" class="all-done">
     <text class="ad-title">恭喜！你已完成全部 MCU 观看路线</text>
-    <view class="ad-share" bindtap="goH5" hover-class="btn-hover" hover-stay-time="80">分享你的成就</view>
   </view>
 
   <!-- ═══ 路线列表 ═══ -->
@@ -49,8 +48,7 @@
     </view>
   </view>
 
-  <!-- ═══ H5 引导 ═══ -->
-  <h5-guide title="想了解完整宇宙关系？" desc="前往 H5 探索" />
+  <!-- ═══ H5 引导（V2.4 已移除第三方引流） ═══ -->
 
   <view class="mcu-bottom-space"></view>
 </view>

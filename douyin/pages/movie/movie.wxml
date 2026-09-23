@@ -47,9 +47,6 @@
     <!-- ═══ 底部：进入宇宙导航 ═══ -->
     <view class="mv-nav-btn" bindtap="goJourney" hover-class="btn-hover" hover-stay-time="80">进入宇宙导航</view>
 
-    <!-- ═══ H5 引导 ═══ -->
-    <h5-guide title="想了解更多？" desc="打开 H5 查看完整宇宙导航" />
-
     <view class="mcu-bottom-space"></view>
   </block>
 </view>

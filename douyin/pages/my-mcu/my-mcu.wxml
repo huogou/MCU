@@ -149,8 +149,5 @@
     </view>
   </view>
 
-  <!-- ⑨ H5 引导 -->
-  <h5-guide title="想深入探索 MCU？" desc="前往 H5 查看完整宇宙关系" />
-
   <view class="mcu-bottom-space"></view>
 </view>

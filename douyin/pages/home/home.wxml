@@ -70,8 +70,7 @@
   </scroll-view>
   <view wx:else class="empty-hint">还没有已标记的作品，从《钢铁侠》开始你的旅程</view>
 
-  <!-- ═══ ⑤ H5 引导（工具型引导卡，非影视推广 Banner） ═══ -->
-  <h5-guide title="{{h5Guide.title}}" desc="{{h5Guide.desc}}" />
+
 
   <view class="mcu-bottom-space"></view>
 </view>
