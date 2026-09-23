@@ -1,0 +1,400 @@
+total=133
+[0] cand-29d5341c-001 | S002 | 2026-09-22
+    T: James Gunn's DCU Officially Reveals Its 6th Superhero Team
+    S: DC Studios is about to bring in yet another major superhero team in the new DC Universe thanks to Lanterns.
+[1] cand-c1a960c4-002 | S002 | 2026-09-22
+    T: Marvel Studios Is Officially Ending Its Third Disney+ Trilogy in 2027
+    S: Another Disney+ trilogy is sadly coming to an end at Marvel Studios in 2027.
+[2] cand-ae42a935-003 | S002 | 2026-09-22
+    T: Lanterns Episode 7 Trailer Reveals What’s Inside Hal Jordan’s Fortress of Storage Cube
+    S: Lanterns' promo for Episode 7 revealed the truth behind Hal Jordan's secret storage that could hint at his fate.
+[3] cand-34361fcb-004 | S002 | 2026-09-22
+    T: It's Official: 'Avengers Secret Wars' Will Fix Doomsday's Biggest Mistake
+    S: Marvel Studios has set up its final installment of the Multiverse Saga better than it did for Avengers 5.
+[4] cand-95daeab9-005 | S002 | 2026-09-22
+    T: Clayface 2026’s Runtime Makes DC Movie History
+    S: Clayface cements its place in the DC movie history books with one of the franchise's shortest runtimes of all time.
+[5] cand-f11e379e-006 | S002 | 2026-09-22
+    T: James Gunn Sets the Record Straight on Hal Jordan’s DCU Death
+    S: DC Studios co-CEO James Gunn finally address the longstanding mystery behind Hal Jordan's death in Lanterns.
+[6] cand-decc2ea5-007 | S002 | 2026-09-22
+    T: 2026's WandaVision Sequel Just Unveiled Its 3rd Major Superhero
+    S: WandaVision is getting a sequel that is continuing to add to its superhero roster ahead of its 2026 Disney+ debut.
+[7] cand-6b24612d-008 | S002 | 2026-09-22
+    T: Marvel Studios Confirms Spider-Man & Daredevil Will Reunite Sooner Than Expected To Fight Classic Spidey Villains
+    S: The reunion between Spider-Man and Daredevil will now happen this year on a Your Friendly Neighborhood Spider-Man Season 2 official prequel story.
+[8] cand-f204aeb8-009 | S002 | 2026-09-22
+    T: Dave Filoni Confirms Mortis God’s Role In Ahsoka Season 2; Releases New Photo
+    S: Lucasfilm is beginning to peel back the curtain on the long-awaited second season of Ahsoka.
+[9] cand-6117573e-010 | S002 | 2026-09-22
+    T: Avengers: Endgame Encore’s Doomsday Scene Reportedly Focuses On 2 MCU Characters
+    S: Days ahead of Endgame: Encore's theatrical release, reports of its exclusive footage hint at a meet-up between two highly-anticipated characters.
+[10] cand-c1c3120a-011 | S002 | 2026-09-22
+    T: Marvel Studios Confirms Spider-Man's Least Popular Villain Exists in the MCU
+    S: One major Spider-Man villain, who many fans do not particularly enjoy, is officially part of the MCU.
+[11] cand-e7a50013-012 | S002 | 2026-09-22
+    T: Disney+ Will Release a New Marvel TV Crossover Very Soon - Here's the First Trailer
+    S: The first trailer for Marvel's next superhero crossover project was revealed.
+[12] cand-96ced758-013 | S002 | 2026-09-22
+    T: New 'Avengers: Doomsday' Photo Gives Elizabeth Olsen's Scarlet Witch Return Appearance Reports Some Real Credibility
+    S: Marvel is yet to confirm Scarlet Witch's MCU return, but new evidence suggests she could reemerge soon.
+[13] cand-48b17d92-014 | S002 | 2026-09-22
+    T: Marvel Changes Avengers: Endgame Poster For 'Encore' Re-Release
+    S: Avengers: Endgame Encore's poster is a game-changer in its marketing strategy.
+[14] cand-11198005-015 | S002 | 2026-09-22
+    T: 7 Years Later, Star Wars Finally Reveals Grogu's First Word
+    S: Grogu finally uttered his first words in the Star Wars universe after not being able to talk for nearly a decade.
+[15] cand-c9a5e41c-016 | S002 | 2026-09-22
+    T: Disney+'s Percy Jackson Season 3: All 12 Olympian Gods Confirmed to Appear
+    S: Percy Jackson Season 3 will see the 12 Olympians assemble for the first time on screen.
+[16] cand-285894eb-017 | S002 | 2026-09-22
+    T: Disney Releases First-Ever Poster For 'Incredibles 3' — And It Looks Great
+    S: Pixar finally released the stunning first-ever poster for Incredibles 3.
+[17] cand-5ed28e71-018 | S002 | 2026-09-21
+    T: Lanterns Episode 6 Might Have Created a Suicide Squad & Creature Commandos Continuity Error
+    S: The Suicide Squad sequel is referenced in the newest Lanterns episode, raising questions about one of its former members.
+[18] cand-2a45f9c7-019 | S002 | 2026-09-21
+    T: VisionQuest’s First Clip Reveals Doctor Strange’s Spider-Man Spell Didn’t Work On 1 Character
+    S: Disney+'s VisionQuest unveiled a special Spider-Man connection in a new clip.
+[19] cand-43e2586b-020 | S002 | 2026-09-21
+    T: Lanterns: 5 Reasons I Am Convinced Noah Is A Manhunter After Episode 6
+    S: Lanterns Episode 6 officially brought us into the modern day of the DCU, and also dropped many hints that Noah Macon might be another Manhunter.
+[20] cand-fd7d3c85-021 | S004 | 2026-09-23
+    T: Dolly Parton’s Manager Files for Restraining Order Against Fired Nephew, Alleging Ex-Security Head Sent ‘Terrorizing’ Texts and Threatened to ‘Destroy the Entire Brand’
+    S: Dolly Parton’s longtime manager has filed for a restraining order against her nephew, who until being fired a week ago was her head of security, alleging that the family member is 
+[21] cand-f46abbd0-022 | S004 | 2026-09-23
+    T: Berlinale Title ‘Lali’ to Open Tasveer Film Festival’s 21st Edition (EXCLUSIVE)
+    S: Seattle’s Tasveer Film Festival & Market has unveiled its 21st edition lineup: 136 films from 16 countries screening Oct. 13-18, opening with Sarmad Sultan Khoosat’s “Lali,” a Berl
+[22] cand-4a07ab58-023 | S004 | 2026-09-23
+    T: Variety Power Of Women: Los Angeles Event Announces Channing Dungey, Queen Latifah, Lauren Graham, Marc Maron as Presenters
+    S: Variety has announced the presenters for this year’s Power of Women event on Wednesday, Sept. 23 in Beverly Hills. The event, in partnership with Lifetime, celebrates the Power of 
+[23] cand-b07e2045-024 | S004 | 2026-09-23
+    T: Impact Fund for Global South Creators Launches at Toronto With Focus on Distribution and Audiences (EXCLUSIVE)
+    S: A new impact fund backing creators from the Global South launched at the recently concluded first edition of the Toronto Film Festival market, with a model built around getting fil
+[24] cand-4a9150be-025 | S004 | 2026-09-23
+    T: David Worth, Director of ‘Kickboxer’ and DP of ‘Any Which Way You Can,’ Dies at 86
+    S: David Worth, director of films including “Kickboxer” and DP on numerous films including Clint Eastwood’s “Any Which Way You Can,” died Sept. 4 in Sunland, Calif. He was 86. Worth s
+[25] cand-4a56d086-026 | S004 | 2026-09-23
+    T: Clavicular Posts Video After Being Charged With Rape and Drugging: ‘Theres Better Ways to Make Money Then Suing Someone’
+    S: “Looksmaxxing” influencer Clavicular has shared his first video on social media since news circulated Monday that the online personality had been charged with rape and drugging in 
+[26] cand-64608f23-027 | S004 | 2026-09-23
+    T: ‘The Housewife’ Review: Naomi Watts Anchors a Watchable but Underpowered True Story of Hidden Nazism in Suburban Queens
+    S: Long before the relevant authorities do, you’ll figure out the secret that immigrant homemaker Hermine Ryan (née Braunsteiner) holds close to her chest in “The Housewife” — a givea
+[27] cand-4d3586bd-028 | S004 | 2026-09-23
+    T: Judge in Paramount-State AGs Case Still Has Questions, Schedules Hearing on Settlement Terms
+    S: Paramount’s deal with the 12 state attorneys general to settle their antitrust lawsuit over the Warner Bros. Discovery merger is not official just yet: The judge in the case has so
+[28] cand-a985a657-029 | S004 | 2026-09-23
+    T: Rob Bonta Sued Paramount to Counter Political Influence, Then Fell Victim to It
+    S: When Rob Bonta sued to block the Paramount-Warner Bros. merger in July, he said he was doing so because the Trump administration had failed to act for political reasons. “They are 
+[29] cand-7651d228-030 | S004 | 2026-09-22
+    T: Tom Cruise Welcomes Prince William and Kate Middleton at ‘Digger’ World Premiere in London: ‘We Love Them and Really Appreciate What They Do for the Arts’
+    S: Tom Cruise world-premiered his new film “Digger” on Tuesday night to an enthusiastic audience in London, which included some royal guests. Prince William and Princess Catherine of 
+[30] cand-e5e62c89-031 | S006 | 2026-09-22
+    T: Disney Consumer Products Announces New Structure and Leadership Details
+    S: The post Disney Consumer Products Announces New Structure and Leadership Details appeared first on The Walt Disney Company .
+[31] cand-e79d181c-032 | S006 | 2026-09-22
+    T: Disney+ and Hulu Expand Video Podcast Slate
+    S: The post Disney+ and Hulu Expand Video Podcast Slate appeared first on The Walt Disney Company .
+[32] cand-b0195a6e-033 | S006 | 2026-09-18
+    T: The Walt Disney Company Names Karandeep Anand to Newly Created Role of Chief Technology Officer
+    S: The post The Walt Disney Company Names Karandeep Anand to Newly Created Role of Chief Technology Officer appeared first on The Walt Disney Company .
+[33] cand-b0195a6e-034 | S006 | 2026-09-18
+    T: The Walt Disney Company Names Karandeep Anand To Newly Created Role Of Chief Technology Officer
+    S: The post The Walt Disney Company Names Karandeep Anand To Newly Created Role Of Chief Technology Officer appeared first on The Walt Disney Company .
+[34] cand-1f4feb05-035 | S006 | 2026-09-17
+    T: Adam Smith Named Chairman, Direct-to-Consumer, Disney Entertainment
+    S: The post Adam Smith Named Chairman, Direct-to-Consumer, Disney Entertainment appeared first on The Walt Disney Company .
+[35] cand-1f4feb05-036 | S006 | 2026-09-17
+    T: Adam Smith Named Chairman, Direct-To-Consumer, Disney Entertainment
+    S: The post Adam Smith Named Chairman, Direct-To-Consumer, Disney Entertainment appeared first on The Walt Disney Company .
+[36] cand-148fe6d2-037 | S006 | 2026-09-15
+    T: Playlists On Disney+: Curated By Disney, Played Your Way
+    S: The post Playlists On Disney+: Curated By Disney, Played Your Way appeared first on The Walt Disney Company .
+[37] cand-91ff6523-038 | S006 | 2026-09-14
+    T: Sounds of Disney: New Ad Spotlights the Local Businesses Behind Disney Experiences
+    S: The post Sounds of Disney: New Ad Spotlights the Local Businesses Behind Disney Experiences appeared first on The Walt Disney Company .
+[38] cand-0788fc94-039 | S006 | 2026-09-08
+    T: ‘Percy Jackson and the Olympians’ Cast Teases Bigger, Darker, More Epic Season 3
+    S: The post ‘Percy Jackson and the Olympians’ Cast Teases Bigger, Darker, More Epic Season 3 appeared first on The Walt Disney Company .
+[39] cand-c9f879e3-040 | S006 | 2026-09-04
+    T: ‘Zootopia 3’ Cast and Filmmakers Tease How Birds Add a ‘Fun Surprise’ to Disney Animation’s Hit Franchise
+    S: The post ‘Zootopia 3’ Cast and Filmmakers Tease How Birds Add a ‘Fun Surprise’ to Disney Animation’s Hit Franchise appeared first on The Walt Disney Company .
+[40] cand-101424ba-041 | S006 | 2026-09-03
+    T: Disney Movies Coming to Theaters Fall 2026
+    S: The post Disney Movies Coming to Theaters Fall 2026 appeared first on The Walt Disney Company .
+[41] cand-3bb6e2ea-042 | S006 | 2026-09-02
+    T: The Story of Industrial Light & Magic — the Company That Changed Visual Effects Forever
+    S: The post The Story of Industrial Light & Magic — the Company That Changed Visual Effects Forever appeared first on The Walt Disney Company .
+[42] cand-77945ce6-043 | S006 | 2026-08-28
+    T: ‘College GameDay’ at 40: Desmond Howard Reflects on the Magic Behind the ESPN Show
+    S: The post ‘College GameDay’ at 40: Desmond Howard Reflects on the Magic Behind the ESPN Show appeared first on The Walt Disney Company .
+[43] cand-2f9f351e-044 | S006 | 2026-08-27
+    T: Ridley Scott and Josh Brolin on ‘The Dog Stars’ and What It Means to Remain Human After the End of the World
+    S: The post Ridley Scott and Josh Brolin on ‘The Dog Stars’ and What It Means to Remain Human After the End of the World appeared first on The Walt Disney Company .
+[44] cand-e8ada459-045 | S006 | 2026-08-27
+    T: Meeting Fans Where They Are: Disney’s Expanding Approach to Movie Marketing
+    S: The post Meeting Fans Where They Are: Disney’s Expanding Approach to Movie Marketing appeared first on The Walt Disney Company .
+[45] cand-36de21e9-046 | S006 | 2026-08-20
+    T: Inside ‘Disney Worldbuilders’: Where Storytelling Becomes a World You Can Experience
+    S: The post Inside ‘Disney Worldbuilders’: Where Storytelling Becomes a World You Can Experience appeared first on The Walt Disney Company .
+[46] cand-c7651842-047 | S006 | 2026-08-17
+    T: Disney Celebrates the Timeless Magic of Disney Princesses During World Princess Week
+    S: The post Disney Celebrates the Timeless Magic of Disney Princesses During World Princess Week appeared first on The Walt Disney Company .
+[47] cand-3e1688e5-048 | S006 | 2026-08-17
+    T: Key Takeaways from Disney’s Streaming Showcase at D23: The Ultimate Disney Fan Event
+    S: The post Key Takeaways from Disney’s Streaming Showcase at D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[48] cand-c7651842-049 | S006 | 2026-08-17
+    T: Disney Celebrates the Timeless Magic of Disney Princesses During World Princess Week
+    S: The post Disney Celebrates the Timeless Magic of Disney Princesses During World Princess Week appeared first on The Walt Disney Company .
+[49] cand-d11daaee-050 | S006 | 2026-08-17
+    T: Disney Legends Awards Ceremony Honors the Stars and Visionaries of Disney’s Enduring Legacy on the Final Day of D23: The Ultimate Disney Fan Event
+    S: The post Disney Legends Awards Ceremony Honors the Stars and Visionaries of Disney’s Enduring Legacy on the Final Day of D23: The Ultimate Disney Fan Event appeared first on The Wa
+[50] cand-ce4b6ad2-051 | S006 | 2026-08-16
+    T: A Great Big Beautiful Tomorrow: Bob Iger Honored with a Window on Main Street, U.S.A.
+    S: The post A Great Big Beautiful Tomorrow: Bob Iger Honored with a Window on Main Street, U.S.A. appeared first on The Walt Disney Company .
+[51] cand-d08dcf66-052 | S006 | 2026-08-16
+    T: Disney Games Just Laid Out Its Vision for the Future of Digital Entertainment — Here’s What D23 Revealed
+    S: The post Disney Games Just Laid Out Its Vision for the Future of Digital Entertainment — Here’s What D23 Revealed appeared first on The Walt Disney Company .
+[52] cand-5205c06c-053 | S006 | 2026-08-16
+    T: Disney Experiences Showcase Gives Sold-Out Crowd a Closer Look at What’s to Come During D23: The Ultimate Disney Fan Event
+    S: The post Disney Experiences Showcase Gives Sold-Out Crowd a Closer Look at What’s to Come During D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[53] cand-1a3e1725-054 | S006 | 2026-08-15
+    T: Disney Sets the Stage for What’s Next in Entertainment at D23: The Ultimate Disney Fan Event
+    S: The post Disney Sets the Stage for What’s Next in Entertainment at D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[54] cand-b8f61c6a-055 | S006 | 2026-08-15
+    T: ‘Kingdom Hearts’ Greenlit for First-Ever Original TV Series on Disney Channel and Disney+
+    S: The post ‘Kingdom Hearts’ Greenlit for First-Ever Original TV Series on Disney Channel and Disney+ appeared first on The Walt Disney Company .
+[55] cand-ddbf1109-056 | S006 | 2026-08-14
+    T: Disney Expands its Employee Health Center Network
+    S: The post Disney Expands its Employee Health Center Network appeared first on The Walt Disney Company .
+[56] cand-ad9b5f7d-057 | S006 | 2026-08-14
+    T: ‘D23 is Built for Our Fans’: Asad Ayaz, Chief Marketing and Brand Officer, on Disney’s Ultimate Fan Event
+    S: The post ‘D23 is Built for Our Fans’: Asad Ayaz, Chief Marketing and Brand Officer, on Disney’s Ultimate Fan Event appeared first on The Walt Disney Company .
+[57] cand-d30e93a1-058 | S006 | 2026-08-14
+    T: Disney and Formula 1® Extend Their Collaboration Through 2028 and Welcome Disney and Pixar’s Cars
+    S: The post Disney and Formula 1® Extend Their Collaboration Through 2028 and Welcome Disney and Pixar’s Cars appeared first on The Walt Disney Company .
+[58] cand-ad78736b-059 | S006 | 2026-08-13
+    T: How Games Are Helping Shape Disney’s Next Chapter
+    S: The post How Games Are Helping Shape Disney’s Next Chapter appeared first on The Walt Disney Company .
+[59] cand-0b8e39d2-060 | S006 | 2026-08-13
+    T: Disney Legends in Conversation: Bob Iger
+    S: The post Disney Legends in Conversation: Bob Iger appeared first on The Walt Disney Company .
+[60] cand-90d84a41-061 | S006 | 2026-08-12
+    T: Disney Legends in Conversation: Alan Tudyk
+    S: The post Disney Legends in Conversation: Alan Tudyk appeared first on The Walt Disney Company .
+[61] cand-88a3ef52-062 | S006 | 2026-08-11
+    T: Disney Legends in Conversation: Eric Goldberg
+    S: The post Disney Legends in Conversation: Eric Goldberg appeared first on The Walt Disney Company .
+[62] cand-a2f9f4ea-063 | S006 | 2026-08-11
+    T: Disney Legends in Conversation: Kim Irvine
+    S: The post Disney Legends in Conversation: Kim Irvine appeared first on The Walt Disney Company .
+[63] cand-28d0bab1-064 | S006 | 2026-08-11
+    T: Disney+ Revs Up as the Global Streaming Home of Formula E
+    S: The post Disney+ Revs Up as the Global Streaming Home of Formula E appeared first on The Walt Disney Company .
+[64] cand-416fa794-065 | S006 | 2026-08-10
+    T: Carrying Walt’s Vision Forward: Leslie Iwerks on Her New Film ‘Disney Worldbuilders’
+    S: The post Carrying Walt’s Vision Forward: Leslie Iwerks on Her New Film ‘Disney Worldbuilders’ appeared first on The Walt Disney Company .
+[65] cand-aaa27e17-066 | S006 | 2026-08-10
+    T: ‘Camp Rock 3’ Stars Malachi Barton and Liamani Segura Talk Music, Legacy, and Disney’s Next Generation
+    S: The post ‘Camp Rock 3’ Stars Malachi Barton and Liamani Segura Talk Music, Legacy, and Disney’s Next Generation appeared first on The Walt Disney Company .
+[66] cand-0372d40a-067 | S006 | 2026-08-10
+    T: Disney Legends in Conversation: Jerry Bruckheimer
+    S: The post Disney Legends in Conversation: Jerry Bruckheimer appeared first on The Walt Disney Company .
+[67] cand-de795b2a-068 | S006 | 2026-08-07
+    T: Disney Legends in Conversation: Jonas Brothers
+    S: The post Disney Legends in Conversation: Jonas Brothers appeared first on The Walt Disney Company .
+[68] cand-d16c9949-069 | S006 | 2026-08-07
+    T: Disney Legends in Conversation: Susan Egan
+    S: The post Disney Legends in Conversation: Susan Egan appeared first on The Walt Disney Company .
+[69] cand-c98d88c9-070 | S006 | 2026-08-06
+    T: Disney Legends in Conversation: Chris Berman
+    S: The post Disney Legends in Conversation: Chris Berman appeared first on The Walt Disney Company .
+[70] cand-0ad0e3c0-071 | S006 | 2026-08-06
+    T: Beta Testing AI-Powered Search and Discovery on ESPN and Disney+
+    S: The post Beta Testing AI-Powered Search and Discovery on ESPN and Disney+ appeared first on The Walt Disney Company .
+[71] cand-f54be639-072 | S006 | 2026-08-06
+    T: Disney Legends in Conversation: Lin-Manuel Miranda
+    S: The post Disney Legends in Conversation: Lin-Manuel Miranda appeared first on The Walt Disney Company .
+[72] cand-06b8dc91-073 | S006 | 2026-08-06
+    T: Disney Teams Up with Jon Youshaei to Host World’s Top Creators at First-of-Its-Kind Event
+    S: The post Disney Teams Up with Jon Youshaei to Host World’s Top Creators at First-of-Its-Kind Event appeared first on The Walt Disney Company .
+[73] cand-e324166f-074 | S006 | 2026-08-05
+    T: Disney Q3 FY26 Earnings: Commentary from CEO Josh D’Amaro
+    S: The post Disney Q3 FY26 Earnings: Commentary from CEO Josh D’Amaro appeared first on The Walt Disney Company .
+[74] cand-fbe08f9a-075 | S006 | 2026-08-05
+    T: The Walt Disney Company and TikTok Announce a First-of-its-Kind Global Short-Form Content-Sharing Deal
+    S: The post The Walt Disney Company and TikTok Announce a First-of-its-Kind Global Short-Form Content-Sharing Deal appeared first on The Walt Disney Company .
+[75] cand-5212a9b4-076 | S006 | 2026-08-03
+    T: Meet the Minds Behind the Magic: ‘Disney Worldbuilders’ Premieres August 20 on Disney+
+    S: The post Meet the Minds Behind the Magic: ‘Disney Worldbuilders’ Premieres August 20 on Disney+ appeared first on The Walt Disney Company .
+[76] cand-ec1091f5-077 | S006 | 2026-07-31
+    T: Disney Accelerator Announces its 2026 Participants
+    S: The post Disney Accelerator Announces its 2026 Participants appeared first on The Walt Disney Company .
+[77] cand-2813d6f5-078 | S006 | 2026-07-30
+    T: Down the Rabbit Hole, Again: The Long Life of ‘Alice in Wonderland’ at Disney
+    S: The post Down the Rabbit Hole, Again: The Long Life of ‘Alice in Wonderland’ at Disney appeared first on The Walt Disney Company .
+[78] cand-4200bb92-079 | S006 | 2026-07-26
+    T: Marvel Studios Stuns San Diego Comic-Con with ‘Avengers: Doomsday,’ ‘Ghost Rider,’ and ‘Black Panther 3’ Reveals
+    S: The post Marvel Studios Stuns San Diego Comic-Con with ‘Avengers: Doomsday,’ ‘Ghost Rider,’ and ‘Black Panther 3’ Reveals appeared first on The Walt Disney Company .
+[79] cand-6413f733-080 | S006 | 2026-07-23
+    T: Disney Ad Creative Studio Begins Closed Beta with Select Advertisers
+    S: The post Disney Ad Creative Studio Begins Closed Beta with Select Advertisers appeared first on The Walt Disney Company .
+[80] cand-c48fbd55-081 | S006 | 2026-07-23
+    T: Disney Celebrates the Power of Fandom with the Return of D23 FANtastic Prizes: The Ultimate Disney Sweepstakes
+    S: The post Disney Celebrates the Power of Fandom with the Return of D23 FANtastic Prizes: The Ultimate Disney Sweepstakes appeared first on The Walt Disney Company .
+[81] cand-df5b717c-082 | S006 | 2026-07-22
+    T: The Definitive Documentary on Disney Legend Julie Andrews Is Coming to Disney+ in 2027
+    S: The post The Definitive Documentary on Disney Legend Julie Andrews Is Coming to Disney+ in 2027 appeared first on The Walt Disney Company .
+[82] cand-0977a6c1-083 | S006 | 2026-07-22
+    T: Bob Iger, James Cameron, Kevin Feige, Jon Favreau and More Featured in New Disney+ Documentary ‘Disney Worldbuilders’
+    S: The post Bob Iger, James Cameron, Kevin Feige, Jon Favreau and More Featured in New Disney+ Documentary ‘Disney Worldbuilders’ appeared first on The Walt Disney Company .
+[83] cand-4bb1c2d7-084 | S006 | 2026-07-21
+    T: The Walt Disney Company and Kraft Heinz Announce Landmark Alliance, Uniting the Iconic Companies Across Food, Media, and Experiences
+    S: The post The Walt Disney Company and Kraft Heinz Announce Landmark Alliance, Uniting the Iconic Companies Across Food, Media, and Experiences appeared first on The Walt Disney Comp
+[84] cand-f70fee7c-085 | S006 | 2026-07-21
+    T: Disney Announces New Shopping Experiences and Exclusive Merchandise Available to Fans at D23: The Ultimate Disney Fan Event
+    S: The post Disney Announces New Shopping Experiences and Exclusive Merchandise Available to Fans at D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[85] cand-1b6c35de-086 | S006 | 2026-07-16
+    T: Inside the Disney | Champion NFL Collection: Where Sports Fandom Meets Storytelling
+    S: The post Inside the Disney | Champion NFL Collection: Where Sports Fandom Meets Storytelling appeared first on The Walt Disney Company .
+[86] cand-8c34614b-087 | S006 | 2026-07-16
+    T: ‘Descendants: Wicked Wonderland’ Cast Teases New Characters, Music, and More
+    S: The post ‘Descendants: Wicked Wonderland’ Cast Teases New Characters, Music, and More appeared first on The Walt Disney Company .
+[87] cand-13d15bc8-088 | S006 | 2026-07-16
+    T: NFL Fantasy is Moving to ESPN Fantasy: Your Questions Answered
+    S: The post NFL Fantasy is Moving to ESPN Fantasy: Your Questions Answered appeared first on The Walt Disney Company .
+[88] cand-63f38dc0-089 | S006 | 2026-07-16
+    T: Disney Announces Exclusive Experiences Coming to the Largest Show Floor Ever at D23: The Ultimate Disney Fan Event
+    S: The post Disney Announces Exclusive Experiences Coming to the Largest Show Floor Ever at D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[89] cand-a5dd89e2-090 | S006 | 2026-07-15
+    T: Disney+ Expands to 58 Languages, Introduces Six New User Interface Languages and Right-to-Left Capabilities
+    S: The post Disney+ Expands to 58 Languages, Introduces Six New User Interface Languages and Right-to-Left Capabilities appeared first on The Walt Disney Company .
+[90] cand-10a9b4e3-091 | S006 | 2026-07-15
+    T: ‘The ESPYS’ Return to New York City, Marking a Full-Circle Moment for Sports’ Biggest Night
+    S: The post ‘The ESPYS’ Return to New York City, Marking a Full-Circle Moment for Sports’ Biggest Night appeared first on The Walt Disney Company .
+[91] cand-d3fb7f8d-092 | S006 | 2026-07-13
+    T: Disney Announces Incredible Lineup of All-Day Programming for D23: The Ultimate Disney Fan Event
+    S: The post Disney Announces Incredible Lineup of All-Day Programming for D23: The Ultimate Disney Fan Event appeared first on The Walt Disney Company .
+[92] cand-9cf5df9a-093 | S006 | 2026-07-11
+    T: Remembering Disney Legend Don Iwerks
+    S: The post Remembering Disney Legend Don Iwerks appeared first on The Walt Disney Company .
+[93] cand-ee70fbcb-094 | S006 | 2026-07-09
+    T: Disney’s Live-Action ‘Moana’: How Dwayne Johnson, Catherine Lagaʻaia, and Director Thomas Kail Reimagined a Beloved Story
+    S: The post Disney’s Live-Action ‘Moana’: How Dwayne Johnson, Catherine Lagaʻaia, and Director Thomas Kail Reimagined a Beloved Story appeared first on The Walt Disney Company .
+[94] cand-4df7fb21-095 | S006 | 2026-07-08
+    T: The Walt Disney Company Earns 125 Emmy® Award Nominations
+    S: The post The Walt Disney Company Earns 125 Emmy® Award Nominations appeared first on The Walt Disney Company .
+[95] cand-33ade281-096 | S006 | 2026-07-03
+    T: Disneyland Resort Welcomes One Billionth Guest
+    S: The post Disneyland Resort Welcomes One Billionth Guest appeared first on The Walt Disney Company .
+[96] cand-05aa32d7-097 | S006 | 2026-07-02
+    T: Disney and Formula 1 Unveil Custom Helmet Initiative Supporting Make-A-Wish
+    S: The post Disney and Formula 1 Unveil Custom Helmet Initiative Supporting Make-A-Wish appeared first on The Walt Disney Company .
+[97] cand-03c0108d-098 | S006 | 2026-07-02
+    T: From Parks to Primetime: ‘Disney Celebrates America’ Takes Over Fourth of July Weekend Nationwide
+    S: The post From Parks to Primetime: ‘Disney Celebrates America’ Takes Over Fourth of July Weekend Nationwide appeared first on The Walt Disney Company .
+[98] cand-01c08470-099 | S006 | 2026-07-02
+    T: ‘Camp Rock 3’ Sets Out on the ‘All Roads Lead to Camp’ Bus Tour, Visiting Cities Across America Starting July 3
+    S: The post ‘Camp Rock 3’ Sets Out on the ‘All Roads Lead to Camp’ Bus Tour, Visiting Cities Across America Starting July 3 appeared first on The Walt Disney Company .
+[99] cand-8ac12486-100 | S006 | 2026-07-02
+    T: Bringing the Magic of Disney Storytelling to Military Families with Blue Star Families
+    S: The post Bringing the Magic of Disney Storytelling to Military Families with Blue Star Families appeared first on The Walt Disney Company .
+[100] cand-b1f5e2dc-101 | S006 | 2026-07-01
+    T: From Main Street to ‘National Treasure’: A Look Inside the Walt Disney Archives at America’s 250th
+    S: The post From Main Street to ‘National Treasure’: A Look Inside the Walt Disney Archives at America’s 250th appeared first on The Walt Disney Company .
+[101] cand-7908289c-102 | S006 | 2026-07-01
+    T: ‘To Infinity… and 2 Billion Hours!’: How Disney+ Helped ‘Toy Story 5’ Soar
+    S: The post ‘To Infinity… and 2 Billion Hours!’: How Disney+ Helped ‘Toy Story 5’ Soar appeared first on The Walt Disney Company .
+[102] cand-ba3ae717-103 | S006 | 2026-06-26
+    T: How Disney Is Celebrating 626 Day Around the World
+    S: The post How Disney Is Celebrating 626 Day Around the World appeared first on The Walt Disney Company .
+[103] cand-a7314982-104 | S006 | 2026-06-26
+    T: The Walt Disney Company Showcases the Strength of its Animated Storytelling at Annecy International Animation Film Festival 2026
+    S: The post The Walt Disney Company Showcases the Strength of its Animated Storytelling at Annecy International Animation Film Festival 2026 appeared first on The Walt Disney Company 
+[104] cand-ae42a925-105 | S006 | 2026-06-23
+    T: As America Celebrates 250 Years, Disney Experiences’ Economic Impact Reaches All 50 States
+    S: The post As America Celebrates 250 Years, Disney Experiences’ Economic Impact Reaches All 50 States appeared first on The Walt Disney Company .
+[105] cand-48234950-106 | S006 | 2026-06-23
+    T: ESPN and Disney Jr. Team Up Again with Every Kid Sports to Expand Access to Youth Sports for Income-Restricted Families
+    S: The post ESPN and Disney Jr. Team Up Again with Every Kid Sports to Expand Access to Youth Sports for Income-Restricted Families appeared first on The Walt Disney Company .
+[106] cand-74d5c4fa-107 | S006 | 2026-06-21
+    T: ‘Toy Story 5’ Soars to Biggest Global Opening of 2026 — and Second-Biggest Domestic Animated Debut Ever
+    S: The post ‘Toy Story 5’ Soars to Biggest Global Opening of 2026 — and Second-Biggest Domestic Animated Debut Ever appeared first on The Walt Disney Company .
+[107] cand-40d543e1-108 | S006 | 2026-06-18
+    T: How the Power of ‘Toy Story’ Extends Across The Walt Disney Company
+    S: The post How the Power of ‘Toy Story’ Extends Across The Walt Disney Company appeared first on The Walt Disney Company .
+[108] cand-6fdfb610-109 | S006 | 2026-06-18
+    T: Why the World’s Leading Tech Companies Collaborate with Disney
+    S: The post Why the World’s Leading Tech Companies Collaborate with Disney appeared first on The Walt Disney Company .
+[109] cand-d84aeae9-110 | S006 | 2026-06-18
+    T: ‘Toy Story 5’: A Behind-the-Scenes Look at When Playtime Meets Screen Time
+    S: The post ‘Toy Story 5’: A Behind-the-Scenes Look at When Playtime Meets Screen Time appeared first on The Walt Disney Company .
+[110] cand-c0e07602-111 | S006 | 2026-06-17
+    T: Disney and Pixar’s ‘Toy Story 5’ Brings the Magic of Movies to Kids and Families Through Charitable Initiatives Worldwide
+    S: The post Disney and Pixar’s ‘Toy Story 5’ Brings the Magic of Movies to Kids and Families Through Charitable Initiatives Worldwide appeared first on The Walt Disney Company .
+[111] cand-716e8b91-112 | S006 | 2026-06-17
+    T: Disney and Epic Games Bring ‘The Simpsons’ to Fortnite Developers Later This Year
+    S: The post Disney and Epic Games Bring ‘The Simpsons’ to Fortnite Developers Later This Year appeared first on The Walt Disney Company .
+[112] cand-c9404d77-113 | S006 | 2026-06-17
+    T: How Toy Story Changed Pixar — and Animation
+    S: The post How Toy Story Changed Pixar — and Animation appeared first on The Walt Disney Company .
+[113] cand-787ba84e-114 | S006 | 2026-06-16
+    T: Inside Shanghai Disney Resort’s First Decade of Storytelling and Expansion
+    S: The post Inside Shanghai Disney Resort’s First Decade of Storytelling and Expansion appeared first on The Walt Disney Company .
+[114] cand-345e980d-115 | S006 | 2026-06-16
+    T: A Decade of Magic! Shanghai Disney Resort Celebrates 10th Birthday with Guests and Cast
+    S: The post A Decade of Magic! Shanghai Disney Resort Celebrates 10th Birthday with Guests and Cast appeared first on The Walt Disney Company .
+[115] cand-3f36925b-116 | S006 | 2026-06-15
+    T: Disney Veterans Institute Kicks Off Multi-City Series
+    S: The post Disney Veterans Institute Kicks Off Multi-City Series appeared first on The Walt Disney Company .
+[116] cand-a13fe0d7-117 | S006 | 2026-06-10
+    T: Disney+ and Hulu Created a Nostalgic Mini Mall Based on Fan Favorite Throwbacks
+    S: The post Disney+ and Hulu Created a Nostalgic Mini Mall Based on Fan Favorite Throwbacks appeared first on The Walt Disney Company .
+[117] cand-77c0744d-118 | S006 | 2026-06-04
+    T: Scaling Viewer‑First Premium Advertising on Disney+
+    S: The post Scaling Viewer‑First Premium Advertising on Disney+ appeared first on The Walt Disney Company .
+[118] cand-a59af356-119 | S006 | 2026-06-04
+    T: Disney Movies Coming to Theaters Summer 2026
+    S: The post Disney Movies Coming to Theaters Summer 2026 appeared first on The Walt Disney Company .
+[119] cand-dc36a5b0-120 | S006 | 2026-06-03
+    T: ‘The Finals Are Where Players Become Legends’: Inside ESPN’s Creative Vision for the NBA Finals
+    S: The post ‘The Finals Are Where Players Become Legends’: Inside ESPN’s Creative Vision for the NBA Finals appeared first on The Walt Disney Company .
+[120] cand-ac95c0a4-121 | S006 | 2026-06-02
+    T: “Disney Celebrates America” Ramps Up With A Phenomenal Lineup Of Experiences Ahead Of The Nation’s 250th Anniversary
+    S: The post “Disney Celebrates America” Ramps Up With A Phenomenal Lineup Of Experiences Ahead Of The Nation’s 250th Anniversary appeared first on The Walt Disney Company .
+[121] cand-ac95c0a4-122 | S006 | 2026-06-02
+    T: ‘Disney Celebrates America’ Ramps Up with a Phenomenal Lineup of Experiences Ahead of the Nation’s 250th Anniversary
+    S: The post ‘Disney Celebrates America’ Ramps Up with a Phenomenal Lineup of Experiences Ahead of the Nation’s 250th Anniversary appeared first on The Walt Disney Company .
+[122] cand-fd1966e6-123 | S006 | 2026-06-01
+    T: Taylor Swift Announces New Song ‘I Knew It, I Knew You’ for Disney and Pixar’s ‘Toy Story 5’
+    S: The post Taylor Swift Announces New Song ‘I Knew It, I Knew You’ for Disney and Pixar’s ‘Toy Story 5’ appeared first on The Walt Disney Company .
+[123] cand-c599b44d-124 | S006 | 2026-05-28
+    T: Disney and Philips Bring Beloved Storytelling and Innovative Technology to Support Kids Undergoing MRI Exams
+    S: The post Disney and Philips Bring Beloved Storytelling and Innovative Technology to Support Kids Undergoing MRI Exams appeared first on The Walt Disney Company .
+[124] cand-cbdd28aa-125 | S006 | 2026-05-26
+    T: How ‘Sofia the First: Royal Magic’ Is Enchanting a Whole New Generation on Disney Jr. and Disney+
+    S: The post How ‘Sofia the First: Royal Magic’ Is Enchanting a Whole New Generation on Disney Jr. and Disney+ appeared first on The Walt Disney Company .
+[125] cand-f3e6f267-126 | S006 | 2026-05-26
+    T: Bluey’s Next Chapter: From Streaming Sensation to Real-World Magic
+    S: The post Bluey’s Next Chapter: From Streaming Sensation to Real-World Magic appeared first on The Walt Disney Company .
+[126] cand-cbd712b1-127 | S006 | 2026-05-21
+    T: Disney Consumer Products Ushers in a New Era of Collaboration and Culture at Licensing Expo with ‘Icons Unleashed’
+    S: The post Disney Consumer Products Ushers in a New Era of Collaboration and Culture at Licensing Expo with ‘Icons Unleashed’ appeared first on The Walt Disney Company .
+[127] cand-3a737c52-128 | S006 | 2026-05-21
+    T: Pedro Pascal and Jon Favreau on Crafting a Big-Screen ‘Star Wars’ Adventure with ‘The Mandalorian and Grogu’
+    S: The post Pedro Pascal and Jon Favreau on Crafting a Big-Screen ‘Star Wars’ Adventure with ‘The Mandalorian and Grogu’ appeared first on The Walt Disney Company .
+[128] cand-d1fe6390-129 | S006 | 2026-05-19
+    T: Disney and Epic Games Bring ‘Star Wars’ Stories to Fortnite Fans
+    S: The post Disney and Epic Games Bring ‘Star Wars’ Stories to Fortnite Fans appeared first on The Walt Disney Company .
+[129] cand-dbb9ba99-130 | S006 | 2026-05-19
+    T: Hulu on Disney+ Just Got Better: What You Need to Know About Linking Your Profiles
+    S: The post Hulu on Disney+ Just Got Better: What You Need to Know About Linking Your Profiles appeared first on The Walt Disney Company .
+[130] cand-08da0c34-028 | S004 | 2026-09-22
+    T: Ari Emanuel on Outrunning ‘Entourage,’ the Art of the Phone Call and the Stolen Commission that Still Hurts
+    S: The Thomas Guide is a map that painstakingly details how to navigate Los Angeles by car. It’s a spiral-bound relic that almost none of your junior executives remember. Your assista
+[131] cand-fbd3e609-029 | S004 | 2026-09-22
+    T: ‘Digger’ First Reactions Split Over Tom Cruise’s ‘Baffling,’ ‘Unpleasant’ and ‘Brave’ New Movie: ‘The Divide on This Is Going to Be Wide’
+    S: Tom Cruise’s star vehicle “Digger” has finally been unveiled to members of the film press, who have been left divided by the satirical black comedy. The latest directorial effort f
+[132] cand-fc97d123-030 | S004 | 2026-09-22
+    T: Spike Lee, Bowen Yang, Amandla Stenberg, Dave Franco and Chance the Rapper Front J.Crew’s 40th Anniversary Barn Jacket Campaign
+    S: J.Crew is celebrating 40 years of its signature Barn Jacket with a sprawling new campaign featuring everyone from Spike Lee and Bowen Yang to Amandla Stenberg, Dave Franco, Chance 

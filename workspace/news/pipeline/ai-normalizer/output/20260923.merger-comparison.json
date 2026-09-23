@@ -1,0 +1,5360 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-23T04:16:20.176Z",
+  "window_days": 3,
+  "before": {
+    "stats": {
+      "input_items": 133,
+      "output_events": 129,
+      "reports_preserved": 133,
+      "mergeable_events": 4,
+      "held_events": 0,
+      "records_deleted": 0
+    },
+    "multi_report_events": [
+      {
+        "event_key": "evt1-7be6e4d3b0195a6e",
+        "decision": "merge",
+        "reports": [
+          "cand-b0195a6e-033|The Walt Disney Company 官方公告页",
+          "cand-b0195a6e-034|The Walt Disney Company 官方公告页"
+        ]
+      },
+      {
+        "event_key": "evt1-1ac8472d1f4feb05",
+        "decision": "merge",
+        "reports": [
+          "cand-1f4feb05-035|The Walt Disney Company 官方公告页",
+          "cand-1f4feb05-036|The Walt Disney Company 官方公告页"
+        ]
+      },
+      {
+        "event_key": "evt1-03d325c4c7651842",
+        "decision": "merge",
+        "reports": [
+          "cand-c7651842-047|The Walt Disney Company 官方公告页",
+          "cand-c7651842-049|The Walt Disney Company 官方公告页"
+        ]
+      },
+      {
+        "event_key": "evt1-65b32656ac95c0a4",
+        "decision": "merge",
+        "reports": [
+          "cand-ac95c0a4-121|The Walt Disney Company 官方公告页",
+          "cand-ac95c0a4-122|The Walt Disney Company 官方公告页"
+        ]
+      }
+    ]
+  },
+  "after": {
+    "stats": {
+      "input_items": 133,
+      "output_events": 131,
+      "reports_preserved": 133,
+      "mergeable_events": 2,
+      "held_events": 0,
+      "records_deleted": 0
+    },
+    "multi_report_events": [
+      {
+        "event_key": "evt1-bee48657643fd6fc",
+        "decision": "merge",
+        "reports": [
+          "cand-643fd6fc-035|The Walt Disney Company 官方公告页",
+          "cand-643fd6fc-036|The Walt Disney Company 官方公告页"
+        ]
+      },
+      {
+        "event_key": "evt1-5ea016fc3e3e9922",
+        "decision": "merge",
+        "reports": [
+          "cand-3e3e9922-047|The Walt Disney Company 官方公告页",
+          "cand-3e3e9922-049|The Walt Disney Company 官方公告页"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "event_key": "evt1-eacd50c461287532",
+        "item_ids": [
+          "cand-61287532-001"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-61287532-001",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/james-gunn-dcu-superhero-team"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/james-gunn-dcu-superhero-team",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-916f70515526f04f",
+        "item_ids": [
+          "cand-5526f04f-002"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5526f04f-002",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/marvel-studios-ending-third-disney-plus-trilogy-2027"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/marvel-studios-ending-third-disney-plus-trilogy-2027",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-915b5cfdf863a508",
+        "item_ids": [
+          "cand-f863a508-003"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f863a508-003",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/lanterns-episode-7-trailer-hal-jordan-fortress-storage-cube"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/lanterns-episode-7-trailer-hal-jordan-fortress-storage-cube",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d5ad71f308b75611",
+        "item_ids": [
+          "cand-08b75611-004"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-08b75611-004",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/avengers-secret-wars-doomsday-fix"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/avengers-secret-wars-doomsday-fix",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-355305bc7e0ff9be",
+        "item_ids": [
+          "cand-7e0ff9be-005"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-7e0ff9be-005",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/clayface-2026-runtime-dc-movie-history"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/clayface-2026-runtime-dc-movie-history",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-2dd0b128780964eb",
+        "item_ids": [
+          "cand-780964eb-006"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-780964eb-006",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/james-gunn-record-straight-hal-jordan-dcu-death"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/james-gunn-record-straight-hal-jordan-dcu-death",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-54459844ba5cff3f",
+        "item_ids": [
+          "cand-ba5cff3f-007"
+        ],
+        "report_count": 1,
+        "category": "series",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-ba5cff3f-007",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/wandavision-sequel-superheroes-2026"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-19cc521d5aacbaf0",
+        "item_ids": [
+          "cand-5aacbaf0-008"
+        ],
+        "report_count": 1,
+        "category": "series",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5aacbaf0-008",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/marvel-studios-spider-man-daredevil-reunite-classic-villains"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/marvel-studios-spider-man-daredevil-reunite-classic-villains",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-c914b9ed388c5f1a",
+        "item_ids": [
+          "cand-388c5f1a-009"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-388c5f1a-009",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/dave-filoni-mortis-gods-ahsoka-season-2"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/dave-filoni-mortis-gods-ahsoka-season-2",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-30235589022ae1d5",
+        "item_ids": [
+          "cand-022ae1d5-010"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-022ae1d5-010",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-cf15a00b8f8255fa",
+        "item_ids": [
+          "cand-8f8255fa-011"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-8f8255fa-011",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-90e15115d54436ae",
+        "item_ids": [
+          "cand-d54436ae-012"
+        ],
+        "report_count": 1,
+        "category": "series",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d54436ae-012",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/disney-plus-marvel-tv-crossover-trailer-release-new"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/disney-plus-marvel-tv-crossover-trailer-release-new",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-788238e4eaa53c91",
+        "item_ids": [
+          "cand-eaa53c91-013"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-eaa53c91-013",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-3db51c4008f68650",
+        "item_ids": [
+          "cand-08f68650-014"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-08f68650-014",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-eb49c20b575e7284",
+        "item_ids": [
+          "cand-575e7284-015"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-575e7284-015",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/star-wars-baby-yoda-word-first"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/star-wars-baby-yoda-word-first",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-945e0de2ebce3d25",
+        "item_ids": [
+          "cand-ebce3d25-016"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-ebce3d25-016",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/disney-plus-percy-jackson-season-3-olympian-gods"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/disney-plus-percy-jackson-season-3-olympian-gods",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-997621f1790d78d0",
+        "item_ids": [
+          "cand-790d78d0-017"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-790d78d0-017",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/disney-incredibles-3-poster-first"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/disney-incredibles-3-poster-first",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-c400c769410933ac",
+        "item_ids": [
+          "cand-410933ac-018"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-21T00:00:00.000Z",
+        "last_publish_time": "2026-09-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-410933ac-018",
+            "publish_time": "2026-09-21",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/lanterns-episode-6-suicide-squad-creature-commandos-continuity-error"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/lanterns-episode-6-suicide-squad-creature-commandos-continuity-error",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-bc80a9b562f058f6",
+        "item_ids": [
+          "cand-62f058f6-019"
+        ],
+        "report_count": 1,
+        "category": "series",
+        "first_publish_time": "2026-09-21T00:00:00.000Z",
+        "last_publish_time": "2026-09-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-62f058f6-019",
+            "publish_time": "2026-09-21",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/visionquest-doctor-strange-spider-man-spell-didnt-work"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/visionquest-doctor-strange-spider-man-spell-didnt-work",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b56969b149b06dbf",
+        "item_ids": [
+          "cand-49b06dbf-020"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-21T00:00:00.000Z",
+        "last_publish_time": "2026-09-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-49b06dbf-020",
+            "publish_time": "2026-09-21",
+            "first_seen_at": "2026-09-23T03:25:05Z",
+            "source_names": [
+              "The Direct"
+            ],
+            "source_urls": [
+              "https://thedirect.com/article/lanterns-episode-6-noah-manhunter"
+            ],
+            "owner_groups": [
+              "独立"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Direct",
+            "source_url": "https://thedirect.com/article/lanterns-episode-6-noah-manhunter",
+            "owner_group": "独立"
+          }
+        ],
+        "distinct_owner_groups": [
+          "独立"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-0735aaa12fc7f9a2",
+        "item_ids": [
+          "cand-2fc7f9a2-021"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-2fc7f9a2-021",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/music/news/dolly-parton-manager-files-restraining-order-fired-nephew-1236872848/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/music/news/dolly-parton-manager-files-restraining-order-fired-nephew-1236872848/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-7fcb30090c034792",
+        "item_ids": [
+          "cand-0c034792-022"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-0c034792-022",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/berlinale-lali-tasveer-film-festival-1236871825/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/berlinale-lali-tasveer-film-festival-1236871825/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ba1d55f195fbdd44",
+        "item_ids": [
+          "cand-95fbdd44-023"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-95fbdd44-023",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/biz/news/variety-power-of-women-presenters-queen-latifah-marc-maron-1236872812/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/biz/news/variety-power-of-women-presenters-queen-latifah-marc-maron-1236872812/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-7e17cb70280be413",
+        "item_ids": [
+          "cand-280be413-024"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-280be413-024",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/impact-fund-global-south-creators-toronto-1236872846/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/impact-fund-global-south-creators-toronto-1236872846/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-a2ebdae18f82cf20",
+        "item_ids": [
+          "cand-8f82cf20-025"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-8f82cf20-025",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/david-worth-dead-kickboxer-1236872806/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/david-worth-dead-kickboxer-1236872806/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-6d790af0d46dcde3",
+        "item_ids": [
+          "cand-d46dcde3-026"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d46dcde3-026",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/digital/news/clavicular-video-charged-rape-drugging-1236872828/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/digital/news/clavicular-video-charged-rape-drugging-1236872828/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ba6113f8e89c1222",
+        "item_ids": [
+          "cand-e89c1222-027"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-e89c1222-027",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/the-housewife-review-naomi-watts-1236870548/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/the-housewife-review-naomi-watts-1236870548/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-e2ca5f45b4b50d39",
+        "item_ids": [
+          "cand-b4b50d39-028"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-b4b50d39-028",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/judge-paramount-state-antitust-case-hearing-settlement-1236872804/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/judge-paramount-state-antitust-case-hearing-settlement-1236872804/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b3c52b8fa970e30a",
+        "item_ids": [
+          "cand-a970e30a-029"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-23T00:00:00.000Z",
+        "last_publish_time": "2026-09-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-a970e30a-029",
+            "publish_time": "2026-09-23",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/rob-bonta-paramount-politics-newsom-nashville-1236872658/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/rob-bonta-paramount-politics-newsom-nashville-1236872658/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-2eda77275e6a75ac",
+        "item_ids": [
+          "cand-5e6a75ac-030"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5e6a75ac-030",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:25:10Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/global/tom-cruise-prince-william-kate-digger-premiere-london-1236871955/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/global/tom-cruise-prince-william-kate-digger-premiere-london-1236871955/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d5d8660abb70c919",
+        "item_ids": [
+          "cand-bb70c919-031"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-bb70c919-031",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/consumer-products-leadership-structure-announcement/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/consumer-products-leadership-structure-announcement/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-516b2bb9baf028ec",
+        "item_ids": [
+          "cand-baf028ec-032"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-baf028ec-032",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/streaming-video-podcast/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/streaming-video-podcast/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-448d45a9faeb9700",
+        "item_ids": [
+          "cand-faeb9700-033"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-18T00:00:00.000Z",
+        "last_publish_time": "2026-09-18T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-faeb9700-033",
+            "publish_time": "2026-09-18",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/karandeep-anand-chief-technology-officer/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/karandeep-anand-chief-technology-officer/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-8f57ec8e814dedbf",
+        "item_ids": [
+          "cand-814dedbf-034"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-18T00:00:00.000Z",
+        "last_publish_time": "2026-09-18T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-814dedbf-034",
+            "publish_time": "2026-09-18",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-karandeep-anand-to-newly-created-role-of-chief-technology-officer/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/press-releases/the-walt-disney-company-names-karandeep-anand-to-newly-created-role-of-chief-technology-officer/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-bee48657643fd6fc",
+        "item_ids": [
+          "cand-643fd6fc-035",
+          "cand-643fd6fc-036"
+        ],
+        "report_count": 2,
+        "category": "industry",
+        "first_publish_time": "2026-09-17T00:00:00.000Z",
+        "last_publish_time": "2026-09-17T00:00:00.000Z",
+        "within_window": true,
+        "decision": "merge",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-643fd6fc-035",
+            "publish_time": "2026-09-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-entertainment-leadership-announcement/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          },
+          {
+            "id": "cand-643fd6fc-036",
+            "publish_time": "2026-09-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/press-releases/adam-smith-named-chairman-direct-to-consumer-disney-entertainment/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-entertainment-leadership-announcement/",
+            "owner_group": "The Walt Disney Company"
+          },
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/press-releases/adam-smith-named-chairman-direct-to-consumer-disney-entertainment/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-bef5459b22d2c7a9",
+        "item_ids": [
+          "cand-22d2c7a9-037"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-15T00:00:00.000Z",
+        "last_publish_time": "2026-09-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-22d2c7a9-037",
+            "publish_time": "2026-09-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-plus-playlists-curated-viewing/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-plus-playlists-curated-viewing/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-29ffd3f53f47dd8a",
+        "item_ids": [
+          "cand-3f47dd8a-038"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-14T00:00:00.000Z",
+        "last_publish_time": "2026-09-14T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-3f47dd8a-038",
+            "publish_time": "2026-09-14",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/sounds-disney-ad-economic-impact/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/sounds-disney-ad-economic-impact/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-323c8a8dfe6eee39",
+        "item_ids": [
+          "cand-fe6eee39-039"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-08T00:00:00.000Z",
+        "last_publish_time": "2026-09-08T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-fe6eee39-039",
+            "publish_time": "2026-09-08",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/percy-jackson-season-3-preview/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/percy-jackson-season-3-preview/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9b41cdbad917bcbc",
+        "item_ids": [
+          "cand-d917bcbc-040"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-04T00:00:00.000Z",
+        "last_publish_time": "2026-09-04T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d917bcbc-040",
+            "publish_time": "2026-09-04",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/zootopia-3-sneak-peek/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/zootopia-3-sneak-peek/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-098f15fa120372c9",
+        "item_ids": [
+          "cand-120372c9-041"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-03T00:00:00.000Z",
+        "last_publish_time": "2026-09-03T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-120372c9-041",
+            "publish_time": "2026-09-03",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-movies-theaters-fall-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-movies-theaters-fall-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-2d2bc83bf261e063",
+        "item_ids": [
+          "cand-f261e063-042"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-02T00:00:00.000Z",
+        "last_publish_time": "2026-09-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f261e063-042",
+            "publish_time": "2026-09-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/industrial-light-and-magic/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/industrial-light-and-magic/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-30270f76a30a0d1f",
+        "item_ids": [
+          "cand-a30a0d1f-043"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-28T00:00:00.000Z",
+        "last_publish_time": "2026-08-28T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-a30a0d1f-043",
+            "publish_time": "2026-08-28",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/college-gameday-40-seasons/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/college-gameday-40-seasons/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-10997ec66c712a36",
+        "item_ids": [
+          "cand-6c712a36-044"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-27T00:00:00.000Z",
+        "last_publish_time": "2026-08-27T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6c712a36-044",
+            "publish_time": "2026-08-27",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/the-dog-stars/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/the-dog-stars/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9ad105a3aa511b49",
+        "item_ids": [
+          "cand-aa511b49-045"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-27T00:00:00.000Z",
+        "last_publish_time": "2026-08-27T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-aa511b49-045",
+            "publish_time": "2026-08-27",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-movie-marketing/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-movie-marketing/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-641fc7db48d64b1b",
+        "item_ids": [
+          "cand-48d64b1b-046"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-20T00:00:00.000Z",
+        "last_publish_time": "2026-08-20T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-48d64b1b-046",
+            "publish_time": "2026-08-20",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/inside-disney-worldbuilders-where-storytelling-becomes-a-world-you-can-experience/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/inside-disney-worldbuilders-where-storytelling-becomes-a-world-you-can-experience/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-5ea016fc3e3e9922",
+        "item_ids": [
+          "cand-3e3e9922-047",
+          "cand-3e3e9922-049"
+        ],
+        "report_count": 2,
+        "category": "industry",
+        "first_publish_time": "2026-08-17T00:00:00.000Z",
+        "last_publish_time": "2026-08-17T00:00:00.000Z",
+        "within_window": true,
+        "decision": "merge",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-3e3e9922-047",
+            "publish_time": "2026-08-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/press-releases/world-princess-week-timeless-magic/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          },
+          {
+            "id": "cand-3e3e9922-049",
+            "publish_time": "2026-08-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/world-princess-week-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/press-releases/world-princess-week-timeless-magic/",
+            "owner_group": "The Walt Disney Company"
+          },
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/world-princess-week-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-639befc064bd2fd7",
+        "item_ids": [
+          "cand-64bd2fd7-048"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-17T00:00:00.000Z",
+        "last_publish_time": "2026-08-17T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-64bd2fd7-048",
+            "publish_time": "2026-08-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-streaming-showcase-d23/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-streaming-showcase-d23/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-e587c2dc399f9797",
+        "item_ids": [
+          "cand-399f9797-050"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-17T00:00:00.000Z",
+        "last_publish_time": "2026-08-17T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-399f9797-050",
+            "publish_time": "2026-08-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-2026-disney-legends-awards/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-2026-disney-legends-awards/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-942ceecbd339b3b0",
+        "item_ids": [
+          "cand-d339b3b0-051"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-16T00:00:00.000Z",
+        "last_publish_time": "2026-08-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d339b3b0-051",
+            "publish_time": "2026-08-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/bob-iger-main-street-window-disneyland/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/bob-iger-main-street-window-disneyland/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-a08e89d6e53cdfcc",
+        "item_ids": [
+          "cand-e53cdfcc-052"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-16T00:00:00.000Z",
+        "last_publish_time": "2026-08-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-e53cdfcc-052",
+            "publish_time": "2026-08-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/games-d23-digital-entertainment/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/games-d23-digital-entertainment/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-4d85ede26abad7a9",
+        "item_ids": [
+          "cand-6abad7a9-053"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-16T00:00:00.000Z",
+        "last_publish_time": "2026-08-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6abad7a9-053",
+            "publish_time": "2026-08-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-2026-disney-experiences-showcase/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-2026-disney-experiences-showcase/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-41bfe883a799dd96",
+        "item_ids": [
+          "cand-a799dd96-054"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-15T00:00:00.000Z",
+        "last_publish_time": "2026-08-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-a799dd96-054",
+            "publish_time": "2026-08-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-2026-disney-entertainment-showcase/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-2026-disney-entertainment-showcase/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-4352f91937888eb8",
+        "item_ids": [
+          "cand-37888eb8-055"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-15T00:00:00.000Z",
+        "last_publish_time": "2026-08-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-37888eb8-055",
+            "publish_time": "2026-08-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ba12010e58b92b8f",
+        "item_ids": [
+          "cand-58b92b8f-056"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-14T00:00:00.000Z",
+        "last_publish_time": "2026-08-14T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-58b92b8f-056",
+            "publish_time": "2026-08-14",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/employee-health-center-network-expansion/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/employee-health-center-network-expansion/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-3f6fb584f9d3b023",
+        "item_ids": [
+          "cand-f9d3b023-057"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-14T00:00:00.000Z",
+        "last_publish_time": "2026-08-14T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f9d3b023-057",
+            "publish_time": "2026-08-14",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/asad-ayaz-d23-fandom/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/asad-ayaz-d23-fandom/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-693c17e2861e4549",
+        "item_ids": [
+          "cand-861e4549-058"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-14T00:00:00.000Z",
+        "last_publish_time": "2026-08-14T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-861e4549-058",
+            "publish_time": "2026-08-14",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/formula-1-extension-pixar-cars/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/formula-1-extension-pixar-cars/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-7c1f2689d2145a46",
+        "item_ids": [
+          "cand-d2145a46-059"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-13T00:00:00.000Z",
+        "last_publish_time": "2026-08-13T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d2145a46-059",
+            "publish_time": "2026-08-13",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/games-next-chapter/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/games-next-chapter/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-1a022ddf870d6886",
+        "item_ids": [
+          "cand-870d6886-060"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-13T00:00:00.000Z",
+        "last_publish_time": "2026-08-13T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-870d6886-060",
+            "publish_time": "2026-08-13",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-bob-iger/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-bob-iger/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-7fa684e1736f8f04",
+        "item_ids": [
+          "cand-736f8f04-061"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-12T00:00:00.000Z",
+        "last_publish_time": "2026-08-12T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-736f8f04-061",
+            "publish_time": "2026-08-12",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-alan-tudyk/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-alan-tudyk/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-10f6de82bd0a89dc",
+        "item_ids": [
+          "cand-bd0a89dc-062"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-11T00:00:00.000Z",
+        "last_publish_time": "2026-08-11T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-bd0a89dc-062",
+            "publish_time": "2026-08-11",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-eric-goldberg/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-eric-goldberg/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d8c5044feaedb95e",
+        "item_ids": [
+          "cand-eaedb95e-063"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-11T00:00:00.000Z",
+        "last_publish_time": "2026-08-11T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-eaedb95e-063",
+            "publish_time": "2026-08-11",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-kim-irvine/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-kim-irvine/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ac37980db4cce758",
+        "item_ids": [
+          "cand-b4cce758-064"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-11T00:00:00.000Z",
+        "last_publish_time": "2026-08-11T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-b4cce758-064",
+            "publish_time": "2026-08-11",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/formula-e-streaming/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/formula-e-streaming/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-3b9406a076ae67be",
+        "item_ids": [
+          "cand-76ae67be-065"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-10T00:00:00.000Z",
+        "last_publish_time": "2026-08-10T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-76ae67be-065",
+            "publish_time": "2026-08-10",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-worldbuilders-leslie-iwerks-interview/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-worldbuilders-leslie-iwerks-interview/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-0ab3adfc9d5cad95",
+        "item_ids": [
+          "cand-9d5cad95-066"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-10T00:00:00.000Z",
+        "last_publish_time": "2026-08-10T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-9d5cad95-066",
+            "publish_time": "2026-08-10",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/camp-rock-3-cast-interview/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/camp-rock-3-cast-interview/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-983867d7bf69fd86",
+        "item_ids": [
+          "cand-bf69fd86-067"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-10T00:00:00.000Z",
+        "last_publish_time": "2026-08-10T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-bf69fd86-067",
+            "publish_time": "2026-08-10",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-jerry-bruckheimer/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-jerry-bruckheimer/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-26dc5fe989392bca",
+        "item_ids": [
+          "cand-89392bca-068"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-07T00:00:00.000Z",
+        "last_publish_time": "2026-08-07T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-89392bca-068",
+            "publish_time": "2026-08-07",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legends-jonas-brothers/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legends-jonas-brothers/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-e45958675e699fd4",
+        "item_ids": [
+          "cand-5e699fd4-069"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-07T00:00:00.000Z",
+        "last_publish_time": "2026-08-07T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5e699fd4-069",
+            "publish_time": "2026-08-07",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-susan-egan/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-susan-egan/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-f1dd5b2145babf27",
+        "item_ids": [
+          "cand-45babf27-070"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-06T00:00:00.000Z",
+        "last_publish_time": "2026-08-06T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-45babf27-070",
+            "publish_time": "2026-08-06",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-chris-berman/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-chris-berman/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-78dc96c014f12e36",
+        "item_ids": [
+          "cand-14f12e36-071"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-06T00:00:00.000Z",
+        "last_publish_time": "2026-08-06T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-14f12e36-071",
+            "publish_time": "2026-08-06",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/ai-powered-search-espn-disney-plus/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/ai-powered-search-espn-disney-plus/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-06e4ae0c70d5f7fa",
+        "item_ids": [
+          "cand-70d5f7fa-072"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-06T00:00:00.000Z",
+        "last_publish_time": "2026-08-06T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-70d5f7fa-072",
+            "publish_time": "2026-08-06",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-legend-lin-manuel-miranda/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-legend-lin-manuel-miranda/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-798ceb960438000e",
+        "item_ids": [
+          "cand-0438000e-073"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-06T00:00:00.000Z",
+        "last_publish_time": "2026-08-06T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-0438000e-073",
+            "publish_time": "2026-08-06",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/jon-youshaei-created-in-la-event/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/jon-youshaei-created-in-la-event/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b1a26a8d05763f15",
+        "item_ids": [
+          "cand-05763f15-074"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-05T00:00:00.000Z",
+        "last_publish_time": "2026-08-05T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-05763f15-074",
+            "publish_time": "2026-08-05",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-q3-earnings-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-q3-earnings-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-4440c0241d30d0d2",
+        "item_ids": [
+          "cand-1d30d0d2-075"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-05T00:00:00.000Z",
+        "last_publish_time": "2026-08-05T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-1d30d0d2-075",
+            "publish_time": "2026-08-05",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/tiktok-content-sharing-deal/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/tiktok-content-sharing-deal/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-6adfecc2f23dce67",
+        "item_ids": [
+          "cand-f23dce67-076"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-08-03T00:00:00.000Z",
+        "last_publish_time": "2026-08-03T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f23dce67-076",
+            "publish_time": "2026-08-03",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-worldbuilders-premiere-date/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-worldbuilders-premiere-date/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-f973b7a9f253218b",
+        "item_ids": [
+          "cand-f253218b-077"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-31T00:00:00.000Z",
+        "last_publish_time": "2026-07-31T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f253218b-077",
+            "publish_time": "2026-07-31",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/accelerator-2026-participants/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/accelerator-2026-participants/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-474ab00f55799c58",
+        "item_ids": [
+          "cand-55799c58-078"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-30T00:00:00.000Z",
+        "last_publish_time": "2026-07-30T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-55799c58-078",
+            "publish_time": "2026-07-30",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/alice-wonderland-75-anniversary/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/alice-wonderland-75-anniversary/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-2807b1a25c8495f2",
+        "item_ids": [
+          "cand-5c8495f2-079"
+        ],
+        "report_count": 1,
+        "category": "movie",
+        "first_publish_time": "2026-07-26T00:00:00.000Z",
+        "last_publish_time": "2026-07-26T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5c8495f2-079",
+            "publish_time": "2026-07-26",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-f067f76b9db4f8c3",
+        "item_ids": [
+          "cand-9db4f8c3-080"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-23T00:00:00.000Z",
+        "last_publish_time": "2026-07-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-9db4f8c3-080",
+            "publish_time": "2026-07-23",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/ad-creative-studio-beta/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/ad-creative-studio-beta/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-8a382425f67c51dd",
+        "item_ids": [
+          "cand-f67c51dd-081"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-23T00:00:00.000Z",
+        "last_publish_time": "2026-07-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f67c51dd-081",
+            "publish_time": "2026-07-23",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-fantastic-prizes-sweepstakes-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-fantastic-prizes-sweepstakes-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-205a0ef46c9d5313",
+        "item_ids": [
+          "cand-6c9d5313-082"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-22T00:00:00.000Z",
+        "last_publish_time": "2026-07-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6c9d5313-082",
+            "publish_time": "2026-07-22",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/julie-andrews-documentary/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/julie-andrews-documentary/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-affbe7069ff2674e",
+        "item_ids": [
+          "cand-9ff2674e-083"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-22T00:00:00.000Z",
+        "last_publish_time": "2026-07-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-9ff2674e-083",
+            "publish_time": "2026-07-22",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-worldbuilders-teaser-trailer/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-worldbuilders-teaser-trailer/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-c99f8231bf4f392e",
+        "item_ids": [
+          "cand-bf4f392e-084"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-21T00:00:00.000Z",
+        "last_publish_time": "2026-07-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-bf4f392e-084",
+            "publish_time": "2026-07-21",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/kraft-heinz-alliance/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/kraft-heinz-alliance/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-4274c1c7789df958",
+        "item_ids": [
+          "cand-789df958-085"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-21T00:00:00.000Z",
+        "last_publish_time": "2026-07-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-789df958-085",
+            "publish_time": "2026-07-21",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-shopping-experiences-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-shopping-experiences-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-c30e9da34f86aeda",
+        "item_ids": [
+          "cand-4f86aeda-086"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-16T00:00:00.000Z",
+        "last_publish_time": "2026-07-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-4f86aeda-086",
+            "publish_time": "2026-07-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/champion-nfl-collection-fanatics-fest/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/champion-nfl-collection-fanatics-fest/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9ac7fb4073bac3fa",
+        "item_ids": [
+          "cand-73bac3fa-087"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-16T00:00:00.000Z",
+        "last_publish_time": "2026-07-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-73bac3fa-087",
+            "publish_time": "2026-07-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/descendants-wicked-wonderland/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/descendants-wicked-wonderland/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-768229c5f2d72931",
+        "item_ids": [
+          "cand-f2d72931-088"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-16T00:00:00.000Z",
+        "last_publish_time": "2026-07-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f2d72931-088",
+            "publish_time": "2026-07-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/nfl-espn-fantasy-answers/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/nfl-espn-fantasy-answers/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b34c78d0b61bf737",
+        "item_ids": [
+          "cand-b61bf737-089"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-16T00:00:00.000Z",
+        "last_publish_time": "2026-07-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-b61bf737-089",
+            "publish_time": "2026-07-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-show-floor-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-show-floor-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-8a59c34c7dcfb3e6",
+        "item_ids": [
+          "cand-7dcfb3e6-090"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-15T00:00:00.000Z",
+        "last_publish_time": "2026-07-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-7dcfb3e6-090",
+            "publish_time": "2026-07-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-plus-expands-languages-right-to-left-interface/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-plus-expands-languages-right-to-left-interface/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d3aae40fdfe90ef7",
+        "item_ids": [
+          "cand-dfe90ef7-091"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-15T00:00:00.000Z",
+        "last_publish_time": "2026-07-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-dfe90ef7-091",
+            "publish_time": "2026-07-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/espys-new-york-city-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/espys-new-york-city-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d047eb320993bf54",
+        "item_ids": [
+          "cand-0993bf54-092"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-13T00:00:00.000Z",
+        "last_publish_time": "2026-07-13T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-0993bf54-092",
+            "publish_time": "2026-07-13",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/d23-programming-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/d23-programming-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9cb41951be812077",
+        "item_ids": [
+          "cand-be812077-093"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-11T00:00:00.000Z",
+        "last_publish_time": "2026-07-11T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-be812077-093",
+            "publish_time": "2026-07-11",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/remembering-disney-legend-don-iwerks/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/remembering-disney-legend-don-iwerks/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-fcb6cf13f5c368b3",
+        "item_ids": [
+          "cand-f5c368b3-094"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-09T00:00:00.000Z",
+        "last_publish_time": "2026-07-09T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f5c368b3-094",
+            "publish_time": "2026-07-09",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/moana-dwayne-johnson-catherine-lagaaia/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/moana-dwayne-johnson-catherine-lagaaia/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-193a9b3637112ee5",
+        "item_ids": [
+          "cand-37112ee5-095"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-08T00:00:00.000Z",
+        "last_publish_time": "2026-07-08T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-37112ee5-095",
+            "publish_time": "2026-07-08",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/emmy-nominations-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/emmy-nominations-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-6f1497476a0c3bfc",
+        "item_ids": [
+          "cand-6a0c3bfc-096"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-03T00:00:00.000Z",
+        "last_publish_time": "2026-07-03T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6a0c3bfc-096",
+            "publish_time": "2026-07-03",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disneyland-billionth-guest/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disneyland-billionth-guest/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-5b2b69a1f162e665",
+        "item_ids": [
+          "cand-f162e665-097"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-02T00:00:00.000Z",
+        "last_publish_time": "2026-07-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f162e665-097",
+            "publish_time": "2026-07-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/formula-1-custom-helmet-make-wish/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/formula-1-custom-helmet-make-wish/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-bcaea981f27bd4f7",
+        "item_ids": [
+          "cand-f27bd4f7-098"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-02T00:00:00.000Z",
+        "last_publish_time": "2026-07-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f27bd4f7-098",
+            "publish_time": "2026-07-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-celebrates-america-july-fourth-weekend/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-celebrates-america-july-fourth-weekend/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-43d1f5692205bc0e",
+        "item_ids": [
+          "cand-2205bc0e-099"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-02T00:00:00.000Z",
+        "last_publish_time": "2026-07-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-2205bc0e-099",
+            "publish_time": "2026-07-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/all-roads-lead-to-camp/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/all-roads-lead-to-camp/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-916944ef49e0c518",
+        "item_ids": [
+          "cand-49e0c518-100"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-02T00:00:00.000Z",
+        "last_publish_time": "2026-07-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-49e0c518-100",
+            "publish_time": "2026-07-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-celebrates-america-blue-star-families/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-celebrates-america-blue-star-families/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-7db1b2dc14d5c6ee",
+        "item_ids": [
+          "cand-14d5c6ee-101"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-01T00:00:00.000Z",
+        "last_publish_time": "2026-07-01T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-14d5c6ee-101",
+            "publish_time": "2026-07-01",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-archives-america-250/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-archives-america-250/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ed5ef012f516904a",
+        "item_ids": [
+          "cand-f516904a-102"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-07-01T00:00:00.000Z",
+        "last_publish_time": "2026-07-01T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-f516904a-102",
+            "publish_time": "2026-07-01",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/toy-story-streaming/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/toy-story-streaming/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-30c425e7ac5e1273",
+        "item_ids": [
+          "cand-ac5e1273-103"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-26T00:00:00.000Z",
+        "last_publish_time": "2026-06-26T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-ac5e1273-103",
+            "publish_time": "2026-06-26",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/626-day-stitch-celebration/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/626-day-stitch-celebration/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-0eb9715028e92e43",
+        "item_ids": [
+          "cand-28e92e43-104"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-26T00:00:00.000Z",
+        "last_publish_time": "2026-06-26T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-28e92e43-104",
+            "publish_time": "2026-06-26",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/animation-annecy-2026-announcements/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/animation-annecy-2026-announcements/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9a2fb0721ed3ef5a",
+        "item_ids": [
+          "cand-1ed3ef5a-105"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-23T00:00:00.000Z",
+        "last_publish_time": "2026-06-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-1ed3ef5a-105",
+            "publish_time": "2026-06-23",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/america-250-economic-impact/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/america-250-economic-impact/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ac4c78d8dea2dd62",
+        "item_ids": [
+          "cand-dea2dd62-106"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-23T00:00:00.000Z",
+        "last_publish_time": "2026-06-23T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-dea2dd62-106",
+            "publish_time": "2026-06-23",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-jr-espn-youth-sports/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-jr-espn-youth-sports/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-0c6873f18605306c",
+        "item_ids": [
+          "cand-8605306c-107"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-21T00:00:00.000Z",
+        "last_publish_time": "2026-06-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-8605306c-107",
+            "publish_time": "2026-06-21",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/toy-story-5-box-office/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/toy-story-5-box-office/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-f6626066d92e6e6f",
+        "item_ids": [
+          "cand-d92e6e6f-108"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-18T00:00:00.000Z",
+        "last_publish_time": "2026-06-18T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d92e6e6f-108",
+            "publish_time": "2026-06-18",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/the-story-of-toy-story/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/the-story-of-toy-story/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9987783b81031631",
+        "item_ids": [
+          "cand-81031631-109"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-18T00:00:00.000Z",
+        "last_publish_time": "2026-06-18T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-81031631-109",
+            "publish_time": "2026-06-18",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/tech-companies-collaborate-storytelling-innovation/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/tech-companies-collaborate-storytelling-innovation/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b5eaa206b8f280cf",
+        "item_ids": [
+          "cand-b8f280cf-110"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-18T00:00:00.000Z",
+        "last_publish_time": "2026-06-18T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-b8f280cf-110",
+            "publish_time": "2026-06-18",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/toy-story-5-jessie/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/toy-story-5-jessie/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-e670caabe171034e",
+        "item_ids": [
+          "cand-e171034e-111"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-17T00:00:00.000Z",
+        "last_publish_time": "2026-06-17T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-e171034e-111",
+            "publish_time": "2026-06-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/toy-story-social-impact/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/toy-story-social-impact/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-cf29a87f6ecbb90b",
+        "item_ids": [
+          "cand-6ecbb90b-112"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-17T00:00:00.000Z",
+        "last_publish_time": "2026-06-17T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6ecbb90b-112",
+            "publish_time": "2026-06-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/simpsons-fortnite-epic-games/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/simpsons-fortnite-epic-games/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-1a4106c596316725",
+        "item_ids": [
+          "cand-96316725-113"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-17T00:00:00.000Z",
+        "last_publish_time": "2026-06-17T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-96316725-113",
+            "publish_time": "2026-06-17",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/toy-story-pixar-history/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/toy-story-pixar-history/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-11c61ffd95cd0d12",
+        "item_ids": [
+          "cand-95cd0d12-114"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-16T00:00:00.000Z",
+        "last_publish_time": "2026-06-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-95cd0d12-114",
+            "publish_time": "2026-06-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/shanghai-disney-resort-10th-anniversary-storytelling-expansion/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/shanghai-disney-resort-10th-anniversary-storytelling-expansion/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-770feee5901c8374",
+        "item_ids": [
+          "cand-901c8374-115"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-16T00:00:00.000Z",
+        "last_publish_time": "2026-06-16T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-901c8374-115",
+            "publish_time": "2026-06-16",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/shanghai-disney-resort-10th-birthday/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/shanghai-disney-resort-10th-birthday/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-32357046d1ddec36",
+        "item_ids": [
+          "cand-d1ddec36-116"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-15T00:00:00.000Z",
+        "last_publish_time": "2026-06-15T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d1ddec36-116",
+            "publish_time": "2026-06-15",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/veterans-institute-multi-city-series/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/veterans-institute-multi-city-series/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-d046b7ca437c92b0",
+        "item_ids": [
+          "cand-437c92b0-117"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-10T00:00:00.000Z",
+        "last_publish_time": "2026-06-10T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-437c92b0-117",
+            "publish_time": "2026-06-10",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-plus-hulu-throwbacks-mini-mall/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-plus-hulu-throwbacks-mini-mall/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-796669fde805b647",
+        "item_ids": [
+          "cand-e805b647-118"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-04T00:00:00.000Z",
+        "last_publish_time": "2026-06-04T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-e805b647-118",
+            "publish_time": "2026-06-04",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/viewer-first-premium-advertising/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/viewer-first-premium-advertising/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-56112db6c3e70620",
+        "item_ids": [
+          "cand-c3e70620-119"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-04T00:00:00.000Z",
+        "last_publish_time": "2026-06-04T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-c3e70620-119",
+            "publish_time": "2026-06-04",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-movies-theaters-summer-2026/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-movies-theaters-summer-2026/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-030828991175b3cc",
+        "item_ids": [
+          "cand-1175b3cc-120"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-03T00:00:00.000Z",
+        "last_publish_time": "2026-06-03T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-1175b3cc-120",
+            "publish_time": "2026-06-03",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/espn-nba-finals-knicks-spurs/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/espn-nba-finals-knicks-spurs/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-18f9ab02a5971d35",
+        "item_ids": [
+          "cand-a5971d35-121"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-02T00:00:00.000Z",
+        "last_publish_time": "2026-06-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-a5971d35-121",
+            "publish_time": "2026-06-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/press-releases/disney-celebrates-america-ramps-up-with-a-phenomenal-lineup-of-experiences-ahead-of-the-nations-250th-anniversary/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/press-releases/disney-celebrates-america-ramps-up-with-a-phenomenal-lineup-of-experiences-ahead-of-the-nations-250th-anniversary/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-b57eed745b4a3efb",
+        "item_ids": [
+          "cand-5b4a3efb-122"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-02T00:00:00.000Z",
+        "last_publish_time": "2026-06-02T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-5b4a3efb-122",
+            "publish_time": "2026-06-02",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/america-250-events-lineup/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/america-250-events-lineup/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-9aaa232476e1f391",
+        "item_ids": [
+          "cand-76e1f391-123"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-06-01T00:00:00.000Z",
+        "last_publish_time": "2026-06-01T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-76e1f391-123",
+            "publish_time": "2026-06-01",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-55059ccd2c05fade",
+        "item_ids": [
+          "cand-2c05fade-124"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-28T00:00:00.000Z",
+        "last_publish_time": "2026-05-28T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-2c05fade-124",
+            "publish_time": "2026-05-28",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/disney-philips-mri-ambient-experience-children/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/disney-philips-mri-ambient-experience-children/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-19ccb52e749666d0",
+        "item_ids": [
+          "cand-749666d0-125"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-26T00:00:00.000Z",
+        "last_publish_time": "2026-05-26T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-749666d0-125",
+            "publish_time": "2026-05-26",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/sofia-the-first-royal-magic/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/sofia-the-first-royal-magic/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-ea9c14dea41bb00b",
+        "item_ids": [
+          "cand-a41bb00b-126"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-26T00:00:00.000Z",
+        "last_publish_time": "2026-05-26T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-a41bb00b-126",
+            "publish_time": "2026-05-26",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/bluey-streaming-parks-cruises-movie/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/bluey-streaming-parks-cruises-movie/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-2033f00cd5c9d7b3",
+        "item_ids": [
+          "cand-d5c9d7b3-127"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-21T00:00:00.000Z",
+        "last_publish_time": "2026-05-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-d5c9d7b3-127",
+            "publish_time": "2026-05-21",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/consumer-products-licensing-expo-icons-unleashed/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/consumer-products-licensing-expo-icons-unleashed/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-43662d90636b28a2",
+        "item_ids": [
+          "cand-636b28a2-128"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-21T00:00:00.000Z",
+        "last_publish_time": "2026-05-21T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-636b28a2-128",
+            "publish_time": "2026-05-21",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/the-mandalorian-and-grogu/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/the-mandalorian-and-grogu/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-882c8eb31b037585",
+        "item_ids": [
+          "cand-1b037585-129"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-19T00:00:00.000Z",
+        "last_publish_time": "2026-05-19T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-1b037585-129",
+            "publish_time": "2026-05-19",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/fortnite-epic-games-star-wars/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/fortnite-epic-games-star-wars/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-e6d6d66ccd40ef53",
+        "item_ids": [
+          "cand-cd40ef53-130"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-05-19T00:00:00.000Z",
+        "last_publish_time": "2026-05-19T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-cd40ef53-130",
+            "publish_time": "2026-05-19",
+            "first_seen_at": "2026-09-23T03:26:37Z",
+            "source_names": [
+              "The Walt Disney Company 官方公告页"
+            ],
+            "source_urls": [
+              "https://thewaltdisneycompany.com/news/hulu-disney-plus-profile-linking/"
+            ],
+            "owner_groups": [
+              "The Walt Disney Company"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "The Walt Disney Company 官方公告页",
+            "source_url": "https://thewaltdisneycompany.com/news/hulu-disney-plus-profile-linking/",
+            "owner_group": "The Walt Disney Company"
+          }
+        ],
+        "distinct_owner_groups": [
+          "The Walt Disney Company"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-6350f7ba6f1ed126",
+        "item_ids": [
+          "cand-6f1ed126-131"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-6f1ed126-131",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T02:47:58Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/biz/news/ari-emanuel-outrunning-entourage-stolen-commission-1236872503/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/biz/news/ari-emanuel-outrunning-entourage-stolen-commission-1236872503/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-dacf2c5f580a802d",
+        "item_ids": [
+          "cand-580a802d-132"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-580a802d-132",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T02:47:58Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/film/news/digger-first-reactions-tom-cruise-baffles-1236871935/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/film/news/digger-first-reactions-tom-cruise-baffles-1236871935/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      },
+      {
+        "event_key": "evt1-37bb1264826fc5f4",
+        "item_ids": [
+          "cand-826fc5f4-133"
+        ],
+        "report_count": 1,
+        "category": "industry",
+        "first_publish_time": "2026-09-22T00:00:00.000Z",
+        "last_publish_time": "2026-09-22T00:00:00.000Z",
+        "within_window": false,
+        "decision": "single",
+        "hold_reason": "",
+        "reports": [
+          {
+            "id": "cand-826fc5f4-133",
+            "publish_time": "2026-09-22",
+            "first_seen_at": "2026-09-23T02:47:58Z",
+            "source_names": [
+              "Variety"
+            ],
+            "source_urls": [
+              "https://variety.com/2026/shopping/news/j-crew-barn-jacket-campaign-spike-lee-bowen-yang-1236872685/"
+            ],
+            "owner_groups": [
+              "Penske Media Corporation"
+            ]
+          }
+        ],
+        "reported_by_union": [
+          {
+            "source_name": "Variety",
+            "source_url": "https://variety.com/2026/shopping/news/j-crew-barn-jacket-campaign-spike-lee-bowen-yang-1236872685/",
+            "owner_group": "Penske Media Corporation"
+          }
+        ],
+        "distinct_owner_groups": [
+          "Penske Media Corporation"
+        ],
+        "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+      }
+    ]
+  },
+  "note": "merger 联动对比：before=桩版候选，after=AI 增强候选；状态字段零生成"
+}

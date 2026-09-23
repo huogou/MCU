@@ -1,0 +1,34 @@
+============================================================
+G5.5 AI 整理层单元测试（ai-normalizer）
+============================================================
+  PASS  A1 输出恰为 35 字段
+  PASS  A2 LAYER = L1-AI
+  PASS  A3 AI_ALLOWED_FIELDS 恰为任务书七字段 + ai_model
+  PASS  B1 AI 结果含 verification_status → FORBIDDEN_FIELD
+  PASS  B2 AI 结果含 judged_by → FORBIDDEN_FIELD
+  PASS  B3 AI 结果含 supersedes_id（交付物独有）→ FORBIDDEN_FIELD
+  PASS  B4 AI 结果含白名单外字段（confidence）→ FORBIDDEN_FIELD
+  PASS  C1 title 为空 → MISSING_FIELD
+  PASS  C2 category 非法 → INVALID_CATEGORY
+  PASS  C3 title 含 HTML → MARKUP_NOT_ALLOWED
+  PASS  C4 summary 含 Markdown 粗体 → MARKUP_NOT_ALLOWED
+  PASS  D1 related_movies 丢弃未命中 id（loki 是 series/movie id，在 content 空间）
+  PASS  D2 related_series 丢弃未命中（avengers 是 movie，不在 series 传入位？——注意：content 空间共用，avengers 应命中）
+  PASS  D3 related_characters 丢弃未命中（strange 命中，ghost-x 丢弃）
+  PASS  D4 related_phases 过滤非法值（保留 4）
+  PASS  D5 event_key 已重算且形态合法
+  PASS  D6 candidate_id 已重算且与 key 派生一致
+  PASS  D7 与桩候选不同 key（分类/实体变化驱动）
+  PASS  D8 capture_refs 保留（追溯链不断）
+  PASS  D9 深扫无状态字段/occurrence
+  PASS  E1 输出候选数 = 输入数
+  PASS  E2 mapping[0].to = 重算后的 id
+  PASS  E3 mapping[0].changed_keys 含 title/category/candidate_id
+  PASS  E4 无 AI 结果的候选原样保留（mapping 记 no_ai_result）
+  PASS  E5 多余 AI 结果键如实暴露
+  PASS  E6 传入不存在候选的 AI 结果 → discarded_ai 记录
+  PASS  F1 输入候选含状态字段 → CANDIDATE_INVALID
+
+============================================================
+结果：27 PASS / 0 FAIL
+============================================================

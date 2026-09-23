@@ -1,0 +1,40 @@
+============================================================
+G5.5 AI 整理执行编排（真实 133 条）
+============================================================
+输入候选（G5.4 桩版）：133 条
+AI 整理结果：133 条（model=jarvis-g55-llm）
+覆盖完整性预检：133/133 一一对应，0 缺失，0 多余 ✅
+增强版落盘：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\output\20260923.json
+
+■ merger 联动对比（窗口 3 天）
+  before（桩版）：input=133 → events=129（mergeable=4 held=0） reports_preserved=133 records_deleted=0
+  after（增强）：input=133 → events=131（mergeable=2 held=0） reports_preserved=133 records_deleted=0
+  事件数变化：129 → 131（+2）
+
+  before 多报道事件：4 个
+    evt1-7be6e4d3b0195a6e [merge] cand-b0195a6e-033|The Walt Disney Company 官方公告页  +  cand-b0195a6e-034|The Walt Disney Company 官方公告页
+    evt1-1ac8472d1f4feb05 [merge] cand-1f4feb05-035|The Walt Disney Company 官方公告页  +  cand-1f4feb05-036|The Walt Disney Company 官方公告页
+    evt1-03d325c4c7651842 [merge] cand-c7651842-047|The Walt Disney Company 官方公告页  +  cand-c7651842-049|The Walt Disney Company 官方公告页
+    evt1-65b32656ac95c0a4 [merge] cand-ac95c0a4-121|The Walt Disney Company 官方公告页  +  cand-ac95c0a4-122|The Walt Disney Company 官方公告页
+
+  after 多报道事件：2 个（错误合并人工复核对象）
+    evt1-bee48657643fd6fc [merge] cand-643fd6fc-035|The Walt Disney Company 官方公告页  +  cand-643fd6fc-036|The Walt Disney Company 官方公告页
+    evt1-5ea016fc3e3e9922 [merge] cand-3e3e9922-047|The Walt Disney Company 官方公告页  +  cand-3e3e9922-049|The Walt Disney Company 官方公告页
+
+  对比产物落盘：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\output\20260923.merger-comparison.json
+
+■ 质量统计
+  输入=133 输出=133
+  字段完整率：title 133/133｜summary 133/133｜category 133/133
+  实体：含实体候选 7 条｜白名单丢弃 0 项｜填阶段 6 条
+  实体命中分布：{"wandavision":2,"peter":2,"endgame":2,"wanda":1,"strange":1,"vision":1}
+  category 分布 before={"industry":133}
+  category 分布 after ={"industry":123,"movie":6,"series":4}
+  摘要模板句清除率：133/133
+  未增强（无 AI 结果）候选：0
+  禁止字段深扫（verification_status/judged_by/status_history/occurrence/chain_steps_hit）：0 命中 ✅
+  AI 结果白名单外字段：0 ✅
+
+============================================================
+G5.5 编排完成。
+============================================================

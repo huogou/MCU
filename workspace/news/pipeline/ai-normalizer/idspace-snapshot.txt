@@ -1,0 +1,86 @@
+=== MCU_CONTENT (59) id | name | kind ===
+iron-man | ? | movie
+incredible-hulk | ? | movie
+iron-man-2 | ? | movie
+thor | ? | movie
+captain-america-first-avenger | ? | movie
+one-shot-the-consultant | ? | short
+one-shot-thor-hammer | ? | short
+avengers | ? | movie
+one-shot-item-47 | ? | short
+iron-man-3 | ? | movie
+one-shot-agent-carter | ? | short
+thor-dark-world | ? | movie
+one-shot-all-hail-the-king | ? | short
+winter-soldier | ? | movie
+guardians | ? | movie
+age-of-ultron | ? | movie
+ant-man | ? | movie
+civil-war | ? | movie
+doctor-strange | ? | movie
+guardians-2 | ? | movie
+spider-man-homecoming | ? | movie
+thor-ragnarok | ? | movie
+black-panther | ? | movie
+infinity-war | ? | movie
+ant-man-wasp | ? | movie
+captain-marvel | ? | movie
+endgame | ? | movie
+far-from-home | ? | movie
+wandavision | ? | series
+falcon-winter-soldier | ? | series
+loki | ? | series
+black-widow | ? | movie
+what-if | ? | series
+shang-chi | ? | movie
+eternals | ? | movie
+hawkeye | ? | series
+no-way-home | ? | movie
+moon-knight | ? | series
+multiverse-of-madness | ? | movie
+ms-marvel | ? | series
+love-and-thunder | ? | movie
+she-hulk | ? | series
+werewolf-by-night | ? | special
+wakanda-forever | ? | movie
+gotg-holiday-special | ? | special
+quantumania | ? | movie
+guardians-3 | ? | movie
+secret-invasion | ? | series
+the-marvels | ? | movie
+echo | ? | series
+deadpool-wolverine | ? | movie
+agatha-all-along | ? | series
+brave-new-world | ? | movie
+daredevil-born-again | ? | series
+thunderbolts | ? | movie
+ironheart | ? | series
+fantastic-four | ? | movie
+wonder-man | ? | series
+brand-new-day | ? | movie
+
+=== MCU_CHARACTERS (24) id | name ===
+tony | ?
+steve | ?
+thor | ?
+natasha | ?
+banner | ?
+clint | ?
+loki | ?
+fury | ?
+bucky | ?
+sam | ?
+peter | ?
+strange | ?
+tchalla | ?
+wanda | ?
+vision | ?
+scott | ?
+carol | ?
+starlord | ?
+gamora | ?
+thanos | ?
+shangchi | ?
+yelena | ?
+wade | ?
+logan | ?
