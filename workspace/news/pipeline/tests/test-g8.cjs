@@ -99,7 +99,8 @@ ok('T3.8 现网 supersedes 互链保护（010/014 不在本批）',
 console.log('\n■ G8-5 上线前检查');
 const backupPath = path.join(ROOT, 'workspace', 'news', 'pipeline', 'review', 'backup', 'news.js.20260923');
 ok('T4.1 news.js 备份存在', fs.existsSync(backupPath));
-eq('T4.2 备份 SHA256 == 现网（备份完整）', sha256(backupPath), SHA_BEFORE);
+/* G9 写入后现网 SHA 已演进（EBF67DE0…），备份即 G8 时刻快照 → 对常量比对 */
+eq('T4.2 备份 SHA256 == G8 基线（G8 时刻完整快照）', sha256(backupPath), '589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2');
 ok('T4.3 备份未落在 C 盘（用户环境约定）', backupPath.indexOf('C:') !== 0);
 
 /* ---------------- T5 · 基线不破坏 ---------------- */

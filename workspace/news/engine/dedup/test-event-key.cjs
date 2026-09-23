@@ -34,7 +34,7 @@ const EK = require('./event-key.cjs');
 const EM = require('./event-merger.cjs');
 const F = require('./fixtures/event-cases.cjs');
 
-const NEWS_JS_SHA256_EXPECTED = '589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2';
+const NEWS_JS_SHA256_EXPECTED = 'EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF';   /* G9 写入后基线（原 589A3934…，见 news-write-report.json） */
 
 let pass = 0, fail = 0;
 const fails = [];
@@ -278,12 +278,12 @@ vm.createContext(ctx);
 const NEWS = ctx.window.MCU_NEWS || [];
 
 const real = EM.mergeCandidates(NEWS);
-eq('输入条数 = 15', real.stats.input_items, 15);
-eq('报道记录零丢失', real.stats.reports_preserved, 15);
+eq('输入条数 = 35（G9 写入后基线）', real.stats.input_items, 35);
+eq('报道记录零丢失', real.stats.reports_preserved, 35);
 eq('records_deleted = 0', real.stats.records_deleted, 0);
 eq('输出中不含状态字段', EM.findForbiddenKeys(real).join(','), '');
-ok('归并后事件数 ≤ 15（去重生效但不激进）',
-  real.stats.output_events > 0 && real.stats.output_events <= 15, String(real.stats.output_events));
+ok('归并后事件数 ≤ 35（去重生效但不激进）',
+  real.stats.output_events > 0 && real.stats.output_events <= 35, String(real.stats.output_events));
 ok('每条真实数据都能生成合法 key',
   NEWS.every(function (n) { return KEY_RE.test(K(n)); }));
 
@@ -313,7 +313,7 @@ try {
   const lines = st.split('\n').filter(function (l) { return l.trim(); });
   const bad = lines.filter(function (l) { return /h5[\\/]|wechat[\\/]|douyin[\\/]/.test(l); });
   console.log('  条目数：' + lines.length + '　其中 h5 / wechat / douyin 相关：' + bad.length);
-  ok('git status 中无 h5 / wechat / douyin 路径', bad.length === 0, bad.join(' | '));
+  ok('git status 中仅允许 h5/data/news.js（G9 白名单），wechat/douyin 零改动', bad.filter(function (l) { return l.indexOf('h5/data/news.js') < 0; }).length === 0, bad.join(' | '));
 } catch (e) {
   console.log('  （本环境无法执行 git，跳过 —— 由外部 wrapper 另行留档）：' + e.message);
 }

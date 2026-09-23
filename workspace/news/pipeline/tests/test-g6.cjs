@@ -222,7 +222,7 @@ ok('S8 签名映射留档（from/to/signature）',
  * T6 · news.js 写入前模拟测试（反向端到端）
  * ============================================================ */
 section('G6-T6 news.js 写入前模拟测试（news.js 15 条反向端到端）');
-eq('T6.0a 现网 15 条', NEWS.length, 15);
+eq('T6.0a 现网 35 条（G9 写入后基线 = 15 + 20）', NEWS.length, 35);
 eq('T6.0b 现网条目 33 字段', Object.keys(NEWS[0]).length, 33);
 
 /* a. 反向构造候选（数组顺序 = 入库顺序）
@@ -279,15 +279,15 @@ const reverseCands = NEWS.map(function (n, i) {
 const illegal = reverseCands.map(function (c, i) {
   return { i: i, v: CI.validate(c), id: NEWS[i].id };
 }).filter(function (x) { return !x.v.pass; });
-eq('T6.1a 反向候选合法数 = 14（现网 007 的 reported_by=[] 与 L1-10 契约差异）',
-  reverseCands.length - illegal.length, 14);
+eq('T6.1a 反向候选合法数 = 34（现网 007 的 reported_by=[] 与 L1-10 契约差异；G9 写入 20 条全部合法）',
+  reverseCands.length - illegal.length, 34);
 eq('T6.1b 唯一非法条 = news-2026-09-21-007 且原因唯一指向 L1-10',
   illegal.length === 1 && illegal[0].id === 'news-2026-09-21-007' &&
   illegal[0].v.issues.length === 1 && illegal[0].v.issues[0].rule === 'L1-10', true);
 
 /* b. Gate */
 const revGate = GATE.review(reverseCands, {});
-eq('T6.1c 通过闸门 14 条（007 被 L1 契约拦截，属预期差异）', revGate.approved.length, 14);
+eq('T6.1c 通过闸门 34 条（007 被 L1 契约拦截，属预期差异）', revGate.approved.length, 34);
 
 /* c. I9 / judgedBy 映射（来自 G1 黄金用例 + 现网记录） */
 const i9ById = {}, judgedByById = {};
@@ -341,8 +341,8 @@ revConv.items.forEach(function (it) {
   if (bad.length === 0) fieldMatch++;
   else diffs.push(real.id + ': ' + bad.join(','));
 });
-eq('T6.2a 生成的 14 个 id 与现网全等（id 复现）', idMatch, 14);
-eq('T6.2b 稳定字段集 14 条逐条全等（29 项 × 14 条）', fieldMatch, 14);
+eq('T6.2a 生成的 34 个 id 与现网全等（id 复现）', idMatch, 34);
+eq('T6.2b 稳定字段集 34 条逐条全等（29 项 × 34 条）', fieldMatch, 34);
 if (diffs.length) { console.log('  INFO  差异明细：'); diffs.forEach(function (d) { console.log('    ' + d); }); }
 eq('T6.2c supersedes 互链复现（010←014）',
   (function () {
@@ -382,7 +382,7 @@ function simulateWrite(newItems, existing) {
 }
 const revSim = simulateWrite(revConv.items, NEWS);
 eq('T6.3a 反向场景 = 复现现网获批条目（更新 14 / 新增 0；007 因 L1 契约差异不在写入集）',
-  revSim.to_update.length + '/' + revSim.to_add.length, '14/0');
+  revSim.to_update.length + '/' + revSim.to_add.length, '34/0');
 /* 警告语义 = 提示（不阻断）：owner_group 待核/unknown（G8 清单 4 条 + 006
  * 的 unknown 口径）+ 015 的 related 指向未上映作品（前端安全丢弃） */
 const knownWarnIds = ['news-2026-09-22-005', 'news-2026-09-21-006', 'news-2026-09-21-008',

@@ -61,7 +61,28 @@ const GOLDEN_EXPECT = {
   'news-2026-09-18-012': { status: 'single_source',         groups: 1, step: 'Step 6' },
   'news-2026-09-19-013': { status: 'official_confirmed',    groups: 1, step: 'Step 1' },
   'news-2026-09-19-014': { status: 'corrected',             groups: 0, step: 'Step 3' },
-  'news-2026-09-17-015': { status: 'single_source',         groups: 1, step: 'Step 6' }
+  'news-2026-09-17-015': { status: 'single_source',         groups: 1, step: 'Step 6' },
+/* ---------------- G9 写入基线（news-2026-09-23-001…020，判定器本体零改动）---------------- */
+  'news-2026-09-23-001': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-002': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-003': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-004': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-005': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-006': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-007': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-008': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-009': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-010': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-011': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-012': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-013': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-014': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-015': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-016': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-017': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-018': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-019': { status: 'single_source', groups: 1, step: 'Step 6' },
+  'news-2026-09-23-020': { status: 'single_source', groups: 1, step: 'Step 6' },
 };
 
 /* ---------------- 合成边界用例 B1–B10 ---------------- */

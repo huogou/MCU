@@ -1,0 +1,47 @@
+{
+  "report": "news-write-report",
+  "version": "1.0",
+  "generated_at": "2026-09-23T00:00:00Z",
+  "confirmation_chain": "G8 review-result（20 approve 建议草案）→ 负责人《G9 首次生产写入任务书》= 执行确认",
+  "operator": "dev-side (Jarvis) · 负责人授权：G9 任务书",
+  "old_hash": "589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2",
+  "new_hash": "EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF",
+  "added_count": 20,
+  "updated_count": 0,
+  "deleted_count": 0,
+  "total_after": 35,
+  "write_mode": "append-only（文本级插入，旧 15 条字节级不变）",
+  "added_ids": [
+    "news-2026-09-23-001",
+    "news-2026-09-23-002",
+    "news-2026-09-23-003",
+    "news-2026-09-23-004",
+    "news-2026-09-23-005",
+    "news-2026-09-23-006",
+    "news-2026-09-23-007",
+    "news-2026-09-23-008",
+    "news-2026-09-23-009",
+    "news-2026-09-23-010",
+    "news-2026-09-23-011",
+    "news-2026-09-23-012",
+    "news-2026-09-23-013",
+    "news-2026-09-23-014",
+    "news-2026-09-23-015",
+    "news-2026-09-23-016",
+    "news-2026-09-23-017",
+    "news-2026-09-23-018",
+    "news-2026-09-23-019",
+    "news-2026-09-23-020"
+  ],
+  "backups": [
+    "D:\\SEO\\发挥余热\\漫威电影宇宙导航\\workspace\\news\\pipeline\\review\\backup\\news.js.20260923",
+    "D:\\SEO\\发挥余热\\漫威电影宇宙导航\\workspace\\news\\pipeline\\review\\backup\\news.js.20260923-g9"
+  ],
+  "verify": {
+    "old15_unchanged": true,
+    "new20_present": true,
+    "total_after": 35,
+    "vm_reload": true
+  },
+  "note": "写入后 test-g6/test-g8 基线随总库演进更新（35 条），见 G9 报告 §基线演进"
+}

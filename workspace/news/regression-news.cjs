@@ -175,7 +175,7 @@ class CDP {
   ok('MCU_RELATIONS 未被破坏（92）', counts.relations === 92, 'actual ' + counts.relations);
   ok('MCU_ROUTES 未被破坏（11）', counts.routes === 11, 'actual ' + counts.routes);
   ok('MCU_CHARACTERS 未被破坏（24）', counts.chars === 24, 'actual ' + counts.chars);
-  ok('MCU_NEWS 已加载（15）', counts.news === 15, 'actual ' + counts.news);
+  ok('MCU_NEWS 已加载（35，G9 写入后基线）', counts.news === 35, 'actual ' + counts.news);
 
   /* ============================================================
    * 2. 首页资讯 Section
@@ -211,17 +211,24 @@ class CDP {
   ok('存在「加载更多」按钮', hasMore === true);
 
   if (hasMore) {
-    await page.evalExpr('document.getElementById("news-more").click(); true');
-    await sleep(600);
+    /* G9 基线 35 条：每批 +10，循环点击「加载更多」直至全部展示（按钮消失） */
+    let clicks = 0;
+    let stillMore = true;
+    while (stillMore && clicks < 10) {
+      await page.evalExpr('document.getElementById("news-more").click(); true');
+      await sleep(500);
+      clicks++;
+      stillMore = await page.evalExpr('!!document.getElementById("news-more")');
+    }
     const batch2 = await page.evalExpr('document.querySelectorAll("#news-list .v2n-news-card").length');
-    /* 15 条数据中：officially_denied 那条 pinned=true 故保留，publish_time 缺失那条
-       first_seen_at 存在故保留 → Step 0 不剔除任何条目，可展示总数为 15 */
-    ok('点击后追加下一批（10 + 5 = 15 条全部可展示）', batch2 === 15, 'actual ' + batch2);
+    /* 35 条中：officially_denied 那条 pinned=true 故保留，publish_time 缺失那条
+       first_seen_at 存在故保留 → Step 0 不剔除任何条目，可展示总数为 35 */
+    ok('循环加载后全部展示（G9 基线 35 条，点击 ' + clicks + ' 次）', batch2 === 35, 'actual ' + batch2);
     const endText = await page.evalExpr('(document.querySelector(".v2n-list-end")||{}).textContent||""');
     ok('到底显示「— 已展示全部 —」', endText.indexOf('已展示全部') >= 0, endText);
   }
   const stdSummary = await page.evalExpr('document.querySelectorAll("#news-list .v2n-news-card__summary").length');
-  ok('列表卡片为标准变体（含摘要行）', stdSummary === 15, 'actual ' + stdSummary);
+  ok('列表卡片为标准变体（含摘要行）', stdSummary === 35, 'actual ' + stdSummary);
 
   /* ============================================================
    * 4. 详情页
