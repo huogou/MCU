@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Variety</title>
+    <link>https://variety.com/</link>
+    <description>权威行业媒体（夹具）</description>
+    <item>
+      <title>&#8216;Daredevil: Born Again&#8217; To End With Season 3 At Disney+</title>
+      <link>https://variety.com/2026/tv/news/daredevil-born-again-season-3-1234567890/</link>
+      <description>Variety 报道该剧将在第三季完结，援引知情人士说法。</description>
+      <pubDate>Mon, 22 Sep 2026 23:40:00 +0000</pubDate>
+      <guid>https://variety.com/?p=1234567890</guid>
+    </item>
+    <item>
+      <title>Marvel Studios Sets First Teaser for Avengers: Doomsday</title>
+      <link>https://variety.com/2026/film/news/avengers-doomsday-teaser-1234567891/</link>
+      <description>The studio released a first look at the sixth-phase tentpole.</description>
+      <pubDate>Sun, 21 Sep 2026 16:05:00 +0000</pubDate>
+      <guid>https://variety.com/?p=1234567891</guid>
+    </item>
+  </channel>
+</rss>

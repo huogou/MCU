@@ -1,0 +1,5 @@
+﻿--- G5 (rev) baseline ---
+news.js SHA256 = 589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+hash match     = True
+git entries    = 65
+h5/wechat/douyin entries = 0

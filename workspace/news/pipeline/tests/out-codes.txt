@@ -1,0 +1,2 @@
+﻿test-pipeline   exit=0
+test-g5-baseline exit=0

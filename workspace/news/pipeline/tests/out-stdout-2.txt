@@ -1,0 +1,83 @@
+﻿============================================================
+G5 基础测试 G5-T1 – G5-T6
+============================================================
+L0 14 字段｜L1 35 字段
+  PASS  已载入交付物字段集（33 字段）与 idSpace（只读）
+
+■ G5-T1  L0 → L1 字段完整性
+  PASS  L0 恰为 14 字段
+  PASS  L1 恰为 35 字段
+  PASS  L1 = L0(14) + 新增(21)
+  PASS  L0 的 14 字段在 L1 中全部继承（无丢失）
+  PASS  L1 输出无 L0 之外的多余字段（严格等于规范字段集）
+  PASS  L1 validate 通过
+  PASS  candidate_id 已生成
+  PASS  title 取自 AI 整理（纯文本）
+  PASS  summary 取自 AI 整理
+  PASS  category 为 6 值之一
+  PASS  reported_by 为数组且首项含 source_name/source_url/owner_group
+  PASS  capture_refs = [L0.capture_id]
+  PASS  gate_status 默认 pending
+  PASS  ai_suggested_status 保留为建议值
+
+■ G5-T2  禁止字段进入 DeliveryItem
+  PASS  L0 不含 9 项状态字段
+  PASS  L1 不含 9 项状态字段
+  PASS  L1 不含交付物独有字段
+  PASS  L1 未生成 verification_status（含深扫）
+  PASS  L1 未生成 judged_by
+  PASS  L1 未生成 status_history
+  PASS  交付物确有 L1 不含的独有字段（差集 19 个，证明两层可区分）
+  PASS  L1 字段集与交付物字段集**不相等**（L1 35 / 交付物 33）
+  PASS  L1 不含任何「交付物独有字段」（按交付物 33 字段反算）
+
+■ G5-T3  merger 输入字段白名单
+  PASS  白名单字段数 = 9
+  PASS  toMergerInput 输出键集合 = 白名单 + id
+  PASS  输出恰为 10 个键
+  PASS  无越出白名单的字段
+  PASS  不含 6 项禁止字段（verification_status/judged_by/chain_steps_hit/status_history/ai_suggested_status/gate_status）
+  PASS  白名单精确内容与任务书一致
+  PASS  适配后 merger 可正常产出事件
+  PASS  适配后报道记录数 = 2
+
+■ G5-T4  event_key 不污染交付层
+  PASS  L0 不产出 event_key（字段集与输出双向确认）
+  PASS  event_key 在 L1 产出且形态合法
+  PASS  交付物 33 字段中**不含** event_key
+  PASS  交付数据实际条目中不含 event_key（全量扫描 15 条）
+  PASS  交付物不含 occurrence
+  PASS  L0 / L1 输出均不含 occurrence
+  PASS  merger 输出不含 occurrence（B-ii 暂不落码）
+  PASS  merger 输出不含状态字段
+
+■ G5-T5  capture 证据可追溯
+  PASS  capture 已落盘
+  PASS  按 capture_refs 可取回原始 capture
+  PASS  取回的 capture 与原始一致（逐字段）
+  PASS  原始证据齐备：title_raw / source_url / published_at_raw / fetched_at / http_status / content_hash / raw_excerpt
+  PASS  title_raw 未被改写（不做 AI 判断、不改标题）
+  PASS  L1 的 capture_refs 指向的正是该 capture
+  PASS  写入位置守卫：pipeline 之外的路径被拒绝
+  PASS  拒绝写入 h5 的 code
+
+■ G5-T6  重复采集不会覆盖历史 capture
+  PASS  第 1 次采集：新增 2 条
+  PASS  归档总数 = 3（含 T5 的 1 条）
+  PASS  第 2 次采集：新增 1 条
+  PASS  第 2 次采集：冲突 1 条（同 id 不同内容）
+  PASS  冲突对象为 cap-T6-1
+  PASS  冲突未被覆盖（原记录仍为 run-A）
+  PASS  原记录 title_raw 未被改动
+  PASS  归档总数 = 4（3 + 1 新增，冲突不新增）
+  PASS  第 3 次采集：新增 0
+  PASS  第 3 次采集：跳过 2（幂等）
+  PASS  归档总数仍为 4（无增长）
+  PASS  历史 capture 累计可查（4 条）
+  PASS  可按 pipeline_run_id 过滤（run-A 2 条）
+
+■ 已清理临时目录 tests\tmp\
+
+============================================================
+结果：61 PASS / 0 FAIL
+============================================================

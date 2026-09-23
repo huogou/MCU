@@ -1,0 +1,39 @@
+============================================================
+G5.4 生产采集稳定性验证（T9 + T10）
+============================================================
+模式：OFFLINE（仅离线段）
+批次 run_id：run20260923G54B1 / run20260923G54B2 / run20260923G54B3
+
+■ A. candidate-store 契约
+  PASS  去重键字段 = registry_id + content_hash
+  PASS  SEMANTIC_FIELDS 含 title/summary/category/related_*/publish_time
+  PASS  FORBIDDEN_KEYS 含 9 项状态字段 + supersedes_id/superseded_by_id
+  PASS  A1 首次落盘：added=1
+  PASS  A2 同内容跨批（fetched_at/seq 变化）：skipped=1（幂等）
+  PASS  A2b added=0
+  PASS  A2c 归档总数仍为 1
+  PASS  A2d 保留首条 candidate_id
+  PASS  A3 同键不同语义：conflict=1
+  PASS  A3b 保留原始候选（总数不变）
+  PASS  A3c 保留的是首条 candidate_id
+  PASS  A4 候选含 verification_status → FORBIDDEN_FIELD
+  PASS  A5 拒绝写入 pipeline 之外
+
+■ B. T10 机制预演（合成夹具，不改引擎）
+  PASS  B1 C6 supersedes 场景：同 key 归并为 1 事件
+  PASS  B2 双条 report 保留（supersedes 双条保留机制）
+  PASS  B3 同 event_key 对应 2 个 hold 事件（指纹非主键的结构证明）
+  PASS  B4 分裂事件间 item_ids 不重叠（每条报道只属一个事件）
+
+■ C. T10.3 supersedes 双条保留（news.js 真实对）
+  PASS  C1 news.js 存在 supersedes 互链的真实对（动态发现，未硬编码）
+  PASS  C2 supersedes_pair_preserved：两条真实报道 id 均保留在输出中
+  PASS  C3 records_deleted == 0
+  PASS  C4 互链对字段齐全（id/publish_time/reported_by 非空）
+  INFO  真实对：news-2026-09-19-014（旧）← news-2026-09-20-010（新）
+  INFO  归并形态：1 个事件 / report_count=2
+（未加 --live / MCU_LIVE：跳过 T9 真实联网三批与 T10 真实候选段）
+
+============================================================
+[OFFLINE] 结果：21 PASS / 0 FAIL
+============================================================

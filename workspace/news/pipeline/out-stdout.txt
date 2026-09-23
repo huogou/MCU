@@ -1,0 +1,148 @@
+﻿============================================================
+G5 · 资讯管道三层接口测试
+============================================================
+L0 字段数：16｜L1 字段数：35
+登记表版本：V1.0｜登记条目：12
+
+■ 1. pipeline 目录与冻结约束
+  PASS  目录存在：pipeline\captures\
+  PASS  目录存在：pipeline\candidates\
+  PASS  目录存在：pipeline\events\
+  PASS  pipeline 位于 workspace 下（不进 h5/wechat/douyin）
+  PASS  L0 模块零网络能力（无 http/https/net/dns/fetch/axios）
+  PASS  L1 模块零网络能力
+  PASS  L0 模块不写文件（无 writeFile / fs 写操作）
+  PASS  L1 模块不写文件
+  PASS  L0 / L1 均不引用 h5 路径
+
+■ 2. L0 RawCapture 接口
+  PASS  L0 字段数 = 16（规范 P-01 – P-16）
+  PASS  L0 字段顺序与规范一致
+  PASS  C1 官方来源：输出字段集合恰为 16
+  PASS  C1 url_level = article（文章级 URL）
+  PASS  C1 published_at 已规范化为 ISO8601
+  PASS  C1 first_publish_time = published_at
+  PASS  C1 event_key 形态合法
+  PASS  C1 content_hash 已生成（40 位十六进制）
+  PASS  L0 validate 通过
+  PASS  L0 的 event_key 标记为临时值
+  PASS  url_level：/news → section
+  PASS  url_level：/news/some-slug → article
+  PASS  url_level：/feed/ → feed
+  PASS  url_level：/rss → feed
+  PASS  url_level：/category/marvel/feed/ → feed
+  PASS  RFC822 时间可解析（C2 媒体来源）
+  PASS  无法解析的时间 → null
+
+■ 2b. C4 非法 URL（4 变体）
+  PASS  【C4a】空 URL → 抛 INVALID_URL
+  PASS  【C4b】非 http(s) 协议（javascript:） → 抛 INVALID_URL
+  PASS  【C4c】非 http(s) 协议（ftp:） → 抛 INVALID_URL
+  PASS  【C4d】相对路径（无协议） → 抛 INVALID_URL
+
+■ 2c. registry_id / source_name 一致性
+  PASS  registry_id 未登记 → UNKNOWN_REGISTRY_ID
+  PASS  source_name 与登记表不符 → SOURCE_NAME_MISMATCH
+  PASS  C3 未登记来源：registry_id 保留值 unregistered 可用
+
+■ 3. L1 CandidateItem 接口
+  PASS  L1 字段数 = 35（L0 16 + L1 新增 19）
+  PASS  L1 包含本次补充登记的 P-补1 / P-补2
+  PASS  C1 L0→L1：输出字段集合恰为 35
+  PASS  C1 candidate_id 形态合法
+  PASS  C1 candidate_id 不使用交付物 id 格式
+  PASS  ★ event_key 在 L1 被重算（与 L0 的临时值不同）
+  PASS  C1 publish_time 取日期部分
+  PASS  C1 first_seen_at = fetched_at
+  PASS  C1 gate_status 默认 pending
+  PASS  C1 capture_refs 指向 L0
+  PASS  C1 L1 validate 通过
+  PASS  ★ C1 reported_by[0].owner_group 取自登记表（Disney / Marvel）
+  PASS  C2 媒体来源：owner_group = Penske Media Corporation
+  PASS  C3 未登记来源：owner_group 回落 unknown
+  PASS  登记表 S002 owner_group = 独立
+  PASS  登记表 S003 owner_group = Savage
+
+■ 3b. C7 缺失发布时间
+  PASS  C7 published_at = null（无法解析）
+  PASS  C7 publish_time = 空串
+  PASS  C7 first_seen_at 仍有值（排序可回落）
+  PASS  C7 L1 validate 通过（不因缺 publish_time 而拒绝）
+
+■ 3c. C5 重复事件（同事件、不同来源）
+  PASS  C5 两条候选得到**同一个** event_key
+  PASS  C5 两条来源不同（owner_group 分别为 独立 / Savage）
+
+■ 3d. C6 supersedes 场景
+  PASS  C6 两条候选同 event_key（同标题同作品同动作）
+  PASS  C6 更正记录已承载（P-补1）
+  PASS  C6 未更正的一条为空数组
+
+■ 4. C8 异常字段（15 变体）
+  PASS  【C8a】raw 含 verification_status（L0）→ 抛 FORBIDDEN_FIELD
+  PASS  【C8b】L0 缺必填（title_raw）（L0）→ 抛 MISSING_FIELD
+  PASS  【C8c】raw_excerpt 超长（>200 字）（L0）→ 抛 EXCERPT_TOO_LONG
+  PASS  【C8d】registry_id 未登记（L0）→ 抛 UNKNOWN_REGISTRY_ID
+  PASS  【C8e】source_name 与登记表不符（L0）→ 抛 SOURCE_NAME_MISMATCH
+  PASS  【C8f】feed_type 非枚举（L0）→ 抛 INVALID_FEED_TYPE
+  PASS  【C8g】http_status 非整数（L0）→ 抛 INVALID_HTTP_STATUS
+  PASS  【C8h】AI 结果含 verification_status（L1）→ 抛 FORBIDDEN_FIELD
+  PASS  【C8i】AI 结果含 judged_by（L1）→ 抛 FORBIDDEN_FIELD
+  PASS  【C8j】AI 结果含交付物 id（L1）→ 抛 FORBIDDEN_FIELD
+  PASS  【C8k】title 含 HTML 标签（L1）→ 抛 MARKUP_NOT_ALLOWED
+  PASS  【C8l】summary 含 Markdown 粗体（L1）→ 抛 MARKUP_NOT_ALLOWED
+  PASS  【C8m】category 非 6 值枚举（L1）→ 抛 INVALID_CATEGORY
+  PASS  【C8n】ai_suggested_status 非 8 态（L1）→ 抛 INVALID_SUGGESTED_STATUS
+  PASS  【C8o】gate_status 非枚举（L1）→ 抛 INVALID_GATE_STATUS
+
+■ 4b. 关联 id 交集校验（未命中一律丢弃）
+  PASS  已载入 MCU_CONTENT / MCU_CHARACTERS 作为 idSpace（只读）
+  PASS  未命中的 related_movies 被丢弃（含 avengers-5，属 MCU_UPCOMING）
+  PASS  related_series 保留命中项
+  PASS  related_characters 保留命中项
+  PASS  related_phases 只保留 1–6 整数
+  PASS  C8i L1 validate 通过（丢弃不报错）
+
+■ 5. 交付物隔离（L0 / L1 ≠ DeliveryItem）
+  PASS  L0 无任何状态字段（深扫 9 项）
+  PASS  L1 无任何状态字段（深扫 9 项）
+  PASS  L1 无交付物独有字段（深扫 10 项）
+  PASS  L1 不含交付物独有字段（12 项点名）
+  PASS  L1 不含交付物 id
+  PASS  L1 的 ai_suggested_status 只是建议值、不是最终状态
+  PASS  L1 未产出任何 verification_status（含嵌套深扫）
+
+■ 6. 三层串联（L0 → L1 → L2 EventCandidate）
+  PASS  所有 L1 条目均满足 merger 的 10 字段输入契约
+  PASS  适配器把 candidate_id 桥接为 merger 需要的 id
+  PASS  适配器不引入交付物 id 格式
+  PASS  【反证】未适配时 merger 的报道记录数为 0（证明适配器必要）
+  PASS  串联：输入 5 条 → 报道记录零丢失
+  PASS  串联：records_deleted = 0
+  PASS  串联：输出不含任何状态字段（深扫 6 项）
+  PASS  C5 两条不同来源被归并为同一事件
+  PASS  ★ C6 supersedes 两条被归并为 1 个事件，且**两条报道记录都保留**（A3/A4）
+  PASS  ★ C6 归并未压缩为一条数据（item_ids 仍为 2）
+  PASS  C5 / C6 分别独立成事件（不同 event_key 不合并）
+
+■ 7. 确定性与幂等
+  PASS  L0 create 幂等
+  PASS  L1 fromRawCapture 幂等
+  PASS  event_key 重算稳定（两次一致）
+
+■ 8. 明细
+  layer id                            url_level  event_key
+  L0    cap-S001-run20260923-001      article    evt1-061cd904677047fd
+  L0    cap-S004-run20260923-001      article    evt1-f2ab5b3e951f3dad
+  L0    cap-unregistered-run20260923-001article    evt1-b4781766ae54ce9e
+  L0    cap-S006-run20260923-001      article    evt1-bdc2a705b49bf751
+  L1    cand-612bb6b7-001             article    evt1-dda4e6a9612bb6b7
+  L1    cand-7d6e4106-001             article    evt1-dd167e737d6e4106
+  L1    cand-84a31b10-001             article    evt1-a581dfd984a31b10
+  L1    cand-fa0f7ec1-001             article    evt1-04824f8dfa0f7ec1
+
+  INFO  串联：L1 5 条 → 事件 3 个（可合并 2 / hold 0）
+
+============================================================
+结果：100 PASS / 0 FAIL
+============================================================

@@ -1,0 +1,143 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《事件去重与合并引擎 V1.0 交付报告 · 精简版》（G4）
+执行：开发侧（Jarvis）｜2026-09-22 16:5x
+**未接采集、未联网、未改 H5/news.js、未改 33 字段结构与 8 态体系、未改 G1/G2/G3 冻结代码、未进 G5**
+全量版（归档）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\事件去重与合并引擎V1.0交付报告.txt
+新增（4 个文件，均在 workspace 下，不进 h5）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-key.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-merger.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\test-event-key.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\fixtures\event-cases.cjs
+测试留档：同目录 out-event-key.txt / out-codes.txt / out-regression-codes.txt / out-gitstatus-g4.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】event_key 设计
+
+  形态：`evt1-` + 16 位十六进制（sha1 前 16 位），如 `evt1-ef028cf29e74d90e`。
+  性质：纯函数、零网络、零 AI、**无时间依赖**、同输入必同输出。
+
+  ★ **禁止直接 title hash** —— 本实现由三个可审计成分合成后取哈希：
+    ① entitySig  关联实体集合（movie/series/character → kind:id，去重排序）**主信号**
+    ② actionSig  标准化标题命中的「事件动作词」集合（封闭词表，不含状态词）
+    ③ textSig    标题文本指纹（中文 2-gram + 拉丁词 + 数字）**仅作兜底**
+    payload 明文可审计：`v=1;cat=…;ent=…;act=…;mode=…;txt=…`
+    **模式选择**：有实体 → mode=entity（**不含标题文本**）；无实体 → mode=text（退化文本指纹）
+
+  ★ 反证（已写成断言）：两个**标题不同**但实体与动作相同的条目 → **同 key**，
+    而两标题的 sha1 **不同**。若实现是 title hash，必得不同 key。
+    另断言 key ≠ sha1(title)、key ≠ 'evt1-'+sha1(title).slice(0,16)。
+    并提供 explain() 审计接口（返回三成分 + 标准化标题 + 被移除项 + time_participates=false）。
+
+  四条词表（共 168 条，全部封闭可回归）：
+    TEMPLATE_WORDS 35（独家/快讯/首发/重磅/据悉/首支…→ 删除）
+    STATUS_WORDS   28（官方/正式/官宣/确认/否认/辟谣/传闻/网传/爆料/将/已/可能…→ 删除）
+    FUNCTION_WORDS 47（的/了/在/与/和/是/为/被/把…→ 删除）
+    ACTION_WORDS   58（预告/上映/定档/改档/杀青/选角/续集/完结/首映/票房/开发/更名…→ 参与 actionSig）
+
+  ★ 两条关键取舍：
+    ① **publish_time 不参与 key** —— 依据 E4「日期不同 → 可识别同事件」；
+       时间只交 merger 做窗口候选判断。断言：仅改 publish_time（差 300 天）→ key 完全不变。
+    ② **状态词不参与 key** —— 依据 R8.8「状态不是永久事实标签」，
+       事件身份必须**跨状态稳定**，否则每次改状态都会生成新 key。
+       断言：「Marvel 官方确认…续集进入开发」与「网传…续集可能将进入开发」→ **同 key**。
+       ※ 副作用：**不能**用 event_key 区分「已确认」与「传闻」两条报道（刻意，见待确认 B）。
+
+【二】合并规则（第一阶段仅规则层，无 AI）
+
+  标题标准化三步：**去日期**（7 类模式 + 独立 19xx/20xx 年份）→ **去符号**
+  （全角转半角、噪声括号【】〖〗［］整块删、其余括号去符号留内容、去所有标点）→
+  **去模板词**（模板→状态→功能，长词优先替换）。
+  关联对象参与：`related_movies/series/characters` → `movie:…` / `series:…` / `character:…`，
+  去重排序后作 entitySig。容错：缺失/null/非数组/含脏元素全部跳过（E5 共 7 变体不抛错）。
+
+  **时间窗口（仅候选判断）**：默认 3 天，可经 opts.windowDays 传入。
+    窗口内同 key → 链式聚簇 → decision='merge'
+    同 key 越窗分裂 → 每簇各输出，decision='hold'，reason='out_of_window'
+    缺时间 → decision='hold'，reason='missing_time'（保守：缺数据不合并）
+    ★ 窗口只决定「能否自动合并」，**不改内容、不改状态**。
+
+  输出：`{ merger_version, window_days, events:[{ event_key, item_ids, report_count,
+  first/last_publish_time, within_window, decision, hold_reason, reports（不裁剪）,
+  reported_by_union, distinct_owner_groups }], stats:{ input_items, output_events,
+  reports_preserved, mergeable_events, held_events, records_deleted } }`
+  ※ `reported_by_union` 只是**已有来源证据的并集**，作为**输入材料**交 G1 重算；
+    本层不产出/不推导/不缓存任何状态。
+
+【三】三条禁令的机器校验（全部通过）
+
+  不落状态：模块显式声明 FORBIDDEN_OUTPUT_KEYS（6 项）→ 输出**递归深扫 0 命中**
+           → 输出全文检索 `verification_status` 未出现 → 模块内不读取输入的该字段
+  不删记录：`reports_preserved` = 输入条数；`records_deleted` 恒 0（显式暴露该计数）；
+           每条输入 id 都出现在输出中；输出 id 无重复
+  不跨事件合并：成员须同 event_key；某 event_key 下至多一个 merge/single 事件；
+           同 key 超窗口 → 断言输出 **2 个 hold 事件**（不合并）
+
+【四】测试结果：**95 PASS / 0 FAIL，退出码 0**
+
+  E1–E6（任务要求）全 PASS：E1a/E1b/E1c 同事件不同标题 → 同 key；
+    E2a 同标题不同作品 → 不同 key；E2b 同标题同实体但相距 79 天 → 同 key 但 **hold**；
+    E3a 不同作品 → 不同 key；E3b category 不同 → 不同 key；
+    E4a 差 1 天 → 同 key 且 **merge**；E4b 仅改时间（差 300 天）→ key 完全不变；
+    E5 空关联 7 变体不抛错；E6 边界标题 12 例不抛错。
+  E7–E14 补充全 PASS：确定性 / 非 title hash 反证 / 缺时间 hold /
+    动作词参与 / 状态词不参与 / explain() 可审计。
+
+  ★★ **真实 15 条 news.js 集成跑（只读）**：输入 15 条 → **14 个事件**
+     （可合并 1 / hold 0），零记录丢失、零误合。
+     唯一被归并的一对：
+       `evt1-ef028cf29e74d90e ×2 merge  ← news-2026-09-19-014 + news-2026-09-20-010`
+     这两条正是 `supersedes_id`/`superseded_by_id` 互链的一对（同标题、同作品 ironheart、
+     同动作「改档」）→ **引擎在真实数据上正确识别为同一事件**。其余 13 条各自独立。
+     ※ 由此引出必须澄清的边界，见待裁定 A。
+
+  ★ 首轮曾 2 FAIL，**两处都是我的断言写错**（batch 实为 8 条我写成 9；
+    把「同 key 因窗口分裂产出多个 hold 事件」误判为违规）→ 修正后 95/0。如实记录。
+
+  验收四项：PASS **95**｜FAIL **0**｜退出码 **0**｜
+    git status 46 条变更中 **h5/wechat/douyin 相关 = 0 条**
+  h5/data/news.js SHA256 `589A3934…0242F2` = 基线（未改动）
+
+  全量回归 8 项全部退出码 0：
+    dedup 95｜G3 校验器 60｜G1黄金 25｜G1边界 49｜G2登记表 38｜V2.2规则 78｜全站回归 55｜视觉 11
+  ★ 本阶段**只新增 4 个文件、未修改任何既有文件**。
+
+【五】待裁定与待确认
+
+  A ★ **事件归并 vs R8.5 supersedes 合并的语义交叠**（须在落库阶段 G6 前定案）：
+    010/014 同时受两套机制管辖 —— R8.5（展示层）要求「保留两条 + 互链，列表展示合并为一条」；
+    event-merger（管道层）把它们并为一个事件。方向一致但机制与落点不同。
+    风险：若把事件归并结果直接写成交付数据，会与 R8.5「保留两条」冲突，链式引用丢失。
+    建议在规范层写清：**事件归并只用于管道层减少候选与组装来源证据，
+    不得替换 R8.5 的双条保留 + 互链**；交付数据仍保留 supersedes 双条。
+  B ★ **event_key 刻意不区分状态，需产品确认**：
+    「官方确认」与「传闻」两条不同报道会得到同一 event_key。
+    副作用：下游若想按报道层级筛选/统计，**不能用 event_key**，须另用 reported_by/tier/状态。
+    我方判断与 R8.8 一致，但属产品语义决定。
+  C **工程风险：event_key 不是事件级唯一键** —— 同 key 越窗分裂时会产出多个 hold 事件；
+    下游若把 event_key 当主键写库会冲突/误覆盖。建议下游主键用
+    `event_key + first_publish_time`，或引入 occurrence 序号（本阶段未加，避免超范围）。
+  D 已知限制：**无实体的「同事件不同标题」识别不了**（文本模式偏保守，宁可不合不可误合）。
+  E 时间窗口默认 3 天**未校准**（建议 G5 实测后回调，如同事件多来源集中在 1–2 日）。
+  F 沿用未决项：C-1 judged_by 口径｜C-2 各层代码是否入库｜
+    G3-F1 **R7.4 Step 1「URL 可达性探测」仍无阶段归属**｜
+    G2-F3 未具名社交爆料是否登记｜**E-2 S002/S003 owner_group 仍待核，须在 G5 前关闭**
+  G 本阶段未触碰：h5\ / wechat\ / douyin\ 全部、既有测试脚本、G1/G2/G3 全部文件、
+    33 字段交付结构、8 态状态体系、三份同步文件。
+
+【六】置信度
+
+  高（~90%）：event_key 确定性与「非 title hash」（双向断言 + 反证，机器可验证）；
+             三条禁令遵守（深扫/计数/成员分组校验，可复现）；
+             真实数据归并正确性（15 条实跑，010/014 正确归并、其余零误合）；
+             h5/wechat/douyin 零改动（git status 0 条 + SHA256 一致）
+  中（~65%）：四条词表**覆盖度**（168 条基于 MCU 语料人工整理，未做大样本校准，
+             漏词会削弱 E1 类识别率）；文本模式识别力（2-gram 偏保守）；
+             时间窗口 3 天未校准
+  低（~30%）：真实采集环境表现（输入全为 mock 或构造用例，真实 feed 的标题噪声未验证，
+             须 G5 实测）；事件归并粒度是否符合产品预期（取决于待裁定 A/B）；
+             跨天同事件的分簇策略（链式聚类在密集报道期可能意外分裂，未实测）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G4 交付完成并停止。未进入 G5、未开发采集、未修改 H5。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

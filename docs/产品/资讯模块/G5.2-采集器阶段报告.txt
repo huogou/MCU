@@ -1,0 +1,342 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《G5.2 采集器阶段报告》
+阶段：G5 第二阶段 —— 真实采集输入层
+日期：2026-09-23｜角色：开发侧（Jarvis）
+链路：source_registry → collector → RawCapture(L0) → （可接）CandidateItem(L1)
+**未进入 G6；未生成 DeliveryItem；未修改 news.js / h5/**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+============================================================
+0. 关联文件索引
+============================================================
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5.2-采集器阶段报告.txt
+【转交用精简版】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5.2-采集器阶段报告-精简版.txt
+【采集层代码（本阶段新增）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\base-collector.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\source-fetcher.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\parser.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\normalizer.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\test-collector.cjs
+【夹具（本地，零网络）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\fixtures\S001.html
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\fixtures\S002.rss
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\fixtures\S004.rss
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\fixtures\S005.rss
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\fixtures\_sample.json
+【测试留档】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\out-collector.txt   （101 PASS）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\tests\out-codes.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g52-regression-codes.txt               （11 项退出码）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g52-baseline.txt                       （SHA256 + git）
+【上游】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-阶段报告.txt（G5.1）
+
+
+============================================================
+1. 新增文件
+============================================================
+
+  ┌────┬──────────────────────────────────────────┬──────────────────────────────────┐
+  │ #  │ 文件（相对 pipeline\collectors\）           │ 职责                              │
+  ├────┼──────────────────────────────────────────┼──────────────────────────────────┤
+  │ 1  │ base-collector.cjs                       │ 编排：读登记表 → 取数 → 解析 →     │
+  │    │                                          │ 归一化 → 生成 RawCapture；         │
+  │    │                                          │ 提供 collect / collectAndStore /  │
+  │    │                                          │ collectAll                        │
+  │ 2  │ source-fetcher.cjs                       │ ①读登记表并投射来源记录            │
+  │    │                                          │ ②取内容（**通道可注入**）          │
+  │    │                                          │ ③合规守卫（R6.3）                  │
+  │ 3  │ parser.cjs                               │ 文本 → 原始条目（rss/atom/json）   │
+  │    │                                          │ html-parse 明确出界                │
+  │ 4  │ normalizer.cjs                           │ 原始条目 + 来源 → L0 入参 + 纪律校验│
+  │ 5  │ tests\test-collector.cjs                 │ G5.2 T1–T8（101 条断言）           │
+  │ 6  │ tests\fixtures\S002.rss                  │ The Direct 型（**dc:date 陷阱**）  │
+  │ 7  │ tests\fixtures\S004.rss                  │ Variety 型（pubDate）              │
+  │ 8  │ tests\fixtures\S005.rss                  │ Deadline 型（**含 1 条缺标题脏数据**）│
+  │ 9  │ tests\fixtures\S001.html                 │ Marvel 官方 HTML（验证出界）        │
+  │ 10 │ tests\fixtures\_sample.json              │ 公开 JSON 接口样例                 │
+  └────┴──────────────────────────────────────────┴──────────────────────────────────┘
+
+  ★ 一次性工具 `_print-sample-once.cjs`（用于打印本报告第 3 节的真实样例）**已删除**。
+
+
+============================================================
+2. 支持来源列表
+============================================================
+
+■ 2.1 登记表 12 条来源在**本阶段**的可采集性
+
+  ┌──────┬──────────────────────────┬──────────┬────────────────┬──────────────────────────┐
+  │reg_id│ source_name              │ feed_type│ 本阶段可采集？   │ 原因 / 处理                │
+  ├──────┼──────────────────────────┼──────────┼────────────────┼──────────────────────────┤
+  │ S001 │ Marvel 官方               │ html-parse│ ❌ **出界**     │ HTML 列表页解析不在本阶段范围 │
+  │      │                          │          │                │ （任务书 §5「真实网页抓取需  │
+  │      │                          │          │                │ 单独评估」）→ 明确报错不静默 │
+  │ S002 │ The Direct               │ rss      │ ✅ 可采集       │ 夹具 S002.rss；已验 dc:date │
+  │ S003 │ ComicBook                │ rss      │ ✅ 可采集       │ 无夹具 → 报 FIXTURE_NOT_FOUND│
+  │ S004 │ Variety                  │ rss      │ ✅ 可采集       │ 夹具 S004.rss              │
+  │ S005 │ Deadline                 │ rss      │ ✅ 可采集       │ 夹具 S005.rss（含脏数据用例）│
+  │ S006 │ The Walt Disney 公告页     │ rss      │ ✅ 可采集       │ 无夹具 → 报 FIXTURE_NOT_FOUND│
+  │ S007 │ The Hollywood Reporter   │ rss      │ ⛔ 合规拒绝     │ ai_ban_named → SOURCE_POLICY_REFUSED │
+  │ S008 │ Entertainment Weekly     │ none     │ ⛔ 合规拒绝     │ blocked → SOURCE_POLICY_REFUSED      │
+  │ S009 │ Collider                 │ rss      │ ⛔ 合规拒绝     │ ai_ban_notice → SOURCE_POLICY_REFUSED│
+  │ S010 │ Marvel 日本官方           │ none     │ ⛔ 已停用       │ blocked + enabled=false    │
+  │ S011 │ Marvel Studios 官方       │ none     │ ⛔ 已停用       │ manual_only + enabled=false│
+  │ S012 │ D23 官方                 │ none     │ ⛔ 已停用       │ manual_only + enabled=false│
+  └──────┴──────────────────────────┴──────────┴────────────────┴──────────────────────────┘
+
+  **统计**：登记 12 条 → 合规可采集 **6 条**（S001–S006）→
+           其中**本阶段实际可解析的 5 条**（S002–S006，均为 rss）；
+           S001 因 html-parse 出界暂不可采。
+
+■ 2.2 ★ 两个需要你知道的覆盖缺口（如实披露）
+
+  ① **JSON 通道暂无端到端来源**：登记表里**没有任何来源**的 `feed_type = json`
+     → 公开 JSON 接口通道目前**只有单元级测试覆盖**（parser 直测），
+       没有经过真实登记来源的端到端验证。若未来新增 JSON 出口，需在登记表
+       登记后补一次端到端验证。
+  ② **官方来源 S001 暂不可采**：Marvel 官方是 `html-parse`，本阶段按任务书
+     明确出界。**结果是：本阶段无法采集任何"官方确认"证据**
+     （S001 与 S006 中，S006 是 rss 可采，但它是"公告核实器"而非日常发现源）。
+     → 这意味着 `official_confirmed` 的**自动**证据链在本阶段仍不可用，
+       须等 HTML 解析单独评估后补齐。
+
+■ 2.3 任务书字段名的两处映射（已按登记表实际字段名落地）
+
+  ┌────────────────┬──────────────────────────────────────────────────────────────┐
+  │ 任务书 §3 的叫法 │ 登记表实际字段名 / 处理                                        │
+  ├────────────────┼──────────────────────────────────────────────────────────────┤
+  │ `source_id`    │ ≡ `registry_id`（两个名字**都保留**在来源记录里，避免下游取不到）│
+  │ `source_url`   │ ≡ `feed_url`（登记出口；同样两个名字都保留）                    │
+  │ `owner_group`  │ **原样读取**，不做任何推断（任务书 §3 明令禁止）                 │
+  └────────────────┴──────────────────────────────────────────────────────────────┘
+
+  ★ 来源记录字段集：`source_id / registry_id / source_name / source_url / feed_url /
+    owner_group / source_type / tier / feed_type / crawl_policy / enabled`（**11 个**），
+    由测试断言「**不含任何推断字段**」。
+
+
+============================================================
+3. RawCapture 样例（**真实采集产出，非手写**）
+============================================================
+
+■ 3.1 S004 Variety（pubDate 常规路径）
+
+  ```json
+  {
+    "capture_id": "cap-S004-run20260923-001",
+    "pipeline_run_id": "run20260923",
+    "registry_id": "S004",
+    "source_name": "Variety",
+    "source_url": "https://variety.com/2026/tv/news/daredevil-born-again-season-3-1234567890/",
+    "url_level": "article",
+    "title_raw": "‘Daredevil: Born Again’ To End With Season 3 At Disney+",
+    "published_at_raw": "Mon, 22 Sep 2026 23:40:00 +0000",
+    "published_at": "2026-09-22T23:40:00Z",
+    "fetched_at": "2026-09-23T02:00:00Z",
+    "feed_type": "rss",
+    "http_status": 200,
+    "content_hash": "14d40434a6a6f8f502da04d5b0574906aa18ec6b",
+    "raw_excerpt": "Variety 报道该剧将在第三季完结，援引知情人士说法。"
+  }
+  ```
+
+■ 3.2 S002 The Direct（**dc:date 陷阱路径**）
+
+  ```json
+  {
+    "capture_id": "cap-S002-run20260923-001",
+    "pipeline_run_id": "run20260923",
+    "registry_id": "S002",
+    "source_name": "The Direct",
+    "source_url": "https://thedirect.com/article/daredevil-born-again-season-3-final",
+    "url_level": "article",
+    "title_raw": "【独家】《夜魔侠：重生》第三季将是最终季",
+    "published_at_raw": "2026-09-22T23:36:42Z",
+    "published_at": "2026-09-22T23:36:42Z",
+    "fetched_at": "2026-09-23T02:00:00Z",
+    "feed_type": "rss",
+    "http_status": 200,
+    "content_hash": "f8e80aee3fb7f5c4659b649189fe4ddabb3b33e8",
+    "raw_excerpt": "The Direct 独家报道该剧第三季完结，尚未获官方确认。"
+  }
+  ```
+
+  ★ 两条样例共同验证：字段**恰为 14 个**；**不含** `event_key` / `first_publish_time`；
+    `title_raw` 与来源原文**逐字符一致**（仅 trim）；实体已解码
+    （`&#8216;` → `‘`）；`raw_excerpt` ≤200 字。
+
+
+============================================================
+4. 测试数量
+============================================================
+
+  ```
+  collectors\tests\test-collector.cjs   **101 PASS / 0 FAIL**（退出码 0）
+  ```
+
+  【T1 – T8 覆盖】
+
+  ┌──────┬────────────────────────────────────┬──────┬────────────────────────────────┐
+  │ 编号  │ 要求                                │ 结果  │ 关键断言                        │
+  ├──────┼────────────────────────────────────┼──────┼────────────────────────────────┤
+  │ T1   │ source_registry 读取正确              │ PASS │ 12 条读全；S002 五个字段逐项一致；│
+  │      │                                    │      │ enabledOnly = 6 条；**字段集仅    │
+  │      │                                    │      │ 11 个、无任何推断字段**          │
+  │ T2   │ owner_group 从 registry 进入 reported_by│ PASS │ S004→Penske Media Corporation； │
+  │      │                                    │      │ S002→**独立**（登记表原值）；      │
+  │      │                                    │      │ 与登记表逐字符一致；未按名推断     │
+  │ T3   │ 未知来源进入 unregistered             │ PASS │ 采集器拒绝未登记来源；           │
+  │      │                                    │      │ 保留值 `unregistered` 可用；      │
+  │      │                                    │      │ owner_group 回落 `unknown`       │
+  │ T4   │ 非法来源拒绝                          │ PASS │ S999→UNKNOWN_REGISTRY_ID；       │
+  │      │                                    │      │ S007/8/9→SOURCE_POLICY_REFUSED；│
+  │      │                                    │      │ 未进入取数阶段                   │
+  │ T5   │ RawCapture 字段 14 项完整             │ PASS │ 字段集合恰 14、与 RC.FIELDS 一致；│
+  │      │                                    │      │ **不含 event_key / first_publish_time**；│
+  │      │                                    │      │ validate 通过；标题未改写         │
+  │ T6   │ 采集异常不会污染 Candidate             │ PASS │ 3 解析→2 接受→1 拒绝（MISSING_  │
+  │      │                                    │      │ FIELD）；单条脏数据不阻塞其他条；  │
+  │      │                                    │      │ 输出深扫无状态字段；normalizer  │
+  │      │                                    │      │ 拒绝含状态字段/event_key 的入参   │
+  │ T7   │ 重复抓取 content_hash 一致             │ PASS │ 两次抓取 hash 逐条一致；         │
+  │      │                                    │      │ 【反证】标题变化→hash 变化        │
+  │ T8   │ 不同时间抓取不覆盖历史 capture          │ PASS │ runA 2 条 + runB 2 条 = 归档 4 条；│
+  │      │                                    │      │ runA 记录 fetched_at/hash 未被改写；│
+  │      │                                    │      │ 同批次重跑→新增 0 / 跳过 2（幂等）  │
+  └──────┴────────────────────────────────────┴──────┴────────────────────────────────┘
+
+  另含：解析器专项 18 条（RSS 常规 / **dc:date 陷阱 + 反证告警** / JSON 字段名多态 /
+        html-parse 出界 / 空文本 / 不支持类型）、collectAll 专项 4 条、输出洁净专项若干。
+
+  ★ 关键反证：**移除 dc:date 后触发 `ENTRY_DATE_MISSING_BUT_CHANNEL_DATE_PRESENT` 告警**
+    —— 该告警正是为「The Direct 型来源读错时间标签」预留的探测点。
+
+
+============================================================
+5. 回归结果
+============================================================
+
+  ┌──────┬──────────────────────────────┬─────────────┬────────┐
+  │ 组    │ 脚本                          │ 结果         │ 退出码  │
+  ├──────┼──────────────────────────────┼─────────────┼────────┤
+  │ G5.2 │ collectors\tests\test-collector.cjs │ **101 PASS**│ **0**  │
+  │ G5.1 │ tests\test-g5-baseline.cjs    │ 61 PASS     │ 0      │
+  │ G5.1 │ tests\test-pipeline.cjs       │ 103 PASS    │ 0      │
+  │ G1   │ test-judge-golden.cjs         │ 25 PASS     │ 0      │
+  │ G1   │ test-judge-boundary.cjs       │ 49 PASS     │ 0      │
+  │ G2   │ test-registry-validate.cjs    │ 38 PASS     │ 0      │
+  │ G3   │ test-official-validator.cjs   │ 60 PASS     │ 0      │
+  │ G4   │ test-event-key.cjs            │ 95 PASS     │ 0      │
+  │ V2.2 │ test-news-rules.cjs           │ 78 PASS     │ 0      │
+  │ V2.2 │ regression-news.cjs           │ 55 PASS     │ 0      │
+  │ V2.2 │ shots.cjs                     │ 11 PASS     │ 0      │
+  └──────┴──────────────────────────────┴─────────────┴────────┘
+
+  **合计 11 项 / 676 条断言 / 0 FAIL / 11 个退出码全为 0**
+  （101 + 61 + 103 + 411 = 676）
+  · 任务书要求「511 条断言 PASS」→ **已满足**，并新增 101 条采集层断言。
+  · 留档：`engine\g52-regression-codes.txt`
+
+
+============================================================
+6. git diff 摘要
+============================================================
+
+  · `git status --porcelain` 共 **66 条**；其中
+    **h5 / wechat / douyin 相关 = 0 条**；**残留 capture 归档 = 0 个**（临时目录已清理）。
+  · 本阶段实际改动：
+    新增：`workspace\news\pipeline\collectors\`（4 模块 + tests + 5 夹具 + 留档）
+          `docs\产品\资讯模块\G5.2-采集器阶段报告.txt`（本文件）+ 精简版
+    删除：一次性工具 `collectors\_print-sample-once.cjs`（取材后立即删除）
+  · **未执行任何 git add / commit**（等指令）。
+
+
+============================================================
+7. 是否影响冻结层
+============================================================
+
+  ┌──────────────────────────────┬────────┬──────────────────────────────────────┐
+  │ 冻结对象                      │ 影响    │ 证据                                  │
+  ├──────────────────────────────┼────────┼──────────────────────────────────────┤
+  │ h5/data/news.js              │ **无** │ SHA256 = 589A3934…0242F2（**True**）    │
+  │ h5/ · wechat/ · douyin/      │ **无** │ git status 中三者路径 = 0 条            │
+  │ 33 字段交付结构                │ **无** │ 未产出任何交付数据；L0 恰 14 字段        │
+  │ 8 态体系                      │ **无** │ 未触碰状态定义；采集输出深扫 0 命中       │
+  │ G1 judge / G2 registry 装载    │ **无** │ golden 25 + boundary 49 + registry 38 全绿│
+  │ G3 official-validator         │ **无** │ 60 全绿                               │
+  │ G4 event_key 算法 / merger     │ **无** │ 95 全绿；merger 未被调用也未被修改       │
+  │ G5.1 pipeline 三层（L0/L1）     │ **无** │ 61 + 103 全绿；RC/CI 未修改             │
+  └──────────────────────────────┴────────┴──────────────────────────────────────┘
+
+  ★ 本阶段**未联网**、**未抓取真实网页**、**未自动判断状态**、**未合并事件**、**未进入 G6**。
+
+
+============================================================
+8. 本阶段修的 4 类问题（如实记录，全部是我自己的实现/断言缺陷）
+============================================================
+
+  首轮：**8 FAIL**；第二轮：`collectAll` 段**整段崩溃**。四类根因：
+
+  ┌────┬──────────────────────────────────────────┬──────┬──────────────────────────────┐
+  │ 类  │ 根因                                      │ 处数  │ 修正                          │
+  ├────┼──────────────────────────────────────────┼──────┼──────────────────────────────┤
+  │ ①  │ **我在测试里写漏了字段**：来源记录实际 11 个 │ 1    │ 补上 `source_url`；断言改为   │
+  │    │ 字段，期望串只列了 10 个                    │      │ 显式列全 11 个并打印实际值     │
+  │ ②  │ **合规守卫检查顺序不当**：先判 enabled →    │ 3    │ 改为**先政策后启用**，使        │
+  │    │ THR/EW/Collider 报 SOURCE_DISABLED 而非    │      │ THR/EW/Collider 报出合规原因   │
+  │    │ SOURCE_POLICY_REFUSED（信息量更低）        │      │ SOURCE_POLICY_REFUSED         │
+  │ ③  │ **normalizer 只清洗输出、不清洗输入**：      │ 2    │ 增加 `assertClean(item)`：     │
+  │    │ 原始条目若自带状态字段/event_key 会被静默丢弃│      │ **拒绝**而非静默丢弃           │
+  │ ④  │ ★ **同步抛错未兜住导致整批中断**：           │ 1+   │ `fetchContent` 保留原始错误码 + │
+  │    │ 夹具缺失时 localTransport **同步**抛错，    │      │ `collect` 用 try 兜住 → 单源   │
+  │    │ `collect` 未 try → `collectAll` 整段崩溃    │      │ 失败不再中断批量               │
+  └────┴──────────────────────────────────────────┴──────┴──────────────────────────────┘
+
+  另：T8 首轮因**上一轮脚本中途崩溃遗留 tmp 未清理**而误报 2 FAIL →
+    已在测试开场加「自清 tmp」，避免跨轮污染。
+
+  ★ 方法论（第六次复用）：**首轮 FAIL 基本都是我自己的实现/断言缺陷**。
+    本阶段新增一条教训：**「同步抛错」与「Promise 拒绝」必须同等对待** ——
+    只处理 `.then(ok, err)` 而不 try 住同步调用，批量流程会被单点打穿。
+
+
+============================================================
+9. 下一阶段建议
+============================================================
+
+  1. **★ 联网取数的决策点（须你拍板）**
+     本阶段按任务书 §5「真实网页抓取需单独评估」**未内置任何网络代码**；
+     `source-fetcher.fetchContent()` 的取数通道是**可注入**的
+     （`opts.transport`，默认 `local`）。要启用真实联网，**只需在调用侧注入一个
+     http transport**，采集层代码无需改动。
+     → 请裁定：是否启动「真实联网取数」的单独评估（含 robots 合规复核、
+       UA 声明、限速、超时与重试策略）。
+  2. **HTML 解析（S001 Marvel 官方）** —— 本阶段唯一被排除的来源。
+     它是官方确认证据链的**唯一自动入口**；建议下一个专项优先做
+     （marvel.com 无 RSS，只能解析 `/news` 列表页 + JSON-LD + 影视类过滤）。
+  3. **JSON 通道补端到端验证**：若未来登记 JSON 出口，需补一次真实来源的端到端测试。
+  4. **告警渠道**（G4.3 的 NB-7）—— R6.2 要求「连续 3 次失败 → paused 并告警」，
+     本阶段已能产出逐条错误，但告警发到哪里仍未定。
+  5. **沿用未决项**：L1 补充字段是否正式采纳；`unregistered` 保留值是否正式化；
+     URL 可达性探测归属（NB-5）。
+
+
+============================================================
+10. 置信度
+============================================================
+  **高（约 93%）**：采集层链路（登记表 → 取数 → 解析 → 归一化 → L0）、
+    T1–T8 八项、676 条断言全绿、SHA256 与 git 双向取证 —— 均可复现。
+  **中（约 70%）**：`content_hash` 的默认口径（url + title + published_at）
+    在真实重采场景下的稳定性；`url_level` 对目录页的误判边界；
+    合规守卫的「先政策后启用」顺序属工程判断（两种码都有道理，我选了信息量更大的）。
+  **低（约 30%）**：真实 feed 文本（含命名空间变体、编码异常、字段缺失形态）
+    进入 parser 后的鲁棒性 —— 本阶段全部为合成夹具，未见真实字节。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G5.2 采集器完成。
+未联网、未修改 news.js / h5、未修改 33 字段与 8 态、未自动判断状态、未合并事件、未进入 G6。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

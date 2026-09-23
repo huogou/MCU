@@ -1,0 +1,106 @@
+============================================================
+G3 · 官方来源校验器 V1.0 —— 测试
+============================================================
+校验器：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\official-source-validator.cjs
+规则版本：V1.0
+登记表：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+用例数：15（C1–C8 任务要求 + C9–C14 补充）
+
+■ 1. 输出契约完整性
+  PASS  顶层键恰为 valid / checks / reason / rule_version
+  PASS  checks 为对象且含 6 项
+  PASS  checks 键位与顺序与任务书一致
+  PASS  每个检查项均为 { pass:boolean, detail:非空字符串 }
+  PASS  reason 为非空字符串
+  PASS  rule_version = V1.0
+
+■ 2. 用例验证（C1–C14）
+  PASS  【C1】valid = true　（正常官方 URL：marvel.com 文章页 + official 条目 + 已复核 + 事件 ID 一致）
+  PASS  【C1】失败检查项 = 无
+  PASS  【C1】reason 表述为「六项检查全部通过」
+  PASS  【C2】valid = true　（官方栏目页 /news：legacy 策略下通过（现行规则，E-1 冻结））
+  PASS  【C2】失败检查项 = 无
+  PASS  【C2】reason 表述为「六项检查全部通过」
+  PASS  【C3】valid = false　（同一官方栏目页在 article-level 策略下失败（Q-5 严格规则，G8 才启用））
+  PASS  【C3】失败检查项 = path_allowed
+  PASS  【C3】reason 指向最早失败项 path_allowed
+  PASS  【C4】valid = false　（未登记域名 example.com 冒充官方来源 → 域名校验失败）
+  PASS  【C4】失败检查项 = domain_allowed
+  PASS  【C4】reason 指向最早失败项 domain_allowed
+  PASS  【C5】valid = false　（黑名单域名 disneyplus.com：即使被写入 allowed_domains，也必须直接失败）
+  PASS  【C5】失败检查项 = domain_blacklist
+  PASS  【C5】domain_allowed 应为通过（隔离验证）
+  PASS  【C5】reason 指向最早失败项 domain_blacklist
+  PASS  【C6】valid = false　（未登记来源（registry_entry 缺失）→ 资格判断失败）
+  PASS  【C6】失败检查项 = domain_allowed/path_allowed/registry_match
+  PASS  【C6】reason 指向最早失败项 domain_allowed
+  PASS  【C7a】valid = false　（S010 Marvel 日本官方：official 但 allowed_domains 为空 → 不得进入 official_confirm 判断）
+  PASS  【C7a】失败检查项 = domain_allowed/path_allowed/registry_match
+  PASS  【C7a】reason 指向最早失败项 domain_allowed
+  PASS  【C7b】valid = false　（S011 Marvel Studios 官方：official 但 allowed_domains 为空；URL 是 marvel.com 也无效）
+  PASS  【C7b】失败检查项 = domain_allowed/path_allowed/registry_match
+  PASS  【C7b】reason 指向最早失败项 domain_allowed
+  PASS  【C8】valid = false　（空 URL → URL 基础校验失败）
+  PASS  【C8】失败检查项 = url_scheme/domain_allowed/path_allowed/domain_blacklist
+  PASS  【C8】reason 指向最早失败项 url_scheme
+  PASS  【C9】valid = false　（excluded_paths 命中：/articles/comics/* 即使域名正确也必须失败）
+  PASS  【C9】失败检查项 = path_allowed
+  PASS  【C9】reason 指向最早失败项 path_allowed
+  PASS  【C10】valid = false　（source_name 与 registry_entry 不一致（防伪造条目）→ 资格判断失败）
+  PASS  【C10】失败检查项 = registry_match
+  PASS  【C10】reason 指向最早失败项 registry_match
+  PASS  【C11】valid = true　（article-level 下文章级 URL 通过（证明严格策略不是「一律拒绝」））
+  PASS  【C11】失败检查项 = 无
+  PASS  【C11】reason 表述为「六项检查全部通过」
+  PASS  【C12】valid = false　（人工复核未通过（reviewed = false）→ 复核检查失败）
+  PASS  【C12】失败检查项 = review_required
+  PASS  【C12】reason 指向最早失败项 review_required
+  PASS  【C13】valid = false　（claimed_event_id 与 official_confirm.event_id 不一致 → ID 关联检查失败）
+  PASS  【C13】失败检查项 = review_required
+  PASS  【C13】reason 指向最早失败项 review_required
+  PASS  【C14】valid = false　（非官方条目（S004 Variety，official_or_media = media）冒充官方来源 → 资格失败）
+  PASS  【C14】失败检查项 = domain_allowed/path_allowed/registry_match
+  PASS  【C14】reason 指向最早失败项 domain_allowed
+  PASS  valid === 六项检查全部通过（无遗漏、无放宽）
+
+■ 3. 与 G1 checkOfficialUrl 交叉一致性（防实现漂移）
+  PASS  8 组 URL × 策略下，校验器前五项结论 = G1 结论 = 期望值
+
+■ 4. 数据来源纪律自证（不硬编码域名）
+  PASS  校验器代码中不含任何域名样式的字面量（域名全部来自登记表）
+  PASS  校验器通过 news-registry.cjs 取得域名事实
+  PASS  校验器通过 news-judge-rules.cjs 取得 path 策略（不另建第二套）
+  PASS  校验器未引入任何网络能力（无 http/https/net/dns/fetch/axios）
+
+■ 5. 验收输出
+  ── 用例明细 ──
+  case  valid  失败检查项
+  C1    true   （无）
+  C2    true   （无）
+  C3    false  path_allowed
+  C4    false  domain_allowed
+  C5    false  domain_blacklist
+  C6    false  domain_allowed, path_allowed, registry_match
+  C7a   false  domain_allowed, path_allowed, registry_match
+  C7b   false  domain_allowed, path_allowed, registry_match
+  C8    false  url_scheme, domain_allowed, path_allowed, domain_blacklist
+  C9    false  path_allowed
+  C10   false  registry_match
+  C11   true   （无）
+  C12   false  review_required
+  C13   false  review_required
+  C14   false  domain_allowed, path_allowed, registry_match
+
+  ── h5/data/news.js SHA256 ──
+  实测：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  基线：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  PASS  h5/data/news.js SHA256 与基线一致（文件未改动）
+
+  ── git status ──
+  条目数：70
+  其中 h5 / wechat / douyin 相关：0 条
+  PASS  git status 中无任何 h5 / wechat / douyin 路径（三个目录零改动）
+
+============================================================
+结果：60 PASS / 0 FAIL
+============================================================

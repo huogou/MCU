@@ -1,0 +1,412 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU 宇宙导航｜官方来源校验器 V1.0 交付报告》（G3）
+执行时间：2026-09-22 16:1x–16:3x（GMT+8）
+执行依据：《MCU宇宙导航｜官方来源校验器 V1.0 开发任务书（G3）》
+前置：G1 判定器 V1.0（已验收）｜G2 source_registry V1.0（已交付）
+本阶段性质：**R7.4 官方来源校验规则的纯函数验证层**。
+未修改 h5 / wechat / douyin；未接真实网络；未抓取网页；未修改三个基线脚本；
+未修改 G1/G2 已冻结字段；未进入 G4。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+============================================================
+0. 关联文件索引（★ 供策划 / 设计顺着路径查阅）
+============================================================
+
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\官方来源校验器V1.0交付报告.txt
+【本报告精简版】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\官方来源校验器V1.0交付报告-精简版.txt
+
+【★ 本阶段新增（3 个文件，均在 workspace 下，不进 h5）】
+  校验器本体
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\official-source-validator.cjs
+  测试脚本（含验收输出：PASS/FAIL、退出码、git status、SHA256）
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\test-official-validator.cjs
+  测试夹具（C1–C14）
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\fixtures\official-validator-cases.cjs
+
+【★ 本阶段测试输出（可复现留档）】
+  校验器测试完整日志（60 PASS / 0 FAIL）   workspace\news\engine\validator\out-official-validator.txt
+  校验器测试退出码                        workspace\news\engine\validator\out-codes.txt
+  全量回归退出码                          workspace\news\engine\validator\out-regression-codes.txt
+  git status                              workspace\news\engine\validator\out-gitstatus-g3.txt
+
+【上游依赖（本阶段只读未改）】
+  登记表数据（域名事实的唯一来源）
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+  登记表加载与校验器
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-registry.cjs
+  G1 判定器（复用其 parseUrl / pathAllowed 原语）
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-judge.cjs
+  G1 规则常量（复用 PATH_POLICY，不另建第二套策略）
+    D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-judge-rules.cjs
+
+【冻结件与上游规范】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\MCU宇宙导航_资讯治理冻结确认V1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\source_registryV1.0交付报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\资讯状态判定器V1.0交付报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\2.2\最新漫威资讯模块V2.2施工规范-R6至R8收口件.txt
+
+
+============================================================
+1. 一、校验器设计
+============================================================
+
+■ 1.1 定位
+
+  R7.4「official_source 判定六步校验」中**可在离线环境完成的那一部分**，
+  实现为一个**纯函数验证层**：给定一条官方来源声明，输出它是否成立，以及
+  六项检查各自的通过情况。
+
+  ┌────────────┬──────────────────────────────────────────────────────────┐
+  │ 属性        │ 实现方式                                                  │
+  ├────────────┼──────────────────────────────────────────────────────────┤
+  │ 纯函数      │ 无状态、无时间依赖；同输入必得同输出                          │
+  │ 零网络      │ 不做任何 HTTP 请求、不抓取任何页面                           │
+  │ 零副作用    │ 不写文件、不改全局                                          │
+  │ 数据外部化  │ 域名事实全部取自 source-registry.json，**代码中零域名字面量**  │
+  │ 策略单一源  │ path 策略复用 G1 的 PATH_POLICY，**不另建第二套**             │
+  └────────────┴──────────────────────────────────────────────────────────┘
+
+■ 1.2 输入
+
+  ```
+  {
+    source_url        待校验的官方来源 URL（必填）
+    source_name       来源名称（用于与登记表条目复核，防伪造条目）
+    registry_entry    登记表条目（须来自 source-registry.json）
+    claimed_event_id  本条声称对应的事件 id
+    official_confirm  { reviewed: boolean, event_id?: string }
+  }
+  ```
+
+■ 1.3 输出契约（**恰为 4 个顶层键**，已由测试断言）
+
+  ```
+  {
+    valid:        boolean,   // 六项全部通过才为 true
+    checks:       object,    // 6 个检查项，每项 { pass: boolean, detail: string }
+    reason:       string,    // 结论说明
+    rule_version: "V1.0"
+  }
+  ```
+
+  ★ 契约取舍说明：任务书写 `checks:[url_scheme, domain_allowed, ...]`。
+  该写法在 JS 语境下通常表示「checks 是含这些键的映射」。
+  本实现取 **checks 为对象**（键即六项检查名，值含 pass 与 detail），
+  理由是：① 调用方需要按名取用某一项；② detail 需要承载证据；
+  ③ 顶层键严格保持 4 个、不额外增加字段。六项顺序由导出常量
+  `CHECK_ORDER` 显式给出，测试已断言键位顺序与任务书一致。
+
+  六项检查的语义：
+
+  ┌──────────────────┬──────────────────────────────────────────────────────────┐
+  │ 检查项            │ 判据                                                      │
+  ├──────────────────┼──────────────────────────────────────────────────────────┤
+  │ url_scheme       │ URL 非空 且 协议为 http / https                            │
+  │ domain_allowed   │ host 命中 registry_entry.allowed_domains                  │
+  │ path_allowed     │ path 命中 allowed_paths、且不落在 excluded_paths            │
+  │                  │（策略 legacy / article-level，默认 legacy）                 │
+  │ domain_blacklist │ host **不在** non_official_domains（命中即失败）             │
+  │ registry_match   │ 官方来源资格：official_or_media = official **且**           │
+  │                  │ allowed_domains 非空；另加条目真实性复核                     │
+  │                  │（source_name / registry_id 与登记表一致，且在派生官方清单内）│
+  │ review_required  │ 人工复核要求是否已满足：official_confirm.reviewed = true，   │
+  │                  │ 且 claimed_event_id 与 official_confirm.event_id 一致（若成对提供）│
+  └──────────────────┴──────────────────────────────────────────────────────────┘
+
+■ 1.4 ★ 级联语义：六项全部计算，**不做短路**
+
+  校验器一次性算完六项，`valid` 要求六项全通过。
+  因此当 URL 本身不可用（空 / 非 http / 非法格式）时，依赖它的
+  `domain_allowed` / `path_allowed` / `domain_blacklist` 会**一并失败**。
+
+  · 这是**刻意设计**：让调用方与审计一次看到全貌，而不是被第一个失败项遮住。
+  · `reason` 只报「按固定顺序最早失败的那一项」，其余失败项由 `checks` 全量呈现。
+  · 首轮测试曾因此出现 5 项 FAIL —— 是**夹具期望清单写漏了级联项**，非实现缺陷；
+    已修正夹具为「完整失败清单」，并在夹具内写明该语义（详见 3.4）。
+
+■ 1.5 三项关键设计决策
+
+  【决策 1】域名零硬编码，全部来自登记表
+    · 校验器源码中**不含任何域名样式字面量** —— 由测试对源码做正则扫描自证（0 命中）。
+    · allowed_domains / allowed_paths / excluded_paths / non_official_domains
+      四类事实全部经 `news-registry.cjs` 读取 `source-registry.json`。
+
+  【决策 2】复用 G1 的原语与策略常量，不复制逻辑
+    · URL 解析复用 `judge.parseUrl`；path 判定复用 `judge.pathAllowed`；
+      path 策略复用 `rules.PATH_POLICY.mode`。
+    · 这样「legacy / article-level 开关」在全项目只有一个权威定义。
+    · 为防止两者将来漂移，测试专门做了**交叉一致性断言**：
+      8 组 URL × 策略下，本校验器的前五项结论必须与 G1 `checkOfficialUrl` 完全一致。
+      ※ 这条断言的价值：若将来有人只改了一边，测试会立刻失败。
+
+  【决策 3】黑名单是**独立守卫**，不是 domain_allowed 的副产物
+    · 现实的失败顺序是「host 未命中 allowed_domains」先失败，
+      黑名单往往被掩盖。为单独验证黑名单本身有效，
+      测试用例 C5 使用**合成条目**：故意把 disneyplus.com 写进 allowed_domains，
+      使 domain_allowed 通过，从而把 domain_blacklist 隔离出来单独验证。
+    · 这正是「即使有人把黑名单域名误登记进 allowed_domains，也拦得住」这一守卫的验证方式。
+
+■ 1.6 本层**未覆盖**的 R7.4 步骤（必须知悉）
+
+  ┌──────┬────────────────────────────┬──────────────────────────────────────────┐
+  │ 步骤  │ 内容                        │ 未覆盖原因 / 现由谁承载                    │
+  ├──────┼────────────────────────────┼──────────────────────────────────────────┤
+  │Step 1│ URL 可达性（HTTP 200）       │ 需联网。G3 任务书明确「不联网探测」→ 本层不做。│
+  │      │                            │ ★ 归属待定，见 5.1                        │
+  │Step 4│ 「内容确实对应当前事件」       │ 需抓取正文比对，G3 明确不抓取 → 本层只校验    │
+  │      │（主题一致，非泛泛提及）        │ event_id 的**关联声明**，不做内容层比对      │
+  │Step 5│ 人工复核                    │ 由 I9 的 reviewed 位承载，本层只检查该位是否  │
+  │      │                            │ 已置位（即 review_required 检查）           │
+  └──────┴────────────────────────────┴──────────────────────────────────────────┘
+
+
+============================================================
+2. 二、实现范围逐条对照
+============================================================
+
+  ┌────┬──────────────────────────────┬──────────────────────────────────────────────┐
+  │ #  │ 任务要求                      │ 实现与证据                                    │
+  ├────┼──────────────────────────────┼──────────────────────────────────────────────┤
+  │ 1  │ URL 基础校验：http/https      │ `checkUrlScheme`：非空 + 协议白名单。          │
+  │    │ 禁止空 URL / 非 http 协议      │ 证据：C8（空 URL）→ url_scheme 失败；          │
+  │    │                              │ 交叉对照含 '' 输入 → false                    │
+  │ 2  │ 域名校验规则来自               │ `news-registry.cjs` → `source-registry.json`；│
+  │    │ source-registry.json          │ 源码扫描 0 个域名字面量（测试断言）             │
+  │    │ **禁止硬编码域名**             │                                              │
+  │ 3  │ allowed_domains 校验          │ `checkDomainAllowed`：host 精确匹配登记域名     │
+  │    │ host 命中登记域名              │ 证据：C4（example.com）失败、C1/C2 通过         │
+  │ 4  │ allowed_paths 校验             │ `checkPathAllowed`：复用 G1 `judge.pathAllowed`│
+  │    │ 支持 legacy / article-level    │ + rules.PATH_POLICY；**默认 legacy**          │
+  │    │ 默认 legacy（E-1 冻结）        │ 证据：C1/C2 legacy 通过、C3 article-level 失败、│
+  │    │                              │ C11 article-level 文章级通过、C9 excluded 失败 │
+  │ 5  │ 官方来源资格判断               │ `checkRegistryMatch`：official_or_media =     │
+  │    │ official 且 allowed_domains 存在│ official **且** allowed_domains 非空          │
+  │    │                              │ 证据：C7a（S010）/ C7b（S011）失败、           │
+  │    │                              │ C14（S004 media）失败、C10（名称不符）失败      │
+  │ 6  │ 黑名单校验                     │ `checkDomainBlacklist`：命中 non_official_     │
+  │    │ 命中即直接失败                 │ domains 即 fail                               │
+  │    │                              │ 证据：C5（合成条目隔离验证）                    │
+  └────┴──────────────────────────────┴──────────────────────────────────────────────┘
+
+
+============================================================
+3. 三、测试结果
+============================================================
+
+■ 3.1 总结果：**60 PASS / 0 FAIL**，退出码 **0**
+
+  执行：`node workspace/news/engine/validator/test-official-validator.cjs`
+  留档：workspace\news\engine\validator\out-official-validator.txt
+
+■ 3.2 输出契约完整性（6 项断言全 PASS）
+
+  · 顶层键**恰为** valid / checks / reason / rule_version（不多不少）
+  · checks 为对象且含 6 项，键位与顺序等于 `CHECK_ORDER`
+  · 每项均为 `{ pass: boolean, detail: 非空字符串 }`
+  · reason 非空；rule_version = 'V1.0'
+  · valid === 六项检查全部通过（无遗漏、无放宽）
+
+■ 3.3 用例明细（C1–C8 任务要求 + C9–C14 补充，共 15 例）
+
+  ┌──────┬───────┬────────────────────────────────────────────┬──────────────────────────────────────┐
+  │ 用例  │ valid │ 失败检查项                                  │ 说明                                  │
+  ├──────┼───────┼────────────────────────────────────────────┼──────────────────────────────────────┤
+  │ C1   │ true  │ （无）                                      │ 正常官方 URL（文章页）+ 已复核 + ID 一致│
+  │ C2   │ true  │ （无）                                      │ 官方栏目页 /news，legacy 策略通过       │
+  │ C3   │ false │ path_allowed                               │ 同一 URL 在 article-level 下失败        │
+  │ C4   │ false │ domain_allowed                             │ 未登记域名 example.com                 │
+  │ C5   │ false │ domain_blacklist（domain_allowed 通过）      │ 黑名单独立守卫（合成条目隔离验证）       │
+  │ C6   │ false │ domain_allowed, path_allowed, registry_match│ 未登记来源（entry 缺失）               │
+  │ C7a  │ false │ domain_allowed, path_allowed, registry_match│ S010 官方但 allowed_domains 为空        │
+  │ C7b  │ false │ domain_allowed, path_allowed, registry_match│ S011 官方但 allowed_domains 为空        │
+  │ C8   │ false │ url_scheme + 3 项级联                        │ 空 URL                                │
+  │ C9   │ false │ path_allowed                               │ excluded_paths 命中 /articles/comics/  │
+  │ C10  │ false │ registry_match                             │ source_name 与条目不符（防伪造）        │
+  │ C11  │ true  │ （无）                                      │ article-level 下文章级 URL 通过         │
+  │ C12  │ false │ review_required                            │ 人工复核未通过（reviewed=false）        │
+  │ C13  │ false │ review_required                            │ event_id 不一致                        │
+  │ C14  │ false │ domain_allowed, path_allowed, registry_match│ S004（media）冒充官方来源               │
+  └──────┴───────┴────────────────────────────────────────────┴──────────────────────────────────────┘
+
+  ※ C6 / C7a / C7b / C8 / C14 的失败项为**完整清单**（含级联项），非仅主因。
+
+  另附加断言：每个用例的 `reason` 必须指向「按固定顺序最早失败的那一项」；
+  通过用例的 reason 必须表述为「六项检查全部通过」—— 全部 PASS。
+
+■ 3.4 测试过程中修正的一处**夹具缺陷**（如实记录）
+
+  首轮运行出现 **5 FAIL**（C6 / C7a / C7b / C8 / C14），全部是
+  「失败检查项清单不完整」——我最初只写了**主因**，未写**级联项**。
+  · 根因：校验器刻意不短路（见 1.4），URL 不可用时依赖项一并失败。
+  · 结论：**实现无误，夹具期望写漏**。已把 C6/C7a/C7b/C14 修正为
+    `domain_allowed, path_allowed, registry_match`，C8 修正为
+    `url_scheme, domain_allowed, path_allowed, domain_blacklist`，
+    并在夹具头部写明级联语义、为受影响用例加 `primary` 标注主因。
+  · 修正后 **60 PASS / 0 FAIL**。
+
+■ 3.5 与 G1 `checkOfficialUrl` 交叉一致性（防实现漂移）—— PASS
+
+  8 组「URL × 策略」组合下，本校验器的前五项结论 = G1 结论 = 期望值：
+
+    https://www.marvel.com/news                          legacy        → true
+    https://www.marvel.com/news                          article-level → false
+    https://www.marvel.com/articles/movies/some-article  legacy        → true
+    https://www.marvel.com/articles/movies/some-article  article-level → true
+    https://www.marvel.com/articles/comics/some-preview  legacy        → false
+    https://www.disneyplus.com/news/x                    legacy        → false
+    https://example.com/news/x                           legacy        → false
+    （空 URL）                                            legacy        → false
+
+  ★ 这条断言的作用：G3 未改动 G1，两套 URL 校验实现**暂时并存**；
+  断言保证二者结论一致，任何单边修改都会立刻被测试发现。
+
+■ 3.6 数据来源纪律自证（不硬编码域名）—— PASS
+
+  · 对校验器源码**剥离注释后**做域名样式正则扫描 → **0 命中**
+  · 校验器确实通过 `require('../news-registry.cjs')` 取得域名事实
+  · 校验器确实通过 `require('../news-judge-rules.cjs')` 取得 path 策略
+  · 校验器未引入任何网络能力（无 http / https / net / dns / fetch / axios / XMLHttpRequest）
+
+■ 3.7 验收输出（任务书要求四项）
+
+  ┌────────────────┬──────────────────────────────────────────────────────────────┐
+  │ 要求            │ 实测                                                          │
+  ├────────────────┼──────────────────────────────────────────────────────────────┤
+  │ PASS 数量       │ **60**                                                       │
+  │ FAIL 数量       │ **0**                                                        │
+  │ 退出码          │ **0**                                                        │
+  │ git status      │ 44 条变更，其中 **h5 / wechat / douyin 相关 = 0 条**            │
+  └────────────────┴──────────────────────────────────────────────────────────────┘
+
+  **h5/data/news.js SHA256**
+    实测：`589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2`
+    基线：`589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2`
+    → **一致，文件未改动**（该断言已内置于测试脚本第 5 节，PASS）
+
+■ 3.8 全量回归（确认 G1/G2/V2.2 均未受影响）
+
+  ┌──────────────────────────────┬─────────┬────────┬──────────────────────────┐
+  │ 脚本                          │ 结果     │ 退出码  │ 性质                      │
+  ├──────────────────────────────┼─────────┼────────┼──────────────────────────┤
+  │ validator/test-official-*.cjs │ 60 PASS │ 0      │ 本阶段新增                 │
+  │ test-judge-golden.cjs         │ 25 PASS │ 0      │ G1 黄金用例               │
+  │ test-judge-boundary.cjs       │ 49 PASS │ 0      │ G1 边界用例               │
+  │ test-registry-validate.cjs    │ 38 PASS │ 0      │ G2 登记表校验             │
+  │ test-news-rules.cjs           │ 78 PASS │ 0      │ V2.2 基线                │
+  │ regression-news.cjs           │ 55 PASS │ 0      │ V2.2 全站回归             │
+  │ shots.cjs                     │ 11 PASS │ 0      │ V2.2 视觉规则             │
+  └──────────────────────────────┴─────────┴────────┴──────────────────────────┘
+
+  六项回归**全部退出码 0**，且本阶段**只新增 3 个文件、未修改任何既有文件** ——
+  G1/G2 的冻结字段与逻辑零改动。
+
+
+============================================================
+4. 四、约束遵守自证（X1–X7）
+============================================================
+
+  ┌────┬──────────────────────────────┬──────────────────────────────────────────────┐
+  │ #  │ 任务禁令                      │ 证据                                          │
+  ├────┼──────────────────────────────┼──────────────────────────────────────────────┤
+  │ X1 │ 不修改 h5/                    │ git status 中 **h5 路径 = 0 条**；              │
+  │    │                              │ h5\data\news.js SHA256 = 589A3934…（与基线一致）│
+  │ X2 │ 不修改 wechat/                │ git status 中 wechat 路径 = 0 条               │
+  │ X3 │ 不修改 douyin/                │ git status 中 douyin 路径 = 0 条               │
+  │ X4 │ 不接真实网络请求                │ 校验器源码无任何网络模块与请求调用（测试断言）；  │
+  │    │                              │ 测试全程无网络操作                            │
+  │ X5 │ 不抓取网页内容                  │ 无任何 HTML/XML 解析、无正文抓取逻辑            │
+  │ X6 │ 不修改三个基线测试脚本           │ 本阶段未触碰 workspace\news\ 下任何既有文件；    │
+  │    │                              │ 三脚本本次复跑结果与 G2 一致（78 / 55 / 11）    │
+  │ X7 │ 不修改 G1/G2 已冻结字段         │ 本阶段**只新增 3 个文件**（validator/ 下），     │
+  │    │                              │ news-judge.cjs / news-judge-rules.cjs /       │
+  │    │                              │ source-registry.json 一字未改（回归全绿为证）   │
+  └────┴──────────────────────────────┴──────────────────────────────────────────────┘
+
+  另：未修改三份同步文件、未部署、未写任何交付数据、未进入 G4、未开发采集。
+
+
+============================================================
+5. 五、发现与待确认
+============================================================
+
+■ 5.1 【发现·口径冲突】「URL 可达性探测」目前**无阶段归属**
+  · G1 交付报告 6.3 曾写：「官方 URL 的 HTTP 可达性探测（R7.4 Step 1）—— 属 G3」。
+  · 但本次 G3 任务书明确要求「不联网探测」→ G3 实际交付的是**纯函数校验层**。
+  · 结果：R7.4 的 **Step 1（HTTP 200 可达性）在现有阶段拆分里没有承接者**。
+  · 影响：目前 official_confirmed 的「可访问」这一环，仅由 I9 标记（人工/AI 声明）承载，
+    系统自身不验证 URL 是否真的活着。
+  · 建议：由负责人在 G4/G5 之间**明确指定承接阶段**（可并入 G7 观测与告警，
+    或单列一个「网络校验层」）。**本阶段不擅自承接。**
+
+■ 5.2 【说明】G3 未把 G1 判定器接到本校验器上
+  · 现状：`news-judge.cjs` 的 `checkOfficialUrl` 与本次校验器**两套 URL 校验并存**。
+  · 不接线的理由：G1 判定器已验收冻结，接线属**修改 G1 交付物**，
+    超出本阶段「只新增」的范围；且接线会引入回归风险。
+  · 风险控制：已用**交叉一致性断言**（3.5）保证二者结论一致，漂移会被立即发现。
+  · 建议：待负责人裁定后，单独立项「判定器改用校验器（去重实现）」，
+    届时删除 `checkOfficialUrl` 或改为薄封装。
+
+■ 5.3 【待确认】沿用 G1/G2 的开放项（均不阻塞本阶段）
+  · C-1 `judged_by` 权威口径（G1 报告 6.2）
+  · C-2 判定器 / 校验器代码是否入库
+  · F-3 未具名社交爆料是否登记为来源条目（G2 报告 6.3）
+  · **E-2 S002 / S003 的 owner_group 仍「待核」** —— 必须在 G5（采集）之前关闭
+
+■ 5.4 本阶段未触碰
+  h5\ / wechat\ / douyin\ 全部；workspace\news\ 下的 test-news-rules.cjs /
+  regression-news.cjs / shots.cjs；news-judge.cjs / news-judge-rules.cjs /
+  news-registry.cjs / source-registry.json；三份同步文件。
+
+
+============================================================
+6. 六、结论与置信度
+============================================================
+
+■ 结论
+  G3《官方来源校验器 V1.0》交付完成。
+  · 实现 R7.4 官方来源校验的**纯函数验证层**，六项检查：
+    url_scheme / domain_allowed / path_allowed / domain_blacklist /
+    registry_match / review_required；
+  · 输出契约严格为 4 个顶层键，checks 含 6 项且顺序固定；
+  · 域名事实**全部来自 source-registry.json**，源码零域名硬编码（已自证 0 命中）；
+  · path 策略复用 G1 的 PATH_POLICY，**默认 legacy**（遵守 E-1 冻结）；
+  · 测试 **60 PASS / 0 FAIL，退出码 0**；C1–C8 全部覆盖，另加 C9–C14 六个补充用例；
+  · 与 G1 `checkOfficialUrl` 交叉一致性 8 组组合全 PASS（防漂移）；
+  · 全量回归 25 / 49 / 38 / 78 / 55 / 11 **全部退出码 0**；
+  · h5 / wechat / douyin **零改动**（git status 0 条 + news.js SHA256 一致）；
+  · **未进入 G4、未开发采集、未修改 H5。已停止。**
+
+  另一项值得记录的产出：本次识别出「URL 可达性探测无阶段归属」（5.1），
+  这是一处**阶段拆分缺口**，需负责人裁定，不宜由开发侧默认承接。
+
+■ 置信度
+
+  **高（约 95%）**：
+    · 六项检查的实现符合任务书要求 —— 逐条对照 + C1–C14 覆盖，可复现
+    · 输出契约正确性 —— 键位/顺序/类型/valid 一致性均有断言
+    · 「域名不硬编码」这一纪律 —— 源码扫描 0 命中，属机器可验证事实
+    · h5 / wechat / douyin 零改动 —— git status 0 条 + news.js SHA256 一致
+    · 与 G1 的一致性 —— 8 组交叉对照全 PASS
+
+  **中（约 70%）**：
+    · 用例覆盖的**完备性** —— C1–C14 覆盖了任务要求与主要边界，
+      但 URL 形态的极端变体（大小写 host、端口号、国际化域名、多层子域、
+      带 query/fragment 的路径）未系统覆盖，建议 G4/G5 实测时补测
+    · `registry_match` 的严格程度 —— 加了「条目真实性复核」防止伪造条目，
+      但这属于**超出任务书的加固**，是否需要保留同等严格度可讨论
+    · path 策略切到 article-level 后各来源的适配性 —— 未逐来源验证（属 G8）
+
+  **低（约 30%）**：
+    · R7.4 Step 1（可达性）与 Step 4（内容对应事件）的最终实现方式 ——
+      前者归属未定（5.1），后者需联网，均不在本层，实际效果无法评估
+    · 该层在真实采集环境中的表现 —— 输入全部为登记表条目与构造用例，
+      真实 URL 的形态噪声未经验证，须 G5 实测
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G3 交付完成并停止。未修改 h5 / wechat / douyin、
+未接真实网络、未抓取网页、未修改三个基线脚本与 G1/G2 冻结件、未进入 G4。
+下一步：等待指令，并请裁定 5.1（URL 可达性探测的阶段归属）。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

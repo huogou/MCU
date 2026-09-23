@@ -1,0 +1,119 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《G5.2 采集器阶段报告 · 精简版》（转交策划用）
+2026-09-23｜开发侧（Jarvis）｜**未联网、未抓网页、未改 news.js/h5、未改 33 字段与 8 态、未进入 G6**
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5.2-采集器阶段报告.txt
+新增代码：workspace\news\pipeline\collectors\（base-collector / source-fetcher / parser /
+  normalizer + tests\test-collector.cjs + 5 个本地夹具）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一句话结论】
+采集输入层建成：`source_registry → collector → RawCapture(L0)`，**101 条新断言全绿**，
+全量 **11 项 / 676 条断言 / 0 FAIL**，冻结层与交付层零改动。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【一、支持来源（登记 12 条 → 本阶段实际可用 5 条）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ 可采集（rss）：S002 The Direct｜S003 ComicBook｜S004 Variety｜
+     S005 Deadline｜S006 Disney 公告页
+  ❌ **出界**：**S001 Marvel 官方（html-parse）** —— HTML 列表页解析不在本阶段范围
+  ⛔ 合规拒绝：S007 THR / S008 EW / S009 Collider（R6.3 → SOURCE_POLICY_REFUSED）
+  ⛔ 已停用：S010 Marvel 日本 / S011 Marvel Studios / S012 D23
+
+  ★★ **两个覆盖缺口（必须知悉）**
+  ① **本阶段采集不到任何"官方确认"证据**：Marvel 官方是 html-parse，按你任务书
+     §5「真实网页抓取需单独评估」明确出界 → `official_confirmed` 的**自动**证据链
+     仍不可用，须等 HTML 解析专项。
+  ② **JSON 通道无端到端来源**：登记表里**没有任何来源**的 feed_type 是 json
+     → 该通道只有单元级测试，无真实来源验证。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【二、RawCapture 样例（真实采集产出，非手写）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  S004 Variety（pubDate 常规路径）
+    capture_id   cap-S004-run20260923-001
+    registry_id  S004 ｜ source_name  Variety
+    source_url   https://variety.com/2026/tv/news/daredevil-born-again-season-3-1234567890/
+    url_level    article
+    title_raw    ‘Daredevil: Born Again’ To End With Season 3 At Disney+
+    published_at 2026-09-22T23:40:00Z（原始：Mon, 22 Sep 2026 23:40:00 +0000）
+    feed_type    rss ｜ http_status  200
+    content_hash 14d40434a6a6f8f502da04d5b0574906aa18ec6b
+    raw_excerpt  Variety 报道该剧将在第三季完结，援引知情人士说法。
+
+  S002 The Direct（**dc:date 陷阱路径**）
+    capture_id   cap-S002-run20260923-001
+    registry_id  S002 ｜ source_name  The Direct
+    source_url   https://thedirect.com/article/daredevil-born-again-season-3-final
+    title_raw    【独家】《夜魔侠：重生》第三季将是最终季
+    published_at 2026-09-22T23:36:42Z
+    content_hash f8e80aee3fb7f5c4659b649189fe4ddabb3b33e8
+
+  ★ 两条共同验证：字段**恰 14 个**；**不含 event_key / first_publish_time**；
+    标题与原文逐字符一致（仅 trim）；实体已解码（&#8216; → ‘）；摘录 ≤200 字。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【三、测试 T1–T8（101 PASS / 0 FAIL）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  T1 source_registry 读取正确 —— 12 条读全、enabledOnly=6、来源记录**仅 11 个字段无推断**
+  T2 owner_group 从 registry 进 reported_by —— S004→Penske Media Corporation、
+     **S002→独立（登记表原值，未按来源名推断）**
+  T3 未知来源进 unregistered —— 采集器拒绝未登记来源；保留值可用；owner_group 回落 unknown
+  T4 非法来源拒绝 —— S999→UNKNOWN_REGISTRY_ID；S007/8/9→**SOURCE_POLICY_REFUSED**（未进取数）
+  T5 RawCapture 14 项完整 —— 字段集合恰 14、无 event_key/first_publish_time、标题未改写
+  T6 采集异常不污染 Candidate —— 3 解析→2 接受→1 拒绝（MISSING_FIELD）；
+     **单条脏数据不阻塞其他条**；输出深扫无状态字段
+  T7 重复抓取 content_hash 一致 —— 两次逐条一致；【反证】标题变→hash 变
+  T8 不同时间抓取不覆盖历史 —— runA 2 条 + runB 2 条 = 归档 4 条；runA 记录未被改写；
+     同批次重跑→新增 0 / 跳过 2（幂等）
+  另：解析器专项 18 条，含 **dc:date 陷阱 + 反证告警**
+     （移除 dc:date → 触发 ENTRY_DATE_MISSING_BUT_CHANNEL_DATE_PRESENT）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【四、回归（11 项 / 676 条 / 0 FAIL / 退出码全 0）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  G5.2 collector 101 ｜ G5.1 baseline 61 ｜ G5.1 pipeline 103 ｜
+  G1 25 + 49 ｜ G2 38 ｜ G3 60 ｜ G4 95 ｜ V2.2 78 + 55 + 11
+  news.js SHA256 = 589A3934…0242F2（**未变**）
+  git 66 条中 **h5 / wechat / douyin = 0 条**；**残留 capture 归档 = 0**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【五、是否影响冻结层：全部无影响】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  h5/news.js｜h5、wechat、douyin｜33 字段｜8 态｜G1–G4 规则｜G5.1 的 L0/L1 —— 均零改动。
+  未联网、未抓真实网页、未自动判断状态、未合并事件。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【六、★ 联网取数：需要你拍板】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  本阶段按你任务书 §5「真实网页抓取需单独评估」**未内置任何网络代码**；
+  取数通道是**可注入**的（`opts.transport`，默认 local 本地夹具）。
+  **启用真实联网只需在调用侧注入一个 http transport，采集层代码无需改动。**
+  → 请裁定是否启动「真实联网取数」的单独评估（含 robots 合规复核、UA 声明、
+     限速、超时与重试策略）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【七、本阶段修的 4 类问题（全是我自己的缺陷，如实记录）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  首轮 8 FAIL + 二轮 `collectAll` 整段崩溃，四类根因：
+  ① 我写漏字段：来源记录实际 11 个字段，期望串只列了 10 个
+  ② 合规守卫**检查顺序不当**：先判 enabled → THR/EW/Collider 报 SOURCE_DISABLED
+     （信息量低）→ 改为**先政策后启用**
+  ③ normalizer 只清洗输出、**不清洗输入**：原始条目自带状态字段会被静默丢弃 →
+     改为**拒绝**（fail closed）
+  ④ ★ **同步抛错未兜住**：夹具缺失时 localTransport 同步抛错，`collect` 未 try →
+     `collectAll` 整段崩溃 → 已 try 住并保留原始错误码
+  另：T8 首轮因**上一轮崩溃遗留 tmp**误报 → 已加开场自清。
+  ★ 新教训：**「同步抛错」与「Promise 拒绝」必须同等对待**。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【八、置信度】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  高（~93%）：采集链路 + T1–T8 + 676 条断言全绿 + SHA256/git 双向取证
+  中（~70%）：content_hash 口径在真实重采下的稳定性；url_level 对目录页误判边界；
+            「先政策后启用」的检查顺序属工程判断
+  低（~30%）：真实 feed 文本（命名空间变体/编码异常/字段缺失）进入 parser 后的鲁棒性 ——
+            本阶段全为合成夹具
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  状态：G5.2 完成并停止，等待下一阶段任务书。
+━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,104 @@
+﻿============================================================
+V2.2 最新漫威资讯模块 · 规则与数据断言测试
+============================================================
+数据：MCU_CONTENT 59 条 / MCU_CHARACTERS 24 个 / MCU_NEWS 15 条
+
+■ 1. 数据层结构（V2.2 R6/R7/R8 + 设计规范 R12.2）
+  PASS  components 组件层已挂载 MCU.v2
+  PASS  sortNews / newsCard / newsDetail / statusBadge / sourceItem / relatedNode 均已导出
+  PASS  每条资讯均含 R12.2 全字段
+  PASS  全部 verification_status 均为 8 态之一，无新增状态
+  PASS  8 态文案表键位完整（附录 A）
+  PASS  8 态提醒语齐全
+
+■ 2. owner_group 独立性判定（R6.1：同组只计 1；待核不计）
+  PASS  isGroupConfirmed("Penske Media Corporation") = true
+  PASS  isGroupConfirmed("待核") = false
+  PASS  isGroupConfirmed("unknown") = false
+  PASS  isGroupConfirmed("") = false
+  PASS  【伪多源】3 家同属 PMC 的报道 → 独立来源数 = 1（非 3）
+  PASS  【伪多源】该条状态为 single_source（非 multi_source_reported）
+  PASS  【真多源】PMC + People Inc. 两个独立组 → 独立来源数 = 2
+  PASS  【真多源】状态为 multi_source_reported
+  PASS  【真多源】展示文案用「独立来源」而非「媒体报道数」
+  PASS  【待核不计】两家 owner_group 均待核 → 独立来源数 = 0（不得计为 2）
+  PASS  【待核不计】不展示独立来源数量（D11）
+  PASS  【待核不计】落到 unverified
+  PASS  【禁止手写】全部条目 independent_group_count 与运行时计算一致
+
+■ 3. 八态覆盖
+  PASS  存在 official_confirmed 状态的用例
+  PASS  存在 multi_source_reported 状态的用例
+  PASS  存在 single_source 状态的用例
+  PASS  存在 rumor 状态的用例
+  PASS  存在 unverified 状态的用例
+  PASS  存在 conflicting 状态的用例
+  PASS  存在 officially_denied 状态的用例
+  PASS  存在 corrected 状态的用例
+  PASS  conflicting 条目带有并列的各来源表述（R3.4⑦ / R6.6）
+  PASS  corrected 条目带有报道级更正记录（R8.5 保留原始报道与更正记录）
+  PASS  corrected 链式引用成对存在（supersedes_id ↔ superseded_by_id）
+  PASS  【事件级语义】报道级更正后，事件级仍为 multi_source_reported
+  PASS  【事件级语义】该条独立来源数仍为 2
+
+■ 4. official_confirmed 的 R7.4 校验痕迹
+  PASS  存在 official_confirmed 用例
+  PASS  官方来源 URL 命中登记表（host=marvel.com + path 命中 allowed_paths）
+
+■ 5. 关联 MCU 节点（未命中丢弃 / 阶段不跳转）
+  PASS  related_movies 全部命中 MCU_CONTENT 且为电影（关联校验用例除外）
+  PASS  关联校验用例确实写入了非 MCU_CONTENT 的 id
+  PASS  related_series 全部命中 MCU_CONTENT 且为剧集
+  PASS  related_characters 全部命中 MCU_CHARACTERS
+  PASS  related_phases 全部为 1-6 整数
+  PASS  【丢弃】avengers-5 不在 MCU_CONTENT → 关联节点被丢弃
+  PASS  【保留】角色关联仍渲染（steve / sam）
+  PASS  【不跳转】阶段节点卡 href 为空（D17，不产生死链）
+  PASS  【不跳转】阶段节点渲染为静态 span 而非 a 标签
+  PASS  【跳转参数】角色节点使用 map.html?focus=（不是 ?char=）
+  PASS  【跳转参数】作品节点使用 movie.html?id=
+
+■ 6. 排序与置顶（R5.2 五步）
+  PASS  Step 0：officially_denied 且未置顶者被剔除
+  PASS  Step 0：publish_time 与 first_seen_at 皆缺者被剔除
+  PASS  Step 1/2：有效置顶条目全部排在非置顶之前
+  PASS  Step 1：失效置顶（pinned_until 已过）不计入有效置顶
+  PASS  Step 3：置顶组内按 pinned_order 升序
+  PASS  Step 2：非置顶组按 publish_time 降序（缺失回落 first_seen_at）
+  PASS  官方确认不自动置顶（除人工 pinned 外，official 条目按时间序参与普通排序）
+
+■ 7. 措辞红线（R4.1 / 设计规范 D3）
+  PASS  无真实性/可信度百分比（禁止「真实性 87%」「可信度 92%」）
+  PASS  无绝对化措辞（已证实为真 / 100% / 铁定 / 确定无疑）
+  PASS  无实时性措辞（刚刚 / N 分钟前）
+  PASS  无星级与评分 UI（★★★★★ / 可靠指数）
+  PASS  multi_source_reported 标签沿用产品 R4.2 原文「多家媒体报道」
+  PASS  corrected 不使用绿色语义（仅暗金灰，见 v2n-news.css）
+  PASS  corrected 状态标签使用 --corrected 类（对应暗金灰）
+
+■ 8. 日期口径（D13：仅日期，无时分）
+  PASS  卡片/详情页日期一律 YYYY-MM-DD
+  PASS  publish_time 缺失时回落到 first_seen_at
+
+■ 9. file:// 纪律（无 fetch / 无网络依赖）
+  PASS  news.js 无 fetch / XMLHttpRequest / import（注释已剥离）
+  PASS  components.js 资讯部分无 fetch / import（注释已剥离）
+  PASS  news.html 引入 12 个标准数据脚本 + news.js
+  PASS  news.html 未引入 community.js（非资讯页所需）
+  PASS  news.html 引入 v2n-news.css
+  PASS  news.html 未引用 v4-news.css（禁止命名）
+  PASS  news.html news.js 位于 content.js 之后、app.js 之前
+  PASS  news-detail.html 引入 12 个标准数据脚本 + news.js
+  PASS  news-detail.html 未引入 community.js（非资讯页所需）
+  PASS  news-detail.html 引入 v2n-news.css
+  PASS  news-detail.html 未引用 v4-news.css（禁止命名）
+  PASS  news-detail.html news.js 位于 content.js 之后、app.js 之前
+  PASS  index.html 引入 v2n-news.css
+  PASS  index.html 引入 data/news.js 且位于 app.js 之前
+  PASS  index.html 已加「最新漫威资讯」Section
+  PASS  app.js 的 NAV 未新增导航项（仍为 4 项：首页/下一部/路线/地图）
+  PASS  index.html 未在 NAV 中加入资讯入口（资讯入口为首页 Section）
+
+============================================================
+结果：78 PASS / 0 FAIL
+============================================================

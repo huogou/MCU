@@ -1,0 +1,149 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《资讯状态判定器 V1.0 交付报告 · 精简版》（G1）
+执行：开发侧（Jarvis）｜2026-09-22 16:1x｜**未接采集、未联网、未修改 H5**
+全量版（归档）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\资讯状态判定器V1.0交付报告.txt
+新增代码（全部在 workspace 下，不进 h5）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\
+    news-judge-rules.cjs（枚举与常量）｜news-judge.cjs（判定引擎）
+    fixtures\judge-cases.cjs（测试夹具）｜test-judge-golden.cjs｜test-judge-boundary.cjs
+测试留档：同目录 out-golden.txt / out-boundary.txt / out-baseline-codes*.txt / out-gitstatus.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】判定器设计
+
+  形态：**纯函数规则引擎**。零网络、零 AI 依赖、零副作用、时间可注入、可幂等复现。
+  结构：rules 模块（纯数据：8 态枚举 / tier / 爆料词表 / registry 最小子集 /
+        官方登记表 / path 策略开关）+ judge 模块（判定逻辑）。规则与逻辑分离，
+        便于 G2 落地 registry 时只换数据源、逻辑一行不动。
+
+  三个关键设计决策：
+  1. **判定器不读文本、不做语义判断**。官方确认 / 官方否认 / 互斥表述由第一层 AI
+     建议 + 人工复核后以**结构化标记**传入（I9）。唯一例外：Step 7 对
+     `original_source` 一个字段做爆料词表匹配（该字段是最小封闭字段，
+     且 R8.3 Step 7 的判据本身即「原始来源是否属爆料」）。**title / summary 一律不匹配**。
+  2. **双计数**：`independent_group_count`（仅按 owner_group 去重，与 components.js
+     口径一致，用于输出与验收）与 `reliable_group_count`（额外要求 tier ∈ T1–T3，
+     用于 Step 5/6 的「可靠来源」判据）。现有 15 条下两值逐条相同，差异只在
+     B9/B10 这类边界出现。
+  3. **path 策略做成开关，默认 legacy**（★E-1）：默认允许栏目/目录页，
+     与现有断言一致；`article-level` 为 Q-5 冻结的严格版，**G8 数据修正后再启用**。
+     若不这样处理，001/009/013 将无法通过 Step 1/2，与「黄金用例复现现状」冲突。
+
+【二】输入输出契约
+
+  输入 = 结构事实 + 语义标记（物理分开）：
+    结构事实：reported_by[] / registry 映射 / URL / report_corrections[] /
+             conflict_statements[] / original_source
+    ★ 独立组数 **由判定器自算，禁止作为入参**（接口无该参数）
+    语义标记 I9：{ official_confirm:{url,reviewed}, official_denial:{url,reviewed},
+                  conflict_verified:{verified} }　缺省即「不成立」，一律降级
+
+  调用：judge(item, input, opts) → result
+        opts = { now, pathPolicy, previousStatus, judgedBy }
+
+  输出契约（**7 项必填，缺一即抛错**，不静默返回默认值）：
+    verification_status / chain_steps_hit / judged_by / status_changed_at /
+    status_change_reason / status_change_evidence_url / status_history_entry
+    另附诊断字段：rule_version / path_policy / independent_group_count / reliable_group_count
+
+  异常：item 为空、缺 id、产出状态不在 8 态内 → 显式抛错。
+
+【三】规则实现方案
+
+  派生：逐项取 owner_group → 丢弃「待核/未确认/unknown/空」→ 去重计数 → 输出。
+        空数组 → 0；全待核 → 0。
+
+  R7.4 机器校验（本阶段范围，全为字符串处理）：
+    URL 为 http(s) → host 不在不登记域名 → host 命中 allowed_domains →
+    path 命中 allowed_paths 且不在 excluded_paths → path 策略（legacy / article-level）
+    未实现：HTTP 可达性（属 G3）、「内容对应当前事件」（语义，由 I9 承载）、人工复核（由 reviewed 位承载）
+
+  八步链（短路，顺序即优先级）：
+    Step 1 官方确认（过校验 + reviewed）        → official_confirmed
+    Step 2 官方明确否认（过校验 + reviewed）     → officially_denied
+    Step 3 report_corrections 非空且**全部**有效报道均被更正 → corrected
+    Step 4 互斥已核准 且 conflict_statements ≥2 → conflicting
+    Step 5 reliable_group_count ≥ 2            → multi_source_reported
+    Step 6 reliable_group_count = 1            → single_source
+    Step 7 原 source 命中爆料词表 / 唯一来源 tier=T4 / 唯一来源 owner_group=unknown → rumor
+    Step 8 以上皆不成立                          → unverified
+
+  三条顺序性硬约束（均有对照测试）：
+    · Step 4 早于 Step 5（互斥时「表述一致」前提已破）—— B4 vs B4b
+    · Step 3 只施加于被更正的那条报道（011 即此形态）—— B8
+    · Step 6 要求「可靠来源」，T4 不得判 single_source —— B9
+
+  降级矩阵：任何缺数据 → 降级，绝不升格；来源未登记 → tier 默认 T4（保守）。
+
+【四】测试结果
+
+  ① 黄金用例（现有 15 条 news.js，vm 沙箱加载真实数据）→ **25 PASS / 0 FAIL**
+     15/15 状态 = 数据现状 = 任务书独立期望表（三处基准同时命中）
+     15/15 independent_group_count = 数据现状
+     15/15 chain_steps_hit = 数据现状
+     + 14 项关键规则专项（伪多源 / 真多源 / 待核不计组 / 空源 / 报道级更正 /
+       全部更正 / 更正链成对 / 官方确认 / 官方否认 / 置顶与日期缺失不影响状态 /
+       E-1 双策略 / 红线 1）全 PASS
+     ★ 结论：**R8.3 八步判定链可被完整复现** —— 现有 15 条状态不是人主观贴的，
+       而是判定链的确定性输出。
+
+  ② 合成边界用例 B1–B10 → **49 PASS / 0 FAIL**
+     含三条关键「不得升格」：
+       B9  独立组 1 / 可靠组 0 → 不得判 single_source
+       B10 独立组 2 / 可靠组 0 → 不得判 multi_source_reported
+       B4/B4b 同数据仅差核准位 → Step 4 vs Step 5（证明顺序性）
+
+  ③ V2.2 基线未变 → **78 / 55 / 11 全部 0 FAIL**（三脚本退出码均为 0）
+     test-news-rules.cjs 98B6DBEB…｜regression-news.cjs 3AD6DC9B…｜shots.cjs 45A42DEF…
+     h5\data\news.js 589A3934…（哈希未变）
+     git status 输出中**无任何 h5/ 路径**
+
+  ④ 如实记录一处**夹具缺陷**：首轮边界用例 9 FAIL 全在 B4/B4b/B8，
+     根因是我用 Variety + Deadline 构造「2 个独立组」，而二者**同属 Penske Media
+     Corporation**，独立组应为 1 —— 正是 003 号用例在防的「伪多源」。
+     改为跨集团（Variety/PMC + Collider/Valnet）后全绿。
+     **意义：引擎正确拦截了我自己的错误假设。**
+
+【五】例外与发现
+
+  F-1 ★ **E-1 范围应由 2 条更正为 3 条**：013 的 official_source_url 是
+      `https://www.marvel.com/articles/live-events/`（目录页），在 article-level
+      下同样不通过。→ G8 的 URL 修正清单 = **001 / 009 / 013 三条**。
+  F-2 ★ **judged_by 权威口径未定义**（待产品裁定）：现有 15 条中 6 条与
+      「按命中步骤自动派发」不同（5 条 ai_suggested、1 条 human_confirmed）。
+      两种读法：a) 谁最终确认了这条状态　b) 本次判定的层级。
+      该字段必须语义唯一，否则将来统计「AI 建议采纳率」会失真。不阻塞 G1。
+  F-3 本阶段未实现（属后续阶段）：HTTP 可达性（G3）、「内容对应事件」（G3/语义）、
+      去重与事件合并（G4）。
+  F-4 提示：`docs\产品\资讯模块\` 下 8 份 V2.2 期文档已被移入新建的 `2.2\` 子目录
+      （**非本阶段所为**，git 显示原路径「已删除」+ 新路径未跟踪）。
+      这导致我此前生成的 6 份文档的「关联文件索引」中指向这 8 份文件的路径失效。
+      本报告已按当前实际路径（含 `2.2\`）书写。**是否回补那 6 份，等指令。**
+  F-5 本阶段未触碰：h5/ 全部、三个基线测试脚本、shared/、wechat/、douyin/、docs/同步/。
+
+【六】待产品确认（3 项）与下一步
+
+  C-1 judged_by 的权威口径（建议选 b「按判定层级」，现有 15 条视为历史写法，G8 统一）
+  C-2 判定器代码是否入库（建议入库，属长期资产）
+  C-3 是否现在回补 6 份文档的失效路径（建议回补，可立即执行）
+
+  ★ 按任务书第 11 节：**已完成 D1–D7，现停止。**
+    不进入 G2，不顺手实现 G3/G4。等确认 C-1/C-2/C-3 后下达下一阶段任务书。
+    提示：G0 未闭环项 **E-2（The Direct / ComicBook 的 owner_group 仍待核）**
+    须在 **G5（采集）之前**关闭；不阻塞 G2/G3/G4 的推进。
+
+【七】置信度
+
+  高（~95%）：判定器对 15 条黄金用例的复现能力（直接实测、三处基准比对、可复现）；
+             八步链顺序性（有对照用例）；「不得升格」降级行为（B9/B10 直接验证）；
+             H5 与基线未受影响（git status + 四项 SHA256 + 三脚本退出码 0）
+  中（~65%）：边界用例的**覆盖完备性**（可能出现未预见的组合，如
+             「官方确认与互斥并存」的优先级争议）；爆料词表准确度（未用真实数据校准，
+             过宽会把正常报道误判为 rumor）；tier 的 T2/T3 分界
+  低（~30%）：判定器在**真实采集数据**上的表现（本阶段输入全为 mock 或合成，
+             真实 feed 的字段噪声未验证，须 G5 实测）；event_key 去重效果（未做实验）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G1 交付完成并停止。未接采集、未联网、未修改 H5。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

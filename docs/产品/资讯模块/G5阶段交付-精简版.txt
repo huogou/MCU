@@ -1,0 +1,143 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+★ 2026-09-23 修订（依 G5 任务书 V1.0）：L0 由 16 → **14 字段**
+  （event_key / first_publish_time 上移至 L1；L1 仍 35 = 14 + 21）；
+  merger 输入改为**白名单 9 字段**投影；测试扩为两套（103 + 61 = 164），
+  含任务书点名的 G5-T1–T6。**合计 10 项 / 575 条断言 / 0 FAIL。**
+  → 本精简版下文凡出现「16 字段」请按 **14** 读；详见《G5-阶段报告.txt》。
+
+《G5 阶段交付 · 精简版》（转交策划用）
+2026-09-23｜开发侧（Jarvis）｜**未接网络、未抓取、未写 h5/、未进入 G6**
+五份全量报告（均在 docs\产品\资讯模块\）：
+  G5-pipeline目录报告.txt｜G5-RawCaptureSchema报告.txt｜
+  G5-CandidateItemSchema报告.txt｜G5-fixtures测试报告.txt｜G5-回归报告.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一句话结论】
+三层管道基础已建成（RawCapture 16 字段 → CandidateItem 35 字段 → EventCandidate），
+**100 条新断言全绿**，既有 **411 条断言全部保持 PASS**，基线未漂移。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【一、目录（已创建）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  workspace\news\
+  ├── engine\        ← G1–G4 冻结层（judge / registry / validator / dedup）
+  └── pipeline\      ← ★ 本阶段新增
+      ├── raw-capture.cjs      L0 接口
+      ├── candidate-item.cjs   L1 接口 + toMergerInput 适配器
+      ├── test-pipeline.cjs    100 条断言
+      ├── fixtures\g5-cases.cjs
+      ├── captures\  candidates\  events\   ← 三层落盘位（UTF-8 JSON）
+  ※ engine\ 与 pipeline\ **平级**，引用路径为 `../engine/...`（首轮踩过坑，已修）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【二、L0 RawCapture（16 字段）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  capture_id｜pipeline_run_id｜registry_id｜source_name｜source_url｜url_level｜
+  title_raw｜published_at_raw｜published_at｜fetched_at｜feed_type｜http_status｜
+  content_hash｜raw_excerpt(≤200字)｜event_key｜first_publish_time
+
+  ★ 两条必须知悉：
+  1. **L0 的 event_key 是临时指纹**（只有 title_raw，无 category/关联 →
+     必然走 text 模式），**L1 会重算且通常不同**。
+     → **禁止**用 L0 的 key 做跨层主键或跨层比较。
+  2. **registry_id 允许保留值 `unregistered`**（来源不在登记表时用，
+     如未具名社交爆料）；**不得**凭来源名猜 registry_id。
+
+  8 个错误码（fail closed，非法条目一律拒绝）：INVALID_URL｜UNKNOWN_REGISTRY_ID｜
+  SOURCE_NAME_MISMATCH｜INVALID_FEED_TYPE｜INVALID_HTTP_STATUS｜EXCERPT_TOO_LONG｜
+  FORBIDDEN_FIELD｜MISSING_FIELD。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【三、L1 CandidateItem（35 字段 = L0 16 + 新增 19）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  新增：candidate_id（`cand-xxxxxxxx-001`，**不得**用交付物 id 格式）｜title｜summary｜
+  category（6 值）｜related_movies/series/characters/phases｜reported_by｜
+  original_source(_url)｜publish_time｜first_seen_at｜ai_suggested_status｜ai_model｜
+  capture_refs｜gate_status（默认 pending）｜**report_corrections｜conflict_statements**
+
+  ★ 三条硬禁止（实现层强制）：
+   ① **不得生成 verification_status**（末态只能由 G1 判定器按 R8.3 重算）
+   ② **不得进入 33 字段交付物**（12 项交付物独有字段点名断言缺失）
+   ③ **不得使用交付物 id 格式**
+
+  ★★ 本阶段补充登记 2 个 L1 字段（规范缺口闭合）：
+   `report_corrections[]` / `conflict_statements[]` —— Candidate Schema §5.1 规定
+   judge 读取它们，但 V1.0 的 L1 结构未承载 → 判定输入链断裂。
+   已按 §8「仅可新增可选字段并登记」补入（默认 []），**待你确认**。
+
+  ★ 管道侧接线：`reported_by[0].owner_group` **以登记表为权威来源**
+   （C1 → Disney/Marvel；C2 → Penske Media Corporation；未登记 → unknown）。
+   这闭合了 G4.3 登记的「登记表未接入判定链」缺口在**管道侧**的那一半。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【四、★★ 实测发现的一处跨层契约缺口（已修）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  `event-merger`（G4）读的条目主标识字段名是 **`id`**，
+  而候选层字段名是 **`candidate_id`**（`id` 在 L1 属禁止字段）。
+  → 直接喂入：`reports[].id` 全空、`report_count` **恒为 0**，
+    表现为「报道记录全丢」（实为字段名不通）。
+
+  **处理**：调用侧加适配器，**不改冻结件** ——
+   `CI.toMergerInput(candidate)` → `{ ...candidate, id: candidate.candidate_id }`
+
+  **双向锁定**：正证（适配后 reports_preserved = 输入数、records_deleted = 0）+
+  **反证**（未适配时 reports_preserved = 0）。
+  → **后续阶段（尤其 G6 落库）不得绕过该适配器。**
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【五、fixtures 与测试（100 PASS / 0 FAIL）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  任务要求 8 类覆盖：
+   1 官方来源 C1｜2 媒体来源 C2｜3 未登记来源 C3｜4 非法 URL C4a–d（4 变体）｜
+   5 重复事件 C5（同事件两来源 → 同 key，merger 归并为 1 事件）｜
+   6 supersedes 场景 C6（同 key 两条，一条带 report_corrections →
+     **merger 归并为 1 事件但两条报道记录都保留**，满足边界规范 A3/A4）｜
+   7 缺失发布时间 C7（published_at=null → publish_time=''，first_seen_at 回落，不拒绝）｜
+   8 异常字段 C8a–o（15 变体逐项断言错误码）+ 关联交集用例
+
+  ★ 首轮 **84 PASS / 13 FAIL**，四类根因**全部是我方问题**：
+   ① 字段计数笔误（L0 误写 15、L1 误写 34）→ 更正为 **16 / 35**（4 处）
+   ② 空 URL 报错码不准（MISSING_FIELD → INVALID_URL）→ 调整校验顺序（1 处）
+   ③ L1 复用 L0 validate 未放行额外字段 → 加 `allowExtraFields` 开关（3 处）
+   ④ **跨层字段名不通** → `toMergerInput()` 适配器（5 处）
+   修正后 **100 / 0**。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【六、回归与基线】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ```
+  G5 新增  100 PASS ｜ G1 25 + 49 ｜ G2 38 ｜ G3 60 ｜ G4 95
+  V2.2 78 + 55 + 11
+  合计 9 项 / 511 条断言 / 0 FAIL / 9 个退出码全为 0
+  ```
+  · 任务书要求「411 条保持 PASS」→ **已满足**，并新增 100 条。
+  · `h5\data\news.js` SHA256 = `589A3934…0242F2`（**与基线一致**）
+  · git 59 条变更中 **h5 / wechat / douyin = 0 条**
+  → 证明：h5 未修改、news.js 未修改、交付层未受影响。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【七、待你确认（2 项）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. L1 补充字段 `report_corrections` / `conflict_statements` 是否采纳
+     （我按 Candidate Schema §8「仅可新增可选字段」处理，建议采纳）
+  2. `registry_id` 保留值 `unregistered` 是否作为正式约定（建议采纳）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【八、本阶段未做（守界声明）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  未开发完整生产采集（无定时/轮询/出口配置）｜未接真实网络｜未抓网页｜
+  未调用外部 API｜未写 h5/wechat/douyin｜未改 33 字段与 8 态｜
+  未改 G1–G4 任何冻结代码｜未进入 G6。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【九、置信度】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  高（~92%）：字段结构、三条硬禁止、适配器必要性（正证+反证）、
+            511 条断言全绿、SHA256 与 git 双向取证
+  中（~70%）：夹具形态完备性（真实 feed 噪声未覆盖）；
+            url_level 对目录页的误判边界；两个待确认项的最终采纳
+  低（~30%）：真实采集数据进入管道后的稳定性与异常发生率（本阶段无真实输入）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+  状态：G5 第一段完成并停止。等待《G5 采集器开发任务书》（后续段）。
+━━━━━━━━━━━━━━━━━━━━━━━━━━

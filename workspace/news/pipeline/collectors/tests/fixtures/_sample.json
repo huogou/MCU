@@ -1,0 +1,19 @@
+{
+  "source": "sample-public-json-feed",
+  "items": [
+    {
+      "id": "j-001",
+      "title": "Marvel 公布《复仇者联盟5：毁灭之日》首支预告",
+      "url": "https://example-feed.test/items/avengers-doomsday-teaser",
+      "published_at": "2026-09-22T21:10:00Z",
+      "summary": "公开 JSON 接口示例条目：用于验证 JSON 解析通道（非真实接口）。"
+    },
+    {
+      "id": "j-002",
+      "title": "Daredevil: Born Again to End With Season 3",
+      "url": "https://example-feed.test/items/daredevil-s3-end",
+      "publishedAt": "2026-09-22T23:40:00Z",
+      "description": "公开 JSON 接口示例条目（驼峰字段名），验证字段名多态。"
+    }
+  ]
+}

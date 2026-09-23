@@ -1,0 +1,133 @@
+============================================================
+G5.2 采集器测试（T1 – T8）
+============================================================
+采集器版本 1.0｜L0 14 字段｜零网络（local fixture）
+
+■ T1  source_registry 读取正确
+  PASS  来源总数 = 登记表条目数（12）
+  PASS  S002 source_id = registry_id
+  PASS  S002 source_name 与登记表一致
+  PASS  S002 source_url = 登记出口 feed_url
+  PASS  S002 owner_group 原样读取 = 独立（不推断）
+  PASS  S002 tier = T3
+  PASS  S002 source_type = MCU垂直媒体
+  PASS  S004 owner_group = Penske Media Corporation
+  PASS  S003 owner_group = Savage（登记表原值）
+  PASS  登记表本身 S002 = 独立
+  PASS  已启用来源 = 6 条（S001–S006）
+  PASS  未启用来源被 enabledOnly 过滤（S007 不在其中）
+  PASS  ★ 来源记录中不含任何推断字段（仅登记表字段投射）
+
+■ T4  非法来源拒绝（fail closed）
+  PASS  未登记来源 → UNKNOWN_REGISTRY_ID
+  PASS  S007（THR，ai_ban_named）→ 不可采集
+  PASS  S007 拒绝码 = SOURCE_POLICY_REFUSED
+  PASS  S008（EW，blocked）→ SOURCE_POLICY_REFUSED
+  PASS  S009（Collider，ai_ban_notice）→ SOURCE_POLICY_REFUSED
+  PASS  S001（Marvel 官方）→ 可采集（auto_allowed + enabled）
+  PASS  collect(未登记来源) → errors 1 条
+  PASS  collect(未登记来源) 错误码
+  PASS  collect(未登记来源) 产出 capture 数 = 0
+  PASS  collect(THR) 被合规守卫拦下（未进入取数）
+  PASS  夹具缺失 → FIXTURE_NOT_FOUND
+
+■ 解析器：RSS · dc:date 陷阱 · JSON · html 出界
+  PASS  Variety RSS 解析出 2 条
+  PASS  pubDate 可解析（RSS 常规路径）
+  PASS  实体解码生效（&#8216; → 左单引号）
+  PASS  link 提取正确
+  PASS  The Direct RSS 解析出 2 条
+  PASS  ★ dc:date 被正确读取（不读则时间全空）
+  PASS  ★ 未触发「条目时间全空」告警
+  PASS  频道级时间不混入条目
+  PASS  【反证】移除 dc:date 后触发 ENTRY_DATE_MISSING_BUT_CHANNEL_DATE_PRESENT
+  PASS  JSON 接口解析出 2 条
+  PASS  JSON published_at 字段被识别
+  PASS  JSON publishedAt（驼峰）被识别
+  PASS  JSON summary 被识别
+  PASS  ★ html-parse 明确出界（任务书第 5 节）
+  PASS  出界码 = HTML_PARSE_NOT_IN_SCOPE
+  PASS  空文本 → EMPTY_CONTENT
+  PASS  不支持的 feed_type → UNSUPPORTED_FEED_TYPE
+
+■ T5  RawCapture 字段 14 项完整（采集链路 S004）
+  PASS  S004 无错误
+  PASS  S004 解析 2 条 / 接受 2 条
+  PASS  产出 capture 2 条
+  PASS  字段集合恰为 14
+  PASS  字段名与 RC.FIELDS 完全一致
+  PASS  registry_id 来自登记表
+  PASS  source_name 与登记表一致
+  PASS  ■ L0 不含 event_key（14 字段版）
+  PASS  ■ L0 不含 first_publish_time
+  PASS  url_level 由文章级 URL 判定为 article
+  PASS  published_at 已规范化
+  PASS  feed_type 来自登记表
+  PASS  http_status 已记录
+  PASS  L0 validate 通过
+  PASS  标题未被改写（与解析结果逐字符一致）
+  PASS  原始证据齐备（url / published_at_raw / fetched_at / content_hash / raw_excerpt）
+  PASS  raw_excerpt ≤ 200 字
+
+■ T5b  官方来源 S001（html-parse）→ 明确出界、不产垃圾
+  PASS  S001 产出 capture = 0
+  PASS  S001 报 HTML_PARSE_NOT_IN_SCOPE
+  PASS  ★ 出界时不产出任何半成品 capture
+
+■ T6  采集异常不会污染 Candidate（fail closed，逐条）
+  PASS  S005 解析 3 条（含 1 条缺标题脏数据）
+  PASS  S005 接受 2 条
+  PASS  S005 拒绝 1 条
+  PASS  被拒条目的错误码 = MISSING_FIELD
+  PASS  ★ 单条脏数据未阻塞其他条目（3 解析 → 2 接受）
+  PASS  输出仍通过洁净检查（无状态字段）
+  PASS  输出不含任何状态字段（深扫）
+  PASS  输出不含 event_key / first_publish_time
+  PASS  每一条 capture 都能构造 L1 且未被脏数据污染
+  PASS  normalizer 对缺标题条目抛 MISSING_FIELD
+  PASS  normalizer 拒绝含状态字段的入参
+  PASS  normalizer 拒绝 event_key（不属 L0）
+
+■ T2  owner_group 从 registry 进入 reported_by
+  PASS  S004 的 L1.reported_by[0].owner_group = Penske Media Corporation
+  PASS  与登记表逐字符一致
+  PASS  S002 的 L1.reported_by[0].owner_group = 独立（登记表原值）
+  PASS  ★ 未按来源名推断（登记表值为 独立，而非猜测的集团名）
+  PASS  L1 的 source_url 为文章级（不是 feed 出口）
+
+■ T3  未知来源进入 unregistered
+  PASS  采集器拒绝未登记来源（不伪造来源记录）
+  PASS  保留值 unregistered 可用于未登记来源
+  PASS  未登记来源的 owner_group 回落 unknown（不推断）
+  PASS  L1 validate 通过
+
+■ T7  重复抓取 content_hash 一致
+  PASS  两次抓取产出条数一致
+  PASS  ★ 两次抓取 content_hash 逐条一致
+  PASS  capture_id 亦一致（同 run_id + 同序号）
+  PASS  【反证】标题变化 → content_hash 变化
+
+■ T8  不同时间抓取不覆盖历史 capture
+  PASS  runA 落盘 2 条
+  PASS  runB 落盘 2 条（capture_id 含 run_id，不冲突）
+  PASS  归档总数 = 4（历史保留 + 新批次追加）
+  PASS  runA 的记录仍在归档中
+  PASS  runA 记录未被改写（fetched_at 仍为 02:00:00Z）
+  PASS  runA 的 content_hash 未被改写
+  PASS  同批次重跑 → 新增 0
+  PASS  同批次重跑 → 跳过 2（幂等）
+  PASS  归档总数仍为 4
+  PASS  按 run_id 过滤可查（runA 2 条）
+
+■ collectAll（全部可采集来源）
+  PASS  尝试来源数 = 6（S001–S006）
+  PASS  S007–S012 未被尝试（合规/未启用）
+  PASS  html-parse 来源（S001/S006）报出界而非崩溃
+  PASS  缺夹具来源（S003）报 FIXTURE_NOT_FOUND 而非崩溃
+  PASS  输出洁净（无状态字段）
+
+■ 已清理临时目录 collectors\tests\tmp\
+
+============================================================
+结果：101 PASS / 0 FAIL
+============================================================

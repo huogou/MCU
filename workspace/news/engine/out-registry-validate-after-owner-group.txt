@@ -1,0 +1,83 @@
+★ 说明（2026-09-23 G4.3 收口）
+★ source-registry.json 已按负责人确认修改 S002 / S003 的 owner_group：
+    S002 The Direct = 独立      （负责人确认：无母公司、独立运营）
+    S003 ComicBook  = Savage    （依据：comicbook.com/robots.txt 首行「# Added by savage robots-txt」，留档 workspace\sources-probe-2.txt 第 19 行）
+★ 本次仅修改 owner_group 一字段，其余 19 字段未动（note 仍含「★ owner_group 待核（E-2）」字样，属已知待清理项）。
+★ 本文件为修改后的 registry 校验输出：38 PASS / 0 FAIL，退出码 0。
+★ 同时登记一处接线事实（重要）：判定器计算独立证据组读取的是交付数据 news.js 的
+   reported_by[].owner_group，**不读登记表的 owner_group** —— 因此本次登记表修改对现有
+   411 条断言零影响；005/008/010/014 的 reported_by[].owner_group 仍为「待核」，须在 G8 同步。
+----------------------------------------------------------------------
+============================================================
+G2 · source_registry V1.0 校验
+============================================================
+登记表：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+版本：V1.0｜条目：12 条｜字段：20 个
+
+■ 1. 登记表内部校验（R-01 – R-22）
+  PASS  校验器整体判定 pass = true
+  PASS  校验问题数 = 0
+  PASS  R-01 registry_id 格式可被检出（注入非法 id）
+  PASS  R-02 registry_id 唯一可被检出（注入重复 id）
+  PASS  R-04 source_name 唯一可被检出（注入重复名）
+  PASS  R-05 字段齐备性可被检出（删除字段）
+  PASS  R-07 tier 枚举可被检出（注入非法 tier）
+  PASS  R-08 crawl_policy 枚举可被检出（注入非法 crawl_policy）
+  PASS  R-09 health 枚举可被检出（注入非法 health）
+  PASS  R-11 official_or_media 枚举可被检出
+  PASS  R-14 feed_url 条件必填可被检出（feed_type=rss 但 url 为空）
+  PASS  R-15 enabled 无出口可被检出
+  PASS  R-17 owner_group 为空可被检出
+  PASS  R-19 official ↔ T1 联动可被检出
+  PASS  R-20 非官方来源填写 allowed_* 可被检出
+  PASS  R-21 合规联动可被检出（ai_ban_named 却 enabled=true）
+  PASS  R-22 不登记域名泄漏进 allowed_domains 可被检出
+
+■ 2. 任务点名的五项检查
+  PASS  【检查 2】registry_id 唯一（无重复）
+  PASS  【检查 2】registry_id 全部形如 S\d{3}
+  PASS  【检查 2】registry_id 恰为 S001–S012（连续无缺号、无重号）
+  PASS  【检查 3】tier 全部命中枚举 T1/T2/T3/T4
+  PASS  【检查 4】crawl_policy 全部命中枚举 auto_allowed/manual_only/ai_ban_named/ai_ban_notice/blocked
+  PASS  【检查 5】health 全部命中枚举 ok/degraded/paused
+  PASS  【检查 1】source_name 唯一（无重复）
+  PASS  【检查 1】source_name 全部非空且已去首尾空白
+  PASS  合规联动：所有 ai_ban_* / blocked 来源 enabled 均为 false
+
+■ 3. 跨文件一致性（与 h5/data/news.js 比对）
+  INFO  news.js 中出现的 reported_by[].source_name：10 个
+        Marvel 官方 ｜ Variety ｜ Entertainment Weekly ｜ Deadline ｜ The Hollywood Reporter ｜ The Direct ｜ ComicBook ｜ 社交平台爆料（未具名） ｜ Collider ｜ The Walt Disney Company 官方公告页
+  PASS  【检查 1】15 条数据中的 reported_by 来源全部已在登记表（未登记数 = 1，见 INFO）
+  INFO  未登记来源清单：社交平台爆料（未具名）
+  PASS  【检查 1】news.js 的 official_source 全部命中登记表且为 official 来源
+  PASS  登记表内 12 条 source_name 与 news.js 中出现的名称「逐字符一致」（无同名变体）
+
+■ 4. 与 G1 判定器的连接验证
+  PASS  判定器规则模块已改为消费登记表（SOURCE_REGISTRY 来自 registry）
+  PASS  判定器侧 SOURCE_REGISTRY 条目数 = 登记表条目数
+  PASS  每个已登记来源在判定器中读到的 tier = 登记表 tier
+  PASS  未登记来源在判定器中回落为 T4（保守降级）
+  PASS  未登记来源在登记表中查不到（保持「未登记」与「登记为 T4」可区分）
+  PASS  官方来源派生 = official 且域名已登记者（S001 / S006 / S012）
+  PASS  域名未登记的官方条目（S010 / S011）不进入官方来源登记
+  PASS  本阶段启用来源 = S001–S006（6 条）
+  PASS  不登记域名黑名单已随登记表加载（4 项）
+
+■ 5. 初始登记数据（S001–S012）
+  id   source_name                       owner_group              tier crawl_policy   health 启用
+  S001 Marvel 官方                       Disney / Marvel        T1   auto_allowed   ok     是
+  S002 The Direct                      独立                     T3   auto_allowed   ok     是
+  S003 ComicBook                       Savage                 T3   auto_allowed   ok     是
+  S004 Variety                         Penske Media CorporationT2   auto_allowed   ok     是
+  S005 Deadline                        Penske Media CorporationT2   auto_allowed   ok     是
+  S006 The Walt Disney Company 官方公告页   The Walt Disney CompanyT1   auto_allowed   ok     是
+  S007 The Hollywood Reporter          Penske Media CorporationT2   ai_ban_named   ok     否
+  S008 Entertainment Weekly            People Inc.            T2   blocked        ok     否
+  S009 Collider                        Valnet                 T3   ai_ban_notice  ok     否
+  S010 Marvel 日本官方                     Disney                 T1   blocked        ok     否
+  S011 Marvel Studios 官方               未确认                    T1   manual_only    ok     否
+  S012 D23 官方                          The Walt Disney CompanyT1   manual_only    ok     否
+
+============================================================
+结果：38 PASS / 0 FAIL
+============================================================

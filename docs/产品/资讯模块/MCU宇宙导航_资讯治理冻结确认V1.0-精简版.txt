@@ -1,0 +1,137 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU宇宙导航｜资讯治理冻结确认 V1.0 · 精简版》（转交用）
+编制：开发侧（Jarvis）｜2026-09-22｜**未写代码、未修改 H5、未开发采集**
+全量版（归档，含全部字段表与签字栏）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\MCU宇宙导航_资讯治理冻结确认V1.0.txt
+配套任务书（下一阶段 G1）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\资讯状态判定器V1.0开发任务书.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】Q-1 .. Q-6 最终决策版
+
+  Q-1 category 字段策略　　【已冻结】
+    定位＝**资讯主题类型**（不是关联对象类型）；枚举 **6 值**：
+    movie / series / special / short / character / industry
+    前 4 值对齐 MCU_CONTENT.type 词表，character 对齐 MCU_CHARACTERS；
+    必填，无法归类兜底 industry；**不进渲染、不参与筛选与排序**（实测无渲染位）。
+
+  Q-2 publish_time 策略　　【已冻结】
+    · publish_time = **来源文章的发布时间**（YYYY-MM-DD，前端只展示日期）
+    · first_seen_at = **系统首次见到该内容的时间**（ISO8601 UTC）
+    · 两字段至少一个非空（皆缺 → 条目被排序 Step 0 **静默剔除**）
+    · 排序：publish_time 优先，缺失回落 first_seen_at
+    · 延迟 = first_seen_at − publish_time，**仅内部统计，禁止对外展示**
+    · 每篇报道的 published_at **只存管道层**，不进交付物
+
+  Q-3 related_* 关联范围　　【待签字】
+    建议冻结值：**维持现状，不扩展**。
+    related_movies / series 只能命中 MCU_CONTENT；characters 只能命中 MCU_CHARACTERS；
+    phases 只能 1–6；未命中一律丢弃。
+    登记为已知限制：**MCU_UPCOMING 的未来未上映作品无法被关联**（001 号用例实测被丢弃）。
+    不扩展理由：①扩展需改前端取数域＝改 UI　②G1–G7 均不触碰 UI　③属三方事项，应单独立项。
+    若不同意：需改 UI，回退成本高。
+
+  Q-4 rule_version 归属　　【已冻结】
+    **只进管道层（必填），不进交付物**；status_history 内不追加；
+    交付物保持 **33 字段**不变。原因：任何字段增减都会与设计规范 R12.2 生口径差
+    并触发断言口径变化。历史可复算性由管道层保存记录保证。
+
+  Q-5 source_url 路径规则　　【已冻结，动作推迟】
+    强制**文章级 URL**：
+    · reported_by[].source_url 与 official_source_url 必须是文章页链接
+    · 禁止 feed 端点（/feed/、/rss）、栏目页（marvel.com/news）、目录页
+    · R7.3 allowed_paths 收紧为「至少含一级 slug 段」（/news/{slug} 形态）
+    · feed 级 URL 只允许出现在 source_registry.feed_url
+    · 社交等无文章页来源按 R7.5，须附原始发布链接
+    依据：实测 **15/15 条全部非文章级** → R7.4 的 path 校验形同虚设。
+    ★ **执行动作推迟至 G8**（见 E-1）。
+
+  Q-6 三端复用边界　　【待签字】
+    建议冻结值：**仅 H5 + 结构可转换**；不承诺、不实现小程序端资讯展示；
+    不建 shared/data/news.js、不复制到 wechat/douyin、不加跨端同步脚本。
+    三条理由（事实）：①微信/抖音端**零资讯代码**（全仓命中 0）
+    ②已有拍板不复制到小程序端　③抖音 V1.2.0 曾因「文娱-资讯」类目被驳回。
+    作废条件：一旦确认小程序端要显示资讯，本项立即作废，静态通道技术上不成立，
+    须重走存储选型（V3.0 方案第四节）。回退成本高。
+
+【二】四项基线冻结
+
+  ① 字段规范冻结
+     交付物 = 前端展示 26 + 审计 7 = **33 字段**（命名/类型/语义一律不得变更）；
+     管道字段 **12 个**（event_key / registry_id / ingested_at / raw_excerpt /
+     content_hash / crawl_evidence / ai_suggested_status / ai_model /
+     pipeline_run_id / reviewed_by / reviewed_at / rule_version）**不得进交付物**；
+     4 种嵌套结构键名冻结；格式约定 6 条（id 形态 / 日期 / 空值 / URL / 纯文本 / 名称一致）；
+     前端硬约束 8 条（summary 纯文本、双时间至少一个非空、URL http(s)、
+     **不得引入图片字段**、关联未命中丢弃、「待核」不计组、corrected 事件级独立重算…）
+
+  ② 状态体系冻结
+     **8 态冻结，禁止第 9 态**（前端 NEWS_LABEL 仅 8 键，未知值兜底 unverified）；
+     8 态展示文案与提醒语冻结；措辞红线冻结；
+     排序五步冻结（官方确认不自动置顶、状态仅作并列打破器）；
+     状态≠永久标签，新证据必须重跑判定链；
+     officially_denied 保留不删；corrected 报道级≠事件级；conflicting 并列展示。
+
+  ③ source_registry 冻结
+     **20 字段**冻结（registry_id / source_name / owner_group / tier / crawl_policy /
+     health / note + source_type / official_or_media / discovery_role / feed_type /
+     feed_url / allowed_domains / allowed_paths / excluded_paths / source_role /
+     last_check_at / consecutive_failures / enabled / registry_version）；
+     枚举冻结（tier T1–T4；crawl_policy 5 类；health 3 态）；
+     **种子数据 12 条**（S001–S012）冻结；
+     维护规则 6 条；`non_official_domains` 黑名单冻结。
+     ★ 定位：管道层文件，**任何字段都不得渲染进 H5**。
+
+  ④ 判定器原则冻结
+     输入契约 I1–I9；★ **判定器不读文本、不做语义判断**（官方否认/冲突等语义
+     由第一层 AI 建议 + 人工复核后以结构化标记传入）；
+     独立组数由判定器**自行去重计算，禁外部传入**；
+     8 步判定链冻结（Step 4 必须早于 Step 5；Step 3 仅施加于被更正的那条报道）；
+     「可靠来源」冻结为 **tier ∈ {T1,T2,T3}，T4 不构成可靠来源**；
+     输出 7 项缺一不得入库；重新判定必须从 Step 1 重跑，人工不得指定目标状态；
+     **缺数据一律降级、绝不升格**；红线 10 条；三层职责边界冻结。
+
+【三】当前禁止事项（G0 冻结期，立即生效）
+
+  X1 不写任何代码（含判定器/校验器/去重/采集）
+  X2 不修改 H5 任何文件
+  X3 不开发采集、不发起网络请求、不探活来源
+  X4 不修改三个测试脚本的断言（含 Q-5 要求的 path 收紧 → 推迟至 G8）
+  X5 不建 shared/data/news.js、不复制到小程序端
+  X6 不新增第 9 态、不改 8 态文案
+  X7 不增减 33 字段、不改嵌套键名
+  X8 不为 The Direct / ComicBook 猜测 owner_group
+  X9 Q-3 未签字前不扩展关联范围
+
+  长期禁止：管道字段不得进交付数据｜registry 字段不得渲染｜tier 不得映射状态｜
+  禁百分比与实时性措辞｜禁抓第三方封面图｜禁抓 ai_ban_* 来源｜
+  AI/人工均不得指定状态｜不得删除 officially_denied｜不得覆盖 status_history。
+
+【四】例外与待办
+
+  E-1 ★ **Q-5 收紧与本次禁令冲突**：收紧 path 断言后，现有 001/009 两条
+      （official_source_url = marvel.com/news 栏目页）将不通过；修正它们需改
+      h5/data/news.js → 与「不修改 H5」直接冲突。
+      **处理：规则即日冻结，执行动作推迟至 G8**。G8 前不得据 Q-5 判定现状数据违规。
+  E-2 S002 / S003 的 owner_group 仍「待核」—— 冻结的是字段与枚举，不是这两个值已确认。
+      影响 005/008/010/014 四条；须在 G5（采集）之前关闭。
+  E-3 未来未上映作品无法关联（Q-3 冻结下的既有能力边界，非缺陷）。
+  E-4 测试夹具仍留在生产数据（avengers-5 负向用例 + publish_time=null），G8 按 6 处依赖点迁移。
+  E-5 本轮完全未触碰 h5/、三个测试脚本、shared/、wechat/、douyin/。
+
+【五】签字与置信度
+
+  已由开发侧直接冻结（无需签字）：Q-1 / Q-2 / Q-4 / Q-5（规则）+ 四项基线
+  需负责人签字：**Q-3（关联范围）、Q-6（三端边界）、E-1（生效时点）**
+  ※ 签字仅表示确认冻结值，**不表示授权开工**；G1 开工须另行下达指令。
+
+  置信度：
+    高（~90%）——四项冻结值与 Q-1/Q-2/Q-4 决策（由封版规范 + 实测推导，可复核）；
+               E-1 冲突判定（断言与实测逐行对照）
+    中（~65%）——Q-3「不扩展」属产品取向判断；Q-5 的 slug 形态未全量验证；
+               「可靠来源 = T1–T3」的 tier 分界需真实数据校准
+    低（~30%）——Q-6 的稳定性（属外部产品决策）；S002/S003 归属（探活未证实）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G0 治理冻结确认完成。未写代码、未修改 H5、未开发采集。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

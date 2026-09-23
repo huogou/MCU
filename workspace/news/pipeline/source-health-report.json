@@ -1,0 +1,317 @@
+{
+  "report": "source-health-report",
+  "version": "1.0",
+  "generated_at": "2026-09-23T03:25:05.771Z",
+  "scope": "G5.4 T9 连续 3 批真实采集（白名单 S002–S006；S001 html-parse 出界未纳入）",
+  "batches": [
+    {
+      "run_id": "run20260923G54B1",
+      "captured_at": "2026-09-23T03:26:43Z",
+      "transport": {
+        "requests": 13,
+        "retries": 2,
+        "timeouts": 4,
+        "redirects": 1
+      },
+      "store": {
+        "added": 130,
+        "skipped": 0,
+        "conflicts": 0,
+        "total": 260
+      },
+      "per_source": {
+        "S002": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 20,
+          "accepted": 20,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S003": {
+          "success": false,
+          "fail_reason": "HTTP_FORBIDDEN: [HTTP_FORBIDDEN] 取数通道失败：[HTTP_FORBIDDEN] HTTP 403：https://comicbook.com/category/marvel/feed/",
+          "http_status": 403,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S004": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 10,
+          "accepted": 10,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S005": {
+          "success": false,
+          "fail_reason": "ETIMEDOUT: [ETIMEDOUT] 取数通道失败：请求超时",
+          "http_status": null,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S006": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 100,
+          "accepted": 100,
+          "rejected": 0,
+          "robots_policy": "allow"
+        }
+      }
+    },
+    {
+      "run_id": "run20260923G54B2",
+      "captured_at": "2026-09-23T03:27:40Z",
+      "transport": {
+        "requests": 13,
+        "retries": 2,
+        "timeouts": 2,
+        "redirects": 1
+      },
+      "store": {
+        "added": 130,
+        "skipped": 0,
+        "conflicts": 0,
+        "total": 390
+      },
+      "per_source": {
+        "S002": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 20,
+          "accepted": 20,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S003": {
+          "success": false,
+          "fail_reason": "HTTP_FORBIDDEN: [HTTP_FORBIDDEN] 取数通道失败：[HTTP_FORBIDDEN] HTTP 403：https://comicbook.com/category/marvel/feed/",
+          "http_status": 403,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S004": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 10,
+          "accepted": 10,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S005": {
+          "success": false,
+          "fail_reason": "ECONNREFUSED: [ECONNREFUSED] 取数通道失败：connect ECONNREFUSED 108.160.167.165:443",
+          "http_status": null,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S006": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 100,
+          "accepted": 100,
+          "rejected": 0,
+          "robots_policy": "allow"
+        }
+      }
+    },
+    {
+      "run_id": "run20260923G54B3",
+      "captured_at": "2026-09-23T03:28:02Z",
+      "transport": {
+        "requests": 13,
+        "retries": 2,
+        "timeouts": 0,
+        "redirects": 1
+      },
+      "store": {
+        "added": 130,
+        "skipped": 0,
+        "conflicts": 0,
+        "total": 520
+      },
+      "per_source": {
+        "S002": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 20,
+          "accepted": 20,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S003": {
+          "success": false,
+          "fail_reason": "HTTP_FORBIDDEN: [HTTP_FORBIDDEN] 取数通道失败：[HTTP_FORBIDDEN] HTTP 403：https://comicbook.com/category/marvel/feed/",
+          "http_status": 403,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S004": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 10,
+          "accepted": 10,
+          "rejected": 0,
+          "robots_policy": "allow"
+        },
+        "S005": {
+          "success": false,
+          "fail_reason": "ECONNREFUSED: [ECONNREFUSED] 取数通道失败：connect ECONNREFUSED 108.160.167.165:443",
+          "http_status": null,
+          "parsed": 0,
+          "accepted": 0,
+          "rejected": 0,
+          "robots_policy": "unknown"
+        },
+        "S006": {
+          "success": true,
+          "fail_reason": null,
+          "http_status": 200,
+          "parsed": 100,
+          "accepted": 100,
+          "rejected": 0,
+          "robots_policy": "allow"
+        }
+      }
+    }
+  ],
+  "sources": {
+    "S002": {
+      "attempts": 3,
+      "success_runs": 3,
+      "fail_runs": 0,
+      "fail_reasons": [],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "robots_policies": [],
+      "last_http_status": 200,
+      "robots_policy_last": "allow",
+      "success_rate": "3/3"
+    },
+    "S003": {
+      "attempts": 3,
+      "success_runs": 0,
+      "fail_runs": 3,
+      "fail_reasons": [
+        "HTTP_FORBIDDEN: [HTTP_FORBIDDEN] 取数通道失败：[HTTP_FORBIDDEN] HTTP 403：https://comicbook.com/category/marvel/feed/"
+      ],
+      "http_statuses": [
+        403,
+        403,
+        403
+      ],
+      "robots_policies": [],
+      "last_http_status": 403,
+      "robots_policy_last": "unknown",
+      "success_rate": "0/3"
+    },
+    "S004": {
+      "attempts": 3,
+      "success_runs": 3,
+      "fail_runs": 0,
+      "fail_reasons": [],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "robots_policies": [],
+      "last_http_status": 200,
+      "robots_policy_last": "allow",
+      "success_rate": "3/3"
+    },
+    "S005": {
+      "attempts": 3,
+      "success_runs": 0,
+      "fail_runs": 3,
+      "fail_reasons": [
+        "ETIMEDOUT: [ETIMEDOUT] 取数通道失败：请求超时",
+        "ECONNREFUSED: [ECONNREFUSED] 取数通道失败：connect ECONNREFUSED 108.160.167.165:443"
+      ],
+      "http_statuses": [],
+      "robots_policies": [],
+      "last_http_status": null,
+      "robots_policy_last": "unknown",
+      "success_rate": "0/3"
+    },
+    "S006": {
+      "attempts": 3,
+      "success_runs": 3,
+      "fail_runs": 0,
+      "fail_reasons": [],
+      "http_statuses": [
+        200,
+        200,
+        200
+      ],
+      "robots_policies": [],
+      "last_http_status": 200,
+      "robots_policy_last": "allow",
+      "success_rate": "3/3"
+    }
+  },
+  "note": "retries/timeouts/requests 为每批共享 transport 的全局计数（含 robots.txt 请求），不按来源拆分；单源故障通过 fail_reason 错误码归因（HTTP_FORBIDDEN / ETIMEDOUT / ECONNREFUSED 等）；robots_policy 为同日事后复查值（见 robots_reaudit），非采集时刻原值",
+  "robots_reaudit": {
+    "method": "同日事后复查（重取 robots.txt，parseRobots/matchRobots 与 http-transport 同源）",
+    "checked_at": "2026-09-23T03:31:06.470Z",
+    "results": {
+      "S002": {
+        "origin": "https://thedirect.com",
+        "feed_path": "/rss",
+        "robots_status": 200,
+        "policy": "allow",
+        "matched_rule": ""
+      },
+      "S003": {
+        "origin": "https://comicbook.com",
+        "feed_path": "/category/marvel/feed/",
+        "robots_status": 403,
+        "policy": "unknown",
+        "note": "status=403"
+      },
+      "S004": {
+        "origin": "https://variety.com",
+        "feed_path": "/feed/",
+        "robots_status": 200,
+        "policy": "allow",
+        "matched_rule": ""
+      },
+      "S005": {
+        "origin": "https://deadline.com",
+        "feed_path": "/feed/",
+        "robots_status": 0,
+        "policy": "unknown",
+        "note": "status=0 err=ETIMEDOUT"
+      },
+      "S006": {
+        "origin": "https://thewaltdisneycompany.com",
+        "feed_path": "/feed/",
+        "robots_status": 200,
+        "policy": "allow",
+        "matched_rule": ""
+      }
+    }
+  }
+}

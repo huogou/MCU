@@ -1,0 +1,203 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+★ 2026-09-23 修订提示（依 G5 任务书 V1.0）：L1 仍为 **35 字段**，但构成为
+  **L0 14 + 新增 21**（`event_key` / `first_publish_time` 由 L0 **上移**至 L1）；
+  `toMergerInput()` 已改为 **白名单 9 字段投影 + id 桥接（恰 10 键）**，
+  从结构上保证 merger 读不到验证/审核类字段。
+  以《G5-阶段报告.txt》与《候选数据CandidateSchemaV1.0.txt》顶部修订记录为准。
+
+《G5 交付报告 3／5 · CandidateItem Schema 报告》（L1）
+阶段：G5（第一段）｜日期：2026-09-23｜角色：开发侧（Jarvis）
+实现文件：workspace\news\pipeline\candidate-item.cjs
+本阶段性质：**仅实现接口**。不调用任何 AI 服务；AI 整理结果由调用方结构化传入。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+============================================================
+0. 关联文件索引
+============================================================
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-CandidateItemSchema报告.txt
+【实现与测试】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\candidate-item.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\raw-capture.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\test-pipeline.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\out-pipeline.txt
+【规范依据】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\候选数据CandidateSchemaV1.0.txt（第 3 / 4 / 5 节）
+【被消费的冻结模块（未修改）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-registry.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-key.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-merger.cjs
+
+
+============================================================
+1. L1 字段表（35 = L0 16 + L1 新增 19）
+============================================================
+
+  【L0 全部 16 字段原样继承】 capture_id / pipeline_run_id / registry_id /
+    source_name / source_url / url_level / title_raw / published_at_raw /
+    published_at / fetched_at / feed_type / http_status / content_hash /
+    raw_excerpt / event_key（**被重算覆盖**）/ first_publish_time
+
+  【L1 新增 19 字段】
+
+  ┌────────┬────────────────────────┬──────────────┬────────┬──────────────────────────────┐
+  │ 编号    │ 字段                    │ 类型          │ 必填    │ 说明                          │
+  ├────────┼────────────────────────┼──────────────┼────────┼──────────────────────────────┤
+  │ —      │ candidate_id           │ string       │ 必填    │ `cand-<event_key 后 8 位>-<3 位序号>`│
+  │        │                        │              │        │ ★ **不得**用交付物 id 格式      │
+  │ —      │ title                  │ string       │ 必填    │ AI 整理（**纯文本**）           │
+  │ —      │ summary                │ string       │ 必填    │ AI 撰写（**纯文本**）           │
+  │ —      │ category               │ enum(6)      │ 必填    │ movie/series/special/short/    │
+  │        │                        │              │        │ character/industry            │
+  │ —      │ related_movies         │ array<string>│ 必填    │ 可 []；须过交集校验             │
+  │ —      │ related_series         │ array<string>│ 必填    │ 同上                          │
+  │ —      │ related_characters     │ array<string>│ 必填    │ 同上                          │
+  │ —      │ related_phases         │ array<int>   │ 必填    │ 只保留 1–6 整数               │
+  │ —      │ reported_by            │ array<object>│ 必填    │ ★ owner_group **取自登记表**   │
+  │ —      │ original_source        │ string       │ 必填    │ 无法判断填 `unknown`           │
+  │ —      │ original_source_url    │ string       │ 必填    │ 可 ''                         │
+  │ —      │ publish_time           │ string       │ 二选一  │ 由 published_at 取日期部分      │
+  │ —      │ first_seen_at          │ string       │ 二选一  │ = fetched_at                  │
+  │ —      │ ai_suggested_status    │ enum(8)\|''  │ 必填    │ **建议值**，非最终状态          │
+  │ —      │ ai_model               │ string       │ 必填    │ 模型标识                       │
+  │ —      │ capture_refs           │ array<string>│ 必填    │ 指向 L0 的 capture_id          │
+  │ —      │ gate_status            │ enum(3)      │ 必填    │ pending(默认) / approved / rejected│
+  │ P-补1  │ report_corrections     │ array<object>│ 必填([])| ★ 本阶段补充登记（见第 3 节）│
+  │ P-补2  │ conflict_statements    │ array<object>│ 必填([])| ★ 本阶段补充登记（见第 3 节）│
+  └────────┴────────────────────────┴──────────────┴────────┴──────────────────────────────┘
+
+
+============================================================
+2. ★ 三条硬禁止（实现层强制）
+============================================================
+
+  ┌──────────────────────────────────┬──────────────────────────────────────────────┐
+  │ 禁止                              │ 实现方式                                      │
+  ├──────────────────────────────────┼──────────────────────────────────────────────┤
+  │ **不得生成 verification_status**   │ ① `verification_status` 在 `LAYER_FORBIDDEN_KEYS`│
+  │                                  │    内 → 入参一旦出现即抛 `FORBIDDEN_FIELD`      │
+  │                                  │ ② 输出深扫 9 项状态字段 → 测试断言 0 命中        │
+  │                                  │ ③ 输出全文不含 `verification_status` 字样       │
+  │ **不得进入 33 字段交付物**          │ L1 字段集合（35）与交付物（33）**无交集可混用**： │
+  │                                  │ 交付物独有 12 项（status_history / pinned×4 /  │
+  │                                  │ independent_group_count / official_source(_url) /│
+  │                                  │ supersedes×2 / conflict_resolved×2）**点名断言缺失**│
+  │ **不得使用交付物 id 格式**          │ `candidate_id` 正则 `^cand-…$`；              │
+  │                                  │ 命中 `^news-\d{4}-\d{2}-\d{2}-\d{3}$` 即抛错   │
+  └──────────────────────────────────┴──────────────────────────────────────────────┘
+
+  ★ 「AI 只能出建议值」这一点也做了强约束：
+    `ai_suggested_status` 仅接受 8 态枚举值或空串（**非 8 态即抛错**），
+    且它**不是** `verification_status` —— 后者只能由 G1 判定器按 R8.3 重算。
+
+
+============================================================
+3. ★ 本阶段补充登记的两个 L1 字段（规范缺口闭合）
+============================================================
+
+  · **P-补1 `report_corrections[]`** —— 报道级更正记录（judge Step 3 的输入）
+  · **P-补2 `conflict_statements[]`** —— 冲突各方表述（judge Step 4 的输入）
+  · 缺口依据：Candidate Schema §5.1 规定 judge 读取这两个字段，
+    但 V1.0 的 L1 结构（第 3 节）**未承载**它们 → 判定输入链断裂。
+  · 处理：补入 L1 为**可选字段**（默认 `[]`），
+    符合 §8「不得在 V1.x 内改变任何字段的语义；**仅可新增可选字段并登记编号**」。
+  · 两者均为**交付物字段**（不是管道字段）→ **不在**禁止清单内，
+    会在 G6 转换时直传交付物。
+
+
+============================================================
+4. ★★ 与 L2（merger）的接线：发现并修复一处字段名不通
+============================================================
+
+  【实测发现】`event-merger`（G4）读取条目主标识的字段名是 **`id`**；
+    而候选层字段名是 **`candidate_id`**（`id` 在 L1 属禁止字段）。
+    → 直接把候选对象喂给 merger：`reports[].id` 全为空 → `report_count` **恒为 0**，
+      `item_ids` 为空 → 表现为「报道记录全部丢失」（**实为字段名不通，非数据丢失**）。
+
+  【处理】在**调用侧**加适配器，**不改冻结件**：
+    ```js
+    CI.toMergerInput(candidate)   // → { ...candidate, id: candidate.candidate_id }
+    CI.toMergerInputs(list)       // 批量
+    ```
+    约定：适配后的 `id` = `candidate_id` 的值（**不是**交付物 id）。
+
+  【测试双向锁定】
+    · 正证：经适配后 merger 的 `reports_preserved` = 输入条数、`records_deleted` = 0；
+    · **反证**：未适配直接喂入 → `reports_preserved = 0`（证明适配器必要）。
+    两条断言均 PASS（见 out-pipeline.txt 第 6 节）。
+
+  ★ 这正是 Candidate Schema §4.1 所写「candidate_id（作为 item id）」的落地形态；
+    建议在 G6 的落库流程中沿用同一适配器，不得绕过。
+
+
+============================================================
+5. ★ 管道侧的接线点：`owner_group` 以登记表为权威来源
+============================================================
+
+  · L1 的 `reported_by[0].owner_group` **取自 `news-registry.cjs`**：
+    已登记来源 → 登记表的 `owner_group`；未登记来源 → `'unknown'`。
+  · 实测：C1（S001）= `Disney / Marvel`；C2（S004）= `Penske Media Corporation`；
+    C3（未登记）= `unknown`。
+  · ★ 意义：这闭合了 G4.3 登记的「登记表未接入判定链」缺口在**管道侧**的那一半 ——
+    此前判定器读的是**交付数据**里的 `owner_group`，登记表的值无人使用；
+    现在 G5 的候选层**以登记表为准**产出该值，未来落库后即可让两侧口径一致。
+  · ★ 但请注意：**该缺口在交付数据侧仍未闭合** ——
+    现有 005 / 008 / 010 / 014 的 `reported_by[].owner_group` 仍为「待核」，
+    须按 G4.3 的 **NB-8** 在 **G8** 同步（清单已扩容为 4 项）。
+
+
+============================================================
+6. 错误码表（`fromRawCapture()` 抛出的 `.code`）
+============================================================
+
+  ┌──────────────────────────┬──────────────────────────────────────────────┐
+  │ code                     │ 触发条件                                      │
+  ├──────────────────────────┼──────────────────────────────────────────────┤
+  │ CAPTURE_INVALID          │ 传入的 L0 对象未过 L0 校验                      │
+  │ FORBIDDEN_FIELD          │ AI 结果含禁止字段（状态 9 项 / 交付物独有字段）  │
+  │ MISSING_FIELD            │ title / summary / category / ai_model 缺失     │
+  │ MARKUP_NOT_ALLOWED       │ title 或 summary 含 HTML 标签 / MD 粗体 / 代码围栏│
+  │ INVALID_CATEGORY         │ category 非 6 值枚举                          │
+  │ INVALID_SUGGESTED_STATUS │ ai_suggested_status 非 8 态且非空              │
+  │ INVALID_GATE_STATUS      │ gate_status 非枚举                            │
+  │ MISSING_TIME             │ publish_time 与 first_seen_at 皆空             │
+  │ DELIVERY_ID_FORBIDDEN    │ candidate_id 落入交付物 id 格式                 │
+  │ FIELD_SET_MISMATCH       │ 内部自检：输出字段集合不等于 35                  │
+  └──────────────────────────┴──────────────────────────────────────────────┘
+
+
+============================================================
+7. 接口清单
+============================================================
+
+  ┌──────────────────────────────┬────────────────────────────────────────────┐
+  │ fromRawCapture(capture, ai, opts) │ L0 + AI 结果 → L1；非法则抛错             │
+  │                              │ opts = { idSpace:{content,character}, seq }│
+  │ toMergerInput(c) / Inputs(l) │ ★ L1 → L2 适配（candidate_id → id）        │
+  │ validate(candidate)          │ 校验；返回 {pass, issues}                   │
+  │ intersect(ids, space)        │ 关联交集校验（未命中丢弃，返回 kept/discarded）│
+  │ findMarkup(s)                │ 纯文本检查                                  │
+  │ FIELDS(35) / L1_ADDED(19) / CATEGORIES / GATE_STATUSES / AI_STATUSES     │
+  │ LAYER_FORBIDDEN_KEYS / DELIVERY_ID_RE                                    │
+  └──────────────────────────────┴────────────────────────────────────────────┘
+
+  ★ 关联交集校验需要真实 id 空间：测试中从 `h5\data\content.js` 与 `characters.js`
+    **只读**载入 MCU_CONTENT / MCU_CHARACTERS 作为 `idSpace`（不写 h5）。
+    实测：`avengers-5`（属 MCU_UPCOMING，不在 MCU_CONTENT）被正确丢弃 ——
+    与 G1 / G4 的既有口径一致。
+
+
+============================================================
+8. 置信度
+============================================================
+  **高（约 92%）**：字段结构（35）与三条硬禁止 —— 由 100 条断言锁定，可复现；
+    L1→L2 适配器的必要性有**正证 + 反证**双向证据。
+  **中（约 70%）**：`report_corrections` / `conflict_statements` 作为 L1 补充字段
+    是否最终被规范采纳（我按 §8 的「仅可新增可选字段」处理，建议你确认）；
+    `findMarkup` 的纯文本判定粒度（只拦 HTML / MD 粗体 / 代码围栏）。
+  **低（约 30%）**：AI 整理结果的实际质量对 L1 字段的影响 ——
+    本阶段 AI 结果由夹具合成，真实整理效果须后续验证。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本报告：G5 交付 3／5。未接网络、未抓取、未写 h5/。未进入 G6。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

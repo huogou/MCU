@@ -1,0 +1,28 @@
+{
+ "st": {
+  "total": 133,
+  "by_source": {
+   "S002": 20,
+   "S004": 13,
+   "S006": 100
+  },
+  "category": {
+   "industry": 133
+  },
+  "title_ok": 133,
+  "summary_ok": 133,
+  "category_ok": 133,
+  "rm_array": 133,
+  "rs_array": 133,
+  "rb_ok": 133,
+  "gate_ok": 133,
+  "ek_ok": 133,
+  "cid_ok": 133,
+  "vs_hits": 133,
+  "occ_hits": 133,
+  "time_ok": 133,
+  "refs_ok": 133,
+  "vs_ok": 133
+ },
+ "forbidden_deep_hits": []
+}

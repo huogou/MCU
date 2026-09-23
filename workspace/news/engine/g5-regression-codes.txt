@@ -1,0 +1,9 @@
+﻿--- G5 regression (8 suites) ---
+G1 golden(25) exit=0
+G1 boundary(49) exit=0
+G2 registry(38) exit=0
+G3 validator(60) exit=0
+G4 dedup(95) exit=0
+V2.2 rules(78) exit=0
+V2.2 regression(55) exit=0
+V2.2 shots(11) exit=0

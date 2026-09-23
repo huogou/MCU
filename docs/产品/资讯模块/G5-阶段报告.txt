@@ -1,0 +1,307 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《G5 阶段报告》（依《MCU资讯模块 G5 启动任务书 V1.0》）
+阶段：G5（采集与管道验证 —— 管道骨架段）
+日期：2026-09-23｜角色：开发侧（Jarvis）
+本阶段目标：完成「采集输入 → 候选 → 事件候选」的**内部管道骨架**。
+**不生成 DeliveryItem、不进入 G6、不修改 news.js。**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+============================================================
+0. 关联文件索引
+============================================================
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-阶段报告.txt
+【转交用精简版】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5阶段交付-精简版.txt
+【管道层代码（本阶段新增/修订）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\README.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\raw-capture.cjs        （L0 接口，14 字段）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\candidate-item.cjs     （L1 接口，35 字段 + 白名单适配器）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\capture-store.cjs      （capture 归档，只追加不覆盖）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\fixtures\g5-cases.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\test-pipeline.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\test-g5-baseline.cjs
+【测试留档】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-pipeline.txt      （103 PASS）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-g5-baseline.txt   （61 PASS）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-codes.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g5b-regression-codes.txt      （10 项退出码）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g5b-baseline.txt              （SHA256 + git）
+【规范（已按本阶段任务书同步修订）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\候选数据CandidateSchemaV1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5开工门禁复核V1.0.txt
+
+
+============================================================
+1. 新增文件列表
+============================================================
+
+  【代码（10 个，全部在 workspace\news\pipeline\ 下）】
+
+  ┌────┬──────────────────────────────────────────┬────────┬──────────────────────────┐
+  │ #  │ 路径（相对 pipeline\）                     │ 性质    │ 说明                      │
+  ├────┼──────────────────────────────────────────┼────────┼──────────────────────────┤
+  │ 1  │ README.txt                               │ 新增    │ 目录说明 + 8 条硬约束       │
+  │ 2  │ raw-capture.cjs                          │ **修订**│ L0 接口；16 → **14 字段**  │
+  │ 3  │ candidate-item.cjs                       │ **修订**│ L1 接口；35 字段 + 白名单适配器│
+  │ 4  │ capture-store.cjs                        │ **新增**│ capture 归档（只追加不覆盖）│
+  │ 5  │ fixtures\g5-cases.cjs                    │ 新增    │ C1–C8 合成夹具             │
+  │ 6  │ tests\test-pipeline.cjs                  │ **迁移+修订**│ 由 pipeline\ 根迁入 tests\│
+  │ 7  │ tests\test-g5-baseline.cjs               │ **新增**│ G5-T1 – G5-T6            │
+  │ 8  │ captures\.gitkeep                        │ 新增    │ 目录保位                  │
+  │ 9  │ candidates\.gitkeep                      │ 新增    │ 目录保位                  │
+  │ 10 │ events\.gitkeep                          │ 新增    │ 目录保位                  │
+  └────┴──────────────────────────────────────────┴────────┴──────────────────────────┘
+
+  【报告与规范（docs\产品\资讯模块\）】
+    新增：G5-阶段报告.txt（本文件）
+    修订：候选数据CandidateSchemaV1.0.txt（加顶部「修订记录」+ 第 2/3 节口径标注）
+          G5-pipeline目录报告.txt / G5-RawCaptureSchema报告.txt /
+          G5-CandidateItemSchema报告.txt / G5-fixtures测试报告.txt /
+          G5-回归报告.txt / G5阶段交付-精简版.txt（各加顶部修订横幅，指向本报告）
+
+  【清理】删除迁移后失效的旧留档：pipeline\out-pipeline.txt / out-codes.txt / out-stdout.txt
+
+
+============================================================
+2. pipeline 结构（任务书第 1 节要求已满足）
+============================================================
+
+  ```
+  workspace\news\pipeline\            ← UTF-8；JSON 落盘无 BOM
+  ├── README.txt
+  ├── raw-capture.cjs                 L0 接口
+  ├── candidate-item.cjs              L1 接口（+ toMergerInput 白名单适配器）
+  ├── capture-store.cjs               capture 归档
+  ├── captures\        ← L0 落盘位（.gitkeep）
+  ├── candidates\      ← L1 落盘位（.gitkeep）
+  ├── events\          ← L2 落盘位（.gitkeep）
+  ├── fixtures\        g5-cases.cjs
+  └── tests\           test-pipeline.cjs / test-g5-baseline.cjs
+  ```
+
+  ★ 五个子目录（captures / candidates / events / fixtures / tests）**均已存在**，
+    由测试第 1 节逐目录断言（`fs.statSync().isDirectory()`）。
+  ★ `tests\` 为本阶段新增，既有 `test-pipeline.cjs` 已迁入。
+
+
+============================================================
+3. 字段校验结果
+============================================================
+
+■ 3.1 ★ 两处**规范性变更**（本任务书与我上段实现不一致，已按本任务书改并登记）
+
+  ┌────┬──────────────────────────────┬────────────────────────────────────────────┐
+  │ #  │ 变更                          │ 处理                                        │
+  ├────┼──────────────────────────────┼────────────────────────────────────────────┤
+  │ 1  │ **L0 由 16 → 14 字段**         │ 任务书第 2 节清单**不含** `event_key` 与      │
+  │    │                              │ `first_publish_time` → 已从 L0 移除          │
+  │ 2  │ **两者上移至 L1**              │ L1 = L0 14 + 新增 21 = **35**（总数不变）     │
+  │    │                              │ ★ 副作用是好的：上段我标记的「L0 临时 key     │
+  │    │                              │ 与 L1 正式 key 不一致」隐患**被彻底消除**      │
+  └────┴──────────────────────────────┴────────────────────────────────────────────┘
+
+  ※ 该变更与《候选数据 Candidate Schema V1.0》第 2 节原表冲突 →
+    已在该文件顶部加「**修订记录（2026-09-23）**」，并在第 2 / 3 节标注
+    「字段数以修订记录为准」，正式重写待规范升版 V1.1 时执行。
+
+■ 3.2 L0 RawCapture（**14 字段**）校验结果
+
+  ```
+  capture_id｜pipeline_run_id｜registry_id｜source_name｜source_url｜url_level｜
+  title_raw｜published_at_raw｜published_at｜fetched_at｜feed_type｜http_status｜
+  content_hash｜raw_excerpt
+  ```
+  五条约束的落地情况：
+
+  ┌──────────────────────────────┬──────────────────────────────────────────────────┐
+  │ 任务书约束                    │ 落地方式                                          │
+  ├──────────────────────────────┼──────────────────────────────────────────────────┤
+  │ 1 单来源单条                  │ 一条 capture 对应一个 registry_id + 一个 source_url│
+  │                              │ （结构上无「多来源」字段）                          │
+  │ 2 不做 AI 判断                │ 模块内无语义判断；仅 3 个纯派生字段                 │
+  │                              │ （url_level / published_at / content_hash）        │
+  │ 3 不修改标题                  │ `title_raw` 原样保留；测试断言与入参逐字符一致        │
+  │ 4 不生成状态                  │ 9 项状态字段列入禁止清单，入参出现即抛错；输出深扫 0 命中│
+  │ 5 保留原始证据                │ url / published_at_raw / fetched_at / http_status /│
+  │                              │ content_hash / raw_excerpt 全部留痕（T5 断言齐备）  │
+  └──────────────────────────────┴──────────────────────────────────────────────────┘
+
+  · `url_level` 派生实测：`/news`→section｜`/news/slug`→article｜`/feed/`→feed｜
+    `/rss`→feed｜`/category/marvel/feed/`→feed —— 5 例全 PASS
+  · `published_at`：RFC822 可解析为 ISO；不可解析 → `null`（不抛错）
+  · registry 一致性：`registry_id` 未登记 → `UNKNOWN_REGISTRY_ID`；
+    `source_name` 不符 → `SOURCE_NAME_MISMATCH`；保留值 `unregistered` 可用
+
+■ 3.3 L1 CandidateItem（**35 字段 = 14 + 21**）校验结果
+
+  · 新增 21 字段：candidate_id / title / summary / category /
+    related_movies·series·characters·phases / reported_by /
+    original_source(_url) / publish_time / first_seen_at /
+    ai_suggested_status / ai_model / capture_refs / gate_status /
+    report_corrections / conflict_statements / **event_key** / **first_publish_time**
+  · 三条硬禁止全部机器校验通过：
+    ① **不生成 verification_status**（入参出现即抛 `FORBIDDEN_FIELD`；输出深扫 0 命中）
+    ② **不生成 judged_by / status_history**（同上）
+    ③ **不进 33 字段交付物**（交付物独有 12 项点名断言缺失；字段集 35 ≠ 33，两层可区分）
+  · `candidate_id` 形态 `cand-<8位>-<3位序号>`，**不使用**交付物 id 格式
+  · `reported_by[0].owner_group` **以登记表为权威来源**（实测 S001=Disney / Marvel、
+    S004=Penske Media Corporation、未登记=unknown）
+  · `related_*` 交集校验：未命中一律丢弃（含 `avengers-5`，属 MCU_UPCOMING）→ 不报错
+
+■ 3.4 ★ merger 输入**白名单**（任务书第 4 节）
+
+  · 白名单 **9 字段**：candidate_id / title / category / related_movies /
+    related_series / related_characters / publish_time / first_seen_at / reported_by
+  · `toMergerInput()` 做**白名单投影 + id 桥接**（`id = candidate_id`）→ 输出**恰 10 键**
+  · 断言：无越出白名单字段；**6 项禁止字段全部不存在**
+    （verification_status / judged_by / chain_steps_hit / status_history /
+      ai_suggested_status / gate_status）
+  · ★ 该设计把「merger 读不到验证类字段」从**约定**升级为**结构保证**
+  · 反证保留：不桥接 `id` 时 `reports_preserved = 0`（字段名不通）
+
+■ 3.5 ★ occurrence（任务书第 5 节：暂不落码）
+
+  · 已在 L1 `validate` 中加规则 **L1-17**：`occurrence` 出现在 L1 输出即判违规
+  · 断言：L0 / L1 / merger 输出三处均不含 `occurrence`（PASS）
+  · 交付物 33 字段中亦不含 `occurrence`（PASS）
+
+
+============================================================
+4. 测试数量
+============================================================
+
+  ```
+  本阶段新增/修订测试：
+    tests\test-pipeline.cjs      **103 PASS / 0 FAIL**（退出码 0）
+    tests\test-g5-baseline.cjs   ** 61 PASS / 0 FAIL**（退出码 0）
+    ── 小计 164 条，覆盖任务书点名的 G5-T1 – G5-T6
+  ```
+
+  【G5-T1 – G5-T6 覆盖】
+    · **G5-T1  L0→L1 字段完整性**：L0=14、L1=35、L0 字段 100% 继承、无冗余字段、
+      validate 通过；关键字段取值逐项断言
+    · **G5-T2  禁止字段进入 DeliveryItem**：L0/L1 无 9 项状态字段；
+      L1 不含交付物独有字段；按交付物 33 字段**反算差集**再断言一次；
+      未生成 verification_status / judged_by / status_history
+    · **G5-T3  merger 输入字段白名单**：白名单 = 9、输出 = 10 键、无越界、无 6 项禁止字段、
+      白名单内容与任务书逐字一致、适配后 merger 可正常归并（2 报道）
+    · **G5-T4  event_key 不污染交付层**：L0 不产出；L1 产出且形态合法；
+      **交付物 33 字段不含 event_key**；交付数据 15 条全量扫描不含；L0/L1/merger 均不含 occurrence
+    · **G5-T5  capture 证据可追溯**：落盘 → 按 capture_refs 取回 → 与原始**逐字段一致**；
+      title_raw 未被改写；7 项原始证据齐备；写入位置守卫拒绝 pipeline 外路径（含 h5）
+    · **G5-T6  重复采集不会覆盖历史 capture**：
+      第 1 次 2 条 → 第 2 次「同 id 不同内容」判冲突 1 条（**原记录保留、未覆盖**）+ 新增 1 条
+      → 第 3 次完全重复全部跳过（幂等）→ 归档总数不因冲突增长；可按 pipeline_run_id 过滤
+
+  【全量回归（10 项 / 575 条断言 / 0 FAIL / 退出码全 0）】
+
+  ┌──────┬──────────────────────────────┬───────────┬────────┐
+  │ 组    │ 脚本                          │ 结果       │ 退出码  │
+  ├──────┼──────────────────────────────┼───────────┼────────┤
+  │ G5   │ tests\test-g5-baseline.cjs    │ **61 PASS**│ **0**  │
+  │ G5   │ tests\test-pipeline.cjs       │ **103 PASS**│ **0** │
+  │ G1   │ test-judge-golden.cjs         │ 25 PASS   │ 0      │
+  │ G1   │ test-judge-boundary.cjs       │ 49 PASS   │ 0      │
+  │ G2   │ test-registry-validate.cjs    │ 38 PASS   │ 0      │
+  │ G3   │ test-official-validator.cjs   │ 60 PASS   │ 0      │
+  │ G4   │ test-event-key.cjs            │ 95 PASS   │ 0      │
+  │ V2.2 │ test-news-rules.cjs           │ 78 PASS   │ 0      │
+  │ V2.2 │ regression-news.cjs           │ 55 PASS   │ 0      │
+  │ V2.2 │ shots.cjs                     │ 11 PASS   │ 0      │
+  └──────┴──────────────────────────────┴───────────┴────────┘
+
+  **合计 575 条**（164 + 411）。任务书要求「411 条保持 PASS」→ **已满足**，
+  并新增 164 条管道层断言。
+
+
+============================================================
+5. 是否修改冻结文件
+============================================================
+
+  ┌──────────────────────────────────┬────────┬──────────────────────────────────────┐
+  │ 冻结对象                          │ 是否修改│ 证据                                  │
+  ├──────────────────────────────────┼────────┼──────────────────────────────────────┤
+  │ h5/                              │ **未改**│ git status 中 h5 路径 = 0 条            │
+  │ h5/data/news.js                  │ **未改**│ SHA256 = 589A3934…0242F2（**True**）    │
+  │ wechat/                          │ **未改**│ git status = 0 条                     │
+  │ douyin/                          │ **未改**│ git status = 0 条                     │
+  │ 33 字段交付结构                    │ **未改**│ T2/T4 断言：字段集 35≠33、无 event_key   │
+  │ 8 态体系                          │ **未改**│ 未触碰任何状态定义；L0/L1 深扫 0 命中     │
+  │ G1 judge 规则                     │ **未改**│ golden 25 + boundary 49 全绿           │
+  │ G2 registry 装载/校验逻辑          │ **未改**│ registry 38 全绿                       │
+  │ G3 official-validator 规则         │ **未改**│ validator 60 全绿                      │
+  │ G4 event_key 算法 / merger 规则     │ **未改**│ dedup 95 全绿；merger 未改（适配在调用侧）│
+  │ G1–G4 既有测试脚本与夹具            │ **未改**│ 8 项回归全绿、退出码 0                  │
+  └──────────────────────────────────┴────────┴──────────────────────────────────────┘
+
+  ★ 本阶段被修改的文件**全部属于 G5 自身产出**（`pipeline\raw-capture.cjs`、
+    `candidate-item.cjs`、`tests\test-pipeline.cjs`），**不属于任何冻结件**；
+    冻结层（G1–G4）与交付层（h5 / wechat / douyin / 33 字段 / 8 态）**零改动**。
+  ★ 未接真实网络、未抓取网页、未接入展示层、未生成任何最终资讯数据。
+
+
+============================================================
+6. git diff 摘要
+============================================================
+
+  · `git status --porcelain` 共 **65 条**变更；
+    其中 **h5 / wechat / douyin 相关 = 0 条**（这是本阶段最关键的基线断言）
+  · 本阶段**实际改动归属**（其余为历史会话产物与既有未跟踪目录，未逐条归属）：
+
+  【新增（未跟踪）】
+    workspace\news\pipeline\**（含 tests\、fixtures\、capture-store.cjs 等）
+    docs\产品\资讯模块\G5-阶段报告.txt
+  【修改（未提交）—— 文档类】
+    docs\产品\资讯模块\候选数据CandidateSchemaV1.0.txt（顶部修订记录 + 2 处口径标注）
+    docs\产品\资讯模块\G5-*.txt（5 份报告 + 精简版各加顶部修订横幅）
+  【迁移】
+    workspace\news\pipeline\test-pipeline.cjs → workspace\news\pipeline\tests\test-pipeline.cjs
+  【删除】
+    workspace\news\pipeline\out-pipeline.txt / out-codes.txt / out-stdout.txt（迁移后失效的旧留档）
+
+  ★ 未执行任何 git add / commit（等指令）。
+
+
+============================================================
+7. 下一阶段建议
+============================================================
+
+  【建议下一步：G5 第二段 —— 采集适配器（仍不真正联网前先做可测部分）】
+
+  1. **先定「出口适配器接口」再写实现**
+     为 A 档 6 个来源各定义 `adapter(htmlOrFeedText) -> RawCapture[]` 的**纯函数**签名，
+     输入是**已取得的文本**（由调用方提供），本层不发起请求 →
+     这样可以在**不联网**的前提下把解析逻辑与陷阱全部写完并测透
+     （The Direct 读 `dc:date`；ComicBook 必须用 `/category/marvel/feed/`；
+      marvel.com 无 RSS 走 HTML + JSON-LD；影视类过滤）。
+  2. **解析陷阱必须逐条写成断言**（R6.2 已实测）：这是历史上最容易踩的地方。
+  3. **采集调度与告警**：R6.2 要求「连续 3 次失败 → paused 并告警」，
+     但**告警渠道仍未定**（G4.3 的 NB-7）→ 建议在本段任务书中一并定义。
+  4. **URL 可达性探测的归属**仍未定（G4.3 的 NB-5，建议单列 G5.5 网络校验层）。
+  5. **待确认两项**（上段遗留）：
+     ① L1 补充字段 `report_corrections` / `conflict_statements` 是否正式采纳；
+     ② `registry_id` 保留值 `unregistered` 是否正式化。
+  6. **G6 前必须记得**：事件归并**不得替代** R8.5 的 supersedes 双条保留（A4/A5）；
+     G8 数据整改清单已扩容为 4 项（含 005/008/010/014 的 `owner_group` 同步）。
+
+  【不建议现在做的事】
+    · 不建议在「出口适配器接口」定稿前直接写联网采集（会同时引入解析与网络两类不确定性）。
+    · 不建议为适配 merger 而修改 G4 冻结件（应继续在调用侧适配）。
+
+
+============================================================
+8. 置信度
+============================================================
+  **高（约 95%）**：目录结构、14/35 字段、白名单投影、G5-T1–T6 六项、
+    575 条断言全绿、SHA256 与 git 双向取证 —— 均可复现。
+  **中（约 70%）**：`capture-store` 的冲突策略（同 id 不同内容一律保留原始记录）
+    是否符合未来真实重采的运维预期；`url_level` 对目录页（如 `/articles/live-events/`）
+    的误判边界。
+  **低（约 30%）**：真实 feed 文本进入解析器后的鲁棒性 ——
+    本阶段无真实输入，解析陷阱只能靠夹具模拟。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G5（管道骨架段）完成。
+未联网采集真实数据、未修改 news.js 与 h5/、未接入展示层、未生成最终资讯数据、未进入 G6。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

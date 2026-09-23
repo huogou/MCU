@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>The Direct</title>
+    <link>https://thedirect.com/</link>
+    <description>MCU 垂直媒体（夹具）</description>
+    <pubDate>Mon, 22 Sep 2026 23:36:42 +0000</pubDate>
+    <item>
+      <title>【独家】《夜魔侠：重生》第三季将是最终季</title>
+      <link>https://thedirect.com/article/daredevil-born-again-season-3-final</link>
+      <description><![CDATA[The Direct 独家报道该剧第三季完结，尚未获官方确认。]]></description>
+      <dc:date>2026-09-22T23:36:42Z</dc:date>
+      <guid>https://thedirect.com/article/daredevil-born-again-season-3-final</guid>
+    </item>
+    <item>
+      <title>Marvel 官方公布《复仇者联盟5：毁灭之日》首支正式预告</title>
+      <link>https://thedirect.com/article/avengers-doomsday-first-teaser</link>
+      <description><![CDATA[Marvel 发布该片首支正式预告，并确认北美上映档期。]]></description>
+      <dc:date>2026-09-22T21:10:00Z</dc:date>
+      <guid>https://thedirect.com/article/avengers-doomsday-first-teaser</guid>
+    </item>
+  </channel>
+</rss>

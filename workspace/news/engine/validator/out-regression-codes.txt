@@ -1,0 +1,7 @@
+﻿--- G3 regression ---
+golden(25) exit=0
+boundary(49) exit=0
+registry(38) exit=0
+rules(78) exit=0
+regression(55) exit=0
+shots(11) exit=0

@@ -1,0 +1,148 @@
+============================================================
+G4 · 事件指纹 / 合并引擎 V1.0 —— 测试
+============================================================
+指纹版本：1｜合并窗口：3 天
+
+■ 1. key 形态与确定性（E7）
+  PASS  key 形如 evt1-<16位十六进制>
+  PASS  【E7】同输入两次调用返回同一 key（确定性）
+  PASS  【E7】深拷贝同内容对象 → 同一 key
+  PASS  空对象输入不抛错
+
+■ 2. E1 同事件不同标题 → 同 key
+  PASS  【E1a】同 key　（同一作品的同一事件，措辞不同（公布 / 发布）+ 模板词差异（首支 / 正式））
+  PASS  【E1a】两标题确实不同（非同标题退化用例）
+  PASS  【E1b】同 key　（同一事件，一方带媒体模板词（【独家】）与状态词（已））
+  PASS  【E1b】两标题确实不同（非同标题退化用例）
+  PASS  【E1c】同 key　（无关联实体（文本模式），一方带状态措辞（有消息称 / 将））
+  PASS  【E1c】两标题确实不同（非同标题退化用例）
+
+■ 3. E2 同标题不同事件
+  PASS  【E2a】不同 key　（标题完全相同，但关联的作品不同 → 不同 key）
+  PASS  【E2b】同 key　（标题与实体完全相同，但时间相距很远 → 同 key，但 merger 必须判 hold（不自动合并））
+  PASS  【E2b】merger 决策 = hold
+  PASS  【E2b】hold 原因 = out_of_window
+  PASS  【E2b】同 key 但超窗口 → 不自动合并（不误合不同事件）
+
+■ 4. E3 不同作品 / 不同 category → 不同 key
+  PASS  【E3a】不同 key　（标题同构，作品不同）
+  PASS  【E3b】不同 key　（无实体时，category 不同 → 不同 key）
+
+■ 5. E4 日期不同 → 可识别同事件
+  PASS  【E4a】同 key（日期不参与 key）　（同一事件，publish_time 相差 1 天 → 同 key，且 merger 判 merge）
+  PASS  【E4a】merger 决策 = merge
+  PASS  【E4a】within_window = true
+  PASS  【E4b】仅改 publish_time（2026-01-01 → 2027-01-01）→ key 完全不变
+
+■ 6. E5 空关联 / 异常输入 → 不崩溃
+  PASS  【E5a】不抛错　（完全不含关联字段）
+  PASS  【E5a】返回合法 key
+  PASS  【E5b】不抛错　（关联字段为 null）
+  PASS  【E5b】返回合法 key
+  PASS  【E5c】不抛错　（关联字段为空数组）
+  PASS  【E5c】返回合法 key
+  PASS  【E5d】不抛错　（关联数组含 null / 空白 / 非字符串元素）
+  PASS  【E5d】返回合法 key
+  PASS  【E5e】不抛错　（关联字段类型错误（字符串而非数组））
+  PASS  【E5e】返回合法 key
+  PASS  【E5f】不抛错　（整个输入为空对象）
+  PASS  【E5f】返回合法 key
+  PASS  【E5g】不抛错　（输入为 null）
+  PASS  【E5g】返回合法 key
+
+■ 7. E6 边界标题
+  PASS  【E6a】不抛错　（空字符串）
+  PASS  【E6a】返回合法 key
+  PASS  【E6b】不抛错　（null 标题）
+  PASS  【E6b】返回合法 key
+  PASS  【E6c】不抛错　（undefined 标题）
+  PASS  【E6c】返回合法 key
+  PASS  【E6d】不抛错　（纯中文标点）
+  PASS  【E6d】返回合法 key
+  PASS  【E6e】不抛错　（纯英文标点与符号）
+  PASS  【E6e】返回合法 key
+  PASS  【E6f】不抛错　（全角字符 + 全角空格）
+  PASS  【E6f】返回合法 key
+  PASS  【E6g】不抛错　（仅日期）
+  PASS  【E6g】返回合法 key
+  PASS  【E6h】不抛错　（仅媒体模板词与状态词）
+  PASS  【E6h】返回合法 key
+  PASS  【E6i】不抛错　（含 emoji 与符号）
+  PASS  【E6i】返回合法 key
+  PASS  【E6j】不抛错　（超长标题（约 3000 字））
+  PASS  【E6j】返回合法 key
+  PASS  【E6k】不抛错　（纯数字与空格）
+  PASS  【E6k】返回合法 key
+  PASS  【E6l】不抛错　（中英混排 + 日期 + 括号）
+  PASS  【E6l】返回合法 key
+
+■ 8. E8 证明不是直接 title hash
+  PASS  【E8】不同 title、相同实体与动作 → 同 key
+  PASS  【E8】两个 title 本身确实不同
+  PASS  【E8】且 key 不等于任何 title 的 hash（含前缀截断形式）
+  PASS  【E8】反证成立：title 哈希不同但 key 相同 → 实现不是 title hash
+  PASS  【E8】explain() 暴露三个成分（可审计）
+  PASS  【E8】explain() 明确 time_participates = false
+  PASS  【E8】entity 模式下不使用 text_sig
+  PASS  【E8】mode = entity
+
+■ 9. E12 / E13 / E14 补充用例
+  PASS  【E12】缺时间条目被判 hold
+  PASS  【E12】hold 原因 = missing_time
+  PASS  【E13】同作品不同动作（定档 / 改档）→ 不同 key
+  PASS  【E14】官方确认版 与 传闻版 → 同 key（事件身份跨状态稳定）
+  PASS  【E14】该对动作词一致（续集 / 开发）
+  PASS  【E14】状态词已被标准化移除（A 中不含「官方」「确认」）
+
+■ 10. 禁用行为校验（不落状态 / 不删记录 / 不跨事件合并）
+  PASS  【禁用 1】输出中不含任何状态字段（深层扫描，含 verification_status）
+  PASS  【禁用 1】输出文本中亦不出现 verification_status 字样
+  PASS  【禁用 1】模块显式声明禁止输出的字段清单（6 项）
+  PASS  【禁用 2】输入 8 条 → 输出报道总数仍为 8
+  PASS  【禁用 2】records_deleted = 0
+  PASS  【禁用 2】每条输入的 id 都出现在输出中（无丢失）
+  PASS  【禁用 2】无重复 id（同一报道不会被两边各算一次）
+  PASS  【禁用 3】每个事件的成员都属于同一 event_key（无跨事件合并）
+  PASS  【禁用 3】某个 event_key 下至多一个 merge/single 事件
+  PASS  【禁用 3】所有 hold 事件都给出了 hold_reason（不静默）
+  PASS  【窗口分裂】同 key 超窗口 → 输出 2 个 hold 事件（不自动合并）
+  PASS  【窗口分裂】两个事件 decision 均为 hold，reason 均为 out_of_window
+  PASS  【合并统计】存在可合并事件（decision = merge）
+  PASS  【合并统计】存在被 hold 的事件（超窗口 / 缺时间）
+
+■ 11. 真实 15 条 news.js 集成跑（只读）
+  PASS  输入条数 = 15
+  PASS  报道记录零丢失
+  PASS  records_deleted = 0
+  PASS  输出中不含状态字段
+  PASS  归并后事件数 ≤ 15（去重生效但不激进）
+  PASS  每条真实数据都能生成合法 key
+  INFO  真实数据归并结果：输入 15 条 → 事件 14 个（可合并 1 / hold 0）
+        evt1-72351c9a6985146e  ×1  single  news-2026-09-22-001
+        evt1-fd8f73ff64a13c5b  ×1  single  news-2026-09-22-002
+        evt1-ce55e5bb20ccb053  ×1  single  news-2026-09-22-003
+        evt1-ecb7ee6e3fd241aa  ×1  single  news-2026-09-22-004
+        evt1-867dcc3e1d7c6239  ×1  single  news-2026-09-22-005
+        evt1-6c521f62cb21d92a  ×1  single  news-2026-09-21-006
+        evt1-073319f0a721a83c  ×1  single  news-2026-09-21-007
+        evt1-cc9cbd1333a2bf30  ×1  single  news-2026-09-21-008
+        evt1-0deefe3ebe53d6f2  ×1  single  news-2026-09-20-009
+        evt1-ef028cf29e74d90e  ×2  merge  news-2026-09-19-014, news-2026-09-20-010
+        evt1-9ea6645fbf649f5d  ×1  single  news-2026-09-19-011
+        evt1-c70d669dccc066b5  ×1  single  news-2026-09-18-012
+        evt1-98131387d4c55a45  ×1  single  news-2026-09-19-013
+        evt1-c4dd0791beb075fd  ×1  single  news-2026-09-17-015
+
+■ 12. 验收输出
+  ── h5/data/news.js SHA256 ──
+  实测：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  基线：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  PASS  h5/data/news.js SHA256 与基线一致（未改动）
+
+  ── git status ──
+  条目数：70　其中 h5 / wechat / douyin 相关：0
+  PASS  git status 中无 h5 / wechat / douyin 路径
+
+============================================================
+结果：95 PASS / 0 FAIL
+============================================================

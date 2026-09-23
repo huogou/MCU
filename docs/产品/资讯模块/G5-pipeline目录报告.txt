@@ -1,0 +1,139 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+★ 2026-09-23 修订提示（依 G5 任务书 V1.0）：本报告中 L0 字段数「16」应读作 **14**
+  （event_key / first_publish_time 已上移至 L1；L1 仍 35）；merger 输入改为**白名单 9 字段**投影；
+  测试脚本已迁至 `workspace\news\pipeline\tests\`（含新增 `test-g5-baseline.cjs`）。
+  字段数、测试数与路径以《G5-阶段报告.txt》与《候选数据CandidateSchemaV1.0.txt》顶部修订记录为准。
+
+《G5 交付报告 1／5 · pipeline 目录报告》
+阶段：G5（第一段）｜日期：2026-09-23｜角色：开发侧（Jarvis）
+本阶段性质：**建管道基础**（RawCapture → CandidateItem → EventCandidate）。
+不开发完整生产采集、不接真实网络、不抓网页、不调用外部 API；不进入 h5/。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+============================================================
+0. 关联文件索引
+============================================================
+【本报告】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-pipeline目录报告.txt
+【同批交付（G5 其余四份）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-RawCaptureSchema报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-CandidateItemSchema报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-fixtures测试报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5-回归报告.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5阶段交付-精简版.txt
+【本阶段新增代码（管道层）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\README.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\raw-capture.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\candidate-item.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\fixtures\g5-cases.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\test-pipeline.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\captures\.gitkeep
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\candidates\.gitkeep
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\events\.gitkeep
+【规范与上游】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\候选数据CandidateSchemaV1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5开工门禁复核V1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G4.3-G5前置门禁关闭报告V1.0.txt
+【测试留档】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\out-pipeline.txt      （100 PASS）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\out-codes.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g5-regression-codes.txt   （8 项退出码）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\g5-baseline.txt
+
+
+============================================================
+1. 目录结构（已创建）
+============================================================
+
+  workspace\news\
+  ├── engine\                 ← G1–G4 已冻结层（judge / registry / validator / dedup）
+  └── pipeline\               ← ★ 本阶段新增（L0 / L1 / L2 落盘位置）
+      ├── README.txt          目录说明 + 硬约束（8 条）
+      ├── raw-capture.cjs     L0 接口：RawCapture（16 字段）
+      ├── candidate-item.cjs  L1 接口：CandidateItem（35 字段）+ toMergerInput 适配器
+      ├── test-pipeline.cjs   本层测试（100 条断言）
+      ├── fixtures\
+      │   └── g5-cases.cjs    C1–C8 合成夹具
+      ├── captures\           ← L0 落盘位置（.gitkeep 保位）
+      ├── candidates\         ← L1 落盘位置（.gitkeep 保位）
+      └── events\             ← L2 落盘位置（.gitkeep 保位）
+
+  ★ 建目录结果实测：三个子目录均存在且为目录（测试第 1 节断言）。
+  ★ 目录关系：`engine\` 与 `pipeline\` **平级**；pipeline 引用引擎模块的路径为
+    `../engine/...`（首轮曾误写为 `../news-registry.cjs` 导致 MODULE_NOT_FOUND，已修）。
+
+
+============================================================
+2. 落盘约定
+============================================================
+
+  ┌──────────────┬──────────────────────────────────────────────────────┐
+  │ 层            │ 落盘命名建议                                          │
+  ├──────────────┼──────────────────────────────────────────────────────┤
+  │ L0 captures   │ captures\YYYY-MM-DD.captures.json                     │
+  │ L1 candidates │ candidates\YYYY-MM-DD.json                            │
+  │ L2 events     │ events\YYYY-MM-DD.events.json                         │
+  │ L3 交付物      │ h5\data\news.js（唯一交付载体，G6 写入；本阶段不碰）      │
+  └──────────────┴──────────────────────────────────────────────────────┘
+
+  编码：**UTF-8（无 BOM）**；格式：JSON。
+
+
+============================================================
+3. 边界约束（写入 README.txt，8 条）
+============================================================
+
+  1. 本目录及子目录**不得**出现在 h5\ / wechat\ / douyin\ 下。
+  2. 本目录的任何字段**不得**进入 33 字段交付物（h5\data\news.js）。
+  3. L0/L1/L2 **不得**产出任何状态字段（9 项：
+     verification_status / status_history / status_changed_at / judged_by /
+     chain_steps_hit / status_change_reason / status_change_evidence_url /
+     conflict_resolved_at / conflict_resolved_by_evidence_url）
+     → 状态只能由 G1 判定器按 R8.3 重算。
+  4. L0/L1/L2 **不得**产出交付物 id（`news-YYYY-MM-DD-NNN`）——该 id 由 G6 生成。
+  5. 候选层**不得**写入任何真实网络抓取内容（G5 只建接口，不接网络）。
+  6. 候选层**不得**生成 verification_status。
+  7. 不得修改 G1–G4 冻结件（judge / registry / validator / event-key / event-merger）。
+  8. 既有 411 条断言必须保持全绿。
+
+  ★ 第 1–5 条已做成**机器断言**（测试第 1 / 5 节）：
+    · 模块源码零网络能力、不写文件、不引用 h5 路径；
+    · L0/L1 输出深扫 9 项状态字段 → 0 命中；
+    · L1 不含交付物独有字段（12 项点名）与交付物 id。
+
+
+============================================================
+4. 与既有层的关系（只读消费，不改动）
+============================================================
+
+  ┌──────────────────────────────┬────────────────────────────────────┬──────────┐
+  │ 被消费的冻结模块               │ 用途                                │ 是否修改  │
+  ├──────────────────────────────┼────────────────────────────────────┼──────────┤
+  │ engine\news-registry.cjs     │ registry_id 校验、source_name 一致性、│ **未修改**│
+  │                              │ **owner_group 权威取值**              │          │
+  │ engine\dedup\event-key.cjs   │ 计算 event_key（L0 临时值 / L1 正式值）│ **未修改**│
+  │ engine\dedup\event-merger.cjs│ L2 事件归并（经 toMergerInput 适配后喂入）│ **未修改**│
+  └──────────────────────────────┴────────────────────────────────────┴──────────┘
+
+
+============================================================
+5. 本阶段明确未做的事
+============================================================
+
+  · 未开发完整生产采集：无定时任务、无轮询、无出口配置。
+  · 未接真实网络：无 HTTP 请求、无 DNS、无外部 API 调用。
+  · 未抓网页：无 HTML/XML 解析、无 feed 解析实现。
+  · 未写 h5 / wechat / douyin：git status 中三者路径 = 0 条。
+  · 未修改 33 字段交付物、8 态体系、G1–G4 任何代码。
+
+
+============================================================
+6. 置信度
+============================================================
+  **高（约 95%）**：目录已建成且经断言验证；边界约束中可机器验证的 5 条已通过。
+  **中（约 70%）**：落盘命名与编码约定为**建议**，尚未经实际落盘验证（G5 后续段才会真正写文件）。
+  **低（约 25%）**：真实采集接入后，本目录结构是否需要调整 —— 取决于 G5 后续段与 G6 的落库设计。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本报告：G5 交付 1／5。未接网络、未抓取、未写 h5/。未进入 G6。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

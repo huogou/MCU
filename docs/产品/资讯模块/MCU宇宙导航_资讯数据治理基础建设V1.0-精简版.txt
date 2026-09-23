@@ -1,0 +1,155 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU宇宙导航｜资讯数据治理基础建设 V1.0 · 精简版》（评审用）
+编制：开发侧（Jarvis）｜2026-09-22｜**治理规范设计，未写代码、未写采集、未改 H5**
+全量版（归档，含全部字段表与逐条体检）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\MCU宇宙导航_资讯数据治理基础建设V1.0.txt
+被测对象：h5\data\news.js（15 条）+ h5\assets\js\components.js（渲染契约）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】字段规范 V1.0
+
+  交付物字段 = 前端展示字段 26 + 审计字段 7 = **33 个**（与现有 news.js 完全一致）。
+  管道字段 **12 个单独建、永不进交付物**：event_key / registry_id / ingested_at /
+  raw_excerpt / content_hash / crawl_evidence / ai_suggested_status / ai_model /
+  pipeline_run_id / reviewed_by / reviewed_at / rule_version。
+
+  三类要点：
+  · 前端展示 26 个：id / title / summary / publish_time / first_seen_at /
+    verification_status / category / reported_by / original_source(_url) /
+    official_source(_url) / related_movies·series·characters·phases /
+    pinned·pinned_until·pinned_order·pinned_reason /
+    independent_group_count（派生，**禁写**）/ report_corrections /
+    conflict_statements / supersedes_id / superseded_by_id / status_history
+  · 审计 7 个：status_changed_at / status_change_reason /
+    status_change_evidence_url / judged_by / chain_steps_hit /
+    conflict_resolved_at / conflict_resolved_by_evidence_url
+    （前三个缺一，状态变更不得入库）
+  · ★ **category 是必填但当前无任何渲染位**（实测 Grep 无函数读取），且枚举未定义。
+
+  前端 8 条硬约束（违反后果已实测）：
+    ① summary 必须纯文本（走 esc）
+    ② publish_time 与 first_seen_at 至少一个非空 → 否则**条目静默消失，不报错**
+    ③ 日期只到日，禁时分与实时性措辞
+    ④ URL 必须 http(s)，否则链接被置空
+    ⑤ 不得引入图片/视频字段 → 卡片无图片区，**新增字段不会被渲染**
+    ⑥ related_* 未命中真实 id 一律丢弃（不报错）
+    ⑦ owner_group「待核/unknown/未确认/空」不计入独立组
+    ⑧ corrected 是报道级标记，事件级须独立重算
+
+【二】source_registry
+
+  定位：**管道层数据文件**，不进 h5/data，**任何字段都不得渲染**。
+  核心 7 字段（用户指定）+ 13 个支持字段：
+    registry_id（S001…，永不重用）/ source_name（须与 news.js 逐字符一致）/
+    owner_group（未确认写「待核」，禁猜）/ tier / crawl_policy / health / note
+    + source_type / official_or_media / discovery_role / feed_type / feed_url /
+      allowed_domains / allowed_paths / excluded_paths / source_role /
+      last_check_at / consecutive_failures / enabled / registry_version
+
+  枚举：
+    tier：T1 官方｜T2 权威行业媒体｜T3 MCU 垂直媒体｜T4 社交·未具名爆料
+    crawl_policy：auto_allowed｜manual_only｜ai_ban_named｜ai_ban_notice｜blocked
+    health：ok｜degraded｜paused
+
+  种子数据（12 条，依 R2/R6 实测预填）：
+    S001 Marvel官方(T1/auto)｜S002 The Direct(T3/auto)｜S003 ComicBook(T3/auto)｜
+    S004 Variety(T2/auto)｜S005 Deadline(T2/auto)｜S006 迪士尼公告页(T1/仅核实)｜
+    S007 THR(T2/ai_ban_named/停用)｜S008 EW(T2/blocked 402/停用)｜
+    S009 Collider(T3/ai_ban_notice/停用)｜S010 Marvel日本(T1/403/停用)｜
+    S011 Marvel Studios(未确认/停用)｜S012 D23(T1/仅确认辅助/停用)
+    ★ **S002 / S003 的 owner_group 仍是「待核」**（见下）
+
+【三】状态判定器规则 V1.0
+
+  输入：来源证据 / owner_group 映射 / 官方声明（须过 R7.4 前 3 步机器校验）/
+        **独立证据组数** / 更正记录 / 冲突记录 / 原始来源
+  ★ **口径纠正**：任务书写「媒体数量」不妥 —— R3.1 已明确判定基准是
+    **independent_group_count（按 owner_group 去重后的组数）**，不是站点数。
+    反例：现有 003 号用例 3 家报道（Variety+Deadline+THR）同属 PMC → 独立组 = 1
+    → 只能判 single_source。判定器**必须自行去重，不接受外部传入计数**。
+
+  独立组计算：逐项取 owner_group → 丢弃「待核/未确认/unknown/空」→ 按组去重计数。
+  该值**禁止人工填写，也禁止 AI 提供**。
+
+  判定链（8 步，首个成立即输出并终止）：
+    Step 1 官方确认（过 R7.4）      → official_confirmed
+    Step 2 官方明确否认（须回链官方）→ officially_denied
+    Step 3 全部有效报道均被更正      → corrected
+    Step 4 可靠来源间互斥表述        → conflicting
+    Step 5 独立组 ≥2 且表述一致      → multi_source_reported
+    Step 6 独立组 = 1（可靠媒体）    → single_source
+    Step 7 原始来源属爆料            → rumor
+    Step 8 以上皆不成立              → unverified
+
+  关键约束：
+  · 短路口径即优先级，不得调换；Step 4 必须早于 Step 5（互斥时「表述一致」前提已破）
+  · 「可靠来源」建议定义为 tier ∈ {T1,T2,T3}，**T4 一律不构成可靠来源**
+  · 输出必含：status / chain_steps_hit / judged_by / status_changed_at /
+    reason / evidence_url / status_history 追加项；缺一不得入库
+  · 重新判定：任何状态变更**从 Step 1 重跑**；人工**不得指定目标状态**，
+    只能「提供证据 + 复核结果」
+  · **缺数据一律降级，绝不升格**（owner_group 缺失 → 组数 0 → unverified）
+
+【四】15 条数据体检（实测结论）
+
+  合格部分：33 字段 15/15 齐备｜8 态全覆盖｜派生值逐条一致｜
+            更正链成对｜审计三字段齐备｜文案纪律无违规｜置顶三场景齐备
+
+  ★ S 级（阻塞真实接入）三项：
+    N1 **文章级 URL 缺失：0/15 全部符合**。现有 source_url / official_source_url
+       全是 feed / 栏目页 / 站点首页（如 variety.com/feed/、marvel.com/news、
+       thedirect.com/rss）→ R7.4 的 path 校验形同虚设，详情页「查看原文」偏向栏目。
+    N2 **owner_group 待核**：The Direct、ComicBook 归属未证实，影响 005/008/010/014 四条
+       → 独立组被强制计 0，状态停在 unverified / corrected。
+    N3 **双时间语义未定义**：publish_time 应=来源发布时间（到日）；
+       first_seen_at 应=系统首次见到时间（用于排序回落与延迟统计）。
+       封版规范 R1–R8 全文**未定义这两者差别**。
+
+  另有 A 级 5 项（category 枚举、每篇报道发布时间、path 口径差、rule_version、
+  未来作品无法关联）与 B 级 2 项（未激活字段期望值、测试夹具迁移）。
+
+  ★★ 本次新发现的一处规范内部口径差：
+    R7.3 写 allowed_paths = `/news/*`（要求 /news/ 后有内容），
+    但测试断言（test-news-rules.cjs L182）放宽为 `/\/news\/?$/`（允许 /news 无内容）。
+    实测 001 / 009 的 official_source_url 均为 `https://www.marvel.com/news`
+    → **规范下不命中，测试下通过**。真实接入前必须统一。
+
+【五】下一阶段拆分建议（G0–G8，不写代码）
+
+  G0 治理前置（阻塞）：补 owner_group + 定文章级 URL 规范 + 定双时间语义
+  G1 判定器（纯函数，可与 G0 并行，用现有 15 条作黄金用例）
+  G2 source_registry 落地（数据文件 + 加载 + 校验）
+  G3 官方来源校验器（R7.4 前 3 步机器化）
+  G4 去重与事件合并（event_key、转引识别、跨天合并）
+  G5 采集适配器（6 源，含 R6.2 全部陷阱：dc:date、分类 feed、HTML+JSON-LD）
+  G6 候选产出 + 人工审核流（闸门可验证）
+  G7 观测与告警（health / 连续 3 次失败自动 paused）
+  G8 交付物切换（mock → live）—— **唯一触碰 H5 的阶段，且只替换数据文件**
+
+  依赖：G0→G2→G3、G1→G4、G3+G4→G5→G6→G8；G5→G7
+  全部阶段**独立可验收**，验收基线 = V2.2 的 78 + 55 + 11 条断言继续全绿。
+  不触碰：h5 页面 / CSS / 组件 / app.js / 其他 13 个 data 文件 / shared / wechat / douyin。
+
+【六】待你裁定 Q-1 .. Q-6
+
+  Q-1 category 枚举如何定义？用途是展示、筛选还是统计？（当前必填但无渲染位）
+  Q-2 每篇报道的发布时间是否进交付物？          → 建议只留管道层
+  Q-3 related_* 是否扩展到 MCU_UPCOMING（未来未上映作品）？→ 涉及改 UI，需跨角色决策
+  Q-4 rule_version 是否进审计字段？             → 建议进管道层，审计可选
+  Q-5 path 口径差如何统一：a) allowed_paths 增列 /news  b) 强制文章级路径
+                                                → 建议 b（与 N1 一致）
+  Q-6 三端复用边界（沿用 V3.0 的 S-4）           → 建议「仅 H5 + 结构可转换」
+
+  ★ Q-1 / Q-3 / Q-5 影响字段定型，建议 G1 开工前给结论；其余可并行裁定。
+
+【七】置信度
+
+  高（~88%）：字段规范全部条目（逐行读取 + Grep 可复核）、15 条体检、
+               source_registry 字段结构（由 R2/R6/R7 整理，无新增猜测）
+  中（~65%）：registry 种子数据的 tier 赋值、判定器的「可靠来源」定义与
+               冲突粒度（需真实数据校准）、G0–G8 工作量未评估
+  低（~30%）：event_key 实际去重准确率（未做实验，MCU 标题模板化严重）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：治理规范设计完成。未写代码、未写采集、未改 H5、未部署。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

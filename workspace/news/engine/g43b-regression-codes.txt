@@ -1,0 +1,9 @@
+﻿--- G4.3 follow-up (owner_group closed) ---
+G2 registry exit=0
+G1 golden   exit=0
+G1 boundary exit=0
+G3 validator exit=0
+G4 dedup    exit=0
+V2.2 rules  exit=0
+V2.2 regression exit=0
+V2.2 shots      exit=0

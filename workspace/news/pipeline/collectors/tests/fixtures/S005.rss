@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Deadline</title>
+    <link>https://deadline.com/</link>
+    <description>权威行业媒体（夹具；含 1 条缺标题的脏数据，用于 fail closed 验证）</description>
+    <item>
+      <title>Marvel&#8217;s &#8216;Avengers: Doomsday&#8217; Trailer Draws Record Views</title>
+      <link>https://deadline.com/2026/09/avengers-doomsday-trailer-record-views/</link>
+      <description>Deadline 报道该预告首日播放量创系列纪录。</description>
+      <pubDate>Mon, 22 Sep 2026 14:12:00 +0000</pubDate>
+      <guid>https://deadline.com/?p=9001</guid>
+    </item>
+    <item>
+      <link>https://deadline.com/2026/09/no-title-item/</link>
+      <description>本条**故意缺少 title**，用于验证采集器 fail closed 且不阻塞其他条目。</description>
+      <pubDate>Mon, 22 Sep 2026 09:00:00 +0000</pubDate>
+      <guid>https://deadline.com/?p=9002</guid>
+    </item>
+    <item>
+      <title>Disney Sets Release Calendar Update for Phase Six Slate</title>
+      <link>https://deadline.com/2026/09/disney-phase-six-calendar-update/</link>
+      <description>Deadline 报道迪士尼更新第六阶段档期安排。</description>
+      <pubDate>Sun, 21 Sep 2026 18:30:00 +0000</pubDate>
+      <guid>https://deadline.com/?p=9003</guid>
+    </item>
+  </channel>
+</rss>

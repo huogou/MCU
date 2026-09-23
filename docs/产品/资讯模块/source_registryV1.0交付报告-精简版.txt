@@ -1,0 +1,155 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《source_registry V1.0 交付报告 · 精简版》（G2）
+执行：开发侧（Jarvis）｜2026-09-22 16:2x｜**未改 H5 / news.js、未采集、未联网探测、未进 G3**
+全量版（归档）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\source_registryV1.0交付报告.txt
+新增（登记数据层，均在 workspace 下，不进 h5）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-registry.cjs（加载器 + 校验器）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\test-registry-validate.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\test-registry-legacy-probe.cjs（一次性取证）
+修改（G1 交付物，改为消费登记表；判定逻辑一行未改）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-judge-rules.cjs
+测试留档：同目录 out-registry-validate.txt / out-registry-legacy.txt / out-registry-codes*.txt / out-hashes-g2.txt / out-gitstatus-g2.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】数据结构
+
+  载体：`registry/source-registry.json`，**管道层数据文件**，不进 h5/data，
+        **任何字段都不得渲染进 H5**。
+  顶层：registry_version / built_at / note / non_official_domains /
+        non_official_domains_note / entries[]
+
+  20 字段（冻结）：registry_id、source_name、owner_group、tier、crawl_policy、
+    health、note、source_type、official_or_media、discovery_role、feed_type、
+    feed_url、allowed_domains、allowed_paths、excluded_paths、source_role、
+    last_check_at、consecutive_failures、enabled、registry_version
+
+  枚举：tier T1–T4｜crawl_policy 5 值（auto_allowed / manual_only /
+    ai_ban_named / ai_ban_notice / blocked）｜health 3 值（ok / degraded / paused）｜
+    source_type 4 值｜official_or_media 2 值｜discovery_role 4 值｜
+    feed_type 4 值｜non_official_domains：disney.com / disneyplus.com
+
+  语义澄清（本次新增，消除歧义）：
+    · **health 只描述「已启用来源的抓取健康度」**；未启用来源统一记 ok。
+      **不得使用 `—` / `n/a` 等枚举外取值**（这一处是本次修正的文档不一致之一）。
+    · **crawl_policy 只写裸枚举值**，实测细节（402/403 等）写进 note。
+
+  查询 API：all / byId / bySourceName / isRegistered / getTier（未登记返回 null）/
+    getOwnerGroup / isEnabled / officialSources / enabledSources / validate
+
+【二】初始数据（S001–S012）
+
+  S001 Marvel 官方                T1 auto_allowed  ok  启用
+  S002 The Direct                T3 auto_allowed  ok  启用  ★owner_group 待核
+  S003 ComicBook                 T3 auto_allowed  ok  启用  ★owner_group 待核
+  S004 Variety                   T2 auto_allowed  ok  启用
+  S005 Deadline                  T2 auto_allowed  ok  启用
+  S006 The Walt Disney 公告页      T1 auto_allowed  ok  启用
+  S007 The Hollywood Reporter    T2 ai_ban_named   ok  停用（人工）
+  S008 Entertainment Weekly      T2 blocked        ok  停用（人工）
+  S009 Collider                  T3 ai_ban_notice  ok  停用（人工）
+  S010 Marvel 日本官方             T1 blocked        ok  停用
+  S011 Marvel Studios 官方         T1 manual_only    ok  停用
+  S012 D23 官方                   T1 manual_only    ok  停用（仅确认辅助）
+
+  分布：T1 五 / T2 四 / T3 三｜**启用 6 条（S001–S006）**、停用 6 条（S007–S012）
+  三档：A 档自动抓取 6 条｜B 档人工录入 3 条（THR/EW/Collider，层级封顶 media）｜
+        C 档本阶段不用 3 条（Marvel日本 / Marvel Studios / D23）
+  官方来源登记字段只填在 S001 / S006 / S012（S010 / S011 虽为 official 但域名未登记
+    → 不进入官方来源登记，不得构成 official_confirmed）
+  ★ **未闭环：S002 The Direct / S003 ComicBook 的 owner_group 仍「待核」**
+    （两个主力发现器；影响独立证据组计数；**须在 G5 采集之前关闭**）
+
+【三】校验结果
+
+  总结果：**38 PASS / 0 FAIL**（脚本可重跑，留档三份，退出码均为 0）
+
+  任务点名的五项：
+    【1】source_name 一致性 → 12 条唯一、非空、与 news.js 中名称**逐字符一致、无同名变体**
+    【2】registry_id 唯一   → 12 个无重复、全部形如 S\d{3}、**恰为 S001–S012 连续无缺号**
+    【3】tier 枚举          → 12 条全部命中
+    【4】crawl_policy 枚举  → 12 条全部命中
+    【5】health 枚举        → 12 条全部命中
+
+  校验规则共 **22 条**（R-01 – R-24）：结构 6 条（含 20 字段齐备、无多余键）+
+    枚举 7 条 + 条件必填与类型 4 条 + 一致性 6 条（含
+    **R-21 合规联动：ai_ban_* / blocked 必须 enabled=false**、
+    **R-22 黑名单不得泄漏进 allowed_domains**）+ 跨文件 2 条。
+  ★ 另做 **16 项注入式探针**（注入非法值 → 必须被检出，全部命中）
+    —— 否则「整表通过」可能只是规则从未触发。
+
+  跨文件一致性（与 news.js）：
+    news.js 出现 10 个来源名 → **9 个已登记，1 个未登记**：`社交平台爆料（未具名）`
+    （判定器已按「未登记 → T4」保守处理，该条 006 落 rumor，符合预期）
+    news.js 的 official_source 全部命中登记表且为 official ✓
+
+  ★★ **本次检出并修正 G1 的一处真实违规**：
+    改造前先用新校验器对**原样的 G1 内联种子**做定向取证，检出
+      `[crawl_policy] S011 Marvel Studios 官方 → 「none」不在枚举内`
+    → 即 **G1 内联种子的 1 处枚举违规**，已改为 `manual_only`。
+    **意义：校验器在我自己上一阶段的产出里抓到了问题。**
+
+  连带修正冻结文档 3 处不一致：disabled 来源 health `—`→`ok`（枚举外取值）、
+    S011 crawl_policy `none`→`manual_only`、枚举列混入实测细节 → 改裸枚举值。
+
+  回归验证（改数据源却零回归）：
+    test-judge-golden.cjs **25/25**｜test-judge-boundary.cjs **49/49**｜
+    test-news-rules.cjs **78/78**｜regression-news.cjs **55/55**｜shots.cjs **11/11**
+    h5\data\news.js SHA256 = 589A3934…（与 G1 完全一致）｜git status **零 h5 路径**
+    ★ 这正说明 G1「来源数据与规则逻辑分离」的设计有效：换数据源，逻辑一行不动。
+
+【四】与 G1 判定器的连接方式
+
+  链路（单向，无循环）：
+    news-judge.cjs → news-judge-rules.cjs → news-registry.cjs → source-registry.json
+    · G1 的判定逻辑 **news-judge.cjs 一行未改**；改动只在 rules 模块的三个常量改为加载。
+    · 对外 API 与输出契约完全不变（25/25 + 49/49 为证）。
+
+  三处具体连接：
+    ① **来源等级**：judge.tierOf() → registry.getTier()
+       已登记返回登记表 tier；**未登记回落 T4**（判定器侧保守降级）。
+       ★ 刻意不同：registry.getTier() 对未登记返回 **null**，判定器返回 **T4**
+         —— 保持「未登记」与「登记为 T4」两种状态**可区分**。
+    ② **官方来源登记**：OFFICIAL_SOURCES = officialSources()
+       派生规则：「official 且 allowed_domains 非空」→ 结果 **S001 / S006 / S012**
+       S010/S011 域名未登记 → 不进入 → 天然满足「官方域名未登记不得构成 official_confirmed」
+       ★ 从此不会再出现「代码里的域名清单与登记表漂移」。
+    ③ **不登记域名黑名单**：4 项随登记表加载，判定器 R7.4 首步即拦截。
+
+  tier 在判定链中的作用（未变）：owner_group 决定「算几个组」，tier 决定
+    「这些组算不算可靠」→ 二者都来自登记表，故登记表是判定结论的事实基础。
+    T4 不构成可靠来源：B9（组数1但T4 不判 single_source）、B10（两组均T4 不判 multi_source）已证。
+
+  数据流：登记表**只读**，判定器**不写回**登记表；判定输出**不直接落库**
+    （落库权在 G6 人工审核闸门）；登记表不进交付数据、不进任何页面。
+
+【五】发现与待确认
+
+  F-1 已修正：G1 内联种子 1 处枚举违规（S011 crawl_policy='none'）—— 见上。
+  F-2 已修正：冻结文档 3 处文档层不一致（health '—' / S011 'none' / 枚举列混入细节）。
+  F-3 **待确认**：news.js 中 `社交平台爆料（未具名）` 未登记。
+      建议**不为其登记正式条目**（非固定来源、无稳定域名），但请在规范层明确一句
+      「未具名社交爆料不登记为来源条目，一律按 T4 处理，只能作为 rumor 的原始来源」。
+  F-4 **仍未闭环·阻塞 G5**：S002 / S003 的 owner_group 待核。
+  F-5 提示：G1 遗留的 C-1（judged_by 口径）/ C-2（判定器是否入库）仍未裁定；
+      本阶段新增 4 个文件同属「是否入库」问题，建议一并裁定。
+  F-6 本阶段未触碰：h5\ 全部、三份同步文件、shared/、wechat/、douyin/、
+      news-judge.cjs 与 G1 的两个测试脚本及夹具。
+
+【六】置信度
+
+  高（~95%）：20 字段与枚举落地正确性（校验器 + 16 项探针双向验证，可复现）；
+             校验结果真实性（可重跑、三份留档、退出码全 0）；
+             与 G1 连接有效性（12 条 tier 逐一比对 + 派生结果 + 零回归）；
+             h5 / news.js 零改动（git status + SHA256 一致）
+  中（~70%）：校验规则**完备性**（后续阶段可能出现新约束需补规则）；
+             tier 赋值本身（T1/T2 无争议，T3 与部分 T2 属工程判断，需真实数据校准）；
+             S007–S012 的 last_check_at 为批次时间而非逐条精确时刻
+  低（~30%）：S002 / S003 的 owner_group（探活未证实，本阶段如实保持「待核」，
+             该缺口不因本报告而缩小）；登记表在真实采集环境下的字段可用性（须 G5 实测）；
+             「未具名社交爆料不登记为来源」是否最终被规范采纳（待裁定）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G2 交付完成并停止。未改 H5 / news.js、未开发采集、未联网探测、未进入 G3。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

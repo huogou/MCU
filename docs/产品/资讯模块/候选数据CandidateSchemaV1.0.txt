@@ -1,0 +1,570 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《MCU 宇宙导航｜候选数据 Candidate Schema V1.0》
+（G4.2 正式规范件之三 · 定义采集器输出 / merger 输入 / judge 输入 / 与交付物转换边界）
+生效日期：2026-09-22
+上游：资讯模块冻结事项裁定补充 V1.0（G4.1）第 7.3 节（本规范首次识别的缺口）
+效力：**正式规范**。G5（采集）的采集器输出、G6（落库）的闸门输入，
+      均**必须**符合本规范。
+本件不写代码、不写采集、不接采集、不改 h5/ 与 news.js、不改 33 字段与 8 态体系。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+★★ **修订记录（2026-09-23，依《MCU资讯模块 G5 启动任务书 V1.0》）** ★★
+
+  本次修订 3 处，**以本节为准**；第 2 / 3 节的字段表在下方列出前已注明"以修订为准"：
+
+  ┌────┬──────────────────────────────┬────────────────────────────────────────────┐
+  │ #  │ 项                            │ 修订内容                                    │
+  ├────┼──────────────────────────────┼────────────────────────────────────────────┤
+  │ 1  │ **L0 字段数：16 → 14**         │ 移除 `event_key` 与 `first_publish_time`      │
+  │    │                              │ → L0 仅保留**采集原始证据**（五条约束见 G5    │
+  │    │                              │   任务书第 2 节：单来源单条 / 不做 AI 判断 /  │
+  │    │                              │   不修改标题 / 不生成状态 / 保留原始证据）     │
+  │ 2  │ **两者上移至 L1**              │ `event_key`、`first_publish_time` 改为在 L1   │
+  │    │ **L1 仍为 35 字段**（14 + 21） │ 产出。理由：event_key 依赖 category 与关联    │
+  │    │                              │ 实体，而 L0 只有 title_raw → 在 L0 算出的 key │
+  │    │                              │ 必然走 text 模式、到 L1 还要重算，属无意义的   │
+  │    │                              │ 临时值；上移后该隐患彻底消除                  │
+  │ 3  │ **merger 输入 = 白名单 9 字段**│ candidate_id / title / category /           │
+  │    │                              │ related_movies / related_series /            │
+  │    │                              │ related_characters / publish_time /          │
+  │    │                              │ first_seen_at / reported_by                  │
+  │    │                              │ + 桥接用 `id`（值 = candidate_id）→ 恰 10 键  │
+  │    │                              │ **不得**含 verification_status / judged_by /  │
+  │    │                              │ chain_steps_hit / status_history /           │
+  │    │                              │ ai_suggested_status / gate_status            │
+  └────┴──────────────────────────────┴────────────────────────────────────────────┘
+
+  **未变**：33 字段交付物、8 态体系、转换边界（第 6 节）、三个只读字段集纪律。
+
+  ※ 第 2 节的 L0 字段表与第 3 节的 L1 增量表**仍保留原文**以便追溯，
+    但**字段数与成员以本节修订为准**；正式重写待规范升版 V1.1 时执行。
+  ※ 实现侧已同步：`workspace\news\pipeline\raw-capture.cjs`（14 字段）、
+    `candidate-item.cjs`（35 字段 + `toMergerInput` 白名单投影）。
+    实测见《G5-阶段报告》与 `workspace\news\pipeline\tests\out-*.txt`。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+============================================================
+0. 关联文件索引（★ 供策划 / 设计顺着路径查阅）
+============================================================
+
+【本规范件】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\候选数据CandidateSchemaV1.0.txt
+【同批交付（G4.2 其余三件）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\规范-资讯事件归并与event_key边界V1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\规范-judgedby字段语义V1.0（草案）.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G5前置条件清单最终版.txt
+【同批精简版】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G4.2规范包-精简版.txt
+
+【上游冻结与裁定件】
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\MCU宇宙导航_资讯治理冻结确认V1.0.txt
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\资讯模块冻结事项裁定补充V1.0.txt
+
+【本规范约束/引用的实现（只读）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-key.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\dedup\event-merger.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\news-judge.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\official-source-validator.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json
+
+【交付物基线（33 字段，只读）】
+  D:\SEO\发挥余热\漫威电影宇宙导航\h5\data\news.js
+
+
+============================================================
+1. 定位、四层数据模型与一条须负责人知悉的口径问题
+============================================================
+
+■ 1.1 定位
+  本规范定义**管道层数据的三段结构与一段边界**：
+    L0 采集器输出 → L1 候选条目 → L2 事件候选 → （边界）→ L3 交付物
+  目的：让「采集器产出什么 / merger 吃什么 / judge 吃什么 / 什么能进交付数据」
+  这四个此前**各自空白**的问题，有唯一答案。
+
+■ 1.2 四层数据模型
+
+  ```
+  ┌─────────────────────────── 管道层（不进 h5/，不进交付数据）───────────────────────────┐
+  │                                                                                    │
+  │  L0  RawCapture（原始条目）          采集器产出，**单源单条**，未经 AI 整理            │
+  │        │  ×N（同一事件的多个来源各自产出）                                            │
+  │        ▼                                                                            │
+  │  L1  CandidateItem（候选条目）        AI 整理后；按 event_key 聚合前的候选单位         │
+  │        │                                                                            │
+  │        ▼  由 G4 的 event-merger 归并                                                  │
+  │  L2  EventCandidate（事件候选）       同一事件的多条候选被聚成一个事件对象               │
+  │        │                                                                            │
+  └────────┼────────────────────────────────────────────────────────────────────────────┘
+           │  ★ 转换边界（第 6 节）：只在 G6 人工审核闸门之后发生，且**单向**
+           ▼
+        L3  DeliveryItem（交付条目）      33 字段，写入 h5/data/news.js
+  ```
+
+  ★ 关键性质：
+    · **L0/L1/L2 一律不进入 h5/**，也不进入交付数据；
+    · 每层都有明确的「上一层给的字段 + 本层新增字段」，不得跨层越权写入；
+    · 交付物字段共 33 个，**四层结构不改变它**。
+
+■ 1.3 ★★ 管道字段清单的口径（**已裁定：禁止清单模式 B**）
+
+  **裁定**（2026-09-23，G4.3）：采用**禁止清单模式（B）**。
+
+  【正式定义】
+    · **Candidate 层**：**允许增加管道字段**，总量不设上限。
+    · **DeliveryItem 层**：**严格限制为 33 字段**（前端展示 26 + 审计 7），不增不减。
+
+  【冻结规则】任何新增管道字段**必须同时满足以下 4 条**，缺一不得新增：
+    1. **不进入 h5**（不得出现在 h5/ 目录下的任何文件）
+    2. **不进入 33 字段交付物**（不得出现在 h5/data/news.js）
+    3. **不影响 8 态判定**（不得参与 verification_status 的计算；不得被判定器读取）
+    4. **不改变审核闸门逻辑**（不得改变 gate_status 的语义与「未审核不得入库」的约束）
+
+  【口径的准确表述】
+    Candidate Schema **不限制管道字段总量**；
+    它只限制「**禁止进入 DeliveryItem 的字段集合**」。
+    即：管道层的字段**数量是开放的**，交付层的字段**集合是封闭的（33）**。
+
+  【为什么取 B 而非 A（封闭清单）】
+    ① 「33 字段交付物不变」是真正的硬约束；G0 冻结件对那 12 项的立法措辞是
+       「冻结为**『不进交付物』**」——属**禁止性约束**，不是枚举上限。
+    ② 若按封闭清单执行，候选层将无法留存采集证据与闸门状态，等于放弃可追溯性，
+       而可追溯性属本项目治理铁律的核心。
+
+  【存档：若按封闭清单执行将丢失的能力（仅作立法记录，不构成待决项）】
+
+  ┌──────────────────┬──────────────────────────────────────────────────────────┐
+  │ 被裁掉的字段       │ 丢失的能力                                                │
+  ├──────────────────┼──────────────────────────────────────────────────────────┤
+  │ `capture_id`      │ 无法把交付条目回溯到**具体哪一次采集抓到的原始条目**          │
+  │ `capture_refs`    │ 无法证明「一个事件的多个来源」各自来自哪次抓取                │
+  │ `candidate_id`    │ 候选层失去稳定标识，审核记录无法与候选对应                   │
+  │ `url_level`       │ **Q-5 文章级 URL 的合规状态无法被暴露与统计**（重要）          │
+  │ `title_raw`       │ 无法核对 AI 改写是否偏离原文（文案纪律的可审计性下降）         │
+  │ `published_at_raw`│ 时间解析失败时无法回溯来源原始时间字符串                     │
+  │ `gate_status`     │ **人工审核闸门失去机器可读状态**（"未审核不得入库"难以强制）   │
+  │ `occurrence`      │ 事件级稳定键（B4）无法实现（可退回 B-i 组合键）               │
+  └──────────────────┴──────────────────────────────────────────────────────────┘
+
+  ★ 登记：按模式 B，管道层字段由 12 个扩充为 **20 个**（清单见 6.4 节），
+    并登记为 **P-01 – P-20**。**该裁定不影响 33 字段交付物与 8 态体系。**
+
+
+============================================================
+2. L0：采集器输出结构（RawCapture）
+   ★ 2026-09-23 修订：**字段数以顶部「修订记录」为准 = 14 个**
+     （本节的 P-15 event_key / P-16 first_publish_time 已上移至 L1）
+============================================================
+
+  定义：采集器对**一个来源出口**抓到**一条原始条目**时的输出。
+  性质：**未经 AI 整理、未经任何改写**。一个事件可能由多条 RawCapture 覆盖（不同来源）。
+
+  ┌──────┬────────────────────┬──────────────┬────────┬──────────────────────────────────────┐
+  │ 编号  │ 字段                │ 类型          │ 必填    │ 说明                                  │
+  ├──────┼────────────────────┼──────────────┼────────┼──────────────────────────────────────┤
+  │ P-01 │ capture_id         │ string       │ 必填    │ 建议 `cap-<registry_id>-<run_id>-<seq>`│
+  │      │                    │              │        │ 全批次唯一                             │
+  │ P-02 │ pipeline_run_id    │ string       │ 必填    │ 采集批次号                             │
+  │ P-03 │ registry_id        │ string       │ 必填    │ 指向 source_registry（如 S001）          │
+  │ P-04 │ source_name        │ string       │ 必填    │ **须与登记表逐字符一致**                │
+  │ P-05 │ source_url         │ string       │ 必填    │ 见 P-06 的等级说明                      │
+  │ P-06 │ url_level          │ enum(3)      │ 必填    │ `article` / `feed` / `section`        │
+  │      │                    │              │        │ ★ 暴露 Q-5「文章级 URL」的合规状态       │
+  │ P-07 │ title_raw          │ string       │ 必填    │ **原始标题，不得改写**                  │
+  │ P-08 │ published_at_raw   │ string       │ 可选    │ 来源给出的原始时间字符串（原样保留）      │
+  │ P-09 │ published_at       │ string|null  │ 必填    │ 规范化 ISO8601；无法解析填 null         │
+  │ P-10 │ fetched_at         │ string       │ 必填    │ 抓取时刻（ISO8601）                    │
+  │ P-11 │ feed_type          │ enum(3)      │ 必填    │ `rss` / `atom` / `html-parse`         │
+  │ P-12 │ http_status        │ number       │ 必填    │ HTTP 状态码                            │
+  │ P-13 │ content_hash       │ string       │ 必填    │ 原文内容指纹（建议 sha1）                │
+  │ P-14 │ raw_excerpt        │ string       │ 必填    │ 原文摘录，**限长 ≤200 字**               │
+  │ P-15 │ event_key          │ string       │ 必填    │ 由 event-key.cjs 计算（见同批边界规范）   │
+  │ P-16 │ first_publish_time │ string|null  │ 必填    │ = published_at 的稳定形式；用于窗口/主键  │
+  └──────┴────────────────────┴──────────────┴────────┴──────────────────────────────────────┘
+
+  约束：
+  · `title_raw` 与 `raw_excerpt` **只允许在管道层使用**，禁止渲染、禁止直入交付物。
+  · `url_level = feed | section` 的条目**允许存在**（不得因此丢弃），
+    但必须在审核时被标出（配合 Q-5 的 G8 迁移）。
+  · 采集器**不得**产出任何状态相关字段（见 5.2）。
+
+
+============================================================
+3. L1：候选条目结构（CandidateItem）
+   ★ 2026-09-23 修订：L1 = L0 **14** + 新增 **21** = **35 字段**
+     （新增含 `event_key`、`first_publish_time`，由 L0 上移；本节原列 P-17/P-18 继续有效）
+============================================================
+
+  定义：对一条或多条 RawCapture 做 AI 整理后的候选单位，**按 event_key 聚合前的单位**。
+
+  结构 = **L0 全部字段** + 以下新增字段：
+
+  ┌──────┬────────────────────┬──────────────┬────────┬──────────────────────────────────────┐
+  │ 编号  │ 字段                │ 类型          │ 必填    │ 说明                                  │
+  ├──────┼────────────────────┼──────────────┼────────┼──────────────────────────────────────┤
+  │ P-17 │ candidate_id       │ string       │ 必填    │ 建议 `cand-<event_key 后 8 位>-<seq>`  │
+  │      │                    │              │        │ ★ **不得**使用交付物 id 格式            │
+  │      │                    │              │        │ （`news-YYYY-MM-DD-NNN` 属 G6 生成）   │
+  ├──────┼────────────────────┼──────────────┼────────┼──────────────────────────────────────┤
+  │      │ title              │ string       │ 必填    │ AI 整理后的标题（**纯文本**）           │
+  │      │ summary            │ string       │ 必填    │ AI 撰写摘要（**纯文本，≤120 字**）      │
+  │      │ category           │ enum(6)      │ 必填    │ movie/series/special/short/character/ │
+  │      │                    │              │        │ industry                              │
+  │      │ related_movies     │ array<string>│ 必填    │ 可 `[]`；须命中 MCU_CONTENT            │
+  │      │ related_series     │ array<string>│ 必填    │ 可 `[]`；须命中 MCU_CONTENT            │
+  │      │ related_characters │ array<string>│ 必填    │ 可 `[]`；须命中 MCU_CHARACTERS         │
+  │      │ related_phases     │ array<int>   │ 必填    │ 可 `[]`；须为 1–6 整数                 │
+  │      │ reported_by        │ array<object>│ 必填    │ {source_name, source_url, owner_group}│
+  │      │ original_source    │ string       │ 必填    │ 无法判断填 `unknown`（禁猜测）           │
+  │      │ original_source_url│ string       │ 必填    │ 可 `''`                               │
+  │      │ publish_time       │ string       │ 二选一  │ YYYY-MM-DD（来源发布时间）              │
+  │      │ first_seen_at      │ string       │ 二选一  │ ISO8601（**系统首次见到**该内容的时间）   │
+  │      │ ai_suggested_status│ enum(8)|''   │ 必填    │ AI 的**建议值**；无建议时 `''`           │
+  │      │ ai_model           │ string       │ 必填    │ 生成/整理所用模型标识                    │
+  │      │ capture_refs       │ array<string>│ 必填    │ 指向 L0 的 capture_id（支持多源合并）     │
+  │ P-18 │ gate_status        │ enum(3)      │ 必填    │ `pending` / `approved` / `rejected`   │
+  │      │                    │              │        │ 默认 `pending`；**唯一的入库闸门**       │
+  └──────┴────────────────────┴──────────────┴────────┴──────────────────────────────────────┘
+
+  约束：
+  · `title` / `summary` 必须是**纯文本**（前端走 esc 转义，HTML/Markdown 不会渲染）。
+  · `publish_time` 与 `first_seen_at` **至少一个非空**；两者皆空 → 排序时静默剔除。
+  · `ai_suggested_status` 是**建议值**，与最终 `verification_status` **物理分离**；
+    最终状态必须由判定器重算（见 6.3）。
+  · `related_*` 写入前必须与 MCU_CONTENT / MCU_CHARACTERS 做交集校验，未命中一律丢弃。
+  · 审核阶段填入既有管道字段 `reviewed_by` / `reviewed_at`（属 12 个既有字段）。
+
+
+============================================================
+4. L2：merger 输入契约 / 事件候选结构（EventCandidate）
+============================================================
+
+■ 4.1 merger 的**输入契约**（merger 读取哪些字段）
+
+  merger 只允许读取以下 **10 个字段**，多一个都不许读：
+
+  ┌──────────────────────────────────────────┬────────────────────────────────────────┐
+  │ 读取字段                                  │ 用途                                    │
+  ├──────────────────────────────────────────┼────────────────────────────────────────┤
+  │ `candidate_id`（作为 item id）             │ 输出 item_ids / reports.id              │
+  │ `title`                                  │ 计算 event_key（经标准化）               │
+  │ `category`                               │ 计算 event_key                          │
+  │ `related_movies` / `related_series` /      │ 计算 event_key 的 entitySig（主信号）    │
+  │ `related_characters`                     │                                        │
+  │ `publish_time` / `first_seen_at`           │ 时间窗口判断、first/last_publish_time     │
+  │ `reported_by`                            │ 组装 reported_by_union                  │
+  └──────────────────────────────────────────┴────────────────────────────────────────┘
+
+  ★ **merger 不得读取**（已由 G4 的 95 条断言覆盖）：
+    `verification_status` / `judged_by` / `chain_steps_hit` /
+    `status_history` / `ai_suggested_status` / `gate_status`
+  → 即 merger **不做任何状态或审核判断**，只做机械聚合。
+
+■ 4.2 merger 的**输出结构**（EventCandidate，继承 G4 实现）
+
+  ```
+  {
+    event_key, occurrence（条件字段，见 4.3）,
+    item_ids: [], report_count, category,
+    first_publish_time, last_publish_time,
+    within_window: boolean,
+    decision: 'merge' | 'single' | 'hold',
+    hold_reason: '' | 'out_of_window' | 'missing_time',
+    reports: [ { id, publish_time, first_seen_at,
+                 source_names, source_urls, owner_groups } ],   ← 不裁剪
+    reported_by_union: [ { source_name, source_url, owner_group } ],
+    distinct_owner_groups: [...],
+    note
+  }
+  ```
+
+■ 4.3 `occurrence` 的条件性
+
+  · 若 G4.1 的 Z-3 采纳 **B-ii**（occurrence 序号）→ 本字段**必填**，
+    编号规则与实现要点见同批《资讯事件归并与 event_key 边界规范 V1.0》B4。
+  · 若采纳 **B-i**（组合键）→ 本字段**不出现**，事件级稳定键由
+    `event_key + '@' + first_publish_time` 组成（本 schema 已含 first_publish_time，无需变更）。
+  · ★ 在 Z-3 裁定前，该字段**不得**在任何产出中出现。
+
+
+============================================================
+5. L2→L3 之间的判定输入：judge 输入契约
+============================================================
+
+■ 5.1 judge 的三个入参（继承 G1 实现）
+
+  ```
+  judge(item, input, opts)
+  ```
+
+  【item】— 判定器只允许读取以下 **6 个字段**：
+
+  ┌──────────────────────────────────────────┬────────────────────────────────────────┐
+  │ 读取字段                                  │ 用途                                    │
+  ├──────────────────────────────────────────┼────────────────────────────────────────┤
+  │ `id`（或 candidate_id）                   │ 结果标识                                │
+  │ `reported_by`                            │ 独立证据组计算、来源证据                  │
+  │ `report_corrections`                     │ Step 3 判据                             │
+  │ `conflict_statements`                    │ Step 4 判据                             │
+  │ `original_source`                        │ Step 7 判据（**唯一允许文本匹配的字段**）  │
+  │ `original_source_url`                    │ Step 7 证据                             │
+  └──────────────────────────────────────────┴────────────────────────────────────────┘
+
+  ★ **judge 不得读取** `title` / `summary`（已由 G1 断言覆盖）——
+    判定器**不读文本、不做语义判断**。
+
+  【input】— I9 语义标记（由第一层 AI 建议 + 人工复核后以结构化形式传入）：
+
+  ```
+  {
+    official_confirm:  { url, reviewed, event_id? },   // Step 1
+    official_denial:   { url, reviewed },              // Step 2
+    conflict_verified: { verified }                    // Step 4
+  }
+  ```
+  三项均可缺省；缺省时对应步骤**不成立**（一律降级，绝不升格）。
+
+  【opts】— `{ now, pathPolicy, previousStatus, judgedBy }`
+    · `pathPolicy` 默认 `legacy`（E-1 冻结）
+    · `judgedBy` 覆盖须留痕（见同批 judged_by 规范 2.3②）
+
+■ 5.2 输出（7 项必填，缺一不得入库）
+
+  `verification_status` / `chain_steps_hit` / `judged_by` / `status_changed_at` /
+  `status_change_reason` / `status_change_evidence_url` / `status_history_entry`
+  另附诊断字段（不进交付物）：`rule_version` / `path_policy` /
+  `independent_group_count` / `reliable_group_count`
+
+■ 5.3 官方 URL 校验的接入点（G3）
+
+  判定器在 Step 1 / Step 2 需要 host / path 校验时，
+  应调用 G3 的 `validateOfficialSource(input, opts)`，其输入为：
+  `{ source_url, source_name, registry_entry, claimed_event_id, official_confirm }`。
+  ※ G3 的校验器**尚未接线**到判定器（两套实现并存，已用交叉一致性断言控住漂移）；
+    接线方案待立项，不属本规范范围。
+
+
+============================================================
+6. ★ 与 33 字段交付物的转换边界
+============================================================
+
+■ 6.1 转换时点与唯一入口
+
+  · **时点**：只能在 **G6 人工审核闸门之后**发生。
+  · **唯一入口**：`gate_status === 'approved'` 的候选方可转换。
+    `pending` / `rejected` 的候选**一律不得**进入交付数据。
+  · **执行者**：G6 的落库流程（人工提交 git 为最终动作）。
+  · ★ **未审核候选不可能出现在交付数据中** —— 这是硬约束，须可验证。
+
+■ 6.2 字段映射表（候选 → 交付物）
+
+  ┌────────────────────┬────────────────────────────────┬────────────────────────────────┐
+  │ 候选层字段          │ 交付物字段                      │ 转换规则                        │
+  ├────────────────────┼────────────────────────────────┼────────────────────────────────┤
+  │ （G6 生成）         │ `id`                           │ 见 6.3①                        │
+  │ `title`            │ `title`                        │ 直传（经人工复核）               │
+  │ `summary`          │ `summary`                      │ 直传（经人工复核）               │
+  │ `publish_time`     │ `publish_time`                 │ 直传（YYYY-MM-DD）              │
+  │ `first_seen_at`    │ `first_seen_at`                │ 直传                           │
+  │ （判定器输出）       │ `verification_status`          │ 见 6.3②                        │
+  │ `category`         │ `category`                     │ 直传（6 值枚举）                │
+  │ `reported_by`      │ `reported_by`                  │ 直传；**必须文章级 URL**          │
+  │ `original_source`  │ `original_source`              │ 直传                           │
+  │ `original_source_url`│ `original_source_url`        │ 直传                           │
+  │ （人工登记 + I9）    │ `official_source`              │ 见 6.3③                        │
+  │ （人工登记 + I9）    │ `official_source_url`          │ 见 6.3③                        │
+  │ `related_movies`   │ `related_movies`               │ 直传；入库前做交集校验            │
+  │ `related_series`   │ `related_series`               │ 同上                           │
+  │ `related_characters`│ `related_characters`          │ 同上                           │
+  │ `related_phases`   │ `related_phases`               │ 同上                           │
+  │ （人工运营）         │ `pinned` / `pinned_until` /     │ 默认 `false` / `null` / `0` /  │
+  │                    │ `pinned_order` / `pinned_reason`│ `''`；人工置顶时填写            │
+  │ （运行时计算）       │ `independent_group_count`      │ 见 6.3④                        │
+  │ `report_corrections`│ `report_corrections`          │ 直传（可 `[]`）                  │
+  │ `conflict_statements`│ `conflict_statements`        │ 直传（可 `[]`）                  │
+  │ （G6 / 人工）       │ `supersedes_id` / `superseded_by_id`│ 见 6.3⑤                    │
+  │ （判定器输出）       │ `status_history`               │ 见 6.3⑥                        │
+  │ （判定器输出）       │ `status_changed_at` /          │ 见 6.3⑥                        │
+  │                    │ `status_change_reason` /       │                                │
+  │                    │ `status_change_evidence_url`   │                                │
+  │ （判定器输出）       │ `judged_by` / `chain_steps_hit` │ 见 6.3⑥                        │
+  │ （判定器输出）       │ `conflict_resolved_at` /       │ 见 6.3⑥                        │
+  │                    │ `conflict_resolved_by_evidence_url`│                            │
+  └────────────────────┴────────────────────────────────┴────────────────────────────────┘
+
+  结果：交付物字段数 = **33**（前端展示 26 + 审计 7），**不多不少**。
+
+■ 6.3 必须**重算或生成**的字段（不得从候选直接搬运）
+
+  ① `id` —— 由 **G6 落库时生成**，格式 `news-YYYY-MM-DD-NNN`（当日三位序号）。
+     ★ 候选层**不得**预先占用该格式（故候选用 `candidate_id`）。
+  ② `verification_status` —— **必须由判定器按 R8.3 重算**。
+     候选层 `ai_suggested_status` **仅供参考，不得直接采用**。
+  ③ `official_source` / `official_source_url` —— 来自 I9 标记 + 人工登记，
+     **且必须通过 R7.4 校验**（G3）；否则留 `''`。
+  ④ `independent_group_count` —— 由 `reported_by` 按 owner_group 去重**运行时计算**
+     （与 components.js 口径一致）；**禁止人工填写、禁止从候选搬运**。
+  ⑤ `supersedes_id` / `superseded_by_id` —— 由人工或 G6 依据更正声明写入；
+     ★ 受 A4/A5 约束：**不得**因事件归并而合并两条（见同批边界规范）。
+  ⑥ 审计 6 项 + `status_history` —— 全部来自判定器输出；
+     `status_history` **只追加、禁止覆盖写**。
+
+■ 6.4 禁止进入交付数据的字段（**管道层 20 项，全量禁止**）
+
+  【G0 冻结件原有 12 项】
+    `event_key`｜`registry_id`｜`ingested_at`｜`raw_excerpt`｜`content_hash`｜
+    `crawl_evidence`｜`ai_suggested_status`｜`ai_model`｜`pipeline_run_id`｜
+    `reviewed_by`｜`reviewed_at`｜`rule_version`
+  【本规范新增登记 8 项（按第 2 / 3 节的 P 编号）】
+    `capture_id`(P-01)｜`candidate_id`(P-17)｜`gate_status`(P-18)｜
+    `url_level`(P-06)｜`title_raw`(P-07)｜`published_at_raw`(P-08)｜
+    `capture_refs`(§3)｜`occurrence`(条件字段，见 4.3)
+
+  ★ 合计 **20 项**（含 1 项条件字段），**任何一项出现在交付数据中即为违规**。
+  ★ 违规检查：交付数据的字段集合必须**恰为 33 个**（见第 4 节违规表第 1–3 条）。
+  ※ 说明：第 2 / 3 节的 P-01 – P-18 是**候选层字段编号**，用于本规范内部引用；
+    与 G0 冻结件的「12 项管道字段清单」是两套编号，不可混用。
+  ※ `first_publish_time`(P-16) 不属禁止项之外的新增——它等价于既有的
+    `first_seen_at` 语义的稳定形式，二者在交付物中为 `first_seen_at`；
+    候选层保留 P-16 仅用于窗口判断与主键组合。
+
+■ 6.5 单向性
+
+  转换是**严格单向**的：`候选 → 交付物`。
+  交付数据**不得**反向写回候选层；候选层**不得**读取交付数据作为输入。
+  两者的唯一交集是「同一事件」的语义对应，**不是数据依赖**。
+
+■ 6.6 转换后校验清单（G6 落库后必须全绿）
+
+  ┌────┬──────────────────────────────────────────────────────┬──────────────────┐
+  │ #  │ 校验项                                                │ 基线             │
+  ├────┼──────────────────────────────────────────────────────┼──────────────────┤
+  │ 1  │ 交付数据字段集合**恰为 33 个**                            │ 字段集比对        │
+  │ 2  │ 无任何管道层字段（20 项扫描）                             │ 字段名扫描        │
+  │ 3  │ `verification_status` 全部为 8 态之一                   │ 枚举校验          │
+  │ 4  │ `independent_group_count` 与运行时计算一致（禁手写）       │ G1 断言已有      │
+  │ 5  │ supersedes 双条都在且互链成对（**A6**）                   │ 新增断言          │
+  │ 6  │ `publish_time` / `first_seen_at` 至少一个非空             │ G1 断言已有      │
+  │ 7  │ `summary` 为纯文本、无 HTML/Markdown                    │ 人工复核 + 扫描   │
+  │ 8  │ `reported_by[].source_url` 为**文章级**                  │ Q-5（G8 生效）    │
+  │ 9  │ 既有断言全部保持全绿                                      │ 78+25+49+38+60+95│
+  └────┴──────────────────────────────────────────────────────┴──────────────────┘
+
+
+============================================================
+7. 载体、命名与编码
+============================================================
+
+  ┌────────────────┬──────────────────────────────────────────────────────────┐
+  │ 层              │ 载体建议                                                  │
+  ├────────────────┼──────────────────────────────────────────────────────────┤
+  │ L0              │ `workspace\news\pipeline\captures\YYYY-MM-DD.captures.json`│
+  │ L1              │ `workspace\news\pipeline\candidates\YYYY-MM-DD.json`       │
+  │ L2              │ `workspace\news\pipeline\events\YYYY-MM-DD.events.json`    │
+  │ L3（交付物）      │ `h5\data\news.js`（唯一交付载体，G6 写入）                  │
+  └────────────────┴──────────────────────────────────────────────────────────┘
+
+  · 编码：**UTF-8（无 BOM）**；格式：JSON（L3 为 JS 全局变量形态，属既有约定）。
+  · ★ 全部 L0/L1/L2 文件位于 `workspace\` 下，**不进 h5/**、不进生产部署。
+  · 建议 `workspace\news\pipeline\` 目录**单独入库**（属资产而非产物）——待 Z-8 一并裁定。
+
+
+============================================================
+8. 版本与变更流程
+============================================================
+
+  1. 本规范版本号独立演进（V1.0 → V1.1 …）；字段增删均须升版本。
+  2. **不得**在 V1.x 内改变任何字段的**语义**；仅可新增可选字段并登记编号。
+  3. 任何变更须同步更新：本规范 + 关联的回归断言 + G5/G6 的任务书。
+  4. 与冻结件的关系：本规范**不得**改变 33 字段交付物、8 态体系、
+     12 项既有管道字段的语义。管道层新增字段须在第 6.4 节登记。
+  5. **管道字段总量开放**（1.3 节裁定 · 禁止清单模式 B）：
+     新增管道字段**不受数量限制**，但必须**同时满足**以下 4 条，缺一不得新增：
+       ① **不进入 h5**
+       ② **不进入 33 字段交付物**
+       ③ **不影响 8 态判定**
+       ④ **不改变审核闸门逻辑**
+     → 约束的对象是「**禁止进入 DeliveryItem 的字段集合**」，
+       而不是「管道层字段的个数」。
+
+
+============================================================
+9. 附：完整示例
+============================================================
+
+■ 9.1 L1 CandidateItem 示例（含全部管道字段）
+
+  ```json
+  {
+    "capture_id": "cap-S002-run20260922-003",
+    "pipeline_run_id": "run20260922",
+    "registry_id": "S002",
+    "source_name": "The Direct",
+    "source_url": "https://thedirect.com/article/marvel-avengers-doomsday-teaser",
+    "url_level": "article",
+    "title_raw": "【独家】Marvel 官方公布《复仇者联盟5：毁灭之日》首支正式预告",
+    "published_at_raw": "Mon, 22 Sep 2026 09:10:00 +0000",
+    "published_at": "2026-09-22T09:10:00Z",
+    "fetched_at": "2026-09-22T02:05:12Z",
+    "feed_type": "rss",
+    "http_status": 200,
+    "content_hash": "9a1c0f…（sha1）",
+    "raw_excerpt": "Marvel 于今日发布……（≤200 字）",
+    "event_key": "evt1-72351c9a6985146e",
+    "first_publish_time": "2026-09-22T09:10:00Z",
+
+    "candidate_id": "cand-72351c9a-001",
+    "title": "Marvel 官方公布《复仇者联盟5：毁灭之日》首支正式预告",
+    "summary": "Marvel 发布该片首支正式预告，并确认北美上映日期。",
+    "category": "movie",
+    "related_movies": ["avengers-5"],
+    "related_series": [],
+    "related_characters": ["strange"],
+    "related_phases": [6],
+    "reported_by": [
+      { "source_name": "The Direct",
+        "source_url": "https://thedirect.com/article/marvel-avengers-doomsday-teaser",
+        "owner_group": "待核" }
+    ],
+    "original_source": "Marvel 官方",
+    "original_source_url": "https://www.marvel.com/news/some-official-announcement",
+    "publish_time": "2026-09-22",
+    "first_seen_at": "2026-09-22T02:05:12Z",
+    "ai_suggested_status": "official_confirmed",
+    "ai_model": "（模型标识）",
+    "capture_refs": ["cap-S002-run20260922-003"],
+    "gate_status": "pending"
+  }
+  ```
+
+  ★ 注意三处刻意设计：
+    ① `registry_id = S002` 且 `owner_group = 待核` —— **如实反映**该来源尚未确认归属；
+    ② `published_at_raw` 保留原始字符串，`published_at` 为规范化结果；
+    ③ `candidate_id` 用 `cand-` 前缀，**不占用** `news-YYYY-MM-DD-NNN`。
+
+■ 9.2 L2 EventCandidate 示例（merger 输出）
+
+  ```json
+  {
+    "event_key": "evt1-72351c9a6985146e",
+    "occurrence": null,
+    "item_ids": ["cand-72351c9a-001", "cand-72351c9a-002"],
+    "report_count": 2,
+    "category": "movie",
+    "first_publish_time": "2026-09-22T09:10:00Z",
+    "last_publish_time": "2026-09-22T11:40:00Z",
+    "within_window": true,
+    "decision": "merge",
+    "hold_reason": "",
+    "reports": [ /* 两条，不裁剪 */ ],
+    "reported_by_union": [ /* 两个来源，含各自 owner_group */ ],
+    "distinct_owner_groups": ["Penske Media Corporation", "People Inc."],
+    "note": "本条目不含任何状态信息；状态须由 G1 判定器按 R8.3 重算"
+  }
+  ```
+  ※ `occurrence` 在 Z-3 裁定前恒为不出现（示例中置 null 仅为占位说明）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本规范件至此完成。未写代码、未写采集、未接采集、未修改 h5/ 与 news.js、
+未改 33 字段与 8 态体系。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

@@ -1,0 +1,39 @@
+============================================================
+G5.3 真实采集验证（G5.3-T1 – T6）
+============================================================
+模式：OFFLINE（仅离线段）｜run_id = run20260923
+L0 14 字段｜L1 35 字段
+
+■ A. 允许清单与 transport 默认关闭
+  PASS  联网白名单 = S002–S006
+  PASS  S001 不在白名单（html-parse，任务书 §2 禁止）
+  PASS  S007–S012 不在白名单（合规 / 已停用）
+  PASS  白名单守卫：S001 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  白名单守卫：S010 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  白名单守卫：S007 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  默认通道为 local（fetchContent 的 transport 未注入时不会联网）
+  PASS  本地夹具通道可用（S004.rss 已随夹具交付）
+
+■ B. robots 解析与匹配（单测）
+  PASS  解析出 2 个组
+  PASS  具名 AI 机器人被登记
+  PASS  命中 Disallow /admin/ → 拒绝
+  PASS  命中规则为 /admin/
+  PASS  命中 Allow /public/ → 允许
+  PASS  未命中任何规则 → 允许（robots 默认允许）
+  PASS  匹配对象为通配组 *（无 MCUAtlasBot 组）
+  PASS  无通配组 * → 允许（不扩大解释）
+
+■ C. G5.3-T3 标题原文保留（离线）
+  PASS  title_raw 原样保留（含全角符号与原文）
+  PASS  仅 trim，不改语义、不删词
+
+■ D. G5.3-T5 重复运行幂等（离线，落盘到 tests\tmp\）
+  PASS  第 1 次落盘：新增 1
+  PASS  第 2 次落盘：新增 0（幂等）
+  PASS  归档总数 = 1
+（未加 --live / MCU_LIVE：跳过真实联网验证段 G5.3-T1 / T2 / T4 / T6-LIVE）
+
+============================================================
+[OFFLINE] 结果：21 PASS / 0 FAIL
+============================================================

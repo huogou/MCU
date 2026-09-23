@@ -1,0 +1,85 @@
+﻿============================================================
+G5.3 真实采集验证（G5.3-T1 – T6）
+============================================================
+模式：**LIVE（真实联网）**｜run_id = run20260923
+L0 14 字段｜L1 35 字段
+
+■ A. 允许清单与 transport 默认关闭
+  PASS  联网白名单 = S002–S006
+  PASS  S001 不在白名单（html-parse，任务书 §2 禁止）
+  PASS  S007–S012 不在白名单（合规 / 已停用）
+  PASS  白名单守卫：S001 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  白名单守卫：S010 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  白名单守卫：S007 → LIVE_SOURCE_NOT_ALLOWED
+  PASS  默认通道为 local（fetchContent 的 transport 未注入时不会联网）
+  PASS  本地夹具通道可用（S004.rss 已随夹具交付）
+
+■ B. robots 解析与匹配（单测）
+  PASS  解析出 2 个组
+  PASS  具名 AI 机器人被登记
+  PASS  命中 Disallow /admin/ → 拒绝
+  PASS  命中规则为 /admin/
+  PASS  命中 Allow /public/ → 允许
+  PASS  未命中任何规则 → 允许（robots 默认允许）
+  PASS  匹配对象为通配组 *（无 MCUAtlasBot 组）
+  PASS  无通配组 * → 允许（不扩大解释）
+
+■ C. G5.3-T3 标题原文保留（离线）
+  PASS  title_raw 原样保留（含全角符号与原文）
+  PASS  仅 trim，不改语义、不删词
+
+■ D. G5.3-T5 重复运行幂等（离线，落盘到 tests\tmp\）
+  PASS  第 1 次落盘：新增 1
+  PASS  第 2 次落盘：新增 0（幂等）
+  PASS  归档总数 = 1
+
+■ E. 真实联网采集（S002 – S006）
+  S002  The Direct  parsed=20  accepted=20  rejected=0  err=[（无）]
+  S003  ComicBook  parsed=0  accepted=0  rejected=0  err=[HTTP_FORBIDDEN]
+  S004  Variety  parsed=10  accepted=10  rejected=0  err=[（无）]
+  S005  Deadline  parsed=0  accepted=0  rejected=0  err=[ETIMEDOUT]
+  S006  The Walt Disney Company 官方公告页  parsed=100  accepted=100  rejected=0  err=[（无）]
+
+■ G5.3-T1  真实 RSS 可读取
+  PASS  至少 1 个真实来源成功解析
+  INFO  成功解析的来源：S002, S004, S006
+  INFO  HTTP 状态分布：{"200":3,"HTTP_FORBIDDEN":1,"ETIMEDOUT":1}
+
+■ G5.3-T2  日期解析稳定
+  PASS  全部可解析条目的 published_at 格式均为 ISO8601（无解析残缺）
+  INFO  可解析率（有日期的条目 / 全部条目）：130 / 130
+  PASS  日期可解析率 ≥ 50%（低于此说明时间解析不稳定）
+
+■ G5.3-T3  标题原文保留（联网数据）
+  PASS  ★ L0 的 title_raw 与解析出的原始标题逐字符一致（未改写）
+
+■ G5.3-T4  异常 feed 不会污染其他来源
+  PASS  异常来源与其他来源**互不影响**（单源失败不中断批量）
+  PASS  异常来源的错误已被记录（不静默）
+  INFO  异常来源：S003(HTTP_FORBIDDEN), S005(ETIMEDOUT)
+
+■ G5.3-T6  真实数据进入 Candidate 不产生状态字段
+  PASS  全部真实 capture 构造的 L1 均合法（无状态字段泄漏）
+  PASS  L1 输出全文不含 verification_status
+  PASS  L1 输出全文不含 occurrence（B-ii 暂不落码）
+
+■ §4  落盘到 pipeline\captures\（不覆盖历史）
+  PASS  落盘：新增 130 条 / 跳过 0 条
+  PASS  归档后无记录丢失（总数 = 历史数 + 新增数）
+  INFO  落盘文件：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\captures\20260923.captures.json
+  INFO  归档前 0 条 → 归档后 130 条（新增 130）
+
+■ 汇总表（按来源）
+  reg   http  robots   items  accepted rejected 状态
+  S002  200   allow/allow/allow/unknown/allow20     20       0        ✅
+  S003  —     allow/allow/allow/unknown/allow0      0        0        ❌ HTTP_FORBIDDEN
+  S004  200   allow/allow/allow/unknown/allow10     10       0        ✅
+  S005  —     allow/allow/allow/unknown/allow0      0        0        ❌ ETIMEDOUT
+  S006  200   allow/allow/allow/unknown/allow100    100      0        ✅
+
+  INFO  请求统计：{"user_agent":"MCUAtlasBot/1.0 (+https://mcu.yaokaixin.top/)","limits":{"timeout_ms":20000,"max_retries":1,"min_interval_per_host_ms":1200,"max_requests_per_run":60,"max_redirects":5},"requests":13,"by_host":{"thedirect.com":3,"comicbook.com":2,"variety.com":2,"deadline.com":4,"thewaltdisneycompany.com":2},"retries":2,"timeouts":4,"redirects":1,"denied_urls":[],"robots_records":{"https://thedirect.com":{"url":"https://thedirect.com/robots.txt","origin":"https://thedirect.com","status":200,"bytes":445,"fetched_at":"2026-09-23T02:47:53Z","policy":"allow","matched_rule":"","named_agents":[],"note":"","matched":"no-rule"},"https://comicbook.com":{"url":"https://comicbook.com/robots.txt","origin":"https://comicbook.com","status":403,"bytes":5562,"fetched_at":"2026-09-23T02:47:56Z","policy":"allow","matched_rule":"","named_agents":[],"note":"robots.txt 状态 403 → 保守按允许处理但记录在案"},"https://variety.com":{"url":"https://variety.com/robots.txt","origin":"https://variety.com","status":200,"bytes":1283,"fetched_at":"2026-09-23T02:47:58Z","policy":"allow","matched_rule":"","named_agents":["anthropic-ai","cohere-ai","omgili","omgilibot","applebot-extended","bytespider","ccbot","chatgpt-user","chatgpt","deepseek","deepseekbot","gptbot","oai-searchbot","claudebot","claude-web","diffbot","facebookbot","google-extended","meta-externalagent","meta-externalfetcher","perplexitybot","timpibot","webzio-extended","youbot","cxensebot"],"note":"","matched":"no-rule"},"https://deadline.com":{"url":"https://deadline.com/robots.txt","origin":"https://deadline.com","status":0,"bytes":0,"fetched_at":"2026-09-23T02:47:59Z","policy":"unknown","matched_rule":"","named_agents":[],"note":"robots.txt 获取失败：ETIMEDOUT"},"https://thewaltdisneycompany.com":{"url":"https://thewaltdisneycompany.com/robots.txt","origin":"https://thewaltdisneycompany.com","status":200,"bytes":149,"fetched_at":"2026-09-23T02:49:22Z","policy":"allow","matched_rule":"","named_agents":[],"note":"","matched":"no-rule"}}}
+  INFO  robots 审计：{"https://thedirect.com":{"url":"https://thedirect.com/robots.txt","origin":"https://thedirect.com","status":200,"bytes":445,"fetched_at":"2026-09-23T02:47:53Z","policy":"allow","matched_rule":"","named_agents":[],"note":"","matched":"no-rule"},"https://comicbook.com":{"url":"https://comicbook.com/robots.txt","origin":"https://comicbook.com","status":403,"bytes":5562,"fetched_at":"2026-09-23T02:47:56Z","policy":"allow","matched_rule":"","named_agents":[],"note":"robots.txt 状态 403 → 保守按允许处理但记录在案"},"https://variety.com":{"url":"https://variety.com/robots.txt","origin":"https://variety.com","status":200,"bytes":1283,"fetched_at":"2026-09-23T02:47:58Z","policy":"allow","matched_rule":"","named_agents":["anthropic-ai","cohere-ai","omgili","omgilibot","applebot-extended","bytespider","ccbot","chatgpt-user","chatgpt","deepseek","deepseekbot","gptbot","oai-searchbot","claudebot","claude-web","diffbot","facebookbot","google-extended","meta-externalagent","meta-externalfetcher","perplexitybot","timpibot","webzio-extended","youbot","cxensebot"],"note":"","matched":"no-rule"},"https://deadline.com":{"url":"https://deadline.com/robots.txt","origin":"https://deadline.com","status":0,"bytes":0,"fetched_at":"2026-09-23T02:47:59Z","policy":"unknown","matched_rule":"","named_agents":[],"note":"robots.txt 获取失败：ETIMEDOUT"},"https://thewaltdisneycompany.com":{"url":"https://thewaltdisneycompany.com/robots.txt","origin":"https://thewaltdisneycompany.com","status":200,"bytes":149,"fetched_at":"2026-09-23T02:49:22Z","policy":"allow","matched_rule":"","named_agents":[],"note":"","matched":"no-rule"}}
+
+============================================================
+[LIVE] 结果：32 PASS / 0 FAIL
+============================================================

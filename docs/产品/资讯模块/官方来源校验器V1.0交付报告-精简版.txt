@@ -1,0 +1,140 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《官方来源校验器 V1.0 交付报告 · 精简版》（G3）
+执行：开发侧（Jarvis）｜2026-09-22 16:3x
+**未改 h5 / wechat / douyin、未接真实网络、未抓网页、未改三基线脚本与 G1/G2 冻结件、未进 G4**
+全量版（归档）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\官方来源校验器V1.0交付报告.txt
+新增（3 个文件，均在 workspace 下，不进 h5）：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\official-source-validator.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\test-official-validator.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\validator\fixtures\official-validator-cases.cjs
+测试留档：同目录 out-official-validator.txt / out-codes.txt / out-regression-codes.txt / out-gitstatus-g3.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一】设计
+
+  定位：R7.4 官方来源六步校验中**可离线完成的那部分**，做成纯函数验证层。
+  零网络 / 零副作用 / 确定性；域名事实全部来自 source-registry.json；
+  path 策略复用 G1 的 PATH_POLICY（不另建第二套）。
+
+  输入：{ source_url, source_name, registry_entry, claimed_event_id, official_confirm }
+  输出（**恰为 4 个顶层键**）：
+    {
+      valid:        boolean,     // 六项全通过才 true
+      checks:       object,      // 6 项，每项 { pass, detail }
+      reason:       string,      // 结论说明
+      rule_version: "V1.0"
+    }
+  ※ 契约取舍：任务书写 `checks:[a,b,...]`，本实现取 **checks 为对象**（键即检查名），
+    理由：①调用方需按名取项　②detail 要承载证据　③顶层键严格保持 4 个。
+    六项顺序由常量 CHECK_ORDER 显式给出，测试已断言键位顺序一致。
+
+  六项检查：
+    url_scheme       URL 非空 且 协议 http/https
+    domain_allowed   host 命中 registry_entry.allowed_domains
+    path_allowed     path 命中 allowed_paths 且不在 excluded_paths（legacy / article-level）
+    domain_blacklist host 不在 non_official_domains（命中即失败）
+    registry_match   官方资格：official_or_media=official **且** allowed_domains 非空；
+                     另加条目真实性复核（source_name / registry_id 与登记表一致）
+    review_required  official_confirm.reviewed = true，且 claimed_event_id 与
+                     official_confirm.event_id 一致（若成对提供）
+
+  ★ **级联语义（刻意不短路）**：六项全部计算，URL 不可用时依赖项一并失败。
+    目的是让调用方一次看到全貌；reason 只报「按固定顺序最早失败的一项」，
+    其余由 checks 全量呈现。这一条是首轮 5 个 FAIL 的根因（见三·4）。
+
+  三项关键设计：
+  ① 域名零硬编码（源码扫描 0 命中，机器可验证）
+  ② 复用 G1 的 parseUrl / pathAllowed / PATH_POLICY，不复制逻辑；
+     并用**交叉一致性断言**（8 组 URL×策略）防止两套实现漂移
+  ③ 黑名单做成**独立守卫**：C5 用合成条目把 disneyplus.com 写进 allowed_domains，
+     使 domain_allowed 通过，从而单独验证黑名单本身有效
+     （即「有人误把黑名单域名登记进 allowed_domains 也拦得住」）
+
+  本层**未覆盖**：R7.4 Step 1（HTTP 可达性，需联网）、Step 4 内容层比对（需抓正文，
+  本层只校验 event_id 关联声明）、Step 5 人工复核（由 I9 的 reviewed 位承载）。
+
+【二】测试结果
+
+  总结果：**60 PASS / 0 FAIL，退出码 0**
+
+  用例明细（C1–C8 任务要求 + C9–C14 补充，共 15 例）：
+    C1  true   正常官方 URL（文章页）+ 已复核 + ID 一致
+    C2  true   官方栏目页 /news，legacy 通过
+    C3  false  path_allowed ← 同一 URL 在 article-level 下失败
+    C4  false  domain_allowed ← 未登记域名 example.com
+    C5  false  domain_blacklist（domain_allowed 通过）← 黑名单独立守卫
+    C6  false  domain_allowed, path_allowed, registry_match ← 未登记来源
+    C7a false  domain_allowed, path_allowed, registry_match ← S010 官方但域名未登记
+    C7b false  domain_allowed, path_allowed, registry_match ← S011 同上（URL 是 marvel.com 也无效）
+    C8  false  url_scheme + 3 项级联 ← 空 URL
+    C9  false  path_allowed ← excluded_paths 命中 /articles/comics/
+    C10 false  registry_match ← source_name 与条目不符（防伪造）
+    C11 true   article-level 下文章级 URL 通过（证明严格策略不是「一律拒绝」）
+    C12 false  review_required ← 未复核
+    C13 false  review_required ← event_id 不一致
+    C14 false  domain_allowed, path_allowed, registry_match ← S004(media) 冒充官方来源
+
+  附加断言全 PASS：输出契约完整性（6 项）、valid === 六项全通过、
+  reason 指向最早失败项 / 通过用例表述一致。
+
+  ★ 交叉一致性：8 组「URL × 策略」下，本校验器前五项结论 = G1 checkOfficialUrl = 期望值。
+  ★ 数据来源纪律自证：源码剥离注释后做域名正则扫描 → **0 命中**；
+    确认经 news-registry.cjs 取域名、经 news-judge-rules.cjs 取策略；
+    无任何网络能力（无 http/https/net/dns/fetch/axios/XMLHttpRequest）。
+
+  ★★ 首轮出现 **5 FAIL**（C6/C7a/C7b/C8/C14），根因是**夹具期望写漏了级联项**，
+    非实现缺陷 → 已把期望改为「完整失败清单」并写明级联语义，修正后 60/0。
+    如实记录。
+
+  验收四项：
+    PASS 数量 **60**｜FAIL 数量 **0**｜退出码 **0**
+    git status：44 条变更，其中 **h5 / wechat / douyin 相关 = 0 条**
+
+  h5/data/news.js SHA256：
+    实测 `589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2`
+    = 基线 → **文件未改动**（该断言内置于测试脚本第 5 节）
+
+  全量回归（六项全部退出码 0）：
+    校验器 60｜G1 黄金 25｜G1 边界 49｜G2 登记表 38｜V2.2 规则 78｜全站回归 55｜视觉 11
+  ★ 本阶段**只新增 3 个文件、未修改任何既有文件**，G1/G2 冻结件零改动。
+
+【三】发现与待裁定
+
+  F-1 ★ **「URL 可达性探测」目前无阶段归属**（口径冲突，须裁定）：
+      G1 报告曾把「HTTP 可达性（R7.4 Step 1）」归到 G3；
+      但 G3 任务书明确「不联网探测」→ G3 交付的是纯函数层。
+      结果：**Step 1 在现有阶段拆分里没有承接者**。
+      影响：official_confirmed 的「可访问」这一环目前仅由 I9 标记承载，
+      系统自身不验证 URL 是否真的活着。
+      建议：由负责人指定承接阶段（可并入 G7 观测与告警，或单列「网络校验层」）。
+      **本阶段不擅自承接。**
+  F-2 说明：G3 **未把 G1 判定器接到本校验器上**（两套 URL 校验暂时并存）。
+      不接线的理由：G1 已验收冻结，接线属「修改 G1 交付物」+ 引入回归风险，
+      超出本阶段「只新增」范围；已用交叉一致性断言控住漂移。
+      建议后续单独立项「判定器改用校验器（去重实现）」。
+  F-3 沿用未决项（不阻塞）：C-1 judged_by 口径｜C-2 代码是否入库｜
+      F-3 未具名社交爆料是否登记为来源条目｜
+      **E-2 S002/S003 的 owner_group 仍待核，须在 G5 之前关闭**
+  F-4 本阶段未触碰：h5\ / wechat\ / douyin\ 全部、三个基线脚本、
+      news-judge*.cjs / news-registry.cjs / source-registry.json、三份同步文件。
+
+【四】置信度
+
+  高（~95%）：六项检查符合任务书要求（逐条对照 + C1–C14 覆盖，可复现）；
+             输出契约正确性（键位/顺序/类型/valid 一致性均有断言）；
+             「域名不硬编码」为机器可验证事实（源码扫描 0 命中）；
+             h5/wechat/douyin 零改动（git status 0 条 + SHA256 一致）；
+             与 G1 的一致性（8 组交叉对照全 PASS）
+  中（~70%）：用例覆盖**完备性**（URL 形态极端变体未系统覆盖：大小写 host、端口号、
+             IDN、多层子域、带 query/fragment 的路径 —— 建议 G4/G5 补测）；
+             registry_match 的严格度（「条目真实性复核」属超出任务书的加固，可讨论）；
+             path 切 article-level 后各来源的适配性（属 G8）
+  低（~30%）：R7.4 Step 1 / Step 4 的最终实现方式（前者归属未定，后者需联网，
+             均不在本层，实际效果无法评估）；
+             该层在真实采集环境下的表现（输入全为登记表条目与构造用例，
+             真实 URL 形态噪声未验证，须 G5 实测）
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+本阶段：G3 交付完成并停止。未进入 G4、未开发采集、未修改 H5。
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

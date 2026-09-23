@@ -1,0 +1,11 @@
+============================================================
+G2 · 取证：G1 内联种子数据（SOURCE_REGISTRY）定向校验
+============================================================
+被检对象：news-judge-rules.cjs 的 SOURCE_REGISTRY（12 条）
+检查项：tier / crawl_policy / health 枚举 + owner_group 非空 + source_name 唯一
+
+发现问题 1 处：
+  FAIL  [crawl_policy] S011 Marvel Studios 官方 → 「none」不在枚举 auto_allowed/manual_only/ai_ban_named/ai_ban_notice/blocked
+
+结论：G1 内联种子在枚举层面存在 1 处违规；
+      G2 的正式登记表（registry/source-registry.json）已修正，见 out-registry-validate.txt。

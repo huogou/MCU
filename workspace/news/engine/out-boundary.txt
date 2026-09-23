@@ -1,0 +1,77 @@
+============================================================
+G1 · 资讯状态判定器 V1.0 —— 合成边界用例（B1–B10，含对照用例 B4b，共 11 例）
+============================================================
+用例数：11｜规则版本：V1.0
+
+■ 逐例判定
+  PASS  【B1】状态 = unverified　（两家来源，owner_group 均为「待核」→ 不计独立组 → 落 Step 8）
+  PASS  【B1】独立组数 = 0
+  PASS  【B1】命中 Step 8
+  PASS  【B2】状态 = rumor　（reported_by 空 + original_source 命中爆料词表 → Step 7 rumor）
+  PASS  【B2】独立组数 = 0
+  PASS  【B2】命中 Step 7
+  PASS  【B3】状态 = unverified　（reported_by 空 + original_source = unknown → Step 8 unverified）
+  PASS  【B3】独立组数 = 0
+  PASS  【B3】命中 Step 8
+  PASS  【B4】状态 = conflicting　（独立组 2（跨集团：PMC + Valnet）+ 已核准互斥 → Step 4 conflicting（证明 Step 4 早于 Step 5））
+  PASS  【B4】独立组数 = 2
+  PASS  【B4】命中 Step 4
+  PASS  【B4b】状态 = multi_source_reported　（同 B4 但互斥未经人工核准 → 不判 conflicting，落 Step 5（对照））
+  PASS  【B4b】独立组数 = 2
+  PASS  【B4b】命中 Step 5
+  PASS  【B5】状态 = single_source　（官方 URL host 命中但 path 属排除区（/articles/comics/）→ 不得 official_confirmed）
+  PASS  【B5】独立组数 = 1
+  PASS  【B5】命中 Step 6
+  PASS  【B6】状态 = single_source　（官方标记存在但 reviewed = false → 不得 official_confirmed）
+  PASS  【B6】独立组数 = 1
+  PASS  【B6】命中 Step 6
+  PASS  【B7】状态 = single_source　（官方否认标记存在但 URL 未命中登记表 → 不得 officially_denied）
+  PASS  【B7】独立组数 = 1
+  PASS  【B7】命中 Step 6
+  PASS  【B8】状态 = multi_source_reported　（跨集团 2 条报道（PMC + Valnet）仅 1 条被更正 → 不进 Step 3，继续判 Step 5）
+  PASS  【B8】独立组数 = 2
+  PASS  【B8】命中 Step 5
+  PASS  【B9】状态 = rumor　（独立组 1 但来源 tier = T4（未登记）→ 不得判 single_source，落 Step 7）
+  PASS  【B9】独立组数 = 1
+  PASS  【B9】命中 Step 7
+  PASS  【B9】不得判为 single_source
+  PASS  【B10】状态 = unverified　（2 个独立组但来源均为 tier = T4 → 不得判 multi_source_reported，落 Step 8）
+  PASS  【B10】独立组数 = 2
+  PASS  【B10】命中 Step 8
+  PASS  【B10】不得判为 multi_source_reported
+
+■ 边界专项
+  PASS  【B9】独立组 1 / 可靠组 0（来源 tier=T4 不计入可靠来源）
+  PASS  【B10】独立组 2 / 可靠组 0（两个 T4 组均不计入可靠来源）
+  PASS  【B10】2 个独立组但均为 T4 → 不得升格为 multi_source_reported（缺数据/低质一律降级）
+  PASS  【B4/B4b】同样 2 个独立组：已核准互斥 → Step 4；未核准 → Step 5
+  PASS  【B5】不得落 Step 1 / Step 2（官方标记不合格 → 回落）
+  PASS  【B6】不得落 Step 1 / Step 2（官方标记不合格 → 回落）
+  PASS  【B7】不得落 Step 1 / Step 2（官方标记不合格 → 回落）
+  PASS  【B8】仅 1 条被更正 → 事件级不落 corrected（R8.5 事件级语义）
+
+■ 判定器纪律（红线自检）
+  PASS  【红线 4】不得假设未确认来源的独立性（待核一律不计组）
+  PASS  【红线 7】产出状态全部落在 8 态枚举内
+  PASS  【契约】全部输出含 7 项必填字段
+  PASS  幂等：同输入两次运行输出一致
+  PASS  非法输入（item=null）显式抛错
+  PASS  缺 id 的条目显式抛错
+
+■ 判定明细
+  case  状态                      步骤      独立组/可靠组
+  B1    unverified              Step 8  0/0
+  B2    rumor                   Step 7  0/0
+  B3    unverified              Step 8  0/0
+  B4    conflicting             Step 4  2/2
+  B4b   multi_source_reported   Step 5  2/2
+  B5    single_source           Step 6  1/1
+  B6    single_source           Step 6  1/1
+  B7    single_source           Step 6  1/1
+  B8    multi_source_reported   Step 5  2/2
+  B9    rumor                   Step 7  1/0
+  B10   unverified              Step 8  2/0
+
+============================================================
+结果：49 PASS / 0 FAIL
+============================================================

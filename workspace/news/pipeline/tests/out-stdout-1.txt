@@ -1,0 +1,136 @@
+﻿============================================================
+G5 · 资讯管道三层接口测试
+============================================================
+L0 字段数：14｜L1 字段数：35
+登记表：V1.0｜条目 12
+
+■ 1. pipeline 目录与冻结约束
+  PASS  目录存在：pipeline\captures\
+  PASS  目录存在：pipeline\candidates\
+  PASS  目录存在：pipeline\events\
+  PASS  目录存在：pipeline\fixtures\
+  PASS  目录存在：pipeline\tests\
+  PASS  测试脚本位于 pipeline\tests\ 内
+  PASS  L0 零网络能力
+  PASS  L1 零网络能力
+  PASS  L0 不写文件
+  PASS  L1 不写文件
+  PASS  L0 / L1 不引用 h5 路径
+
+■ 2. L0 RawCapture（14 字段）
+  PASS  L0 字段数 = 14
+  PASS  L0 字段顺序与规范一致
+  PASS  ★ L0 不含 event_key（已上移 L1）
+  PASS  ★ L0 不含 first_publish_time（已上移 L1）
+  PASS  C1 输出字段集合恰为 14
+  PASS  C1 url_level = article
+  PASS  C1 published_at 规范化为 ISO
+  PASS  C1 content_hash 为 40 位十六进制
+  PASS  L0 validate 通过
+  PASS  ★ L0 输出不含 event_key
+
+■ 2b. url_level 判定
+  PASS  /news → section
+  PASS  /news/slug → article
+  PASS  /feed/ → feed
+  PASS  /rss → feed
+  PASS  /category/marvel/feed/ → feed
+  PASS  RFC822 可解析
+  PASS  无法解析 → null
+
+■ 2c. C4 非法 URL + registry 一致性
+  PASS  【C4a】空 URL → INVALID_URL
+  PASS  【C4b】非 http(s) 协议（javascript:） → INVALID_URL
+  PASS  【C4c】非 http(s) 协议（ftp:） → INVALID_URL
+  PASS  【C4d】相对路径（无协议） → INVALID_URL
+  PASS  registry_id 未登记 → UNKNOWN_REGISTRY_ID
+  PASS  source_name 不符 → SOURCE_NAME_MISMATCH
+  PASS  C3 保留值 unregistered 可用
+
+■ 3. L1 CandidateItem（35 字段 = 14 + 21）
+  PASS  L1 字段数 = 35
+  PASS  L1 新增字段数 = 21
+  PASS  L1 包含 event_key（由 L0 上移）
+  PASS  L1 包含 first_publish_time（由 L0 上移）
+  PASS  C1 L0→L1 输出字段集合恰为 35
+  PASS  C1 candidate_id 形态合法
+  PASS  C1 candidate_id 非交付物 id 格式
+  PASS  ★ event_key 只在 L1 产出且形态合法
+  PASS  ★ L1 first_publish_time = L0 published_at
+  PASS  C1 publish_time 取日期部分
+  PASS  C1 first_seen_at = fetched_at
+  PASS  C1 gate_status 默认 pending
+  PASS  C1 capture_refs 指向 L0
+  PASS  C1 L1 validate 通过
+  PASS  ★ C1 owner_group 取自登记表
+  PASS  C2 owner_group = Penske Media Corporation
+  PASS  C3 未登记来源 owner_group = unknown
+  PASS  登记表 S002 = 独立
+  PASS  登记表 S003 = Savage
+
+■ 3b. C7 缺失发布时间
+  PASS  C7 published_at = null
+  PASS  C7 publish_time = 空串
+  PASS  C7 first_seen_at 仍有值
+  PASS  C7 validate 通过（不拒绝）
+
+■ 3c. C5 重复事件 / C6 supersedes
+  PASS  C5 两条同一 event_key
+  PASS  C5 owner_group 分别为 独立 / Savage
+  PASS  C6 两条同一 event_key
+  PASS  C6 更正记录已承载（P-补1）
+
+■ 4. C8 异常字段（15 变体）
+  PASS  【C8a】raw 含 verification_status → FORBIDDEN_FIELD
+  PASS  【C8b】L0 缺必填（title_raw） → MISSING_FIELD
+  PASS  【C8c】raw_excerpt 超长（>200 字） → EXCERPT_TOO_LONG
+  PASS  【C8d】registry_id 未登记 → UNKNOWN_REGISTRY_ID
+  PASS  【C8e】source_name 与登记表不符 → SOURCE_NAME_MISMATCH
+  PASS  【C8f】feed_type 非枚举 → INVALID_FEED_TYPE
+  PASS  【C8g】http_status 非整数 → INVALID_HTTP_STATUS
+  PASS  【C8h】AI 结果含 verification_status → FORBIDDEN_FIELD
+  PASS  【C8i】AI 结果含 judged_by → FORBIDDEN_FIELD
+  PASS  【C8j】AI 结果含交付物 id → FORBIDDEN_FIELD
+  PASS  【C8k】title 含 HTML 标签 → MARKUP_NOT_ALLOWED
+  PASS  【C8l】summary 含 Markdown 粗体 → MARKUP_NOT_ALLOWED
+  PASS  【C8m】category 非 6 值枚举 → INVALID_CATEGORY
+  PASS  【C8n】ai_suggested_status 非 8 态 → INVALID_SUGGESTED_STATUS
+  PASS  【C8o】gate_status 非枚举 → INVALID_GATE_STATUS
+
+■ 4b. 关联交集校验
+  PASS  已载入 idSpace（只读）
+  PASS  未命中 related_movies 被丢弃（含 avengers-5）
+  PASS  related_series 保留命中项
+  PASS  related_characters 保留命中项
+  PASS  related_phases 只保留 1–6 整数
+  PASS  C8i validate 通过（丢弃不报错）
+
+■ 5. 交付物隔离（L0 / L1 ≠ DeliveryItem）
+  PASS  L0 无状态字段（深扫 9 项）
+  PASS  L1 无状态字段（深扫 9 项）
+  PASS  L1 无交付物独有字段（深扫）
+  PASS  L1 不含交付物独有字段（点名）
+  PASS  L1 无 verification_status（含深扫）
+  PASS  L1 无 occurrence（任务书第 5 节）
+
+■ 6. 三层串联（L0 → L1 → L2）
+  PASS  适配器输出恰为 10 个键（9 白名单 + id）
+  PASS  适配器 id = candidate_id
+  PASS  适配器输出未越出白名单
+  PASS  适配器输出不含 6 项禁止字段
+  PASS  串联：输入 5 条 → 报道记录零丢失
+  PASS  串联：records_deleted = 0
+  PASS  串联：输出无状态字段（深扫 6 项）
+  PASS  串联：输出无 occurrence
+  PASS  C5 两条不同来源归并为 1 个事件（2 报道）
+  PASS  ★ C6 supersedes 归并为 1 个事件但两条报道都保留（A3/A4）
+  PASS  【反证】未桥接 id → merger 报道记录数 = 0
+
+■ 7. 确定性与幂等
+  PASS  L0 create 幂等
+  PASS  L1 fromRawCapture 幂等
+  PASS  toMergerInput 幂等
+
+============================================================
+结果：103 PASS / 0 FAIL
+============================================================

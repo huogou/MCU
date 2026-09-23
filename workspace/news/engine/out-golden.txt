@@ -1,0 +1,64 @@
+============================================================
+G1 · 资讯状态判定器 V1.0 —— 黄金用例回归（现有 15 条 news.js）
+============================================================
+判定器规则版本：V1.0｜path 策略：legacy
+数据：MCU_NEWS 15 条
+
+■ 1. 15 条黄金用例逐条比对（数据现状 + 任务书期望表）
+  PASS  【A1】15 条判定状态 = 数据现状 verification_status
+  PASS  【A4】15 条判定状态 = 任务书独立期望表
+  PASS  【A3】15 条 chain_steps_hit = 数据现状
+  PASS  【A2】15 条 independent_group_count = 数据现状
+
+■ 2. 输出契约（7 项必填）与 8 态枚举
+  PASS  【A5】每条输出均含 7 项必填契约
+  PASS  【A6】全部产出状态均为 8 态之一（无第 9 态）
+  PASS  chain_steps_hit 均为合法步骤标识
+  PASS  status_history_entry 结构完整且 to 与状态一致
+
+■ 3. 幂等与确定性（A7）
+  PASS  【A7】同输入两次运行输出完全一致
+
+■ 4. 关键规则专项
+  PASS  【伪多源】003：3 家同属 PMC → 独立组 = 1（非 3）
+  PASS  【伪多源】003：状态为 single_source，命中 Step 6
+  PASS  【真多源】002：PMC + People Inc. → 独立组 = 2
+  PASS  【待核不计】005：两家 owner_group 待核 → 独立组 = 0
+  PASS  【空源】007：reported_by 空 → 独立组 = 0，落 Step 8
+  PASS  【报道级更正】011：仅 1 条被更正 → 事件级不落 corrected，落 Step 5
+  PASS  【全部更正】010：全部有效报道均被更正 → Step 3 corrected
+  PASS  【更正链】010 ↔ 014 均判定为 corrected（链式引用成对）
+  PASS  【官方确认】001：官方 URL 过 R7.4 Step2/3 + 人工复核 → Step 1
+  PASS  【官方否认】009：否认可回链官方 → Step 2
+  PASS  【置顶不影响状态】012：失效置顶不改变状态判定
+  PASS  【日期缺失不影响状态】015：publish_time = null 不影响判定
+  PASS  【E-1】legacy 策略下 001 的官方 URL 通过（现行规则，须为 true）
+  PASS  【E-1】article-level 策略下同一 URL 不通过（G8 启用后须修正）
+  PASS  【红线 1】判定器不提供「传入独立组数」的接口参数
+
+■ 5. 诊断（记录差异，不计失败）
+  PASS  现有 15 条：独立组数与可靠组数一致（tier 过滤未造成差异）
+  INFO  judged_by 与数据现状的差异（属「谁确认的」溯源信息，非规则输出）：
+        news-2026-09-22-004 数据=ai_suggested 产出=rule_validated; news-2026-09-21-006 数据=ai_suggested 产出=rule_validated; news-2026-09-21-007 数据=ai_suggested 产出=rule_validated; news-2026-09-19-011 数据=human_confirmed 产出=rule_validated; news-2026-09-18-012 数据=ai_suggested 产出=rule_validated; news-2026-09-17-015 数据=ai_suggested 产出=rule_validated
+
+■ 6. 判定明细
+  id                    状态                      步骤      独立组
+  news-2026-09-22-001   official_confirmed      Step 1  1
+  news-2026-09-22-002   multi_source_reported   Step 5  2
+  news-2026-09-22-003   single_source           Step 6  1
+  news-2026-09-22-004   single_source           Step 6  1
+  news-2026-09-22-005   unverified              Step 8  0
+  news-2026-09-21-006   rumor                   Step 7  0
+  news-2026-09-21-007   unverified              Step 8  0
+  news-2026-09-21-008   conflicting             Step 4  0
+  news-2026-09-20-009   officially_denied       Step 2  1
+  news-2026-09-20-010   corrected               Step 3  0
+  news-2026-09-19-011   multi_source_reported   Step 5  2
+  news-2026-09-18-012   single_source           Step 6  1
+  news-2026-09-19-013   official_confirmed      Step 1  1
+  news-2026-09-19-014   corrected               Step 3  0
+  news-2026-09-17-015   single_source           Step 6  1
+
+============================================================
+结果：25 PASS / 0 FAIL
+============================================================
