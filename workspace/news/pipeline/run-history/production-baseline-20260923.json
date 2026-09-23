@@ -1,0 +1,59 @@
+{
+  "report": "production-baseline",
+  "version": "1.0",
+  "date": "20260923",
+  "generated_at": "2026-09-23T07:55:34.521Z",
+  "sha256": "EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF",
+  "total": 35,
+  "source_distribution": {
+    "Marvel 官方": 3,
+    "Variety": 3,
+    "Entertainment Weekly": 2,
+    "Deadline": 2,
+    "The Hollywood Reporter": 1,
+    "The Direct": 15,
+    "ComicBook": 2,
+    "社交平台爆料（未具名）": 1,
+    "Collider": 1,
+    "The Walt Disney Company 官方公告页": 10
+  },
+  "source_rows_total": 40,
+  "mcu_ratio": {
+    "by_entity_hit": {
+      "mcu": 22,
+      "other": 13
+    },
+    "by_title_keyword": {
+      "mcu": 20,
+      "other": 15
+    },
+    "note": "口径 A=related 实体命中（客观数据）；口径 B=title 关键词（审核口径）；双口径并列供产品确认"
+  },
+  "single_source": {
+    "by_reported_by_len1": 29,
+    "by_igc_eq_1": 27,
+    "ratio_rows": "82.9%",
+    "ratio_igc": "77.1%"
+  },
+  "review_pass_rate": {
+    "scope": "G8 建议草案（133 条，operator=g8-draft-review，待负责人复核）",
+    "approved": 20,
+    "total": 133,
+    "rate": "15.0%"
+  },
+  "event_merge": {
+    "window_days": 3,
+    "input": 35,
+    "output_events": 34,
+    "mergeable_events": 1,
+    "held_events": 0,
+    "reports_preserved": 35,
+    "records_deleted": 0
+  },
+  "category_distribution": {
+    "movie": 14,
+    "series": 10,
+    "character": 1,
+    "industry": 10
+  }
+}
