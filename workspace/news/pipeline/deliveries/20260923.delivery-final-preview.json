@@ -1,0 +1,1057 @@
+{
+  "schema_version": "1.0",
+  "layer": "L3-DELIVERY-FINAL-PREVIEW",
+  "generated_at": "2026-09-23T00:00:00Z",
+  "nature": "G8-4 首批上线准备预览（预计写入 news.js 的数据）；未写入 h5/data/news.js，等待负责人确认",
+  "review_basis": "review-result-20260923.json（草案）+ 资讯审核规范V1.0",
+  "count": 20,
+  "coverage": {
+    "mcu_core": 11,
+    "disney_tier_b": 9,
+    "single_source_events": 20,
+    "ai_modified_cases": 1,
+    "reject_cases_reference": "见 review-result-20260923.json（reject 113 条）"
+  },
+  "diff": {
+    "existing_count": 15,
+    "preview_count": 20,
+    "to_add": [
+      "news-2026-09-23-001",
+      "news-2026-09-23-002",
+      "news-2026-09-23-003",
+      "news-2026-09-23-004",
+      "news-2026-09-23-005",
+      "news-2026-09-23-006",
+      "news-2026-09-23-007",
+      "news-2026-09-23-008",
+      "news-2026-09-23-009",
+      "news-2026-09-23-010",
+      "news-2026-09-23-011",
+      "news-2026-09-23-012",
+      "news-2026-09-23-013",
+      "news-2026-09-23-014",
+      "news-2026-09-23-015",
+      "news-2026-09-23-016",
+      "news-2026-09-23-017",
+      "news-2026-09-23-018",
+      "news-2026-09-23-019",
+      "news-2026-09-23-020"
+    ],
+    "to_update": [],
+    "unchanged": [],
+    "to_delete": 0,
+    "delete_semantics": "追加写入：现网 15 条全部保留，写入后总库 35 条；管道无删除语义",
+    "supersedes_protection": "现网互链对 010←014 不在本批，保持原状"
+  },
+  "items": [
+    {
+      "id": "news-2026-09-23-001",
+      "title": "漫威影业确认2027年终结其第三部Disney+三部曲",
+      "summary": "漫威影业官方确认将于2027年为 Disney+ 的第三部三部曲画上句号，标志其流媒体剧集布局进入新阶段，具体收官项目与后续规划尚未公布。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/marvel-studios-ending-third-disney-plus-trilogy-2027",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/marvel-studios-ending-third-disney-plus-trilogy-2027"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/marvel-studios-ending-third-disney-plus-trilogy-2027",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-002",
+      "title": "《复仇者联盟：秘密战争》被指将修正《毁灭之日》最大缺憾",
+      "summary": "报道称漫威影业已为多元宇宙传奇终章《复仇者联盟：秘密战争》完成铺垫，铺垫质量被指优于《复仇者联盟5：毁灭之日》，两部影片均为未上映新作。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-secret-wars-doomsday-fix",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-secret-wars-doomsday-fix"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-secret-wars-doomsday-fix",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-003",
+      "title": "《旺达幻视》续作公布第三位主要超级英雄",
+      "summary": "《旺达幻视》续集剧集在2026年Disney+开播前继续扩充阵容，正式揭开第三位主要超级英雄的面纱，延续该系列的悬疑喜剧风格。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "wandavision"
+      ],
+      "related_characters": [],
+      "related_phases": [
+        4
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/wandavision-sequel-superheroes-2026",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-004",
+      "title": "蜘蛛侠与夜魔侠将在动画剧官方前传故事中提前重聚",
+      "summary": "漫威官方确认蜘蛛侠与夜魔侠的重聚将提前上演：二人将在《你的友好邻居蜘蛛侠》第二季官方前传故事中联手对抗经典蜘蛛侠反派。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/marvel-studios-spider-man-daredevil-reunite-classic-villains",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "peter"
+      ],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-daredevil-reunite-classic-villains"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-daredevil-reunite-classic-villains",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-005",
+      "title": "《复联4》重映版独家片段据报聚焦两位MCU角色会面",
+      "summary": "在《复仇者联盟4：终局之战》Encore 重映上映前几天，其独家新片段的报道暗示片中将呈现两位备受期待的MCU角色的会面。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "endgame"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        3
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-endgame-encore-doomsday-two-mcu-characters",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-006",
+      "title": "漫威官方确认蜘蛛侠最不受欢迎的反派已存在于MCU",
+      "summary": "一位口碑两极的蜘蛛侠反派被漫威官方确认为MCU正史的一部分，尽管粉丝评价不高，这一确认仍为未来蜘蛛侠电影埋下伏笔。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "peter"
+      ],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/marvel-studios-spider-man-popular-villain-mcu",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-007",
+      "title": "Disney+即将上线全新漫威电视交叉联动项目并发布首支预告",
+      "summary": "漫威下一部超级英雄电视交叉联动项目的首支预告片正式曝光，该项目即将登陆 Disney+，具体作品阵容与上线日期随后公布。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/disney-plus-marvel-tv-crossover-trailer-release-new",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/disney-plus-marvel-tv-crossover-trailer-release-new"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/disney-plus-marvel-tv-crossover-trailer-release-new",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-008",
+      "title": "《毁灭之日》新剧照为猩红女巫回归传闻增添可信度",
+      "summary": "漫威虽未正式确认猩红女巫回归MCU，但《复仇者联盟5：毁灭之日》释出的新剧照，让伊丽莎白·奥尔森回归的报道更具可信度。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "wanda"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-doomsday-elizabeth-olsen-scarlet-witch-return-appearance",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-009",
+      "title": "《复联4》为Encore重映更换全新海报",
+      "summary": "漫威为《复仇者联盟4：终局之战》Encore 重映更换全新海报，这一营销调整被视为重映版票房动员策略的重要一环。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "endgame"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        3
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/avengers-endgame-encore-re-release-poster-change",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-010",
+      "title": "《波西·杰克逊与奥林匹亚英雄》第三季确认十二主神全员登场",
+      "summary": "Disney+ 剧集《波西·杰克逊与奥林匹亚英雄》第三季将首次让十二位奥林匹亚主神集体亮相，剧集规模再创新高。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/disney-plus-percy-jackson-season-3-olympian-gods",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/disney-plus-percy-jackson-season-3-olympian-gods"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/disney-plus-percy-jackson-season-3-olympian-gods",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-011",
+      "title": "《幻视探案》首曝片段：奇异博士的忘却咒语对一名角色失效",
+      "summary": "Disney+ 新剧《幻视探案》释出特别片段，揭示《蜘蛛侠：英雄无归》中奇异博士的全球忘却咒语并未对某角色生效，并与《旺达幻视》剧情形成勾连。",
+      "publish_time": "2026-09-21",
+      "first_seen_at": "2026-09-23T03:25:05Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/article/visionquest-doctor-strange-spider-man-spell-didnt-work",
+          "owner_group": "独立"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "wandavision"
+      ],
+      "related_characters": [
+        "strange",
+        "vision"
+      ],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thedirect.com/article/visionquest-doctor-strange-spider-man-spell-didnt-work"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thedirect.com/article/visionquest-doctor-strange-spider-man-spell-didnt-work",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-012",
+      "title": "《疯狂动物城3》主创预告鸟类角色带来意外惊喜",
+      "summary": "迪士尼动画《疯狂动物城3》卡司与主创团队预告，鸟类新角色将为这部热门系列注入「有趣的惊喜」，续作正在制作中。",
+      "publish_time": "2026-09-04",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/zootopia-3-sneak-peek/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/zootopia-3-sneak-peek/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/zootopia-3-sneak-peek/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-013",
+      "title": "《王国之心》获批准开拍首部原创剧集登陆Disney频道与Disney+",
+      "summary": "迪士尼宣布游戏IP《王国之心》（Kingdom Hearts）将推出首部原创真人剧集，登陆 Disney 频道与 Disney+，为该IP首次影视化。",
+      "publish_time": "2026-08-15",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/kingdom-hearts-tv-series/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-014",
+      "title": "《摇滚夏令营3》主星谈音乐传承与迪士尼新生代",
+      "summary": "《摇滚夏令营3》主演马拉基·巴顿与利亚马尼·塞古拉接受专访，畅谈音乐、传承与迪士尼新生代演员的成长。",
+      "publish_time": "2026-08-10",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/camp-rock-3-cast-interview/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/camp-rock-3-cast-interview/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/camp-rock-3-cast-interview/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-015",
+      "title": "漫威影业SDCC震撼官宣：《毁灭之日》《恶灵骑士》《黑豹3》",
+      "summary": "漫威影业在圣迭戈动漫展（SDCC）重磅官宣多部新作，包括《复仇者联盟5：毁灭之日》新情报、《恶灵骑士》与《黑豹3》项目，现场反响热烈。",
+      "publish_time": "2026-07-26",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/marvel-studios-comic-con-2026/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-016",
+      "title": "《后裔：邪恶仙境》卡司预告新角色与新音乐",
+      "summary": "迪士尼音乐剧电影《后裔：邪恶仙境》（Descendants: Wicked Wonderland）卡司预告续作的新角色、新音乐与故事走向。",
+      "publish_time": "2026-07-16",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/descendants-wicked-wonderland/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/descendants-wicked-wonderland/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/descendants-wicked-wonderland/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-017",
+      "title": "迪士尼真人版《海洋奇缘》：强森与主创如何重塑经典",
+      "summary": "迪士尼官网解析真人版《海洋奇缘》的创作过程：道恩·强森、凯瑟琳·拉加阿亚与导演托马斯·凯尔如何重新演绎这一 beloved 故事。",
+      "publish_time": "2026-07-09",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/moana-dwayne-johnson-catherine-lagaaia/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/moana-dwayne-johnson-catherine-lagaaia/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/moana-dwayne-johnson-catherine-lagaaia/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-018",
+      "title": "「飞向太空…与20亿小时！」：Disney+如何助力《玩具总动员5》",
+      "summary": "迪士尼官网披露数据：Disney+ 平台上《玩具总动员》系列的累计观看时长达20亿小时，为《玩具总动员5》的火爆蓄力。",
+      "publish_time": "2026-07-01",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/toy-story-streaming/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/toy-story-streaming/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/toy-story-streaming/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-019",
+      "title": "《玩具总动员5》登顶2026全球开画冠军并创动画影史第二",
+      "summary": "皮克斯《玩具总动员5》全球开画成绩登顶2026年冠军，并创下北美动画影史第二高开画纪录，皮克斯强势回归大银幕。",
+      "publish_time": "2026-06-21",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/toy-story-5-box-office/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/toy-story-5-box-office/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/toy-story-5-box-office/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-23-020",
+      "title": "泰勒·斯威夫特为《玩具总动员5》创作新歌《我知道是你》",
+      "summary": "泰勒·斯威夫特宣布为迪士尼与皮克斯的《玩具总动员5》创作全新歌曲《I Knew It, I Knew You》，为影片注入重磅音乐亮点。",
+      "publish_time": "2026-06-01",
+      "first_seen_at": "2026-09-23T03:26:37Z",
+      "verification_status": "single_source",
+      "category": "industry",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/news/taylor-swift-toy-story-5/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    }
+  ]
+}

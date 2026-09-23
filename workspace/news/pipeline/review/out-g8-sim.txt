@@ -1,0 +1,35 @@
+============================================================
+G8 全量审核建议草案 + 首批 20 条预览 + 上线前检查
+============================================================
+审核队列：133 条（全 pending，复用 G7 生成语义）
+建议分布：approve 20 / reject 113（共 133 条，operator=g8-draft-review）
+建议草案落盘：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\review-result-20260923.json
+
+■ 首批 20 条（含 1 条 AI 修改案例）→ Gate → DeliveryItem
+  MODIFY+APPROVE  cand-e7c7cc32-016 → cand-c712c5c5-001
+  批次：20 条（含 modify→approve 1 条）
+  PASS  Gate approved = 20
+  DeliveryItem：20 条，33 字段=全部 OK
+
+■ diff（old news.js × 15 vs final-preview × 20，写入后总库 35）：
+  新增 20 条
+  修改 0 条：（无）
+  删除 0 条（追加写入，现网 15 条全部保留）
+  现网 supersedes 互链保护：010/014 不在本批 → 保持原状 ✅
+  最终预览：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\deliveries\20260923.delivery-final-preview.json
+
+■ G8-5 上线前检查
+  PASS  备份文件 SHA256 == 现网
+  PASS  news.js 全程未被修改
+  news.js SHA256 = 589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  备份位置 = D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\backup\news.js.20260923
+
+  ★★★ 待负责人确认清单（确认前不执行任何写入）★★★
+  1. 复核 review-result-20260923.json（133 条建议草案，20 approve / 113 reject）
+  2. 确认《资讯审核规范V1.0》口径（Tier B 边界、人事类改判）
+  3. 确认 delivery-final-preview 20 条内容与追加写入
+  4. 确认后由负责人执行写入（backup 已就绪：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\backup\news.js.20260923）
+
+============================================================
+G8 模拟编排完成。
+============================================================

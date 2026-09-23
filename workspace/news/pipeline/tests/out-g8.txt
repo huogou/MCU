@@ -1,0 +1,43 @@
+============================================================
+G8 规则收口与上线准备 测试
+============================================================
+
+■ G8-1/2 规范文档
+  PASS  T1.1 《历史数据兼容规则V1.0》存在
+  PASS  T1.2 《资讯审核规范V1.0》存在
+  PASS  T1.3 兼容规则含 R-1 历史允许空值 / R-2 新数据强制来源 / R-4 待拍板不动数据
+  PASS  T1.4 审核规范含收录/拒绝/修改/优先级/来源可信等级五节
+  PASS  T1.5 审核规范声明不改变 G1–G7 代码
+
+■ G8-3 审核建议草案（review-result）
+  PASS  T2.1 草案覆盖 133 条
+  PASS  T2.2 分布 approve=20 / reject=113
+  PASS  T2.3 草案性质显著标注（不自动批准）
+  PASS  T2.4 每条含 candidate_id/operator/action/reason/timestamp 且 reason 非空
+  PASS  T2.5 candidate_id 无重复（与队列一一对应）
+  PASS  T2.6 reject 原因均引用拒绝规则条款（B1/B2/B3）
+
+■ G8-4 最终预览（delivery-final-preview）
+  PASS  T3.1 preview ≤ 20 条（任务书上限）且 = 20
+  PASS  T3.2 逐条恰 33 字段
+  PASS  T3.3 id 形态全部合法
+  PASS  T3.4 diff：新增 20
+  PASS  T3.5 diff：修改 0
+  PASS  T3.6 diff：删除 0（追加写入）
+  PASS  T3.7 覆盖：AI 修改案例 1 条 + 单来源事件全部 + MCU 核心 ≥10
+  PASS  T3.8 现网 supersedes 互链保护（010/014 不在本批）
+
+■ G8-5 上线前检查
+  PASS  T4.1 news.js 备份存在
+  PASS  T4.2 备份 SHA256 == 现网（备份完整）
+  PASS  T4.3 备份未落在 C 盘（用户环境约定）
+
+■ 基线不破坏
+  PASS  T5.1 news.js SHA256 前后一致（全程只读）
+  INFO  news.js SHA256 = 589A39347EF6BEEA…
+  PASS  T5.2 review-history 正式决策链未被 G8 草案写入（仍为 G7 的 12 条）
+  PASS  T5.3 review-queue 的 gate_status 仍全为 pending（草案未触碰队列）
+
+============================================================
+结果：25 PASS / 0 FAIL
+============================================================
