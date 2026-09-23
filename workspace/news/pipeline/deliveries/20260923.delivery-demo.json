@@ -1,0 +1,936 @@
+{
+  "schema_version": "1.0",
+  "layer": "L3-DELIVERY",
+  "generated_at": "2026-09-23T05:33:40.401Z",
+  "nature": "G6 验证产物：news.js 现网 14 条的反向端到端复现（非新增内容）——证明 Gate→DeliveryItem 转换链路可逐字段复现现网交付物；真实管道当前 approved=0（133 条候选均为 pending，等待人工审核）",
+  "count": 14,
+  "reproduced_ids": [
+    "news-2026-09-22-001",
+    "news-2026-09-22-002",
+    "news-2026-09-22-003",
+    "news-2026-09-22-004",
+    "news-2026-09-22-005",
+    "news-2026-09-21-006",
+    "news-2026-09-21-008",
+    "news-2026-09-20-009",
+    "news-2026-09-20-010",
+    "news-2026-09-19-011",
+    "news-2026-09-18-012",
+    "news-2026-09-19-013",
+    "news-2026-09-19-014",
+    "news-2026-09-17-015"
+  ],
+  "report": {
+    "count": 14,
+    "id_assignments": [
+      {
+        "from_candidate": "cand-66000001-001",
+        "to_delivery": "news-2026-09-22-001"
+      },
+      {
+        "from_candidate": "cand-66000002-002",
+        "to_delivery": "news-2026-09-22-002"
+      },
+      {
+        "from_candidate": "cand-66000003-003",
+        "to_delivery": "news-2026-09-22-003"
+      },
+      {
+        "from_candidate": "cand-66000004-004",
+        "to_delivery": "news-2026-09-22-004"
+      },
+      {
+        "from_candidate": "cand-66000005-005",
+        "to_delivery": "news-2026-09-22-005"
+      },
+      {
+        "from_candidate": "cand-66000006-006",
+        "to_delivery": "news-2026-09-21-006"
+      },
+      {
+        "from_candidate": "cand-66000008-008",
+        "to_delivery": "news-2026-09-21-008"
+      },
+      {
+        "from_candidate": "cand-66000009-009",
+        "to_delivery": "news-2026-09-20-009"
+      },
+      {
+        "from_candidate": "cand-6600000a-010",
+        "to_delivery": "news-2026-09-20-010"
+      },
+      {
+        "from_candidate": "cand-6600000b-011",
+        "to_delivery": "news-2026-09-19-011"
+      },
+      {
+        "from_candidate": "cand-6600000c-012",
+        "to_delivery": "news-2026-09-18-012"
+      },
+      {
+        "from_candidate": "cand-6600000d-013",
+        "to_delivery": "news-2026-09-19-013"
+      },
+      {
+        "from_candidate": "cand-6600000e-014",
+        "to_delivery": "news-2026-09-19-014"
+      },
+      {
+        "from_candidate": "cand-6600000f-015",
+        "to_delivery": "news-2026-09-17-015"
+      }
+    ],
+    "official_checks": [
+      {
+        "candidate_id": "cand-66000001-001",
+        "valid": true,
+        "reason": "六项检查全部通过：可进入 official_confirm 判断"
+      },
+      {
+        "candidate_id": "cand-66000009-009",
+        "valid": true,
+        "reason": "六项检查全部通过：可进入 official_confirm 判断"
+      },
+      {
+        "candidate_id": "cand-6600000d-013",
+        "valid": true,
+        "reason": "六项检查全部通过：可进入 official_confirm 判断"
+      }
+    ],
+    "judged_by_distribution": {
+      "human_confirmed": 8,
+      "rule_validated": 2,
+      "ai_suggested": 4
+    },
+    "generated_at": "2026-09-23T00:00:00Z"
+  },
+  "items": [
+    {
+      "id": "news-2026-09-22-001",
+      "title": "Marvel 官方公布《复仇者联盟5：毁灭之日》首支正式预告",
+      "summary": "Marvel 官方发布《复仇者联盟5：毁灭之日》首支正式预告，确认影片将于 2026 年 12 月 18 日北美上映。预告中出现多元宇宙线索与多位角色同框画面。本条为官方发布内容，非媒体转述。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-22T01:10:00Z",
+      "verification_status": "official_confirmed",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Marvel 官方",
+          "source_url": "https://www.marvel.com/news",
+          "owner_group": "Disney / Marvel"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "Marvel 官方",
+      "original_source_url": "https://www.marvel.com/news",
+      "official_source": "Marvel 官方",
+      "official_source_url": "https://www.marvel.com/news",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "strange",
+        "wade",
+        "logan"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "official_confirmed",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "官方来源 URL 通过 R7.4 Step 2/3 校验（host + path 均命中登记表（S001）），且已完成人工复核",
+          "evidence_url": "https://www.marvel.com/news"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "官方来源 URL 通过 R7.4 Step 2/3 校验（host + path 均命中登记表（S001）），且已完成人工复核",
+      "status_change_evidence_url": "https://www.marvel.com/news",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 1",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-22-002",
+      "title": "《蜘蛛侠：崭新之日》续集已进入早期开发",
+      "summary": "Variety 与 Entertainment Weekly 分别报道，索尼与 Marvel Studios 已就《蜘蛛侠：崭新之日》的后续影片展开早期讨论。两篇报道均由各自采编团队独立完成，目前尚未获得官方确认。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-22T00:40:00Z",
+      "verification_status": "multi_source_reported",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Variety",
+          "source_url": "https://variety.com/",
+          "owner_group": "Penske Media Corporation"
+        },
+        {
+          "source_name": "Entertainment Weekly",
+          "source_url": "https://ew.com/",
+          "owner_group": "People Inc."
+        }
+      ],
+      "independent_group_count": 2,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "brand-new-day"
+      ],
+      "related_series": [],
+      "related_characters": [
+        "peter"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "multi_source_reported",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "存在 2 个独立 owner_group 的可靠来源且表述一致",
+          "evidence_url": "https://variety.com/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "存在 2 个独立 owner_group 的可靠来源且表述一致",
+      "status_change_evidence_url": "https://variety.com/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 5",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-22-003",
+      "title": "《夜魔侠：重生》将在第三季完结",
+      "summary": "Variety、Deadline 与 The Hollywood Reporter 均出现同一消息的报道。三家同属 Penske Media Corporation，属同一 owner_group，因此本系统按规则只计 1 个独立证据，而非 3 个独立来源。目前尚未获得官方确认。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-22T00:20:00Z",
+      "verification_status": "single_source",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "Variety",
+          "source_url": "https://variety.com/feed/",
+          "owner_group": "Penske Media Corporation"
+        },
+        {
+          "source_name": "Deadline",
+          "source_url": "https://deadline.com/feed/",
+          "owner_group": "Penske Media Corporation"
+        },
+        {
+          "source_name": "The Hollywood Reporter",
+          "source_url": "https://www.hollywoodreporter.com/feed/",
+          "owner_group": "Penske Media Corporation"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "daredevil-born-again"
+      ],
+      "related_characters": [],
+      "related_phases": [
+        5
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://variety.com/feed/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://variety.com/feed/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-22-004",
+      "title": "Deadline 独家：《雷霆特攻队*》续集由原班主创回归",
+      "summary": "Deadline 独家报道，《雷霆特攻队*》后续影片的主创班底已基本确定。目前仅有这一家媒体出现该消息，尚未获得官方确认。",
+      "publish_time": "2026-09-22",
+      "first_seen_at": "2026-09-22T00:05:00Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Deadline",
+          "source_url": "https://deadline.com/feed/",
+          "owner_group": "Penske Media Corporation"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "thunderbolts"
+      ],
+      "related_series": [],
+      "related_characters": [
+        "yelena",
+        "bucky"
+      ],
+      "related_phases": [
+        5
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://deadline.com/feed/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://deadline.com/feed/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "ai_suggested",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-22-005",
+      "title": "The Direct 与 ComicBook 同时报道《神奇四侠》续集反派人选",
+      "summary": "两家 MCU 垂直媒体均出现同一消息的报道，但二者的 owner_group 目前尚未核实。按本系统规则，无法确认独立性的来源不得计为独立证据组，因此在 owner_group 核实完成前，本条无法判断来源层级。",
+      "publish_time": "2026-09-21",
+      "first_seen_at": "2026-09-21T22:30:00Z",
+      "verification_status": "unverified",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/rss",
+          "owner_group": "待核"
+        },
+        {
+          "source_name": "ComicBook",
+          "source_url": "https://comicbook.com/category/marvel/feed/",
+          "owner_group": "待核"
+        }
+      ],
+      "independent_group_count": 0,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "fantastic-four"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "unverified",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "来源数量与层级均不足，以上判定条件全部不成立",
+          "evidence_url": ""
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "来源数量与层级均不足，以上判定条件全部不成立",
+      "status_change_evidence_url": "",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "rule_validated",
+      "chain_steps_hit": "Step 8",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-21-006",
+      "title": "业内人士称《洛基》第三季已在早期筹备",
+      "summary": "一位未具名业内人士在社交平台提到《洛基》后续季度的筹备情况。该说法尚无任何可靠媒体独立报道，来源属于爆料性质，请谨慎参考。",
+      "publish_time": "2026-09-21",
+      "first_seen_at": "2026-09-21T20:00:00Z",
+      "verification_status": "rumor",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "社交平台爆料（未具名）",
+          "source_url": "https://x.com/",
+          "owner_group": "unknown"
+        }
+      ],
+      "independent_group_count": 0,
+      "original_source": "某业内人士（未具名）",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "loki"
+      ],
+      "related_characters": [
+        "loki"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "rumor",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "原始来源属爆料 / 消息人士 / 社交爆料类",
+          "evidence_url": "https://x.com/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "原始来源属爆料 / 消息人士 / 社交爆料类",
+      "status_change_evidence_url": "https://x.com/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "ai_suggested",
+      "chain_steps_hit": "Step 7",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-21-008",
+      "title": "《复仇者联盟6：秘密战争》档期说法不一",
+      "summary": "两家 MCU 垂直媒体对同一问题给出相反表述：一方称影片档期将后移，另一方称按原档期推进。系统不判断哪一方正确，仅并列展示各方表述。",
+      "publish_time": "2026-09-21",
+      "first_seen_at": "2026-09-21T16:00:00Z",
+      "verification_status": "conflicting",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/rss",
+          "owner_group": "待核"
+        },
+        {
+          "source_name": "ComicBook",
+          "source_url": "https://comicbook.com/category/marvel/feed/",
+          "owner_group": "待核"
+        }
+      ],
+      "independent_group_count": 0,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "strange"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "conflicting",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "存在 2 个可靠来源对同一要素给出互斥表述，且已经人工核准",
+          "evidence_url": "https://thedirect.com/rss"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "存在 2 个可靠来源对同一要素给出互斥表述，且已经人工核准",
+      "status_change_evidence_url": "https://thedirect.com/rss",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [
+        {
+          "source_name": "The Direct",
+          "statement": "称影片档期将后移至 2028 年，并称已获内部人士确认",
+          "source_url": "https://thedirect.com/rss"
+        },
+        {
+          "source_name": "ComicBook",
+          "statement": "称影片仍按 2027 年 12 月 17 日原档期推进，未收到延期通知",
+          "source_url": "https://comicbook.com/category/marvel/feed/"
+        }
+      ],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 4",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-20-009",
+      "title": "网传《死侍与金刚狼》续集已开机",
+      "summary": "此前有传闻称该片续集已进入拍摄阶段。Marvel 官方已就此事作出否认表态。本条默认不进入首页与列表，仅因人工置顶而在列表显著位置提示。",
+      "publish_time": "2026-09-20",
+      "first_seen_at": "2026-09-20T12:00:00Z",
+      "verification_status": "officially_denied",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Marvel 官方",
+          "source_url": "https://www.marvel.com/news",
+          "owner_group": "Disney / Marvel"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "社交平台爆料（未具名）",
+      "original_source_url": "",
+      "official_source": "Marvel 官方",
+      "official_source_url": "https://www.marvel.com/news",
+      "related_movies": [
+        "deadpool-wolverine"
+      ],
+      "related_series": [],
+      "related_characters": [
+        "wade",
+        "logan"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": true,
+      "pinned_until": "2026-09-25T00:00:00Z",
+      "pinned_order": 1,
+      "pinned_reason": "该消息已被官方否认，需在列表显著位置向用户提示，避免继续传播",
+      "status_history": [
+        {
+          "from": null,
+          "to": "officially_denied",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "官方明确否认可回链登记表来源（host + path 均命中登记表（S001）），且已完成人工复核",
+          "evidence_url": "https://www.marvel.com/news"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "官方明确否认可回链登记表来源（host + path 均命中登记表（S001）），且已完成人工复核",
+      "status_change_evidence_url": "https://www.marvel.com/news",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 2",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-20-010",
+      "title": "《钢铁心》第二季将改档至 2027 年",
+      "summary": "最初出现的该档期消息已被其发布方发布更正声明，且不存在其他仍有效的报道。事件级状态因此落为「来源已更正」，原报道与更正记录均予保留。",
+      "publish_time": "2026-09-20",
+      "first_seen_at": "2026-09-20T09:30:00Z",
+      "verification_status": "corrected",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/rss",
+          "owner_group": "待核"
+        }
+      ],
+      "independent_group_count": 0,
+      "original_source": "The Direct",
+      "original_source_url": "https://thedirect.com/rss",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "ironheart"
+      ],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "corrected",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "该事件的全部有效报道均已被其发布方发布更正，且无其他有效证据",
+          "evidence_url": "https://thedirect.com/rss"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "该事件的全部有效报道均已被其发布方发布更正，且无其他有效证据",
+      "status_change_evidence_url": "https://thedirect.com/rss",
+      "supersedes_id": "news-2026-09-19-014",
+      "superseded_by_id": null,
+      "report_corrections": [
+        {
+          "source_name": "The Direct",
+          "corrected_at": "2026-09-20T09:30:00Z",
+          "original_statement": "称《钢铁心》第二季将改档至 2027 年",
+          "corrected_statement": "更正为档期未定，此前表述有误",
+          "evidence_url": "https://thedirect.com/rss"
+        }
+      ],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 3",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-19-011",
+      "title": "《旺达幻视》衍生剧正在讨论中",
+      "summary": "两家不同 owner_group 的媒体分别报道了该项目正在讨论中的消息，目前事件级状态仍为多家媒体报道。其中一家媒体已就报道中的细节发布更正声明，更正后内容以该媒体最新版本为准。",
+      "publish_time": "2026-09-19",
+      "first_seen_at": "2026-09-19T14:00:00Z",
+      "verification_status": "multi_source_reported",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "Variety",
+          "source_url": "https://variety.com/feed/",
+          "owner_group": "Penske Media Corporation"
+        },
+        {
+          "source_name": "Entertainment Weekly",
+          "source_url": "https://ew.com/",
+          "owner_group": "People Inc."
+        }
+      ],
+      "independent_group_count": 2,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "wandavision",
+        "agatha-all-along"
+      ],
+      "related_characters": [
+        "wanda",
+        "vision"
+      ],
+      "related_phases": [
+        4
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "multi_source_reported",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "存在 2 个独立 owner_group 的可靠来源且表述一致",
+          "evidence_url": "https://variety.com/feed/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "存在 2 个独立 owner_group 的可靠来源且表述一致",
+      "status_change_evidence_url": "https://variety.com/feed/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [
+        {
+          "source_name": "Entertainment Weekly",
+          "corrected_at": "2026-09-19T14:00:00Z",
+          "original_statement": "原表述称该剧已获正式预订",
+          "corrected_statement": "更正为项目仍在早期讨论阶段，尚未获得预订",
+          "evidence_url": "https://ew.com/"
+        }
+      ],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 5",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-18-012",
+      "title": "《雷霆特攻队*》原声带上线流媒体平台",
+      "summary": "该片原声带已在主要流媒体平台上架。消息来自单一来源报道，尚未获得官方确认。本条曾被人工置顶，置顶有效期已过，现按发布时间排序。",
+      "publish_time": "2026-09-18",
+      "first_seen_at": "2026-09-18T08:00:00Z",
+      "verification_status": "single_source",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Collider",
+          "source_url": "https://collider.com/feed/",
+          "owner_group": "Valnet"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "thunderbolts"
+      ],
+      "related_series": [],
+      "related_characters": [],
+      "related_phases": [
+        5
+      ],
+      "pinned": true,
+      "pinned_until": "2026-09-19T00:00:00Z",
+      "pinned_order": 3,
+      "pinned_reason": "原声带上线当日的时效性置顶，有效期届满后自动回到时间序",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://collider.com/feed/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://collider.com/feed/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "ai_suggested",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-19-013",
+      "title": "《复仇者联盟5：毁灭之日》主创访谈：毁灭博士的塑造方向",
+      "summary": "Marvel 官方发布主创访谈内容，谈及毁灭博士在第六阶段的塑造方向。本条为官方发布内容，经人工复核确认来源可回链。",
+      "publish_time": "2026-09-19",
+      "first_seen_at": "2026-09-19T02:00:00Z",
+      "verification_status": "official_confirmed",
+      "category": "movie",
+      "reported_by": [
+        {
+          "source_name": "Marvel 官方",
+          "source_url": "https://www.marvel.com/articles/live-events/",
+          "owner_group": "Disney / Marvel"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "Marvel 官方",
+      "original_source_url": "https://www.marvel.com/articles/live-events/",
+      "official_source": "Marvel 官方",
+      "official_source_url": "https://www.marvel.com/articles/live-events/",
+      "related_movies": [],
+      "related_series": [],
+      "related_characters": [
+        "strange"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": true,
+      "pinned_until": "2026-10-06T00:00:00Z",
+      "pinned_order": 2,
+      "pinned_reason": "第六阶段核心作品的官方主创访谈，人工置顶以配合预告发布周期",
+      "status_history": [
+        {
+          "from": null,
+          "to": "official_confirmed",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "官方来源 URL 通过 R7.4 Step 2/3 校验（host + path 均命中登记表（S001）），且已完成人工复核",
+          "evidence_url": "https://www.marvel.com/articles/live-events/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "官方来源 URL 通过 R7.4 Step 2/3 校验（host + path 均命中登记表（S001）），且已完成人工复核",
+      "status_change_evidence_url": "https://www.marvel.com/articles/live-events/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 1",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-19-014",
+      "title": "《钢铁心》第二季将改档至 2027 年",
+      "summary": "本条为已被更正的原始报道版本。按 R8.5，原始报道与更正记录一并保留，不因更正而删除。列表展示时与更正后版本合并为一条，以更正后内容为准。",
+      "publish_time": "2026-09-19",
+      "first_seen_at": "2026-09-19T01:00:00Z",
+      "verification_status": "corrected",
+      "category": "series",
+      "reported_by": [
+        {
+          "source_name": "The Direct",
+          "source_url": "https://thedirect.com/rss",
+          "owner_group": "待核"
+        }
+      ],
+      "independent_group_count": 0,
+      "original_source": "The Direct",
+      "original_source_url": "https://thedirect.com/rss",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [],
+      "related_series": [
+        "ironheart"
+      ],
+      "related_characters": [],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "corrected",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "该事件的全部有效报道均已被其发布方发布更正，且无其他有效证据",
+          "evidence_url": "https://thedirect.com/rss"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "该事件的全部有效报道均已被其发布方发布更正，且无其他有效证据",
+      "status_change_evidence_url": "https://thedirect.com/rss",
+      "supersedes_id": null,
+      "superseded_by_id": "news-2026-09-20-010",
+      "report_corrections": [
+        {
+          "source_name": "The Direct",
+          "corrected_at": "2026-09-20T09:30:00Z",
+          "original_statement": "称《钢铁心》第二季将改档至 2027 年",
+          "corrected_statement": "更正为档期未定，此前表述有误",
+          "evidence_url": "https://thedirect.com/rss"
+        }
+      ],
+      "conflict_statements": [],
+      "judged_by": "human_confirmed",
+      "chain_steps_hit": "Step 3",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    },
+    {
+      "id": "news-2026-09-17-015",
+      "title": "美国队长主题特展公布巡展城市",
+      "summary": "美国队长主题特展公布新一轮巡展城市名单。本条用于验证两件事：一是关联 id 未命中 MCU_CONTENT 时必须丢弃（不展示为关联节点），二是 publish_time 缺失时日期回落到 first_seen_at。",
+      "publish_time": null,
+      "first_seen_at": "2026-09-17T10:00:00Z",
+      "verification_status": "single_source",
+      "category": "character",
+      "reported_by": [
+        {
+          "source_name": "The Walt Disney Company 官方公告页",
+          "source_url": "https://thewaltdisneycompany.com/feed/",
+          "owner_group": "The Walt Disney Company"
+        }
+      ],
+      "independent_group_count": 1,
+      "original_source": "unknown",
+      "original_source_url": "",
+      "official_source": "",
+      "official_source_url": "",
+      "related_movies": [
+        "avengers-5"
+      ],
+      "related_series": [],
+      "related_characters": [
+        "steve",
+        "sam"
+      ],
+      "related_phases": [
+        6
+      ],
+      "pinned": false,
+      "pinned_until": null,
+      "pinned_order": 0,
+      "pinned_reason": "",
+      "status_history": [
+        {
+          "from": null,
+          "to": "single_source",
+          "at": "2026-09-23T00:00:00Z",
+          "reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+          "evidence_url": "https://thewaltdisneycompany.com/feed/"
+        }
+      ],
+      "status_changed_at": "2026-09-23T00:00:00Z",
+      "status_change_reason": "仅 1 个独立 owner_group 的可靠媒体报道",
+      "status_change_evidence_url": "https://thewaltdisneycompany.com/feed/",
+      "supersedes_id": null,
+      "superseded_by_id": null,
+      "report_corrections": [],
+      "conflict_statements": [],
+      "judged_by": "ai_suggested",
+      "chain_steps_hit": "Step 6",
+      "conflict_resolved_at": null,
+      "conflict_resolved_by_evidence_url": null
+    }
+  ],
+  "note": "本文件位于 pipeline/deliveries/，不写入 h5/data/news.js；news.js SHA256=589A3934…242F2 保持不变"
+}

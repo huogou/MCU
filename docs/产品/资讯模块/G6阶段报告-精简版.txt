@@ -1,0 +1,72 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+《G6 阶段报告 · 精简版》（可直接贴进策划 AI 对话框）
+2026-09-23｜开发侧（Jarvis）｜不改 G1–G4 冻结、不改 8 态、judged_by 语义
+不变；AI 不生成状态；event_key 不进交付物；news.js 未写入（SHA256 不变）
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G6阶段报告.txt
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【一句话结论】
+G6 完成：审核闸门 + 33 字段 DeliveryItem 转换器交付，**news.js 现网
+14 条经新管道反向端到端逐字段完整复现**（id/状态/独立组数/官方来源/
+supersedes 互链全等），全量回归 **15 套件 / 772 断言 / 0 FAIL**。
+管道 G0→G6 全链路贯通，**写入 h5 待负责人拍板**。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【四项建设】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+① Gate 层：唯一规则 gate_status==='approved' 才能转换；Gate 不产生
+  审核决策（批准是人的职责）；supersedes 双条必须同时获批。
+② DeliveryItem 转换器：恰 33 字段封闭集；id/news-YYYY-MM-DD-NNN
+  （默认规则+落库显式覆盖）；verification_status 与 independent_group_
+  count **只出自 G1 判定器**（AI 建议结构上到不了状态字段）；
+  official_source 过 G3 校验器（3/3 通过）；supersedes 链 id 生成后
+  回填；21 项管道字段（含 event_key）深扫 0 命中。
+③ AI 隔离：结构性保证——AI 只经七字段白名单，状态字段只在 judge 内产生。
+④ 标题稳定化：event-signature-normalizer（G4 冻结件零改动，只换输入）；
+  original title 保留 + 签名映射留档；可救形态变体（大小写/标点/
+  全半角/尾部括注），**语义措辞差异不可救**（CTO 对实测仍不归并，
+  靠「统一措辞」前置解决——边界如实计量）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【T6 反向端到端（最强验证）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+现网 15 条 → 反向构造候选 → Gate → 转换 → 与现网对比：
+✓ 14/14 id 全等复现　✓ 29 项稳定字段 × 14 条逐条全等
+✓ supersedes 互链复现（010←014）　✓ G3 官方校验 3/3
+✓ 写入模拟：更新 14/新增 0　✓ news.js SHA256 前后一致（全程只读）
+★ 发现（如实登记）：现网 007 的 reported_by=[]（历史形态）与 L1 契约
+L1-10 冲突 → 被新管道拦截；judge 本支持空 reported_by——口径澄清列入 G8 候选。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【回归（FAIL=0）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+15 套件 / 772 断言 / 0 FAIL / 退出码全 0：
+基线 676 不变 + G5.3 21 + G5.4 21 + G5.5 27 + G6 52
+news.js SHA256 未变；git 中 h5/wechat/douyin = 0。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【管道全链路 + 上线条件】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+source_registry → collector → RawCapture → CandidateItem → AI Normalizer
+→ Signature → EventCandidate → Gate → DeliveryItem ✅ 全部贯通
+真实 133 条候选全部 pending（Gate 不自动批准，等待人工审核）。
+**首次写入 h5/data/news.js 的条件（待拍板，未执行）**：
+① 人工审核候选（设 gate_status）② supersedes/置顶决策随行
+③ 写入前跑 T6 模拟检查 ④ 写入属上线动作单独拍板（含 backup）。
+待办继承：D-1 S001 通道、AI 生产化通道、统一措辞前置、G8 清单
+（+新增 007 口径澄清）。
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+【关键关联文件（绝对路径）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Gate        D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\gate\gate.cjs
+签名        D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\gate\event-signature-normalizer.cjs
+转换器      D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\delivery\delivery-converter.cjs
+测试        D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\test-g6.cjs
+交付物演示  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\deliveries\20260923.delivery-demo.json
+
+【置信度】高（~94%）：772 断言 0 FAIL + 反向复现证明。中（~75%）：
+落库口子（idById/pinnedById）的生产分工待运营实践校准。
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+状态：G6 完成并停止。管道全链路贯通；写入 h5 待拍板。
+━━━━━━━━━━━━━━━━━━━━━━━━━━
