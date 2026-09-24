@@ -231,7 +231,7 @@ async function main() {
 
   // N4 投影禁止字段
   const dirty = Object.assign({}, candidate, {
-    api_key: 'sk-SHOULD-NEVER-LEAK', token: 'tok-X', Authorization: 'Bearer X',
+    api_key: 'FAKE-KEY-SHOULD-NEVER-LEAK', token: 'tok-X', Authorization: 'Bearer X',
     credentials: 'c', filesystem_path: 'D:\\secret\\path'
   });
   const projDirty = P.project(dirty);

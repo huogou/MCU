@@ -1,0 +1,90 @@
+================================================================
+N1 FINAL CLOSE REPORT
+================================================================
+生成时间：2026-09-24
+结论：**N1 = CLOSED**
+声明：**N1 Provider 接入链路已完成验证并冻结。**
+说明：N1.2 U1（真实 Provider 单次隔离验证）+ N1.3（idSpace 约束收口）+ N1.4（最终验收）全部 PASS。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+本报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1 FINAL CLOSE REPORT.txt
+U1 报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次验证报告 V2.0.txt
+N1.3 证据：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-n1.3.txt
+U1 证据：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-u1.txt
+新增代码：
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\projection.cjs（AI Input Projection）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\provider-transport.cjs（独立 Provider 出口）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\providers\dashscope.cjs（DashScope Provider）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\id-space.cjs（idSpace 约束，复用 h5/data，不建第二套）
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.2-u1.cjs
+  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.3-dryrun.cjs
+
+----------------------------------------------------------------
+§1 十问十答（最终验收）
+----------------------------------------------------------------
+ 1. Provider 是否真实跑通？
+    → YES。DashScope / 阿里云百炼；model=qwen3.8-flash；OpenAI-compatible；HTTP 200。
+ 2. AI 输入是否经过 Projection？
+    → YES。AI Input Projection（allowlist = title_raw + raw_excerpt，实际投影 2 字段；
+      禁止集 42 项）。禁止 JSON.stringify(wholeCandidate) 直送。
+ 3. 7-field contract 是否稳定？
+    → YES。Provider 输出经 N1.1 contract-validator 校验（恰 7 字段）；未修改字段集合；
+      未知字段 / 缺字段 / 类型错误仍被 FORBIDDEN_FIELD / MISSING_FIELD / TYPE_ERROR 拒绝。
+ 4. ai_model 是否由受控 bridge 注入？
+    → YES。Provider 输出不含 ai_model（自带则 FORBIDDEN_FIELD）；ai_model 由 bridge 从受控
+      meta（provider/model）注入。
+ 5. related_* 是否受到真实 idSpace 约束？
+    → YES。复用项目既有实体空间（h5/data → MCU_CONTENT 59 + MCU_CHARACTERS 24 + phases 1-6，
+      与 build-g55.cjs 同源，未建第二套）。真实 dry-run 中模型输出 related_series=["Lanterns"]，
+      因不属 MCU 实体空间被**实际丢弃**；合法实体保留；空数组允许；绝不自动创建实体。
+ 6. Normalizer 是否通过？
+    → YES。ai-normalizer 产出增强 L1（35 字段），event_key 重算合法。
+ 7. 全量回归是否通过？
+    → YES。N1.1 = 32/0；N1.2 = 53/0；D1/D2 = 42/0；Normalizer 套件 exit=0；
+      N1.3 dry-run = 42/0（含 idSpace 单测 12 项 + 链路级 idSpace 负测试 4 项）；U1 = 43/0。
+ 8. 正式数据是否保持不变？
+    → YES。captures / candidates / deliveries / run-history 文件数全程未变；news.js 未被写入。
+ 9. Scheduler 是否保持 disabled？
+    → YES。DEFAULT_DISABLED = true；即便 enabled=true，run() 仍只到计划层，绝不 production。
+10. Production 是否保持 disabled？
+    → YES。未启用自动生产；未批量；未自动抓取；H5 未部署。
+
+全部 PASS ⇒ **N1 = CLOSED**
+
+----------------------------------------------------------------
+§2 运行与请求计数（透明）
+----------------------------------------------------------------
+  · Provider 调用合计（本次收尾）：N1.3 首轮尝试因**瞬态网络超时**失败（按策略内部重试 2 次）；
+    随后 N1.3 成功（1 请求，0 retry）；N1.4 再次执行成功（2 请求，含 1 次瞬态 retry）。
+  · 全部为「同 1 条 fixture」的孤立 dry-run；无批量、无循环、无多模型横向、无自动生产。
+  · Key 仅经环境变量 DASHSCOPE_API_KEY 注入；未落任何文件。
+
+----------------------------------------------------------------
+§3 最终冻结检查（§十五）
+----------------------------------------------------------------
+  代码：无未完成 TODO；无临时 mock 替代真实 Provider（mock 仅用于确定性负测试，与真实路径分离）；
+        无调试代码；无硬编码 API Key（仓库内真实 Key 0 命中；测试占位串已改为明显非密钥形式）。
+  数据：news.js SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf（未变）；
+        正式 captures / candidates / deliveries / run-history 未被意外写入。
+  运行：Scheduler disabled；Production disabled；H5 未部署。
+  安全：Key 不进入 Git（.gitignore 已含 .env / .env.*，保留 .env.example 空值示例）；
+        Key / Authorization / 完整请求 / 完整响应均不进入日志。
+  冻结件未改：G1–G10 / D1-D2 / N1.1 validator 字段集合 / H5。
+
+----------------------------------------------------------------
+§4 已知边界（冻结声明，非缺陷）
+----------------------------------------------------------------
+  · 模型 ID：qwen3.8-flash（本次实测可用）。若后续变更，**不得自动换模型**，须重新确认并重跑一次验证。
+  · Provider 网络出口与采集层出口独立（provider-transport.cjs ≠ collectors/http-transport.cjs）。
+  · idSpace 实际生效（真实空间 59 + 24 + phases）。
+  · 本阶段只验证「真实 Provider 可安全接入 N1 Pipeline」；未评估内容质量/实体准确率。
+
+----------------------------------------------------------------
+§5 结论
+----------------------------------------------------------------
+N1 = CLOSED
+N1 Provider 接入链路已完成验证并冻结。
+未经新的明确指令，不再开发 N1（不新增子阶段、不扩 Provider、不启 Production、不部署 H5、不改新闻模块）。
+================================================================
