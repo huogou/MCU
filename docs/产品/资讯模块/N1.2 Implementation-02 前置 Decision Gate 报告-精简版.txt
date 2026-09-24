@@ -1,0 +1,83 @@
+================================================================
+N1.2 Implementation-02 前置 Decision Gate 报告（精简版，V1.0）
+================================================================
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告.txt
+上游：N1.2 Implementation-01 = PASS（9948660；53/0）。冻结基线未变（news.js SHA256 ebf67de0…56fcaf；G1–G10/D1-D2/N1.1/H5）。
+最终状态：BLOCKED —— 真实 Provider 接入所需决策未拍板；D-P7 出域合规阻塞 D-P1 供应商收敛。
+本阶段未改任何代码、未接入、未联网、未部署。
+
+---------------- 一、D-P1~D-P9 决策要点（定义取自《决策清单》§1，未猜测）----------------
+D-P1 供应商：候选=国内云/国际云/本地；现状=无任何实现或注册；拍板=是。推荐=国内云优先+本地兜底（受 D-P7 约束）。
+D-P2 模型：候选=各厂商轻量档；现状=无真实模型（fixture ai_model=jarvis-g55-llm，非真实）；拍板=是。推荐=轻量档。
+D-P3 API 形态：候选=REST/SDK/OpenAI 兼容端点；现状=provide 与协议无关、无 HTTP 实现；拍板=是。推荐=OpenAI 兼容端点。
+D-P4 Key 保管：红线=严禁入仓库/news.js/交付物/日志；现状=无 .env、无凭据；拍板=是。推荐=环境变量+.env(gitignore)+运行时注入 meta。
+D-P5 成本：候选=限额/失败不计费重试/content_hash 复用；现状=无 AI 层限额（采集层已有幂等）；拍板=是。推荐=dry-run+小批+日限额+幂等复用。
+D-P6 失败降级：现状=仅 PROVIDER_ERROR 传播；超时/重试/降级**未实现**（15s/2retry 仅在采集层 http-transport）；拍板=是。推荐=复用 15s/≤2 retry；不可用→本地或转人工。
+D-P7 出域合规：是否允许候选原文出域云端；现状=runner 把整个 candidate(L1) 传给 provider → 一接云即出域；拍板=是（最高优先，决定 D-P1）。推荐=由产品/法务定，不得默认可出域。
+D-P8 触发频率：现状=scheduler 脚手架默认 disabled、真实 provider 无触发路径；拍板=是。推荐=先纯手动，与 S002 联动。
+D-P9 输出稳定：现状=validator 已兜底，无 JSON mode/提示词/后处理；拍板=是。推荐=强制 JSON 输出+低温。
+
+◆ 文档不一致（只标记不修正）：
+ 1) 《决策清单》§0 称「adapter.cjs（createProvider 第三参 meta 预留）」= 不实。实测 createProvider(name, impl) 无第三参；实际经 opts.meta 注入。
+ 2) 《最小接线设计说明》§4 称「registry 可携带 defaultModel / provider 携带 meta」= 未实现；仅 opts.meta 生效。
+ 3) http-transport UA 引用已退役旧域 mcu.yaokaixin.top（现行主域 mcuatlas.xyz）。
+
+---------------- 二、当前真实 Provider 现状 ----------------
+事实：ai-provider/ 仅 adapter/validator/bridge/runner，全零网络零真实调用；无 .env/无 Key/无供应商配置；
+  createProvider/createRegistry 仅存在于 ai-provider 与测试；**ai-provider 未接入 orchestrator**（无生产触发路径）；
+  fixture ai_model=jarvis-g55-llm 非真实模型。
+结论：**当前没有已确认的真实 Provider。**
+
+---------------- 三、Provider 候选方案 ----------------
+A. 云端 API：国内（qwen/hunyuan/doubao/glm）｜国际（OpenAI/Anthropic，本机直连境外超时须代理）。受 D-P7 约束。
+B. 本地模型：Ollama / llama.cpp（数据不出域；需算力运维）。
+C. 项目已存在/已配置的 Provider：**无。**
+（未为凑选项虚构厂商。）
+
+---------------- 四、真实 Provider 最小验证方案（设计，本阶段不实施）----------------
+单次/隔离/不可自动生产：1 条 fixture 样本 → 1 次真实 provider → Adapter → 7字段 Validator → bridge → ai-normalizer。
+隔离：不写 news.js/正式业务数据/run-history；不启用 scheduler；不改 D1/D2、G1–G10、H5；临时产物限于 pipeline 内唯一临时目录。
+须证明 7 项：①正常返回 ②过 7 字段契约 ③未知字段仍拒 ④ai_model bridge 正常 ⑤normalizer 正常 ⑥Provider 错误上抛 ⑦超时/网络失败不污染正式数据。
+前置：需授权真实网络出口 + 完成 P1/P2/P4/P7 拍板。
+
+---------------- 五、S001 JSON / HTML 入口决策 ----------------
+背景：S001=html-parse 无 RSS；G5.2 parser 对 html-parse 明确返回 HTML_PARSE_NOT_IN_SCOPE；现入口=JSON-only。
+A JSON-only（现状）：成本 0、无 G5.2 影响、可审计、维持。
+B HTML→raw capture：成本高（须新写 html-parse）+ 触 G5.2 冻结；不建议现在做。
+C JSON+HTML 双入口：成本=A+B、触 G5.2；不建议现在做。
+结论：**需要产品拍板**。本阶段不改当前 JSON 入口。
+
+---------------- 六、安全边界检查（8 项）----------------
+① 不能绕过 Adapter：架构必经，但非强制（调用方可直调 provide，当前无此路径）→ 真实 provider 仅经 runner 暴露。
+② 不能写 ai_model：✅ FORBIDDEN_FIELD。③ 不能加未知字段：✅ FORBIDDEN_FIELD。
+④ 失败不进正式数据：✅ PROVIDER_ERROR 上抛（前提：调用方不吞）。⑤ 不自动触发 production：✅ 无接线。
+⑥ scheduler 默认关闭：✅ DEFAULT_DISABLED=true。⑦ mock 保留：✅。⑧ fixture 回归保留：✅（133 条 + 三套回归）。
+风险：① 网络出口边界——http-transport 自称「唯一联网模块」限采集层，真实 Provider 会引入采集层外新出口，须另立 Provider 出口规范；② 接线越权须防旁路；③ 密钥/缓存不得外泄；④ runAdapter 传整个 candidate → 出域范围=35 字段 L1。
+
+---------------- 七、必须拍板（P1–P12）----------------
+P1 D-P7 出域｜P2 D-P1 供应商｜P3 D-P2 模型字符串｜P4 D-P4 密钥来源/轮换｜P5 D-P3 形态｜P6 D-P5 限额与缓存｜
+P7 D-P6 超时/降级/兜底｜P8 D-P9 JSON mode｜P9 D-P8 触发方式｜P10 S001 入口方案｜P11 Provider 网络出口边界｜P12 是否授权执行最小验证。
+
+---------------- 八、开发 AI 可自行执行 ----------------
+本阶段：**无代码可自行执行项**（仅产报告/精简版 + 只读核对）。拍板后最小单元见 §十。
+
+---------------- 九、禁止事项 ----------------
+接入真实 Provider｜调真实 API｜真实 Live｜启用 scheduler production｜改 news.js/D1-D2/G1–G10/N1.1 validator/H5｜部署｜N1.3｜SOP｜指标看板｜新增 UI。
+
+---------------- 十、下一步最小实施单元 ----------------
+U1（拍板后）：真实 Provider 单次隔离验证（§四，1 样本 1 次调用，零副作用）。前置=P1–P4/P11/P12。
+U2：注册「可显式选择、默认不启用」的真实 provider + provide 实现（协议/超时/重试/JSON mode）。
+U3：与 S002 联动的触发启用（单独拍板）。
+现状=U1 前置未满足 → BLOCKED。
+
+---------------- 最终结论 ----------------
+状态：**BLOCKED**（P1–P12 未拍板；P1 阻塞 P2）。真实 Provider：**当前没有已确认的真实 Provider**。
+解阻：完成 P1–P12 → READY FOR PROVIDER IMPLEMENTATION → 执行 U1。本阶段未改代码/未联网/未部署。
+置信度：高（逐文件源码实测 + orchestrator 无 provider 引用 + 仓库无 .env/凭据 交叉印证）。局限：D-P7 属产品/法务判断；成本数值依赖厂商数据，未定值。
+
+---------------- 关键关联文件 ----------------
+全量报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告.txt
+D-P 定义：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\真实 AI Provider 决策清单.txt
+接线现状：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\runner.cjs
+PASS 基线：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-01 落地报告.txt
+================================================================

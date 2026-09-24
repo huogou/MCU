@@ -1,0 +1,307 @@
+================================================================
+N1.2 Implementation-02 前置 Decision Gate 报告（V1.0）
+================================================================
+生成时间：2026-09-24
+性质：决策准备。只梳理待拍板项 / 现状 / 候选方案 / 影响 / 边界；不实施、不接入真实 Provider、不写代码、不改任何冻结件。
+上游：N1.2 Implementation-01 = PASS（提交 9948660；53 PASS / 0 FAIL）。
+冻结基线（全程未变，已实证）：news.js SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf；
+  G1–G10 / D1-D2 / N1.1 7字段契约与 validator / H5 均未改。
+最终状态：BLOCKED（真实 Provider 接入所需的产品与技术决策尚未拍板；D-P7 出域合规阻塞 D-P1 供应商收敛）。
+本报告不修改任何代码；发现的文档不一致只标记、不修正。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本报告产出】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告.txt
+2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告-精简版.txt
+
+【上游决策与设计（只读）】
+3) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\真实 AI Provider 决策清单.txt（D-P1~D-P9 原始定义）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 最小接线设计说明.txt（§3/§4 桥接机制）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-01 落地报告.txt（PASS 基线 / §三 opts.meta 决策）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Decision Gate 报告.txt（D1–D6 拍板）
+
+【代码现状（只读参照，本次实测）】
+7)  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（Provider 抽象；createProvider 仅两参）
+8)  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（7 字段封闭校验）
+9)  D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\bridge.cjs（ai_model 注入）
+10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\runner.cjs（runAiProviderStage / resolveMeta）
+11) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5 强制 ai_model）
+12) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\parser.cjs（html-parse 明确不在范围）
+13) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\http-transport.cjs（自称「唯一允许联网模块」）
+14) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\manual-capture-loader.cjs（S001 JSON 入口）
+15) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\scheduler.cjs（S002 脚手架，默认 disabled）
+16) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json（S001–S012 登记表）
+
+----------------------------------------------------------------
+一、D-P1~D-P9 全量决策表
+----------------------------------------------------------------
+说明：「当前定义」逐字取自 3)《真实 AI Provider 决策清单.txt》§1，未猜测；
+「代码现状」为本次源码实测；「推荐」为文档既有基线 + 本报告补注，均非拍板。
+
+【D-P1 供应商选型】
+  · 当前定义：国际（OpenAI/Anthropic）｜国内云（qwen/hunyuan/doubao/glm）｜本地（Ollama/llama.cpp）；是否多供应商冗余。
+  · 代码现状：无任何 provider 实现或注册；createProvider/createRegistry 仅出现在 ai-provider 及其测试。
+  · 是否已实现：否。
+  · 是否必须拍板：是（阻塞项）。
+  · 可选方案：国内云 / 国际云（需代理）/ 本地自托管 / 多云冗余。
+  · 推荐方案：国内云优先 + 本地兜底（文档基线）。★ 受 D-P7 约束：若不允许原文出域，则只能用本地。
+  · 推荐理由：合规、延迟、计费可控；冗余可降可用性风险（成本上升）。
+  · 对 N1.1/N1.2 冻结架构影响：无结构影响；仅决定 provide 实现与 bridge 注入的 meta.provider 取值。
+  · 真实网络：是｜API Key：是（云）｜成本：是｜持久化：否。
+
+【D-P2 模型粒度】
+  · 当前定义：具体 model 字符串（将作为 bridge 注入的 ai_model 值）；候选为各厂商轻量档。
+  · 代码现状：无真实模型；fixture 的 ai_model = jarvis-g55-llm（G5.5 会话内整理标识，非真实模型）。
+  · 是否已实现：否。
+  · 是否必须拍板：是。
+  · 可选方案：轻量档（gpt-4o-mini / qwen-turbo / hunyuan-standard 等）/ 标准档。
+  · 推荐方案：轻量档。
+  · 推荐理由：7 字段结构化抽取对大模型能力要求不高，轻量档成本与延迟最优。
+  · 对 N1.1/N1.2 冻结架构影响：无；仅决定 ai_model 取值字符串。
+  · 真实网络：是｜API Key：是｜成本：是｜持久化：是（ai_model 写入增强 L1）。
+
+【D-P3 API 形态】
+  · 当前定义：官方 REST / 官方 SDK(node) / OpenAI 兼容端点；是否统一兼容层。
+  · 代码现状：adapter.provide 是通用函数，与协议形态无关；无 HTTP 客户端实现。
+  · 是否已实现：否。
+  · 是否必须拍板：是。
+  · 可选方案：官方 REST / 官方 SDK / OpenAI 兼容端点。
+  · 推荐方案：OpenAI 兼容端点（便于切换供应商）。
+  · 推荐理由：adapter.provide 内部实现可换，兼容端点降低供应商锁定。
+  · 对 N1.1/N1.2 冻结架构影响：无（仅 provide 内部）。
+  · 真实网络：是｜API Key：是｜成本：间接｜持久化：否。
+
+【D-P4 API Key 保管】
+  · 当前定义：环境变量 / 密钥管理服务 / 配置文件(gitignore)。
+  · 代码现状：无 .env、无密钥、无密钥管理；仓库无任何凭据文件（.gitignore 已含 *.pem/*.key 等）。
+  · 是否已实现：否。
+  · 是否必须拍板：是。
+  · 红线：API Key 严禁入仓库 / news.js / 任何交付物 / 日志。
+  · 可选方案：环境变量 + .env(gitignore) / 云密钥服务 / 运行时注入。
+  · 推荐方案：环境变量 + .env(gitignore) + 运行时注入 provider meta。
+  · 推荐理由：与 N1.2 的 opts.meta 注入路径天然衔接（bridge 已就绪）。
+  · 对 N1.1/N1.2 冻结架构影响：无；meta 注入机制已存在。
+  · 真实网络：否（保管本身）｜API Key：是｜成本：否｜持久化：否（但凭据敏感）。
+
+【D-P5 调用成本策略】
+  · 当前定义：单条限额 / 日限额 / 失败不计费重试 / 结果缓存（同 content_hash 复用）。
+  · 代码现状：无调用限额/计费控制；采集层已有 content_hash 幂等（capture_id 身份 + 内容级幂等键），可复用去重。
+  · 是否已实现：否（缓存复用能力在采集层已具备，未接到 AI 层）。
+  · 是否必须拍板：是。
+  · 可选方案：单条/日限额；失败不计费重试；按 content_hash 复用。
+  · 推荐方案：先 dry-run + 小批真实验证，设日限额；与 content_hash 幂等联动以降低重复调用。
+  · 推荐理由：控制成本、避免重复付费。
+  · 对 N1.1/N1.2 冻结架构影响：需在 runner 外层或 provide 内加限额/缓存；不动冻结模块。
+  · 真实网络：是｜API Key：是｜成本：是｜持久化：是（缓存需落盘）。
+
+【D-P6 失败与降级】
+  · 当前定义：超时 / 限流 429 / 内容超长截断 / 模型不可用降级本地。
+  · 代码现状：adapter 层已实现 PROVIDER_ERROR 向上传播（保留 cause），**无超时/重试/降级/截断**；超时/重试/退避能力仅存在于采集层的 http-transport（15s / 2 retry / 1.5s），ai-provider 层未接线。
+  · 是否已实现：部分（错误传播已实现；超时/重试/降级/截断未实现）。
+  · 是否必须拍板：是。
+  · 可选方案：超时≤15s / 指数退避≤2 次 / 超长截断 / 降级本地或人工。
+  · 推荐方案：复用 http-transport 参数（15s / ≤2 retry / 退避）；模型不可用 → 本地兜底或转人工通道。
+  · 推荐理由：与既有 G5.2 transport 参数一致，运维口径统一。
+  · 对 N1.1/N1.2 冻结架构影响：需为 ai-provider 增加网络控制层（涉及 §六 网络边界决策）；不改冻结语义。
+  · 真实网络：是｜API Key：是｜成本：是（重试计费）｜持久化：否（failure record 可选）。
+
+【D-P7 数据合规（出域）】
+  · 当前定义：是否允许候选原文（含 title/summary/抓取文本，可能含第三方新闻内容）出域到云端模型；若否 → 仅本地模型。
+  · 代码现状：ai-provider 输入 = candidate（L1，35 字段）；runner 将整个 candidate 传给 provider.provide → 一旦接真实云端 provider，候选原文即出域。
+  · 是否已实现：否。
+  · 是否必须拍板：是（最高优先；直接决定 D-P1 候选范围）。
+  · 可选方案：允许云（国内/国际）/ 仅本地。
+  · 推荐方案：由产品/法务定；不得默认"可出域"。文档倾向"国内云优先"，但须先确认合规。
+  · 推荐理由：涉及第三方新闻内容与版权/合规，属产品与法务判断，开发侧不替代。
+  · 对 N1.1/N1.2 冻结架构影响：决定 D-P1 是否只能选本地（结构层面无影响）。
+  · 真实网络：是（若上云）｜API Key：否｜成本：间接｜持久化：否。
+
+【D-P8 触发与频率】
+  · 当前定义：手动 CLI / scheduler（与 S002 调度决策联动）；红线：默认不自动生产。
+  · 代码现状：scheduler.cjs 脚手架已建，默认 disabled、run() 永不执行 production；真实 provider 无任何触发路径（orchestrator 未引用 ai-provider）。
+  · 是否已实现：脚手架已建；真实触发未实现。
+  · 是否必须拍板：是。
+  · 可选方案：纯手动 CLI / 拍板后启用 scheduler。
+  · 推荐方案：先纯手动；与 S002 决策联动，默认仍关闭自动。
+  · 推荐理由：与 D2/S002 拍板一致，避免未审自动调用。
+  · 对 N1.1/N1.2 冻结架构影响：与 D2/D3 联动；不改冻结件。
+  · 真实网络：是（触发后）｜API Key：是｜成本：是｜持久化：是（run-history 记录运行，非新增业务数据）。
+
+【D-P9 输出稳定性】
+  · 当前定义：JSON mode / function calling / 低 temperature / 后处理兜底解析；是否强制 JSON mode。
+  · 代码现状：contract-validator 已兜底（FORBIDDEN_FIELD / MISSING_FIELD / TYPE_ERROR 明确失败，不静默）；**无 JSON mode 强制、无提示词、无后处理解析**。
+  · 是否已实现：部分（校验已实现；输出形态控制未实现）。
+  · 是否必须拍板：是。
+  · 可选方案：强制 JSON mode / 低温 / function calling / 后处理兜底。
+  · 推荐方案：要求 JSON 结构化输出 + 低 temperature；畸形输出走 validator 明确失败。
+  · 推荐理由：validator 已能兜底，配合 JSON mode 可显著降低畸形率。
+  · 对 N1.1/N1.2 冻结架构影响：仅 provide 内部；不动冻结。
+  · 真实网络：是｜API Key：是｜成本：是｜持久化：否。
+
+◆ 文档不一致（只标记，不修正）
+  1) 3)《决策清单》§0 第 3 条写「adapter.cjs（createProvider 第三参 meta 预留）」——**与代码不符**。
+     实测：adapter.cjs 的 createProvider 签名为 createProvider(name, impl)，**无第三参**；且 N1.1 已冻结、Implementation-01 未改该文件。
+     实际机制：受控元数据经 runner.runAiProviderStage 的 **opts.meta** 注入（resolveMeta 优先 opts.meta，其次 provider.meta）。见 5)《落地报告》§三。
+     影响：若后续实现按"第三参"实施，会与冻结件冲突 → 拍板时须明确以「opts.meta」为准。
+  2) 4)《最小接线设计说明》§4 写「meta 来源：provider 注册时携带 {provider, model}；registry 可携带 defaultModel」——**未实现**。
+     实测：createRegistry 无 defaultModel；createProvider 无 meta 位；resolveMeta 的 provider.meta 回退分支目前无任何写入方。
+     实际：仅 opts.meta 生效。
+  3) 13) http-transport.cjs 的 UA 常量为 'MCUAtlasBot/1.0 (+https://mcu.yaokaixin.top/)'——引用的域名为**已退役旧域**（现行主域 mcuatlas.xyz）。非阻塞，但真实 Provider 若复用 UA/出口约定，需对齐域名。
+  以上为事实核对结果，本报告不做修改。
+
+----------------------------------------------------------------
+二、当前真实 Provider 现状
+----------------------------------------------------------------
+【事实（本次源码实测）】
+  - ai-provider/ 目录仅有：adapter.cjs（通用 Provider 抽象）、contract-validator.cjs（7 字段校验）、bridge.cjs（ai_model 注入）、runner.cjs（接线）。**全部零网络、零真实调用**，无任何真实 provider 实现。
+  - 无 .env、无 API Key、无密钥管理、无供应商配置（仓库检索无命中）。
+  - createProvider / createRegistry 仅出现在 ai-provider/ 与其测试；无生产注册点。
+  - ai-provider **未接入 orchestrator**（对 orchestrator.cjs 检索 provider/ai-provider/runAiProviderStage 均无命中）→ 即便实现真实 provider，当前也无生产触发路径。
+  - fixture 的 ai_model = jarvis-g55-llm，是 G5.5 会话内整理的标识，**不是真实模型**。
+  - 网络出口约定：http-transport.cjs 自述为「**唯一**允许发起网络请求的模块；其余**采集层**模块保持零网络」。该约定限定在采集层；AI Provider 若联网将引入采集层之外的新出口（见 §六风险）。
+【结论】当前**没有已确认的真实 Provider**。
+
+----------------------------------------------------------------
+三、Provider 候选方案（决策表）
+----------------------------------------------------------------
+A. 云端 API（候选，未定）
+   - 国内云：阿里通义 qwen / 腾讯混元 hunyuan / 字节豆包 doubao / 智谱 glm。
+   - 国际云：OpenAI / Anthropic（本机直连境外超时，须经代理；见本机网络事实）。
+   - 特点：能力与生态成熟、按量计费；受 D-P7 出域合规约束。
+B. 本地模型（候选，未定）
+   - Ollama / llama.cpp 自托管；数据不出域。
+   - 特点：合规最优、无按量成本；需本地算力与运维，能力较云端轻量档弱。
+C. 项目已存在或已配置的 Provider
+   - **无。当前没有已确认的真实 Provider。**（不虚构厂商；不把 forum-api、探针文件等无关命中的关键词当作 Provider 配置。）
+说明：本表只列 3)《决策清单》已给出的候选与项目实况，未为凑选项增列厂商。
+
+----------------------------------------------------------------
+四、真实 Provider 最小验证方案（设计，本阶段不实施）
+----------------------------------------------------------------
+目标：在「单次、隔离、不可自动生产」约束下，验证真实输入→真实 Provider→Adapter→7字段 Validator→bridge→ai-normalizer 全链路。
+【隔离控制（硬约束）】
+  - 输入：fixture / sandbox input / **明确指定的测试样本**（例如 ai-normalizer/output/20260923.json 中的 1 条 + 指定 raw capture）。
+  - 单次：仅 1 条样本、仅 1 次 Provider 调用；不批量、不循环。
+  - 不写 news.js；不写正式 captures / candidates / deliveries；不写 run-history（dry-run 语义）；不启用 scheduler；不改 D1/D2、G1–G10、H5。
+  - 全部临时产物落 OS 之外的 pipeline 内唯一临时目录（满足 capture-store 的 WRITE_OUTSIDE_PIPELINE 守卫），或仅内存校验。
+【步骤】真实样本 → provider.provide → runAdapter(validate 7字段) → bridge.injectAiModel(meta) → ai-normalizer.normalize → 结果打印/落临时文件。
+【必须能证明（7 项）】
+  1) Provider 正常返回；
+  2) 返回可通过 7 字段契约；
+  3) 未知字段仍被拒绝（FORBIDDEN_FIELD）；
+  4) ai_model bridge 正常（Provider 不含 ai_model，bridge 注入后 normalizer 获得）；
+  5) ai-normalizer 正常产出增强 L1；
+  6) Provider 错误可正确向上抛出（PROVIDER_ERROR，保留 cause）；
+  7) 超时/网络失败不会污染正式数据（无持久化副作用）。
+【前置】需显式授权真实网络出口（见 §六 风险 ①）；需先完成 D-P1/P2/P4/P7 拍板。
+【状态】本阶段**未实施**；此方案为 Implementation-02 的最小实施单元（见 §十）。
+
+----------------------------------------------------------------
+五、S001 JSON / HTML 人工入口决策分析
+----------------------------------------------------------------
+背景事实：S001（Marvel 官方）feed_type = html-parse，feed_url = https://www.marvel.com/news，无 RSS，须解析列表页 HTML；
+  而 G5.2 parser.cjs 对 html-parse **明确返回 HTML_PARSE_NOT_IN_SCOPE**（不在范围）。
+  当前已实现入口 = JSON-only（manual-capture-loader.cjs）。
+本阶段不开发 HTML parser；以下仅分析。
+
+方案 A：JSON-only（现状）
+  · 使用场景：运营把人工获得的结构化条目转成 JSON 投递 inbox。
+  · 技术成本：0（已实现并测试通过）。
+  · 对 G5.2 影响：无。
+  · 审计/回放：JSON 全字段可审计、capture 落盘可回放。
+  · 对真实 Live 帮助：中（S001 本身 manual-only，人工入口已匹配其定位）。
+  · 是否值得现在做：已做，维持现状。
+
+方案 B：HTML → raw capture（人工保存 HTML 再解析）
+  · 使用场景：运营保存 marvel.com/news 列表页 HTML → 解析为原始条目。
+  · 技术成本：高（须新写 html-parse：选择器/结构容错/反爬/结构变更维护）。
+  · 对 G5.2 影响：须扩/改 parser（G5.2 属冻结件）→ 需先拍板解冻。
+  · 审计/回放：原始 HTML 可留档，但解析规则需版本化管理。
+  · 对真实 Live 帮助：高（S001 唯一出口本就是 HTML）。
+  · 是否值得现在做：**不建议现在做**（成本高 + 触冻结件；现状 JSON 已满足人工录入）。
+
+方案 C：JSON + HTML 双入口
+  · 使用场景：兼顾结构化与原始 HTML 两种投递。
+  · 技术成本：A + B。
+  · 对 G5.2 影响：同 B。
+  · 审计/回放：两入口并存，须统一 capture 口径与来源标识。
+  · 对真实 Live 帮助：高。
+  · 是否值得现在做：**不建议现在做**（先以 JSON 满足现状；HTML 待需要时单独评估）。
+
+【结论】**需要产品拍板**。本阶段不修改当前 JSON 入口。
+
+----------------------------------------------------------------
+六、真实 Provider 安全边界检查
+----------------------------------------------------------------
+逐项核对「Provider → Adapter → Validator → Bridge → Normalizer」在接入真实 Provider 后是否仍成立：
+  1) Provider 不能绕过 Adapter：✅ 架构上 runner 必经 runAdapter；但**非强制**——若调用方直接调 provider.provide 即绕过（当前无此调用路径，风险低）。建议真实 provider 仅经 runner 暴露。
+  2) Provider 不能写入 ai_model：✅ contract-validator 为封闭 7 字段集，Provider 输出含 ai_model → FORBIDDEN_FIELD。
+  3) Provider 不能增加未知字段：✅ 同上 FORBIDDEN_FIELD。
+  4) Provider 失败不能进入正式数据：✅ runAdapter 抛 PROVIDER_ERROR；runner 不 catch。前提：调用方不 catch 吞掉（须约定）。
+  5) Provider 调用不能自动触发 production：✅ orchestrator 未引用 ai-provider；无自动接线。
+  6) Scheduler 默认仍关闭：✅ DEFAULT_DISABLED = true；run() 即便 enabled 也只到计划层，绝不执行 production。
+  7) mock provider 仍保留：✅ 测试保留 mock；N1.1/N1.2 套件依赖。
+  8) fixture 回归仍保留：✅ fixture 133 条 + 回归套件（N1.1 32 / D1/D2 42 / N1.2 53）。
+
+【风险（只报告，不扩大修改）】
+  ① 网络出口边界：http-transport.cjs 自述为「唯一允许联网模块」，但该限定在**采集层**。真实 AI Provider 联网将引入采集层**之外**的新出口 → 需明确：Provider 出口是否受同一 transport/UA/robots 体系约束，或另立 Provider 专用出口规范（含 UA 声明、超时、限流、审计）。
+  ② 接线越权：ai-provider 目前未接入 orchestrator。接入时必须保证「必经 Adapter、不自动 production、不旁路 bridge」；否则 1)【不能绕过 Adapter】的"约定"会退化为"没有"。
+  ③ 凭据/缓存外泄：D-P4/D-P5 引入的密钥与缓存，须确保不落入交付物/日志/news.js（与既有红线一致）。
+  ④ runAdapter 将**整个 candidate** 传给 provider → 与 D-P7 出域范围直接相关（出域的不止 title，而是 35 字段 L1）。
+
+----------------------------------------------------------------
+七、必须我拍板的事项
+----------------------------------------------------------------
+  P1. D-P7 出域合规（是否允许候选原文出域云端）——最高优先，决定 D-P1 范围。
+  P2. D-P1 供应商选型（含是否多云冗余）。
+  P3. D-P2 模型（具体 model 字符串，即 bridge 注入的 ai_model 值）。
+  P4. D-P4 API Key 来源与轮换策略（且确认"环境变量 + .env(gitignore)"方案）。
+  P5. D-P3 API 形态（是否 OpenAI 兼容端点）。
+  P6. D-P5 成本策略（限额数值、是否启用 content_hash 缓存复用）。
+  P7. D-P6 失败/降级（超时阈值、重试、是否本地兜底/转人工）。
+  P8. D-P9 是否强制 JSON mode。
+  P9. D-P8 触发方式（纯手动 / 拍板后启用 scheduler）——与 S002 联动。
+  P10. S001 入口方案（JSON-only 维持 / 是否规划 HTML 或双入口）。
+  P11. 真实 Provider 网络出口边界（是否受同一 transport/UA/robots 体系；见 §六风险①）。
+  P12. 是否授权执行 §四「最小验证方案」（单次、隔离、不可自动生产）。
+
+----------------------------------------------------------------
+八、开发 AI 可自行执行事项
+----------------------------------------------------------------
+  · 本阶段（Decision Gate）：**无代码可自行执行项**。禁止改动任何冻结件与实现真实 Provider（见 §九）。
+  · 唯二可自行产出：本报告与精简版（文档），以及只读核对（已完成）。
+  · 拍板**之后**，可自行执行的最小单元见 §十（届时仍需按对应授权范围执行）。
+
+----------------------------------------------------------------
+九、禁止事项（本阶段强制）
+----------------------------------------------------------------
+  - 接入真实 Provider｜调用真实 AI API｜执行真实 Live｜启用 scheduler production。
+  - 修改 news.js｜修改 D1/D2｜修改 G1–G10｜修改 N1.1 validator｜修改 H5。
+  - 部署｜开始 N1.3｜开始 SOP｜开始指标看板｜新增 UI。
+  - 以上任一均不执行；如遇代码问题只报告，不自行修复。
+
+----------------------------------------------------------------
+十、下一步最小实施单元
+----------------------------------------------------------------
+  单元 U1（拍板后，最小、可验证、零副作用）：
+    「真实 Provider 单次隔离验证」——1 条 fixture 样本 + 1 次真实 Provider 调用，按 §四 执行，
+    断言 §四 第 1–7 项；全程不写 news.js / 不落正式业务数据 / 不写 run-history / 不启用 scheduler。
+    前置：完成 P1–P4、P11、P12 拍板。
+  单元 U2（可在 U1 通过后）：把真实 provider 注册为「可显式选择」的 provider（默认不启用），补 provide 实现（协议/超时/重试/JSON mode）。
+  单元 U3（更后）：与 S002 联动的触发启用（仍须单独拍板）。
+  当前处于 U1 前置未满足 → 状态 BLOCKED。
+
+----------------------------------------------------------------
+§最终结论
+----------------------------------------------------------------
+N1.2 Implementation-02 前置 Decision Gate：**BLOCKED**
+  —— 真实 Provider 接入所需产品/技术决策未拍板（P1–P12），其中 P1（D-P7 出域合规）阻塞 P2（D-P1 供应商收敛）。
+当前真实 Provider 现状：**当前没有已确认的真实 Provider**（无实现、无配置、无接入）。
+本阶段未修改任何代码 / 未接入 / 未联网 / 未部署。
+解阻路径：完成 §七 P1–P12 拍板 → 转 READY FOR PROVIDER IMPLEMENTATION → 执行 §十 U1。
+
+置信度：高（现状结论基于本次源码逐文件实测：adapter/validator/bridge/runner/ai-normalizer/parser/http-transport/scheduler/manual-capture-loader/source-registry，且以 orchestrator 无 provider 引用、仓库无 .env/凭据检索为交叉证据）。
+局限：① 真实 Provider 端到端未验证（本阶段禁止）；② 出域合规（D-P7）属产品/法务判断，本报告不替代；③ 成本数值、模型能力对比依赖厂商侧数据，本报告只给候选与基线，不定值。
+================================================================
