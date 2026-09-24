@@ -1,0 +1,151 @@
+================================================================
+N1.2 Decision Gate 报告（V1.0）
+================================================================
+生成时间：2026-09-24
+范围：仅 N1.2「Decision Gate + 实施方案设计」；不进 N1.3 / SOP / 指标看板 / 真实 AI Provider / 自动生产。
+上游基线：N1.1 PASS（ecf4d2a，32 PASS）；D1/D2 PASS（f375f3c，42 PASS）；news.js SHA256 未变；G1–G10 未改。
+本任务：设计 + 拍板清单；不大规模编码（仅在 §三 给出接线设计，落地代码留待 Gate 批准后）。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【上游 / 冻结（只读参照）】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.1 AI Provider Adapter 落地报告.txt
+2) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7字段校验器）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象 + runAdapter）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\orchestrator.cjs（D1/D2 编排；reviewStage 当前读 fixture）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\base-collector.cjs（G5.2 采集；collectLive 白名单）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json（S001–S012 登记表）
+7) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5；normalize 强制 ai_model）
+
+----------------------------------------------------------------
+【已确认事实】
+----------------------------------------------------------------
+F1. N1.1 已落地并冻结：ai-provider/ 含 contract-validator.cjs（7字段封闭集 / FORBIDDEN_FIELD / MISSING_FIELD / TYPE_ERROR / 不修改输入）+ adapter.cjs（Provider 抽象 + 注册表 + runAdapter 传播 PROVIDER_ERROR）。32 PASS / 0 FAIL。
+F2. D1/D2 行为矩阵冻结：dry-run 不写 run-history；production-* 必写 run-history；仅 --persist 落业务数据；dry-run+--persist 拒绝。42 PASS / 0 FAIL。
+F3. 采集白名单（base-collector.collectLive）：LIVE_ALLOWED = [S002,S003,S004,S005,S006]。S001 不在内 → S001 无自动取数路径。
+F4. S001 登记表：feed_type=html-parse、feed_url=https://www.marvel.com/news、crawl_policy=auto_allowed；但 G5.3 实测 S001 为「CDN UA 级封锁，自报 UA 全站 403，GPTBot 被禁」，且明确「禁止以 sitemap 作新闻发现通道」。登记表 note 与 sitemap-news.xml 存在冲突。
+F5. S003/S005 在白名单内，但 G5.3 实测：S003=403、S005=ECONNREFUSED（结构性失败，非偶发）。
+F6. 采集失败语义（base-collector.collect）：单源 fail-closed——失败记入 result.errors 并返回 result（不抛、不中断批量）；collectLiveAll 顺序执行，单源失败不影响其他源。
+F7. 失败写入 run-history：orchestrator.collectStage 把 source_success / source_failed / source_fail_reasons 写入 run-history 10字段日志。失败 item 不入 candidates/deliveries。
+F8. 缺口（现状发现）：① 采集层无重试逻辑；② 无独立「failure 表/state」（registry 有 consecutive_failures 字段但采集不更新）；③ N1.1 的 7字段契约不含 ai_model，而 ai-normalizer.normalize 强制要求 ai_model → 链路「7字段→ai-normalizer」直接接会 FAIL。
+F9. orchestrator.reviewStage 当前从 ai-normalizer/output/20260923.json 读已增强 L1 候选（fixture），作为回归基线。
+
+----------------------------------------------------------------
+【现状发现 / 假设修正】
+----------------------------------------------------------------
+D1. 任务链路图「raw capture → AI Provider Adapter → 7字段 → ai-normalizer」存在断点：ai-normalizer.normalize(candidate, ai) 要求 ai 含 7字段 + ai_model（AI_ALLOWED_FIELDS 含 ai_model，且 ai_model 为空抛 MISSING_FIELD）。N1.1 校验器把 ai_model 视为越权（不在 7字段内）。→ 须在 adapter 输出与 normalizer 之间补「桥接层」从 provider/registry 元数据注入 ai_model，保持 Provider 原始输出不含 ai_model（符合「Provider 输出不得泄漏业务字段」）。
+D2. S001 登记表 crawl_policy=auto_allowed 与 collectLive 白名单排除 S001 矛盾：登记表允许自动，但采集器代码拒绝自动取 S001。结论：S001 实际只能人工通道；登记表 crawl_policy 字段与实际代码不一致，属待澄清的文档/代码口径问题（不阻塞 N1.2 设计，但应在 Decision 中标注）。
+D3. S003/S005「失败处理」目前仅有 run-history 留痕，无重试、无降级决策、无失败 item 持久化。是否重试对 S003(403)/S005(ECONNREFUSED) 意义有限（环境/网络层失败，重试大概率继续失败且可能加剧被封）。
+
+----------------------------------------------------------------
+§一 Decision Gate：S001 人工 HTML 通道形态
+----------------------------------------------------------------
+【当前代码现状】S001 被 collectLive 白名单排除（F3/F4）；无任何自动取数代码路径；G5.3 实测 S001 全站 403。
+【可选方案】
+  A. 文件投递型：运营把抓取的 HTML/JSON 放入指定 inbox 目录，接线读取 → 转 RawCapture(L0)。
+  B. 粘贴 HTML/文本型：小脚本/接口接收粘贴内容写入 inbox（需后台入口，违背「不增加复杂后台UI」）。
+  C. 本地目录监听型：fs.watch 常驻监听 inbox 自动触发（引入常驻进程，违背「默认不自动」+ 最小化）。
+  D. 复用现有最小方案：人工直接产出符合 L0 结构的 RawCapture（JSON），复用 base-collector 的 NM.toCaptureInput + RC.create 接入，与自动采集同构后续链路。
+【推荐方案】D 为主 + A 为辅。即新增轻量 manualCaptureLoader：读 inbox 下的 L0 JSON（或 HTML→同一 parser 解析为 L0），输出与 collectLive 同构的 captures，直接进入 capture→candidate→adapter→normalizer。B/C 不推荐。
+【推荐理由】最小改动、零新依赖、可审计（文件留痕）、可回放（重放 inbox 文件）、复用既有 RawCapture 契约不破坏 G5.2。
+【对 D1/D2/G1–G10 影响】仅新增 manualCaptureLoader（新文件）；不影响 D1/D2 矩阵（manual 走 production-capture 的 opts.captures 注入路径，已支持）；不修改 G 模块。
+【实施复杂度】低（复用 RC.create / NM.toCaptureInput）。
+【风险】中低——S001 列表 75% 非影视需过滤，但过滤逻辑归属 G5.2 parser，人工通道只喂 HTML 原文，过滤规则沿用不新增。
+【是否需要我拍板】是（确认选 D+A；inbox 目录位置/命名/投放责任人；S001 过滤是否需在人工通道额外加严）。
+
+----------------------------------------------------------------
+§二 Decision Gate：S002 调度频率与默认自动性
+----------------------------------------------------------------
+【当前代码现状】orchestrator.runPipeline 支持 dry-run / production-capture / production-review / production-delivery-preview，全手动 CLI 触发；无 scheduler/cron。
+【可选方案】
+  A. 维持全手动（现状）。
+  B. 加 scheduler 脚手架（runner/scheduler.cjs）+ cron 模板，默认禁用自动生产，仅 manual 触发。
+  C. 默认自动定时 production-capture。
+【推荐方案】B，且默认禁用自动生产：scheduler 脚手架可建，但默认不启用；若启用，默认走 dry-run 或 capture-only（不 --persist），人工 review 后才 delivery。符合「不要因为存在 cron 就启用自动生产」「默认可控、可回滚、可审计」。
+【默认频率建议】若启用：每日 1–2 次（资讯时效中等），且首轮仅 capture-only。
+【失败后重试】采集层当前无重试；建议明确「采集失败不自动重试，仅记入 run-history + 失败表」，避免雪崩/被封。
+【是否允许真实生产自动运行】默认否，需你批准（见 §三 S003）。
+【对 D1/D2/G1–G10 影响】scheduler 为新文件，调用 runPipeline 时须遵守 D1/D2 矩阵（尤其 dry-run 不写、--persist 才落盘）；不修改 G。
+【实施复杂度】低（脚手架）。
+【风险】中——若误启用自动 --persist 会落未审数据；以「默认禁用 + 默认 capture-only」缓解。
+【是否需要我拍板】是（是否要 scheduler 脚手架；频率；是否允许自动）。
+
+----------------------------------------------------------------
+§三 Decision Gate：S003 是否现在执行首次真实 live 采集
+----------------------------------------------------------------
+【方案 A：立即执行】
+  风险：高——可能触发 S001(403)/S003(403)/S005(ECONNREFUSED)；S002/S004/S006 成功会产生真实 captures。
+  对 news.js：无影响（采集层只产 L0 capture，不碰 news.js）。
+  是否产生真实数据污染：仅当 --persist 且未审才会落 captures 目录（capture 非 delivery，需 review/gate 才进 news.js；且 capture 幂等去重）；不 --persist 则零持久化。
+  是否触发 AI Provider：否（采集层不调 adapter）。
+  是否进入持久化：取决于是否 --persist（默认不 --persist 则不落盘）。
+  回滚：不 --persist 则无持久化，直接丢弃；--persist 则删除对应 captures 日期文件（幂等可控）。
+【方案 B：暂不执行（推荐）】仅完成 dry-run / fixture / capture-only 验证。
+  理由：治理红线（真实 live 需人工显式触发）、S001/S003/S005 已知失败、N1.2 仍处 Gate 阶段。
+【结论】推荐 B；未经你明确批准不得执行（指令亦明确）。
+【是否需要我拍板】是（是否批准 A）。
+
+----------------------------------------------------------------
+§四 Decision Gate：S004 S003/S005 失败处理
+----------------------------------------------------------------
+【当前代码现状】S003/S005 在白名单内但结构性失败（F5）；collect 单源 fail-closed（F6）；失败写入 run-history source_failed/reasons（F7）；无重试、无独立 failure 表、无降级决策（F8/D3）。
+【哪一步失败】fetch 阶段（403/ECONNREFUSED）→ result.errors 记 stage:'fetch'。
+【是否重试】当前否；建议对 403/ECONNREFUSED 不重试（环境层失败，重试无意义且可能加剧被封）。
+【是否进入 failure state】当前无；registry 有 consecutive_failures 但采集不更新。
+【是否写 run-history】是（source_failed + reasons 已写）。
+【是否写 persistence】否（失败 item 不入 candidates/deliveries；若 --persist 仅落成功的 captures）。
+【单条 vs 整批】源级失败=source_failed++；源内单条失败=result.errors 带 index + stats.rejected++，不影响同/他源其他条。
+【如何保证不污染正式数据】失败仅留痕 run-history；不进 candidates/deliveries/news.js；capture 幂等去重。
+【可选方案】
+  A. 维持现状（失败留痕 run-history，不重试，不持久化失败 item，继续其他）——最小。
+  B. 加轻量失败表（pipeline/failures/ 落 source_failed reasons 供排查），不重试——利于审计，低风险。
+  C. 加重试（指数退避 N 次）+ failure state 标记 consecutive_failures。
+【推荐方案】A 为 N1 基线；B 建议纳入 N1.2 实施（失败表，低风险）；C 暂不推荐（对 S003/S005 无意义且增风险）。
+【对 D1/D2/G1–G10 影响】B 为新文件，不修改 runPipeline；run-history 已含 source_failed（不改）；无 G 修改。
+【实施复杂度】A 零 / B 低 / C 中。
+【风险】C 重试有被封风险。
+【是否需要我拍板】是（选 A/B/C；S003/S005 是否降级为「暂弃/人工」）。
+
+----------------------------------------------------------------
+【需要我拍板】
+----------------------------------------------------------------
+1. S001 通道形态：确认 D+A（inbox 目录位置/命名/投放人）。
+2. S002 调度：是否建 scheduler 脚手架；默认频率；是否允许自动。
+3. S003 真实 live：是否批准现在执行首次真实采集（默认否）。
+4. S004 失败处理：选 A/B/C；S003/S005 是否降级为暂弃。
+5. ai_model 桥接：确认由「桥接层从 provider/registry 元数据注入 ai_model」方案（开发 AI 倾向此，但属设计决策，列此确认）。
+6. S001 登记表 crawl_policy=auto_allowed 与代码排除矛盾：是否澄清（文档或代码口径，不阻塞设计）。
+
+----------------------------------------------------------------
+【开发 AI 可自行执行】（Gate 批准后）
+----------------------------------------------------------------
+- 写 N1.2 最小接线模块（raw capture→provider registry→runAdapter→validate→桥接 ai_model→ai-normalizer），fixture 保留为回归基线。
+- 写 mock provider 测试（8 类：正常/缺字段/空串/类型错/未知字段/provider抛错/validator抛错/下游 normalizer 接收）。
+- 实现 manualCaptureLoader（D+A 方案）。
+- 实现失败表（B 方案，若拍板）。
+
+----------------------------------------------------------------
+【禁止自行决定】
+----------------------------------------------------------------
+- 云厂商 / 模型 / API / API Key / 本地模型 / 成本策略（§四 真实 Provider，本阶段不实施）。
+- 启用真实自动生产采集（默认否，需你批准）。
+- 修改 news.js / D1/D2 / G1–G10 / H5 / 部署。
+- N1.3 / SOP / 指标看板 / 产品层 UI。
+
+----------------------------------------------------------------
+§五 最终结论
+----------------------------------------------------------------
+N1.2 当前状态：PARTIALLY READY（设计可立即开工骨架与 mock 测试；真实采集/S001形态/调度自动性/S003-S005 失败策略须你拍板）
+
+1) 必须你拍板：S001 通道形态、S002 调度、S003 真实 live、S004 失败处理、ai_model 桥接确认、S001 口径矛盾澄清（共 6 项）。
+2) 可立即实施（Gate 批准后）：最小接线模块、mock provider 8类测试、fixture 回归保留、manualCaptureLoader、失败表（若选B）。
+3) 暂时禁止：真实 AI Provider 接入、真实自动生产采集、任何冻结件修改、N1.3/SOP/指标看板。
+4) 下一步最小执行单元：待你拍板上述 6 项后，先落地「最小接线模块 + mock 8类测试 + fixture 回归」三件套（不触真实采集、不改冻结件），再据拍板结果接 manualCaptureLoader / scheduler / 失败表。
+
+----------------------------------------------------------------
+§六 置信度
+----------------------------------------------------------------
+结论置信度：高（事实基于 base-collector.cjs / source-registry.json / ai-normalizer.cjs / N1.1 报告 四方代码实证；Gap 与 ai_model 断点为代码级确认）。
+局限：S001 具体 inbox 形态、调度频率、真实 live 是否执行、失败重试策略为产品决策，依赖你拍板；真实 Provider 端到端未验证（本阶段不实施）。
+================================================================

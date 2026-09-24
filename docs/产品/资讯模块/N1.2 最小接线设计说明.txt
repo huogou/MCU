@@ -1,0 +1,132 @@
+================================================================
+N1.2 最小接线设计说明（V1.0）
+================================================================
+生成时间：2026-09-24
+范围：仅 N1.2「最小接线设计」（设计 + 接线骨架说明）；不落地大规模代码、不进 N1.3 / SOP / 指标看板 / 真实 Provider / 自动生产。
+上游基线：N1.1 PASS（ecf4d2a，32 PASS）；D1/D2 PASS（f375f3c，42 PASS）；news.js SHA256 未变；G1–G10 未改。
+设计约束：复用 N1.1（contract-validator.cjs / adapter.cjs）；保留 fixture 回归基线；可独立测试；不吞错；不改 G5.5 语义。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本任务上游 / 冻结（只读参照）】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.1 AI Provider Adapter 落地报告.txt
+2) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7字段校验器）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象 + runAdapter）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5；normalize 强制 ai_model）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\orchestrator.cjs（D1/D2 编排；reviewStage 读 fixture）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json（S001–S012 登记表）
+【本说明产出】
+7) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Decision Gate 报告.txt（Gate 决策）
+8) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\真实 AI Provider 决策清单.txt（§四，不实施）
+9) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 实施任务清单.txt（§五）
+
+----------------------------------------------------------------
+§1 目标与边界
+----------------------------------------------------------------
+【目标】把 N1.1 已建成的「AI Provider Adapter + 7字段契约校验」接入既有生产链路，使一条候选（L1 Candidate）能经 Provider 增强为「标准 7 字段」并经桥接补齐 ai_model 后，交给 G5.5 ai-normalizer 完成下游归一化，最终进入后续 pipeline（merger / gate / delivery）。
+【边界 / 红线】
+  - 只读复用 N1.1 两个模块，不复制新生产逻辑。
+  - 不修改 G1–G10 / D1/D2 / news.js / H5 / 部署。
+  - 不改 G5.5 语义（ai-normalizer.normalize 仍要求 7字段 + ai_model，契约不变）。
+  - 不触真实 AI Provider、不触真实自动采集（属禁止项，见 Decision Gate §禁止自行决定）。
+  - 默认以 fixture 回归为基线，仅 mock provider 参与，零网络。
+
+----------------------------------------------------------------
+§2 接线链路图（数据流）
+----------------------------------------------------------------
+  L0 RawCapture（采集层产出，G5.2）
+        │  （既有链路：toCaptureInput → RC.create）
+        ▼
+  L1 CandidateItem（35字段，既有）
+        │  input = { candidate, source }
+        ▼
+  ┌─────────────────────────────────────────────┐
+  │ ai-provider/runner.cjs · runAiProviderStage  │  ← 新增（薄编排）
+  │   1) provider = registry.get(providerName)   │
+  │   2) seven  = await runAdapter(provider,     │  ← N1.1 adapter.cjs
+  │                 candidate)                   │
+  │   3) enriched = bridgeAiModel(seven, meta)   │  ← 新增桥接（补 ai_model）
+  │   4) return enriched  (8字段：7 + ai_model)  │
+  └─────────────────────────────────────────────┘
+        │  enriched（含 ai_model）
+        ▼
+  ai-normalizer.normalize(candidate, enriched)   ← G5.5，契约不变
+        │
+        ▼
+  后续 pipeline（signature → event → gate → delivery → 人工确认 → news.js）
+
+  关键性质：runAdapter 只产出「标准 7 字段」（经 contract-validator 校验）；
+  ai_model 由 bridge 在适配器之外注入，保证 Provider 原始输出不含 ai_model（符合「Provider 输出不得泄漏业务字段」）。
+
+----------------------------------------------------------------
+§3 模块职责与新增文件清单
+----------------------------------------------------------------
+【新增 A】workspace/news/pipeline/ai-provider/bridge.cjs
+  - 职责：桥接层，从 provider / registry 元数据注入 ai_model，闭合 D1 断点。
+  - 导出：injectAiModel(sevenFields, meta) -> 8字段对象
+      * meta 来源：provider 注册时携带 {provider, model}；registry 可携带 defaultModel。
+      * 不修改 sevenFields 入参（隔离副本）；ai_model 为空/缺 → 抛 BRIDGE_MISSING_MODEL（不静默）。
+      * 严格只加 ai_model 一个键，不增删其它 7 字段（不越界）。
+
+【新增 B】workspace/news/pipeline/ai-provider/runner.cjs
+  - 职责：薄编排层，串联「registry.get → runAdapter → bridgeAiModel」，返回 enriched。
+  - 导出：runAiProviderStage(candidate, registry, providerName, opts)
+      * 失败不吞：runAdapter 抛 PROVIDER_ERROR/FORBIDDEN_FIELD/MISSING_FIELD/TYPE_ERROR → 原样向上传；bridge 抛 BRIDGE_MISSING_MODEL → 原样向上传。
+      * 不自行落盘、不调采集、不碰 news.js。
+
+【复用（不修改）】
+  - contract-validator.cjs（校验 7 字段，FORBIDDEN_FIELD 等）。
+  - adapter.cjs（createProvider / createRegistry / runAdapter）。
+  - ai-normalizer.cjs（G5.5，normalize(candidate, ai) 要求 7字段 + ai_model）。
+
+----------------------------------------------------------------
+§4 ai_model 桥接设计（闭合 D1 缺口）
+----------------------------------------------------------------
+【问题回顾】N1.1 的 7字段契约不含 ai_model；G5.5 ai-normalizer.normalize(candidate, ai) 强制要求 ai 含 7字段 + ai_model（AI_ALLOWED_FIELDS 含 ai_model，缺则 MISSING_FIELD）。若直接把 7 字段结果交给 normalizer，会 FAIL。
+【方案】在 adapter 与 normalizer 之间插入 bridge：
+  1) Provider 注册时声明元数据：createProvider(name, impl, meta)，meta={provider, model}；或为 registry 设默认 meta。
+  2) runner 在 runAdapter 拿到 7 字段后，调 injectAiModel(seven, meta) 得到 8 字段（7 + ai_model）。
+  3) 8 字段交给 ai-normalizer.normalize（契约对齐，不再 FAIL）。
+【为何不放进 contract-validator】保持「Provider 输出契约 = 纯 7 字段」这一冻结边界；ai_model 是桥接产物而非 Provider 原始输出，避免污染 7 字段封闭集与 FORBIDDEN_FIELD 语义。
+【置信度】高（代码级确认断点 + 桥接为纯透传注入，无语义冲突）。
+
+----------------------------------------------------------------
+§5 与 orchestrator 的接入口（最小、可选）
+----------------------------------------------------------------
+【接线点】在 orchestrator.reviewStage 旁新增 aiProviderStage（默认不接真实 provider）：
+  - 输入：fixture 候选（ai-normalizer/output/20260923.json，现状 reviewStage 已读此 fixture 作回归基线）。
+  - 行为：用 mock provider（test double）跑 runAiProviderStage，断言 enriched 8 字段可被 normalizer 接收；不写 run-history（dry-run 语义）、不 --persist。
+  - 默认禁用真实 provider：registry 仅注册 mock；真实 provider 注册节点（§四 决策清单）留空，由你拍板后单独接入。
+【对 D1/D2 影响】遵守矩阵：dry-run 不写 run-history；不 --persist 不落业务数据；不引入自动触发。
+
+----------------------------------------------------------------
+§6 测试策略（8 类 + fixture 回归）
+----------------------------------------------------------------
+【8 类 mock provider 测试】（落 ai-provider/tests/test-n1.2-wire.cjs）
+  1) 正常：mock provide 返回合法 7 字段 → runAdapter 通过 → bridge 补 ai_model → normalizer 接收 OK。
+  2) 缺字段：mock 缺 category → FORBIDDEN/MISSING（视缺哪个）向上抛。
+  3) 空字符串：title='' → MISSING_FIELD 向上抛。
+  4) 类型错：related_movies='x'（非 array）→ TYPE_ERROR 向上抛。
+  5) 未知字段：mock 多返回 ai_model（越权）→ FORBIDDEN_FIELD（校验器拦截，Provider 不得自带 ai_model）。
+  6) provider 抛错：provide 抛异常 → 包装为 PROVIDER_ERROR，cause 保留，向上传。
+  7) validator 抛错：校验器抛错 → 原样向上传，不进 normalizer。
+  8) 下游 normalizer 接收：enriched 8 字段喂 ai-normalizer.normalize → 断言通过且 ai_model 生效（被 G5.5 记录）。
+【fixture 回归保留】沿用 ai-normalizer/output/20260923.json 作基线；mock provider 喂相同候选，断言输出与 fixture 同构（或 diff 受控）。同时保留 D1/D2 42 PASS 与 N1.1 32 PASS 回归不退化。
+【不吞错】任何阶段失败均向上抛明确错误码；无 try/catch 静默吞；无「失败当成功」分支。
+
+----------------------------------------------------------------
+§7 冻结边界（明确不修改）
+----------------------------------------------------------------
+  - 不修改 contract-validator.cjs / adapter.cjs（N1.1 已冻结）。
+  - 不修改 ai-normalizer.cjs（G5.5 语义与契约不变）。
+  - 不修改 orchestrator.cjs 既有 stage 行为（仅新增可禁用的最小 aiProviderStage 入口）。
+  - 不修改 source-registry.json / base-collector.cjs / news.js / H5 / 部署。
+  - 不新增 scheduler / 失败表 / manualCaptureLoader（属 §五 待拍板后任务，不在本说明落地范围）。
+
+----------------------------------------------------------------
+§8 置信度
+----------------------------------------------------------------
+结论置信度：高（设计基于 N1.1 两模块的已验证导出 + G5.5 normalizer 强制语义 + D1 断点代码级确认；接线为薄编排 + 纯透传桥接，无语义冲突）。
+局限：真实 Provider 端到端未验证（本阶段不实施）；bridge 注入的 ai_model 取值（具体 provider/model 字符串）依赖 §四 决策清单拍板，本说明只定机制不定值。
+================================================================

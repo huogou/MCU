@@ -1,0 +1,104 @@
+================================================================
+N1.2 实施任务清单（V1.0）
+================================================================
+生成时间：2026-09-24
+性质：实施任务清单（任务拆分 + 依赖 + 复杂度 + 风险 + Gate 阻塞标记）。本清单不落地代码，仅编排；落地须待 Decision Gate §需要我拍板 的 6 项拍板。
+状态图例：READY=Gate 批准后可立即做；BLOCKED=须对应 Gate 拍板后才可做；FORBIDDEN=本阶段禁止。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Decision Gate 报告.txt（6 项待拍板 / 4 类清单）
+2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 最小接线设计说明.txt（§3–§6 接线与测试设计）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\真实 AI Provider 决策清单.txt（§四 真实 Provider，FORBIDDEN）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1，复用）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1，复用）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5，复用不改）
+
+----------------------------------------------------------------
+§1 任务清单
+----------------------------------------------------------------
+【T1】最小接线模块（bridge.cjs + runner.cjs）
+  内容：实现 §3 的 injectAiModel + runAiProviderStage，串联 N1.1 adapter 与 G5.5 normalizer。
+  依赖：无（仅复用既有模块）。
+  复杂度：低。
+  风险：低（薄编排 + 纯透传；不修改冻结件）。
+  Gate 阻塞：否（READY，Gate 批准后即做）。
+  冻结边界：不改 contract-validator / adapter / ai-normalizer / orchestrator 既有行为。
+
+【T2】ai_model 桥接闭合（D1 缺口）
+  内容：bridge 从 provider/registry meta 注入 ai_model，使 7 字段→8 字段可被 normalizer 接收。
+  依赖：T1。
+  复杂度：低。
+  风险：低。
+  Gate 阻塞：否（READY）。
+
+【T3】mock provider 8 类测试（test-n1.2-wire.cjs）
+  内容：§6 的 8 类（正常/缺字段/空串/类型错/未知字段/provider抛错/validator抛错/下游接收）。
+  依赖：T1/T2。
+  复杂度：低。
+  风险：低（零网络、fixture 驱动）。
+  Gate 阻塞：否（READY）。
+
+【T4】fixture 回归保留
+  内容：沿用 ai-normalizer/output/20260923.json 作基线，断言 mock 接入输出同构；保 D1/D2 42 PASS + N1.1 32 PASS 不退化。
+  依赖：T3。
+  复杂度：低。
+  风险：低。
+  Gate 阻塞：否（READY）。
+
+【T5】manualCaptureLoader（S001 人工通道，D+A 方案）
+  内容：读 inbox 下 L0 JSON（或 HTML→同 parser→L0），输出与 collectLive 同构 captures，复用 RC.create / NM.toCaptureInput。
+  依赖：Gate §一 S001 拍板（通道形态 + inbox 位置/命名/责任人）。
+  复杂度：低。
+  风险：中低（S001 列表 75% 非影视需过滤，过滤沿用 G5.2 parser，不新增）。
+  Gate 阻塞：是（BLOCKED until S001 拍板）。
+
+【T6】scheduler 脚手架（S002）
+  内容：runner/scheduler.cjs + cron 模板，默认禁用自动生产，仅 manual / dry-run / capture-only。
+  依赖：Gate §二 S002 拍板（是否建 / 频率 / 是否允许自动）。
+  复杂度：低（脚手架）。
+  风险：中（误启用自动 --persist 会落未审数据；以默认禁用 + capture-only 缓解）。
+  Gate 阻塞：是（BLOCKED until S002 拍板）。
+
+【T7】失败表（S004，B 方案）
+  内容：pipeline/failures/ 落 source_failed reasons 供排查，无重试、无失败 item 持久化。
+  依赖：Gate §四 S004 拍板（选 A/B/C；S003/S005 是否降级暂弃）。
+  复杂度：低（B）/ 中（C）。
+  风险：低（B）。
+  Gate 阻塞：是（BLOCKED until S004 拍板；若选 A 则不实施）。
+
+【T8】真实 AI Provider 接入（§四 决策清单）
+  内容：按决策清单实现 provide（含 API Key 注入、成本/失败控制）。
+  依赖：§四 D-P1–D-P9 全部拍板 + N1.3 或单独授权。
+  复杂度：中。
+  风险：中（出域合规 / 成本 / 限流）。
+  Gate 阻塞：FORBIDDEN（本阶段禁止）。
+
+【T9】首次真实 live 采集（S003）
+  内容：执行真实 production-capture（不 --persist 或按拍板）。
+  依赖：Gate §三 S003 拍板（默认否）。
+  复杂度：低（调用既有 runPipeline）。
+  风险：高（可能触发 S001 403 / S003 403 / S005 ECONNREFUSED；仅产 L0 capture，不碰 news.js）。
+  Gate 阻塞：是（BLOCKED until S003 拍板；默认不执行）。
+
+----------------------------------------------------------------
+§2 执行顺序建议（Gate 批准后）
+----------------------------------------------------------------
+  第一批（READY，无阻塞）：T1 → T2 → T3 → T4（最小接线三件套 + 回归；不触真实采集、不改冻结件）。
+  第二批（Gate 拍板后按需）：T5（S001）/ T6（S002）/ T7（S004）并行或依拍板顺序。
+  禁止项：T8（真实 Provider）/ T9（真实 live）本阶段不启动。
+
+----------------------------------------------------------------
+§3 与冻结件关系
+----------------------------------------------------------------
+  修改：仅新增文件（bridge.cjs / runner.cjs / test-n1.2-wire.cjs / manualCaptureLoader / scheduler.cjs / failures/）。
+  不动：contract-validator.cjs / adapter.cjs / ai-normalizer.cjs / orchestrator.cjs 既有行为 / source-registry.json / base-collector.cjs / news.js / H5 / 部署。
+  自检：每次落地后跑 D1/D2（42 PASS）+ N1.1（32 PASS）+ N1.2 wire（8 类）回归；news.js SHA256 须不变（无写入）。
+
+----------------------------------------------------------------
+§4 置信度
+----------------------------------------------------------------
+结论置信度：高（任务拆分基于 Decision Gate 已确认事实 F1–F9 与 §三接线设计；复杂度/风险为代码级估计）。
+局限：T5/T6/T7/T9 的启动依赖你拍板（S001/S002/S004/S003），拍板前为 BLOCKED；T8 本阶段 FORBIDDEN。
+================================================================
