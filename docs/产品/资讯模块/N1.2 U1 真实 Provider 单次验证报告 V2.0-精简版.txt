@@ -1,0 +1,66 @@
+================================================================
+N1.2 U1 真实 Provider 单次验证报告 V2.0（精简版）
+================================================================
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次验证报告 V2.0.txt
+授权：1 fixture → 1 次真实调用 → Projection → Adapter → 7字段 Validator → bridge → ai-normalizer。
+★ 最终结论：**U1 = PASS**
+
+---------------- 一、Execution ----------------
+Provider            : dashscope（阿里云百炼）
+Model               : qwen3.8-flash
+Actual Request Count: 1（真实调用 1 次；本地复核 0 次网络）
+Retry Count         : 0
+Real Network Call   : YES（HTTP 200）
+Structured Output   : json_schema（未触发退回 JSON Object）
+Validator : PASS ｜ Bridge : PASS（ai_model 由受控 meta 注入）｜ Normalizer : PASS（35 字段）
+模型真实返回：category=series；title/summary=中文；related_series=["Lanterns"]；其余 related_* = []。
+
+---------------- 二、Projection ----------------
+Allowed fields : title_raw, raw_excerpt（2 个）
+Forbidden fields: 42 项（ai_model / candidate_id / gate_status / 内部运行字段 / 凭据类 / 路径 / URL / 来源元数据 等）
+Actual projected field count : 2
+结构保证：allowlist → 非白名单字段不可能出域；不确定者默认不出域。
+
+---------------- 三、Security ----------------
+Key source                 : CONFIGURED（环境变量 DASHSCOPE_API_KEY；未落文件）
+Key leakage check          : PASS
+Authorization logging check: PASS
+Payload logging check      : PASS
+Response logging check     : PASS
+（全程只输出 CONFIGURED/NOT CONFIGURED；绝不打印 Key 值）
+
+---------------- 四、Data Isolation ----------------
+news.js unchanged      : PASS（SHA256 ebf67de0…56fcaf）
+Formal data unchanged  : PASS（captures/candidates/deliveries/run-history 文件数未变）
+Scheduler disabled     : PASS　｜　Production disabled : PASS　｜　H5 not deployed : PASS
+
+---------------- 五、Regression ----------------
+N1.1 : PASS(32/0) ｜ N1.2 : PASS(53/0) ｜ D1/D2 : PASS(42/0)
+Projection : PASS ｜ Validator : PASS ｜ Preflight : PASS(8/8)
+★ 修正 2 处（测试断言/夹具正确性，非行为回归）：
+ 1) test-n1.2-wire.cjs J.2：原用 git status 判断 D6，提交后恒失败 → 改为读登记表内容校验。
+ 2) test-n1.2-u1.cjs Negative 6e：runAdapter 依设计把 provider 错误包装为 PROVIDER_ERROR（cause 保留）
+    → 断言改为 code=PROVIDER_ERROR + cause.code=PROVIDER_HTTP_ERROR + cause.http_status=401。
+
+---------------- 六、Final ----------------
+U1 = PASS
+真实 Live = NOT EXECUTED ｜ 自动 Production = DISABLED ｜ H5 = NOT DEPLOYED
+
+---------------- 附录 · 请求计数透明化 ----------------
+Run-1（真实）：1 次真实请求 → HTTP 200 → 链路贯通（发现 2 处断言缺陷）。
+Run-2（复核）：U1_SKIP_REAL=1 → 网络请求 0 次，复用 Run-1 真实响应复核 → 43/0。
+真实 Provider 请求总数 = 1（符合「仅 1 次真实调用」；无批量/无循环/无多模型）。
+
+---------------- 遗留与局限 ----------------
+1) 模型名 qwen3.8-flash 本次真实可用（200），但非常见 id；变更时按 §20 处理，勿自动换模型。
+2) 使用公共 endpoint（dashscope.aliyuncs.com/compatible-mode/v1），与 Key 地域匹配；未用 WorkspaceId。
+3) Projection 仅 2 字段；related_* 由模型输出、U1 未做 idSpace 交集（生产化需注入真实 idSpace）。
+4) 仅验证「真实 Provider 可安全接入」，未评估实体准确率/内容质量。
+
+---------------- 关键关联文件 ----------------
+全量报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次验证报告 V2.0.txt
+U1 脚本：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.2-u1.cjs
+Projection：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\projection.cjs
+DashScope Provider：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\providers\dashscope.cjs
+运行证据：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-u1.txt
+================================================================

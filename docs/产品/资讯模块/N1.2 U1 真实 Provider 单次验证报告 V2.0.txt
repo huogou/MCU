@@ -1,0 +1,143 @@
+================================================================
+N1.2 U1 真实 Provider 单次验证报告 V2.0
+================================================================
+生成时间：2026-09-24
+范围：N1.2 U1「真实 Provider 单次隔离验证」（阿里云百炼 DashScope）。
+授权：1 fixture → 1 次真实 Provider 调用 → Projection → Adapter → 7字段 Validator → ai_model bridge → ai-normalizer。
+上游：Implementation-02 前置 Decision Gate（P1–P12 已拍板）。
+冻结基线（全程未变，实证）：news.js SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf；G1–G10 / D1-D2 / N1.1 validator / H5 未改。
+★ 最终结论：**U1 = PASS**
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本报告】1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次验证报告 V2.0.txt
+        2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次验证报告 V2.0-精简版.txt
+【本阶段新增代码】
+ 3) ...\workspace\news\pipeline\ai-provider\projection.cjs（P1 AI Input Projection）
+ 4) ...\workspace\news\pipeline\ai-provider\provider-transport.cjs（P11 独立 Provider 出口）
+ 5) ...\workspace\news\pipeline\ai-provider\providers\dashscope.cjs（DashScope / OpenAI 兼容 Provider）
+ 6) ...\workspace\news\pipeline\ai-provider\tests\test-n1.2-u1.cjs（U1 验证脚本）
+ 7) ...\workspace\news\pipeline\ai-provider\tests\out-u1.txt（U1 运行证据）
+【本阶段修改】
+ 8) ...\workspace\news\pipeline\ai-provider\tests\test-n1.2-wire.cjs（J.2 断言改为内容校验；见 §五）
+ 9) ...\.gitignore（增 .env / .env.*）；10) ...\.env.example（空值示例）
+【只读参照】11) ...\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 最终契约）
+          12) ...\workspace\news\pipeline\ai-provider\runner.cjs  13) ...\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs
+【历史】14) ...\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次隔离验证报告.txt（V1.0 / BLOCKED，已被本 V2.0 取代）
+
+----------------------------------------------------------------
+一、Execution
+----------------------------------------------------------------
+Provider              : dashscope（阿里云百炼 Model Studio）
+Model                 : qwen3.8-flash
+Actual Request Count  : 1（真实调用 1 次；本地复核 0 次网络）
+Retry Count           : 0
+Real Network Call     : YES（HTTP 200）
+Structured Output     : json_schema（未触发退回 JSON Object；fallback_used = false）
+Validator             : PASS（contract-validator 输出恰 7 字段）
+Bridge                : PASS（ai_model 由受控 meta 注入，非模型输出）
+Normalizer            : PASS（产出增强 L1，35 字段）
+
+调用链（端到端贯通）：
+  L1 candidate → AI Input Projection → Provider payload
+    → DashScope(OpenAI-compatible chat completions) → Provider response
+    → Adapter(N1.1 runAdapter) → 7字段 contract-validator
+    → ai_model bridge → ai-normalizer → U1 result
+
+模型实际返回（真实响应，已脱敏：不含任何凭据）：
+  title            = 詹姆斯·古恩的DCU正式公布第六支超级英雄团队
+  summary          = DC影业将通过《绿灯侠》剧集在新DC宇宙中引入另一支主要超级英雄团队，这标志着DCU的第六支超级英雄团队正式亮相。
+  category         = series
+  related_movies   = []   related_series = ["Lanterns"]
+  related_characters = [] related_phases = []
+
+----------------------------------------------------------------
+二、Projection
+----------------------------------------------------------------
+Allowed fields（显式 allowlist）      : title_raw, raw_excerpt  （2 个）
+Forbidden fields（显式禁止集，共 42 项）: ai_model / run_id / pipeline_run_id / provider /
+  provider_status / gate_status / ai_suggested_status / verification_status / judged_by /
+  status_history / candidate_id / event_key / capture_id / capture_refs / content_hash /
+  registry_id / occurrence / retry / retry_count / error / error_code / reason /
+  filesystem_path / file / path / env / environment / api_key / apikey / token /
+  authorization / credentials / secret / source_url / original_source_url / original_source /
+  url_level / reported_by / owner_group / source_name / feed_type / http_status
+Actual projected field count          : 2
+说明：Projection 为 **allowlist 结构** —— 非白名单字段在结构上不可能出域；
+      「无法确定是否应出域的字段 → 默认不出域」已由 allowlist 保证。
+
+----------------------------------------------------------------
+三、Security
+----------------------------------------------------------------
+Key source               : CONFIGURED（环境变量 DASHSCOPE_API_KEY；本次经运行时注入，未落任何文件）
+Key leakage check        : PASS（报告 / 日志 / fixture / 源码 / git / news.js 均无 Key）
+Authorization logging check : PASS（transport 不记录 Authorization）
+Payload logging check    : PASS（不记录完整请求体）
+Response logging check   : PASS（不记录完整原始响应）
+注：本报告与 out-u1.txt 全程只输出 key_status = CONFIGURED/NOT CONFIGURED，绝不打印 Key 值。
+
+----------------------------------------------------------------
+四、Data Isolation
+----------------------------------------------------------------
+news.js unchanged        : PASS（SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf）
+Formal data unchanged    : PASS（captures / candidates / deliveries / run-history 文件数均未变）
+Scheduler disabled       : PASS（DEFAULT_DISABLED = true；enabled=true 仍只到计划层）
+Production disabled      : PASS
+H5 not deployed          : PASS（未部署、未修改）
+
+----------------------------------------------------------------
+五、Regression
+----------------------------------------------------------------
+N1.1 regression          : PASS（子进程 32 PASS / 0 FAIL）
+N1.2 regression          : PASS（子进程 53 PASS / 0 FAIL）
+D1/D2 regression         : PASS（子进程 42 PASS / 0 FAIL）
+Projection regression    : PASS（allowlist / 禁止字段 / 泄露检查，共 4 断言）
+Validator regression     : PASS（7 字段封闭 + 负测试 N1/N2/N3）
+Preflight regression     : PASS（P1–P8 全 PASS）
+
+★ 本阶段发现并修正 2 处（均为测试断言/夹具正确性，非行为回归；已按「只报告+最小修复」处理）：
+  1) test-n1.2-wire.cjs J.2：
+     原断言用 `git status` 判断「source-registry.json 被修改」→ 该 D6 改动在提交 9948660 后
+     不再出现在 git status → 断言恒失败（**与提交状态耦合的潜在缺陷**；此前 53/0 系在未提交状态下取得）。
+     修正：改为**读登记表内容**校验 S001.crawl_policy == 'manual_only'（保留原意图，去掉状态耦合）。
+  2) test-n1.2-u1.cjs Negative 6e：
+     原断言期望 `PROVIDER_HTTP_ERROR`，实际 `runAdapter` 依设计把 provider 错误统一包装为
+     `PROVIDER_ERROR`（cause 保留，fail-closed 正确）→ **断言写法有误**。
+     修正：断言改为 `code==='PROVIDER_ERROR' && cause.code==='PROVIDER_HTTP_ERROR' && cause.http_status===401`。
+
+----------------------------------------------------------------
+六、Final
+----------------------------------------------------------------
+U1 = PASS
+
+真实 Live        = NOT EXECUTED
+自动 Production  = DISABLED
+H5               = NOT DEPLOYED
+
+----------------------------------------------------------------
+附录 A · 执行时间线（请求计数透明化）
+----------------------------------------------------------------
+  Run-1（真实调用）：发起 1 次真实 DashScope 请求 → HTTP 200 → 链路贯通。
+                    期间发现 2 处本地断言缺陷（上 §五）。
+  Run-2（本地复核）：U1_SKIP_REAL=1 → **网络请求 0 次**，复用 Run-1 的真实响应复核链路 +
+                    修正后的负测试 + 回归 → 43 PASS / 0 FAIL。
+  真实 Provider 请求总数 = 1（符合 §10「只允许 1 次真实调用」；无批量、无循环、无多模型横向）。
+  说明：Run-2 复用 Run-1 的真实响应（持久化于 ai-provider/tests/tmp-u1-cache/response.json，
+        该目录匹配 .gitignore 的 tmp-*/ 规则，不进版本库）。
+
+附录 B · 与 V1.0（BLOCKED）报告的关系
+----------------------------------------------------------------
+  V1.0（提交 ab927d6）结论 U1 = BLOCKED（当时无 Provider 账号/Key）。
+  本次项目负责人提供 DashScope Key 后解阻，V1.0 已被本 V2.0 取代。
+
+附录 C · 遗留与局限（诚实标注）
+----------------------------------------------------------------
+  1) 模型名 `qwen3.8-flash` 本次**真实可用**（HTTP 200），但该名称非本 AI 已知的常见 DashScope
+     模型 id；若将来该名称变更/下线，需更新 CFG.model（勿自动换模型，按 §20 处理）。
+  2) 地域一致性（§3）：本次使用公共 endpoint https://dashscope.aliyuncs.com/compatible-mode/v1，
+     与 Key 地域匹配（调用成功，无 401/403）；未使用业务空间专属 endpoint / WorkspaceId。
+  3) Projection 当前仅 2 字段（title_raw + raw_excerpt）；related_* 由模型输出、经 idSpace=null
+     不做交集过滤（U1 环境无 idSpace）。生产化时须注入真实 idSpace（属后续阶段）。
+  4) 本阶段仅验证「真实 Provider 可安全接入 N1 Pipeline」；未做实体准确率/内容质量评估。
+================================================================
