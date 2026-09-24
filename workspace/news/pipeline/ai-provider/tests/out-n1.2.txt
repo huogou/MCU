@@ -69,7 +69,7 @@ N1.2 · Implementation-01 全量回归验收
 
 ■ J · git 冻结边界检查
   PASS  J.1 无冻结文件被修改（H5/G/D/N1.1 validator/adapter）
-  PASS  J.2 source-registry.json 按计划被修改（D6）
+  PASS  J.2 source-registry.json S001 crawl_policy = manual_only（D6，内容校验）
   PASS  J.3 真实 captures 目录文件数不变
   PASS  J.4 真实 candidates 目录文件数不变
   PASS  J.5 真实 deliveries 目录文件数不变

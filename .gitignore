@@ -60,3 +60,8 @@ workspace/clipboard-ocr*-run.log
 
 # 资讯管道测试临时目录（每轮唯一命名、可由脚本重新生成，不进版本库）
 workspace/news/pipeline/**/tmp-*/
+
+# 环境变量与凭据（P4：API Key 仅允许 env / .env；严禁源码 / git / 报告 / 日志）
+.env
+.env.*
+!.env.example

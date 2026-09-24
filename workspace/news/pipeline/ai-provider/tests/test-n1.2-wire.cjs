@@ -297,8 +297,15 @@ async function main() {
   ];
   const forbiddenHit = tracked.filter(function (l) { return FORBIDDEN.some(function (re) { return re.test(l); }); });
   ok('J.1 无冻结文件被修改（H5/G/D/N1.1 validator/adapter）', forbiddenHit.length === 0, forbiddenHit.join(' | '));
-  ok('J.2 source-registry.json 按计划被修改（D6）',
-    lines.some(function (l) { return /source-registry\.json/.test(l); }));
+  /* J.2：D6 改动的正确校验 = 读登记表内容（不依赖 git 未提交状态；
+     原实现依赖 git status 显示 source-registry.json，提交后必然失败——属状态耦合缺陷，已改为内容校验） */
+  let s001policy = null;
+  try {
+    const reg = JSON.parse(fs.readFileSync(path.join(PIPELINE, '..', 'engine', 'registry', 'source-registry.json'), 'utf8'));
+    const s001 = (reg.entries || []).filter(function (e) { return e.registry_id === 'S001'; })[0] || {};
+    s001policy = s001.crawl_policy;
+  } catch (e) { s001policy = 'READ_ERROR:' + e.message; }
+  ok('J.2 source-registry.json S001 crawl_policy = manual_only（D6，内容校验）', s001policy === 'manual_only', 'crawl_policy=' + s001policy);
   // 真实归档未被污染
   eq('J.3 真实 captures 目录文件数不变', fileCount(REAL.captures), realSnap.captures);
   eq('J.4 真实 candidates 目录文件数不变', fileCount(REAL.candidates), realSnap.candidates);
