@@ -1,0 +1,63 @@
+================================================================
+N1.2 U1 真实 Provider 单次隔离验证报告（精简版，V1.0）
+================================================================
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次隔离验证报告.txt
+上游：Implementation-02 前置 Decision Gate 已拍板（P1–P12）。
+★ 最终结论：U1 = BLOCKED（无 Provider 账号/Key；未发起真实调用；未伪造 PASS）。
+
+---------------- 一、执行结论（要点）----------------
+Provider：无（未选定）｜Model：无（未选定）｜Actual Request Count：0｜Real Network Call：NO
+Structured Output / Validator / Bridge / Normalizer：N/A（未执行真实链路）
+正式数据写入：NO｜news.js：未修改（SHA256 ebf67de0…56fcaf）｜Scheduler：disabled
+U1 = BLOCKED｜真实 Live = NOT EXECUTED｜自动 Production = DISABLED｜H5 = NOT DEPLOYED
+
+---------------- 二、Step 1 核查（Provider 可用性）----------------
+5 项全部无法确认：厂商/endpoint/model/API 兼容性/结构化输出能力。
+账户凭据（实测）：环境变量仅 WorkBuddy 平台内部项（CODEBUDDY_*、WORKBUDDY_PAC_RPC_TOKEN），**无任何 AI Provider 的 Key**；无 .env；无 provider 配置文件；凭据扫描唯一命中为 WorkBuddy 连接器自身 .credentials.v3.json（无关）。
+网络（TCP 探测）：国内端点可达（deepseek / bigmodel / dashscope / ark / hunyuan），api.openai.com 超时（境外不通）。
+⇒ 网络部分具备，但**无凭据仍不可用**。
+
+---------------- 三、阻塞原因 ----------------
+无任何 Provider 账号与 Key → 无法完成 Step 1 → 无法进入 Step 2。
+依 P2/§六：不得自行切换 Provider，故未采用任何替代通道、未发起调用。
+
+---------------- 四、需要的外部条件（解阻）----------------
+1) 提供一家国内云 Provider 的 Key（DashScope/混元/豆包/智谱/DeepSeek 之一），放 env 或 .env（严禁入库）；
+   并给出 endpoint / model（轻量档）/ API 兼容类型（优先 OpenAI-compatible）/ 结构化输出能力。
+2) 或：显式授权采用"平台托管免密钥"通道作为 U1 Provider（见下，**本次未采用**）。
+备选（需拍板）：本环境存在平台托管、免密钥的大模型调用能力；但它不在 D-P1 候选集、非 P11 要求的独立 Provider transport，采用即属"自行替换 Provider"，故本次未用，仅列出供你决定。
+
+---------------- 五、已完成的代码准备工作 ----------------
+已就绪（本次未改）：adapter.cjs（Provider 抽象）、contract-validator.cjs（7 字段契约=U1 最终边界）、bridge.cjs（ai_model 注入）、runner.cjs（runAiProviderStage）、ai-normalizer.cjs（G5.5）、scheduler.cjs（默认 disabled）、test-n1.2-wire.cjs（53/0 零网络）。
+因阻塞未建（Step 1 未过故未开工）：Provider transport、AI Input Projection、真实 provider 实现、U1 验证脚本。
+
+---------------- 六、P1–P12 落地状态 ----------------
+已具备：P9 触发（scheduler disabled）✓、P10（S001 JSON-only / 未改 G5.2）✓。
+未落地：P1 AI Input Projection（代码未实现，runner 仍直传整个 L1 candidate）、P2 选型、P3 模型、P5 兼容接口、P6 成本、P7 失败策略、P8 Provider 输出形态、P11 独立 Provider 出口。
+P4 规范确认但无 Key；注：.gitignore 目前**未含 .env**（若采用 .env 需补忽略规则）。
+P12 已授权，因 Step 1 未过而无法执行。
+
+---------------- 七、安全负测试（§三 7 项）----------------
+1/2/3/7（未知字段 / Provider 输出 ai_model / 缺失字段 / scheduler disabled）：**已有 mock 层证据**（N1.2-01 53/0 套件）。
+4/5（网络失败 / 超时不污染数据）：**未验证**（无 transport、无调用）。
+6（AI Input Projection 传禁字段被拒）：**未实现/未验证**（Projection 未建）。
+说明：不将 mock 证据冒充为真实通道 PASS。
+
+---------------- 八、冻结边界（本轮）----------------
+news.js / D1-D2 / G1–G10 / N1.1 validator 字段集合 / H5：均未修改（本轮零代码改动）。
+未执行真实 Live、未批量、未启用 production、未部署、未开始 N1.3/SOP/指标看板/UI；未创建 .env、未写入凭据。
+
+---------------- 九、下一步（解阻后最小动作）----------------
+U1-a 提供 Key（env/.env）或授权平台通道 → U1-b 建最小 Provider transport（15s / retry≤2 仅瞬态 / Key 自 env / 不记录 Authorization 与完整请求响应）→ U1-c 建 AI Input Projection（明确输入/输出/禁出域字段；无法确认者默认不出域）→ U1-d 1 条 fixture 执行 1 次真实调用 + 7 项负测试，产出 §一 字段。
+当前 U1-a 未满足 → BLOCKED。
+
+---------------- 关键关联文件 ----------------
+全量报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次隔离验证报告.txt
+上游拍板：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告.txt
+契约边界：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs
+接线入口：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\runner.cjs
+
+---------------- 置信度 ----------------
+高：无 Provider 可用由"环境变量名核查 + .env/凭据全仓扫描 + 网络 TCP 探测"三路交叉印证。
+局限：TCP 连通≠可用配额/权限；若你提供凭据则转为可执行。
+================================================================

@@ -1,0 +1,165 @@
+================================================================
+N1.2 U1 真实 Provider 单次隔离验证报告（V1.0）
+================================================================
+生成时间：2026-09-24
+范围：仅 U1「真实 Provider 单次隔离验证」（授权范围：1 fixture / 1 次真实调用 / 不进入正式数据）。
+上游：N1.2 Implementation-02 前置 Decision Gate 已产品拍板（P1–P12）。
+冻结基线（全程未变）：news.js SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf；G1–G10 / D1-D2 / N1.1 / H5 未改。
+★ 最终结论：U1 = BLOCKED（未发起任何真实 Provider 调用；未伪造 PASS）。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本报告】1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次隔离验证报告.txt
+        2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 U1 真实 Provider 单次隔离验证报告-精简版.txt
+【上游拍板】3) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-02 前置 Decision Gate 报告.txt（P1–P12）
+【已就绪代码（只读参照）】
+  4) ...\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象）
+  5) ...\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7 字段契约，U1 的最终边界）
+  6) ...\workspace\news\pipeline\ai-provider\bridge.cjs（ai_model 注入）
+  7) ...\workspace\news\pipeline\ai-provider\runner.cjs（runAiProviderStage，接线）
+  8) ...\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5）
+  9) ...\workspace\news\pipeline\runner\scheduler.cjs（默认 disabled）
+ 10) ...\workspace\news\pipeline\ai-provider\tests\test-n1.2-wire.cjs（N1.2-01 回归 53/0）
+【尚未建立（阻塞于 Step 1）】Provider transport、AI Input Projection、真实 provider 实现、U1 验证脚本。
+
+----------------------------------------------------------------
+一、执行结论（摘要）
+----------------------------------------------------------------
+  Provider        ：无（BLOCKED，未选定——无可用账号/Key）
+  Model           ：无（BLOCKED，未选定）
+  Actual Request Count：0（未发起任何真实请求）
+  Real Network Call：NO（未向任何 Provider 发起调用）
+  Structured Output：N/A（未执行）
+  Validator       ：N/A（未执行真实链路）
+  Bridge          ：N/A（未执行真实链路）
+  Normalizer      ：N/A（未执行真实链路）
+  正式数据写入    ：NO
+  news.js         ：未修改（SHA256 = ebf67de0…56fcaf）
+  Scheduler       ：disabled（DEFAULT_DISABLED = true）
+  === 最终结论：U1 = BLOCKED ===
+  真实 Live = NOT EXECUTED ｜ 自动 Production = DISABLED ｜ H5 = NOT DEPLOYED
+
+----------------------------------------------------------------
+二、Step 1 核查结果（真实 Provider 可用性）
+----------------------------------------------------------------
+按 U1 §二 Step 1，须确认 5 项；任一项无法确认即停止。逐项事实：
+
+  (1) 厂商：**未确认**。无任何已配置的 Provider 归属。
+  (2) endpoint：**未确认**（无 Provider 即无 endpoint）。
+  (3) model：**未确认**（fixture 的 jarvis-g55-llm 按 P3 明确不得作为真实模型）。
+  (4) API compatibility：**未确认**。
+  (5) structured output capability：**未确认**。
+  → 5 项均无法确认 ⇒ 依 Step 1「停止」。
+
+【账户 / 凭据核查（实测）】
+  - 环境变量：仅存在 WorkBuddy 平台内部变量（CODEBUDDY_API_KEY_HELPER_DISABLED / CODEBUDDY_CURRENT_MODEL_ID / WORKBUDDY_PAC_RPC_TOKEN），**无任何 AI Provider（OpenAI/DashScope/Qwen/Hunyuan/DeepSeek/GLM/ARK 等）的 Key**。
+  - .env：工作区与家目录均无（Glob **/.env* 零命中）。
+  - provider 配置文件：零命中。
+  - 凭据文件扫描：唯一命中为 C:\Users\Administrator\.workbuddy\connectors\<id>\.credentials.v3.json（WorkBuddy 连接器自身凭据），**与资讯 Provider 无关**。
+  ⇒ 无可用 Provider 账号 / Key。
+
+【网络出口核查（实测，TCP 探测）】
+  - REACHABLE：api.deepseek.com:443、open.bigmodel.cn:443、dashscope.aliyuncs.com:443、ark.cn-beijing.volces.com:443、hunyuan.tencentcloudapi.com:443（国内端点 TCP 可达）。
+  - UNREACHABLE：api.openai.com:443（timeout，境外直连不通，与既有事实一致）。
+  ⇒ 网络条件**部分具备**（国内可达），但**无凭据仍不可用**。
+
+【结论】网络可达 ≠ Provider 可用；因**无账号/Key**，Provider 不可用 ⇒ U1 无法执行。
+
+----------------------------------------------------------------
+三、阻塞原因
+----------------------------------------------------------------
+  1) 无任何 AI Provider 的账号与 API Key（决定性阻塞）。
+  2) 因此无法完成 Step 1 的 5 项确认，无法进入 Step 2（建立最小 Provider transport）。
+  3) 依 P2 与 §六：**不得自行切换/替换其他 Provider**，故本次未采用任何替代通道，未发起调用。
+
+----------------------------------------------------------------
+四、需要的外部条件（解阻清单）
+----------------------------------------------------------------
+  1) 提供**一家**国内云 Provider 的可用凭据（推荐）：DashScope(qwen) / 混元(hunyuan) / 豆包(ark) / 智谱(glm) / DeepSeek 之一。
+     · 形式：放入**环境变量或 .env**（.env 已在 .gitignore 之外，需自行加入忽略；严禁入库）。
+     · 需同时给出：endpoint、model 名称（轻量档，P3）、API 兼容类型（P5 优先 OpenAI-compatible）、结构化输出能力（P8）。
+  2) 或：由你显式授权采用某个**平台托管、免密钥**的大模型通道作为 U1 的 Provider（见下方"备选"，本次**未采用**，需你拍板）。
+  3) 确认后：U1 方可执行 Step 2–7（1 fixture / 1 次调用 / 零正式数据写入）。
+
+【备选（需你拍板，本次未采用）】本环境存在一个"平台托管、免密钥"的大模型调用能力（WorkBuddy 云服务）。
+  说明：① 它不在 D-P1 授权候选集内；② 其访问通道非 P11 所要求的"独立 Provider transport"；
+  ③ 采用它属于"自行替换 Provider"，与 P2/§六 冲突。故本次**未使用**，仅如实列出，供你决定是否授权。
+
+----------------------------------------------------------------
+五、已完成的代码准备工作（现状盘点）
+----------------------------------------------------------------
+【已就绪（N1.1 / N1.2-01 产出，本次未改动）】
+  - adapter.cjs：Provider 抽象（createProvider/createRegistry/runAdapter；provider 错误→PROVIDER_ERROR 上抛）。
+  - contract-validator.cjs：7 字段封闭契约校验（FORBIDDEN_FIELD / MISSING_FIELD / TYPE_ERROR），**U1 的最终契约边界**。
+  - bridge.cjs：injectAiModel(seven, meta)，注入 ai_model（含 BRIDGE_UNEXPECTED_FIELD / BRIDGE_MISSING_MODEL）。
+  - runner.cjs：runAiProviderStage（registry.get → runAdapter → bridge → ai-normalizer.normalize），受控元数据经 opts.meta 注入。
+  - ai-normalizer.cjs（G5.5）：强制 7 字段 + ai_model；零网络纯函数。
+  - scheduler.cjs：默认 disabled；run() 永不执行 production。
+  - 测试：test-n1.2-wire.cjs（A–J，53 PASS / 0 FAIL，零网络）——含 mock 8 类与安全负测试证据。
+【因阻塞未建立（Step 1 未通过故未开工）】
+  - 最小 Provider transport（timeout 15s / retry ≤2 仅瞬态 / Key 取自环境变量 / 不记录 Authorization 与完整请求响应）。
+  - AI Input Projection（P1：L1 candidate → 最小必要 AI 输入）。
+  - 真实 Provider 的 provide 实现。
+  - U1 验证脚本（含 §三 安全负测试的真实通道版本）。
+  说明：按 U1 §二 Step 1「无法确认即停止」，未提前开工上述代码（避免越界）。
+
+----------------------------------------------------------------
+六、已拍板 P1–P12 的落地状态
+----------------------------------------------------------------
+  P1  AI Input Projection（出域最小化）：方案已拍板；**代码未实现**（阻塞）。现状事实仍为 runner 直接把整个 L1 candidate 传给 provider.provide → 未投影。
+  P2  Provider 选型：**未落地**（无可用 Provider）。
+  P3  轻量档模型：**未落地**（未选定）。
+  P4  Key 保管（env/.env）：规范已确认；无 Key 可放。核查：现无 .env；.gitignore 已含 *.pem/*.key/*.key 等，但未含 `.env`（若采用 .env 需补忽略规则——待解阻后处理）。
+  P5  OpenAI-compatible 优先：**未落地**（无 provide 实现）。
+  P6  成本控制（1 fixture / 1 调用 / 无批量 / 无自动 retry）：**未执行**（0 次调用）。
+  P7  失败策略（瞬态 ≤2 retry；401/403/参数/schema/auth 禁 retry；超时 15s）：**未落地**（无 transport）。
+  P8  JSON Schema / JSON Object + 必过 Validator：Validator 已就绪；Provider 侧输出形态**未落地**。
+  P9  仅人工显式触发；scheduler disabled（P9=P9 决策）：scheduler 已 disabled ✓（已具备）。
+  P10 S001 继续 JSON-only、不改 G5.2：维持现状 ✓（manual-capture-loader JSON-only；parser 未改）。
+  P11 Provider 出口与采集层出口分离：**未落地**（未建独立 Provider transport）。
+  P12 U1 授权：已授权；因 Step 1 未通过而无法执行。
+
+----------------------------------------------------------------
+七、安全负测试（§三 7 项）执行说明
+----------------------------------------------------------------
+  因未接入真实 Provider，本轮**无法对真实通道**执行 §三；逐项说明其可行性：
+  1) 未知字段 → Validator 拒绝：**已有证据**（N1.2-01 §C5，mock，FORBIDDEN_FIELD，PASS）。真实通道未验证。
+  2) Provider 输出 ai_model → 拒绝：**已有证据**（N1.2-01 §C5b，mock，FORBIDDEN_FIELD，PASS）。真实通道未验证。
+  3) 缺失字段 → Validator 拒绝：**已有证据**（N1.2-01 §C2/C3）。真实通道未验证。
+  4) 网络失败 → 不写正式数据：**未验证**（无 transport / 无调用）。
+  5) 超时 → 不写正式数据：**未验证**（同上）。
+  6) AI Input Projection 传入禁止字段 → 拒绝：**未实现 / 未验证**（Projection 尚未建立）。
+  7) scheduler 状态检查 → 必须 disabled：**已有证据**（N1.2-01 §G，DEFAULT_DISABLED=true，PASS）。
+  小结：1/2/3/7 为 mock 层既有证据；4/5/6 属真实通道/未实现，**留待 U1 解阻后执行**。不将 mock 证据冒充为真实通道 PASS。
+
+----------------------------------------------------------------
+八、冻结边界核对（本轮）
+----------------------------------------------------------------
+  - news.js：未修改（SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf）。
+  - D1/D2、G1–G10、N1.1 validator 字段集合、H5：均未修改（本轮零代码改动）。
+  - 未执行真实 Live；未批量调用；scheduler production 未启用；未部署；未开始 N1.3/SOP/指标看板；未新增 UI。
+  - 未创建 .env / 未写入任何凭据。
+
+----------------------------------------------------------------
+九、下一步（解阻后最小动作）
+----------------------------------------------------------------
+  U1-a：你提供一家国内云 Provider 的 Key（env 或 .env）+ endpoint/model/兼容性/结构化输出能力；
+        或显式授权平台托管免密钥通道作为 U1 Provider（需拍板）。
+  U1-b：建最小 Provider transport（15s / retry ≤2 仅瞬态 / Key 取自 env / 不记录 Authorization 与完整请求响应）。
+  U1-c：建 AI Input Projection（明确列出：输入字段 / 输出字段 / 删除-禁出域字段 / 是否含正文 / 是否含 URL / 是否含 source metadata / 是否含内部运行字段；无法确认者默认不出域）。
+  U1-d：取 1 条批准的 fixture，执行 1 次真实调用，跑 §二 Step 6 全链路 + §三 7 项负测试，记录 §五（报告字段）。
+  当前状态：U1-a 未满足 → BLOCKED。
+
+----------------------------------------------------------------
+§最终结论
+----------------------------------------------------------------
+U1 = BLOCKED
+  原因：无任何 AI Provider 账号 / API Key（Step 1 五项无法确认）。
+  已遵守：未自行替换 Provider；未发起真实调用；未伪造 PASS。
+真实 Live = NOT EXECUTED ｜ 自动 Production = DISABLED ｜ H5 = NOT DEPLOYED
+正式数据写入 = NO ｜ news.js = 未修改 ｜ Scheduler = disabled
+
+置信度：高（"无 Provider 可用"由环境变量名核查 + .env/凭据文件全仓扫描 + 网络 TCP 探测三路交叉印证）。
+局限：① 网络探测为 TCP 连通性，不代表可用配额/权限；② 若你另行提供凭据，结论将转为可执行 U1；③ 备选"平台托管通道"是否可作 U1 Provider 属你的决策，本报告不替代。
+================================================================
