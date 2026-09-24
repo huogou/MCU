@@ -27,7 +27,9 @@ console.log = function () {
 process.on('exit', function () { try { fs.writeFileSync(LOG_PATH, _lines.join('\n') + '\n', 'utf8'); } catch (e) {} });
 
 const DATE = '20260924';
-const TMP = path.join(__dirname, 'tmp-d1d2');
+/* 每轮唯一临时目录：位于 pipeline 内（满足 capture-store 的 WRITE_OUTSIDE_PIPELINE 守卫），
+ * 唯一命名故无需 rmSync 清理（sandbox 环境下删除会被拦截，故彻底去删除化）。 */
+const TMP = path.join(__dirname, 'tmp-d1d2-' + process.pid + '-' + Date.now());
 const DIRS = {
   captures: path.join(TMP, 'business', 'captures'),
   candidates: path.join(TMP, 'business', 'candidates'),
@@ -84,7 +86,6 @@ async function main() {
   console.log('N1 · D1/D2 行为矩阵验收');
   console.log('============================================================');
 
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   [DIRS.captures, DIRS.candidates, DIRS.deliveries, DIRS.runHistory, DIRS.scratch].forEach(function (d) {
     fs.mkdirSync(d, { recursive: true });
   });

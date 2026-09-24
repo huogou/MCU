@@ -1,0 +1,42 @@
+================================================================
+N1.2 Implementation-01 落地报告（精简版，V1.0）
+================================================================
+全量版：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-01 落地报告.txt
+核心结论：N1.2 Implementation-01 = PASS（53 PASS / 0 FAIL）
+真实 Provider = NOT IMPLEMENTED｜真实 Live = NOT EXECUTED｜自动 Production = DISABLED｜H5 = NOT DEPLOYED
+
+---------------- 一、本次已实施（5 新模块 + 1 口径修正 + 测试）----------------
+1. bridge.cjs：injectAiModel(seven, meta) 注入 ai_model，闭合 D1 断点；seven 含 ai_model→BRIDGE_UNEXPECTED_FIELD，meta.model 空→BRIDGE_MISSING_MODEL。
+2. runner.cjs：runAiProviderStage 串联 registry→runAdapter→validate→bridge→ai-normalizer.normalize；不修改 N1.1/G5.5。
+3. manual-capture-loader.cjs：loadInbox 读 JSON 投递→复用 RC.create 转 L0；S001 默认；失败 fail-closed 不静默。
+4. scheduler.cjs：createScheduler 默认 enabled=false、mode=capture-only、autoProduction 恒 false；run() 永不自动 production。
+5. failure-record.cjs：recordFailure/recordFromCollectErrors，8 字段结构化、append-only、无重试。
+6. D6：source-registry.json S001 crawl_policy auto_allowed→manual_only（登记表=代码行为）。
+7. test-n1.2-wire.cjs：A–J 全量回归（53 PASS / 0 FAIL）。
+
+---------------- 二、本次已验证（关键链路）----------------
+- 主链路 raw→Adapter→7字段→bridge(ai_model)→ai-normalizer 全绿；第 8 类证明 Provider 不输出 ai_model、bridge 注入后 normalizer 获得合法 ai_model。
+- Mock 8 类、manualCaptureLoader、failure record、scheduler disabled 安全、fixture 回归(133)、news.js SHA256、git 冻结边界 全部 PASS。
+- N1.1(32) 与 D1/D2(42) 两套既有套件子进程回归不退化。
+
+---------------- 三、本次未实施（冻结/拍板禁止）----------------
+真实 AI Provider（D-P1~D-P9）｜真实 Live 采集（S003）｜启用 scheduler 自动 production｜news.js/H5/D1/D2/G1–G10/N1.1 validator 任何修改｜N1.3/SOP/指标看板/UI。
+
+---------------- 四、下一阶段候选（非本次）----------------
+真实 Provider 接入（拍板 D-P1~D-P9 后落地 opts.meta 真实值）｜按 S002 启用 scheduler｜按 S004 对 S003/S005 降级评估｜真实 Live 首次采集（待 S003 拍板）。
+
+---------------- 五、冻结边界（实证）----------------
+news.js 内容/SHA256 未变（ebf67de0…56fcaf）；H5/G1–G10/D1/D2/N1.1 validator/N1.1 adapter 均未改；仅 source-registry.json S001 字段按计划改。
+
+---------------- 六、问题与遗留（须知会策划 AI）----------------
+设计文档曾写 createProvider(name,impl,meta)；本实现以 opts.meta 等价实现且未改 adapter.cjs（更保守，契约不变）。
+人工入口为 JSON 投递（G5.2 parser 不支持 html-parse）；收原始 HTML 需单独评估，不在本阶段。
+
+---------------- 七、置信度 --------------------------------
+高：53 断言 + N1.1(32)/D1/D2(42) 子进程全绿 + news.js SHA256/git 冻结边界双重实证；主链路零网络零真实采集稳定。
+
+---------------- 关键关联文件 --------------------------------
+全量报告：D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 Implementation-01 落地报告.txt
+接线模块：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\runner.cjs
+测试证据：D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-n1.2.txt
+================================================================

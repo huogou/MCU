@@ -36,7 +36,8 @@ console.log = function () {
 };
 process.on('exit', function () { try { fs.writeFileSync(LOG_PATH, _lines.join('\n') + '\n', 'utf8'); } catch (e) {} });
 
-const TMP = path.join(__dirname, 'tmp-n1.1');
+/* 每轮唯一临时目录（位于 pipeline 内；本套件当前不写临时文件，保留变量以对齐 D1/D2 套件） */
+const TMP = path.join(__dirname, 'tmp-n1.1-' + process.pid + '-' + Date.now());
 const REAL = {
   captures: path.join(PIPELINE, 'captures'),
   candidates: path.join(PIPELINE, 'candidates'),
@@ -72,8 +73,6 @@ async function main() {
   console.log('N1.1 · AI Provider Adapter 专项验收');
   console.log('============================================================');
 
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
-  fs.mkdirSync(TMP, { recursive: true });
   const realSnap = {
     captures: fileCount(REAL.captures), candidates: fileCount(REAL.candidates),
     deliveries: fileCount(REAL.deliveries), runHistory: fileCount(REAL.runHistory)
@@ -184,8 +183,7 @@ async function main() {
   eq('F.4 真实 deliveries 目录文件数不变', fileCount(REAL.deliveries), realSnap.deliveries);
   eq('F.5 真实 run-history 目录文件数不变', fileCount(REAL.runHistory), realSnap.runHistory);
 
-  /* 清理隔离目录 */
-  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  /* 隔离目录位于 OS temp（每轮唯一命名），无需清理 */
 
   console.log('\n============================================================');
   console.log('N1.1 验收结果：' + pass + ' PASS / ' + fail + ' FAIL');

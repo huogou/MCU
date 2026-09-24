@@ -1,0 +1,80 @@
+============================================================
+N1.2 · Implementation-01 全量回归验收
+============================================================
+
+■ A · N1.1 专项测试（子进程）
+  PASS  A.1 N1.1 测试退出码 0
+  PASS  A.2 输出含「32 PASS / 0 FAIL」
+
+■ B · D1/D2 行为矩阵回归（子进程）
+  PASS  B.1 D1/D2 测试退出码 0
+  PASS  B.2 输出含「42 PASS / 0 FAIL」
+
+■ C · Mock Provider 8 类测试
+  PASS  C1 正常 7 字段 → runAdapter 通过
+  PASS  C1b 输出恰为 7 字段（无 ai_model）
+  PASS  C2 缺失字段 → MISSING_FIELD
+  PASS  C3 空字符串 → MISSING_FIELD
+  PASS  C4 类型错误 → TYPE_ERROR
+  PASS  C5 未知字段 → FORBIDDEN_FIELD
+  PASS  C5b Provider 自带 ai_model → FORBIDDEN_FIELD（D5：禁止 Provider 注入 ai_model）
+  PASS  C6 Provider 抛错 → PROVIDER_ERROR
+  PASS  C6b 保留 cause
+  PASS  C7 validator 抛错 → RESULT_INVALID
+  PASS  C8 seven 含 ai_model → BRIDGE_UNEXPECTED_FIELD
+  PASS  C9 meta 缺 model → BRIDGE_MISSING_MODEL
+  PASS  C10 bridge 注入 ai_model = meta.model
+  PASS  C10b bridge 输出恰为 8 字段
+
+■ D · Adapter → ai-normalizer 集成（第 8 类：Provider 不输出 ai_model，bridge 注入后 normalizer 获得）
+  PASS  D.1 接线无异常
+  PASS  D.2 seven 恰为 7 字段且无 ai_model
+  PASS  D.3 enriched.ai_model = 受控 meta.model（bridge 注入，非 Provider 输出）
+  PASS  D.4 ai-normalizer 成功接收（enhanced 为合法 L1）
+  PASS  D.5 enhanced.ai_model = 受控注入值
+  PASS  D.6 enhanced 七字段与 fixture 一致（title）
+  PASS  D.7 enhanced 七字段与 fixture 一致（category）
+
+■ E · manualCaptureLoader（S001 D+A）
+  PASS  E.1 合法 L0 被接收
+  PASS  E.2 最小结构被转换为合法 L0
+  PASS  E.3 全部 captures 通过 L0 校验
+  PASS  E.4 错误输入进 errors（不静默）
+  PASS  E.5 不支持类型进 errors
+  PASS  E.6 人工 capture 成功进入 Adapter 流程（→ enhanced L1 合法）
+
+■ F · failure record（S004 B）
+  PASS  F.1 写入文件存在
+  PASS  F.2 记录数 = 2（S003 + S005）
+  PASS  F.3 每条含 8 个结构化字段
+  PASS  F.4 S003=HTTP_403 形成记录
+  PASS  F.5 S005=ECONNREFUSED 形成记录
+  PASS  F.6 recordFromCollectErrors 产出 1 条
+
+■ G · scheduler 脚手架安全（S002）
+  PASS  G.1 默认 enabled = false
+  PASS  G.2 默认 mode = capture-only
+  PASS  G.3 DEFAULT_DISABLED 常量 = true
+  PASS  G.4 disabled → run() skipped 且不执行
+  PASS  G.5 手动触发仅返回计划、不执行
+  PASS  G.6 即便 enabled，run() 仍 skipped（绝不自动 production）
+  PASS  G.7 强制配置下 autoProduction 仍为 false
+
+■ H · fixture 回归
+  PASS  H.1 fixture 候选数 = 133
+  PASS  H.2 fixture[0] 为合法 L1
+
+■ I · news.js SHA256 冻结自检
+  PASS  I.1 news.js SHA256 = 基线
+
+■ J · git 冻结边界检查
+  PASS  J.1 无冻结文件被修改（H5/G/D/N1.1 validator/adapter）
+  PASS  J.2 source-registry.json 按计划被修改（D6）
+  PASS  J.3 真实 captures 目录文件数不变
+  PASS  J.4 真实 candidates 目录文件数不变
+  PASS  J.5 真实 deliveries 目录文件数不变
+  PASS  J.6 真实 run-history 目录文件数不变
+
+============================================================
+N1.2 Implementation-01 验收结果：53 PASS / 0 FAIL
+============================================================

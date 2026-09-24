@@ -57,3 +57,6 @@ workspace/clipboard-ocr*.ps1
 workspace/clipboard-2026*.png
 workspace/clipboard-2026*-ocr.txt
 workspace/clipboard-ocr*-run.log
+
+# 资讯管道测试临时目录（每轮唯一命名、可由脚本重新生成，不进版本库）
+workspace/news/pipeline/**/tmp-*/

@@ -15,7 +15,7 @@
       "source_name": "Marvel 官方",
       "owner_group": "Disney / Marvel",
       "tier": "T1",
-      "crawl_policy": "auto_allowed",
+      "crawl_policy": "manual_only",
       "health": "ok",
       "note": "无 RSS，须解析 /news 列表页 HTML；列表约 75% 为 comics/games/live-events，必须做影视类过滤。禁止以 sitemap 作新闻发现通道。",
       "source_type": "官方",

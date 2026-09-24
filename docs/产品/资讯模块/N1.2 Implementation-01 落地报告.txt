@@ -1,0 +1,189 @@
+================================================================
+N1.2 Implementation-01 落地报告（V1.0）
+================================================================
+生成时间：2026-09-24
+范围：仅 N1.2 Implementation-01「Adapter → ai-normalizer 最小接线 + Mock 全链路验证」。
+上游：N1.2 Decision Gate 已通过（D1–D6 正式拍板）。
+冻结基线（全程未变）：news.js = 35 条；SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf；G1–G10 / D1/D2 / H5 / N1.1 7字段契约 / N1.1 validator 未改。
+最终裁定：N1.2 Implementation-01 = PASS；真实 Provider = NOT IMPLEMENTED；真实 Live = NOT EXECUTED；自动 Production = DISABLED；H5 = NOT DEPLOYED。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本阶段新增代码】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\bridge.cjs（ai_model 元数据桥接）
+2) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\runner.cjs（Adapter→ai-normalizer 接线）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\manual-capture-loader.cjs（S001 人工投递 D+A）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\scheduler.cjs（S002 脚手架）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\failures\failure-record.cjs（S004 B 失败记录）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.2-wire.cjs（A–J 全量回归）
+7) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-n1.2.txt（测试输出证据，53 PASS / 0 FAIL）
+
+【本阶段修改（仅 D6 口径）】
+8) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json（S001 crawl_policy: auto_allowed → manual_only）
+
+【冻结参照（只读，未改）】
+9) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5，仅读调用）
+10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7字段校验器，未改）
+11) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象，未改）
+
+----------------------------------------------------------------
+一、实施内容
+----------------------------------------------------------------
+按拍板 D1–D6 落地 6 个新模块 + D6 口径修正，全部为新增文件（仅 source-registry.json 一处字段修正）。
+证明主链路：raw capture → Adapter → 7字段契约 → ai_model bridge → ai-normalizer 可在完全不触碰真实 AI / 真实 Live / news.js / D1/D2 / H5 的情况下稳定运行。
+
+----------------------------------------------------------------
+二、Adapter 接线架构
+----------------------------------------------------------------
+链路（runner.cjs · runAiProviderStage）：
+  candidate(L1 桩)
+    → registry.get(providerName)
+    → runAdapter(provider, candidate)        [N1.1：validate → 标准 7 字段]
+    → bridge.injectAiModel(7 字段, 受控 meta) [注入 ai_model → 8 字段]
+    → ai-normalizer.normalize(candidate, 8 字段) [G5.5：产出增强 L1]
+约束落实：复用 N1.1，禁止复制 validator、禁止绕过；Provider 原始输出不直接进 normalizer；validator/bridge 失败立即向上抛，不 catch 返回空对象、不静默删字段；不修改 seven 入参（隔离副本）。
+
+----------------------------------------------------------------
+三、ai_model bridge 实现（闭合 D1 断点）
+----------------------------------------------------------------
+bridge.cjs · injectAiModel(sevenFields, meta)：
+  - seven 必须是不含 ai_model 的 7 字段（Provider 不得自带）；若含 → BRIDGE_UNEXPECTED_FIELD。
+  - ai_model 只来自受控 meta（meta.model 必填非空），缺失 → BRIDGE_MISSING_MODEL。
+  - 返回隔离副本（不修改入参）。
+设计决策（须报告）：本阶段**未修改** N1.1 adapter.cjs 的 createProvider 签名，改为把受控元数据经 runAiProviderStage 的 opts.meta 注入。
+  理由：冻结边界 §八只显式列「N1.1 validator 行为 / 7字段契约」，adapter.cjs 虽未列入，但为最大化冻结安全将其一并保持原状；
+  该做法与 D5「ai_model 来自受控 Provider/Registry 元数据」完全等价，且更保守。
+  注：此前《N1.2 最小接线设计说明》曾写「createProvider(name, impl, meta)」，本实现以 opts.meta 实现同一语义，属等价细化，不影响契约。
+
+----------------------------------------------------------------
+四、S001 manualCaptureLoader（D1 D+A）
+----------------------------------------------------------------
+manual-capture-loader.cjs · loadInbox(inboxDir, opts) → { captures, errors }：
+  - 复用现有 L0 入参能力（raw-capture.cjs 的 RC.create 与校验）。
+  - 仅接受 .json 投递（情形 A：已是合法 L0 → 直收；情形 B：人工最小结构 → 组装 L0 入参后 RC.create）。
+  - 非 .json 类型 / JSON 解析失败 / 缺字段 → 明确进 errors（UNSUPPORTED_FILE_TYPE / JSON_PARSE_FAILED / CAPTURE_INVALID），不静默。
+  - 默认 registry_id = S001（manual-only），source_name 取自登记表。
+  - 无后台 UI、无常驻监听、不调用真实 AI；失败 fail-closed。
+约束发现（已落实）：G5.2 parser.cjs 对 html-parse 返回 HTML_PARSE_NOT_IN_SCOPE（不在范围），故人工入口接收**结构化 JSON**（非原始 HTML），与 D1「复用现有 L0 入参能力」一致。
+
+----------------------------------------------------------------
+五、S002 scheduler scaffold
+----------------------------------------------------------------
+scheduler.cjs · createScheduler(config)：
+  - DEFAULT_DISABLED = true；默认 enabled=false、mode='capture-only'、autoProduction 恒 false。
+  - run()：disabled 直接 skipped；即便传入 enabled=true，脚手架仍只到「计划层」，绝不触 production（capture-only/dry-run 仅可配置，不执行）。
+  - triggerManual()：仅返回计划（{triggered, executed:false, action}），不执行。
+  - 不配真实生产 cron、不自动采集、不修改 news.js。
+
+----------------------------------------------------------------
+六、S004 failure record（A + B）
+----------------------------------------------------------------
+failure-record.cjs：
+  - recordFailure(entry, opts) / recordFromCollectErrors(runId, result, mode, opts)。
+  - 结构化 8 字段：run_id / source_id / stage / error_code / error_type / reason / timestamp / mode。
+  - append-only JSON（pipeline/failures/records/<date>.failures.json）。
+  - 无重试、不降级为成功、不进正式资讯数据、不改 run-history。
+  - S003=HTTP_403 / S005=ECONNREFUSED 均形成结构化记录（验证通过）。
+
+----------------------------------------------------------------
+七、Mock 8 类测试
+----------------------------------------------------------------
+test-n1.2-wire.cjs · §C（覆盖任务四 8 类）：
+  1) 正常 7 字段 → runAdapter 通过
+  2) 缺失字段 → MISSING_FIELD
+  3) 空字符串 → MISSING_FIELD
+  4) 类型错误 → TYPE_ERROR
+  5) 未知字段 → FORBIDDEN_FIELD；附加：Provider 自带 ai_model → FORBIDDEN_FIELD（D5 禁止 Provider 注入）
+  6) Provider 主动抛错 → PROVIDER_ERROR（保留 cause）
+  7) validator 抛错（Provider 返回非对象）→ RESULT_INVALID
+  8) ai-normalizer 成功接收：Provider 不输出 ai_model，经受控 bridge 注入后 normalizer 获得合法 ai_model（§D 集成证明）
+
+----------------------------------------------------------------
+八、全部回归测试结果（FAIL = 0）
+----------------------------------------------------------------
+本测试共 53 断言 PASS / 0 FAIL，并子进程复用两套既有套件：
+  A. N1.1 专项（子进程）→ 32 PASS / 0 FAIL
+  B. D1/D2 行为矩阵（子进程）→ 42 PASS / 0 FAIL
+  C. Mock 8 类 → 全 PASS
+  D. Adapter→ai-normalizer 集成（第 8 类）→ 全 PASS
+  E. manualCaptureLoader（合法/最小/错误/非json/进入Adapter流程）→ 全 PASS
+  F. failure record（S003+S005 结构化、8字段、批量）→ 全 PASS
+  G. scheduler disabled 安全（默认 disabled、enabled 也不自动 production）→ 全 PASS
+  H. fixture 回归（133 条、首条合法 L1）→ 全 PASS
+  I. news.js SHA256 = 基线 → PASS
+  J. git 冻结边界（无冻结文件被修改、source-registry.json 按计划改、真实归档未污染）→ 全 PASS
+证据文件：workspace/news/pipeline/ai-provider/tests/out-n1.2.txt
+
+----------------------------------------------------------------
+九、冻结边界检查
+----------------------------------------------------------------
+  - news.js 内容 / SHA256：未变（I.1 PASS）。
+  - H5 / G1–G10 / D1/D2 / N1.1 validator / N1.1 adapter：均未修改（J.1 PASS）。
+  - 仅 source-registry.json 的 S001 crawl_policy 字段按计划修改（D6），其余 Source Registry 行为不变。
+  - 真实 captures / candidates / deliveries / run-history 目录文件数未变（J.3–J.6 PASS）。
+
+----------------------------------------------------------------
+十、git 状态
+----------------------------------------------------------------
+本提交仅纳入 7 个新增文件 + 1 个修改文件（source-registry.json）。
+工作树中存在大量早于本任务的 G 系列回归残留（out-*.txt / map-shots/ / project.json 等未跟踪文件），**严格未纳入提交**。
+改动文件清单：
+  M  workspace/news/engine/registry/source-registry.json
+  A  workspace/news/pipeline/ai-provider/bridge.cjs
+  A  workspace/news/pipeline/ai-provider/runner.cjs
+  A  workspace/news/pipeline/collectors/manual-capture-loader.cjs
+  A  workspace/news/pipeline/runner/scheduler.cjs
+  A  workspace/news/pipeline/failures/failure-record.cjs
+  A  workspace/news/pipeline/ai-provider/tests/test-n1.2-wire.cjs
+  A  workspace/news/pipeline/ai-provider/tests/out-n1.2.txt
+  A  docs/产品/资讯模块/N1.2 Implementation-01 落地报告.txt
+
+----------------------------------------------------------------
+十一、四分类（已实施 / 已验证 / 未实施 / 候选）+ 问题与遗留
+----------------------------------------------------------------
+【本次已实施】
+  - bridge.cjs、runner.cjs、manual-capture-loader.cjs、scheduler.cjs、failure-record.cjs 五个新模块。
+  - source-registry.json S001 crawl_policy 修正（D6）。
+  - test-n1.2-wire.cjs 全量回归（53 PASS / 0 FAIL）。
+
+【本次已验证】
+  - 主链路 raw→Adapter→7字段→bridge→ai-normalizer 全绿（含第 8 类：Provider 无 ai_model、bridge 注入后 normalizer 获得）。
+  - Mock 8 类、manualCaptureLoader、failure record、scheduler disabled 安全、fixture 回归、news.js SHA256、git 冻结边界，全部 PASS。
+  - N1.1（32 PASS）与 D1/D2（42 PASS）两套既有套件回归不退化。
+
+【本次未实施】（按冻结边界与拍板，本阶段禁止）
+  - 真实 AI Provider 接入（§四 决策清单 D-P1~D-P9 全部未落地）。
+  - 真实 Live 生产采集（S003 明确暂不执行）。
+  - 启用 scheduler 自动 production（默认 disabled，脚手架不实现自动执行）。
+  - 任何 news.js / H5 / D1/D2 / G1–G10 / N1.1 validator 修改。
+  - N1.3 / SOP / 指标看板 / 产品层 UI。
+
+【下一阶段候选】（非本次实施，不与本次混淆）
+  - 真实 Provider 接入（待 D-P1~D-P9 拍板）。
+  - 按 S002 拍板启用 scheduler（频率 / 是否允许自动）。
+  - 按 S004 拍板决定是否对 S003/S005 降级为暂弃。
+  - 真实 Live 首次采集（待 S003 拍板）。
+
+【问题与遗留】
+  - 设计文档《N1.2 最小接线设计说明》曾写 createProvider(name,impl,meta)；本实现以 opts.meta 等价实现，未改 adapter.cjs。属保守细化，契约不变，需知会策划 AI。
+  - 人工入口为 JSON 投递（因 G5.2 parser 不支持 html-parse）；若未来需收原始 HTML，需单独评估网页解析能力（不在本阶段范围）。
+
+----------------------------------------------------------------
+十二、N1.2 下一阶段建议
+----------------------------------------------------------------
+  - 下一步建议进入「真实 Provider 决策与接入」（N1.3 或单独授权）：基于《真实 AI Provider 决策清单》拍板 D-P1~D-P9 后，将 opts.meta 的具体值（provider/model）落地为真实 provide 实现。
+  - 真实 Live 与 scheduler 启用均须单独拍板，本阶段已把脚手架与失败记录备妥，可在拍板后零改动启用。
+  - 维持现状：news.js / H5 冻结，任何生产数据写入须经人工确认 Gate。
+
+----------------------------------------------------------------
+§十三 最终结论
+----------------------------------------------------------------
+N1.2 Implementation-01：PASS（53 PASS / 0 FAIL）
+真实 Provider：NOT IMPLEMENTED
+真实 Live：NOT EXECUTED
+自动 Production：DISABLED
+H5：NOT DEPLOYED
+
+置信度：高（结论基于 53 项断言 + 子进程复用 N1.1(32) 与 D1/D2(42) 全绿，且 news.js SHA256 / git 冻结边界双重实证；主链路在零网络、零真实采集下稳定运行）。
+================================================================
