@@ -19,13 +19,18 @@ N1.2 Implementation-01 落地报告（V1.0）
 6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.2-wire.cjs（A–J 全量回归）
 7) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\out-n1.2.txt（测试输出证据，53 PASS / 0 FAIL）
 
-【本阶段修改（仅 D6 口径）】
+【本阶段修改：D6 口径】
 8) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\engine\registry\source-registry.json（S001 crawl_policy: auto_allowed → manual_only）
 
+【本阶段修改：测试夹具隔离加固（非行为性，断言零改动）】
+9) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\tests\test-n1.1.cjs（临时目录改每轮唯一，去 rmSync 依赖）
+10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\tests\test-d1d2.cjs（临时目录改每轮唯一，去 rmSync 依赖）
+11) D:\SEO\发挥余热\漫威电影宇宙导航\.gitignore（忽略测试临时目录 workspace/news/pipeline/**/tmp-*/）
+
 【冻结参照（只读，未改）】
-9) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5，仅读调用）
-10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7字段校验器，未改）
-11) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象，未改）
+12) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-normalizer\ai-normalizer.cjs（G5.5，仅读调用）
+13) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\contract-validator.cjs（N1.1 7字段校验器，未改）
+14) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\ai-provider\adapter.cjs（N1.1 Provider 抽象，未改）
 
 ----------------------------------------------------------------
 一、实施内容
@@ -114,6 +119,7 @@ test-n1.2-wire.cjs · §C（覆盖任务四 8 类）：
   I. news.js SHA256 = 基线 → PASS
   J. git 冻结边界（无冻结文件被修改、source-registry.json 按计划改、真实归档未污染）→ 全 PASS
 证据文件：workspace/news/pipeline/ai-provider/tests/out-n1.2.txt
+夹具隔离说明（须报告）：三套测试原依赖 fs.rmSync 清理固定临时目录（pipeline 内 tmp-*）。在受限沙箱下删除被拦截，残留文件导致 验收1.5 / F.2 / B.1 等假失败。已改为「每轮唯一临时目录」（位于 pipeline 内，满足 capture-store 的 WRITE_OUTSIDE_PIPELINE 守卫），彻底去除对删除的依赖 → 结果确定化。此项为测试基础设施加固，未改任何断言与生产行为；首轮出现的 51/2、48/5 均为沙箱清理受阻所致的假失败，非代码回归。
 
 ----------------------------------------------------------------
 九、冻结边界检查
@@ -126,10 +132,9 @@ test-n1.2-wire.cjs · §C（覆盖任务四 8 类）：
 ----------------------------------------------------------------
 十、git 状态
 ----------------------------------------------------------------
-本提交仅纳入 7 个新增文件 + 1 个修改文件（source-registry.json）。
+提交 9948660：9 个新增文件 + 4 个修改文件（共 13 文件，+1010 / −8）。
 工作树中存在大量早于本任务的 G 系列回归残留（out-*.txt / map-shots/ / project.json 等未跟踪文件），**严格未纳入提交**。
 改动文件清单：
-  M  workspace/news/engine/registry/source-registry.json
   A  workspace/news/pipeline/ai-provider/bridge.cjs
   A  workspace/news/pipeline/ai-provider/runner.cjs
   A  workspace/news/pipeline/collectors/manual-capture-loader.cjs
@@ -138,6 +143,11 @@ test-n1.2-wire.cjs · §C（覆盖任务四 8 类）：
   A  workspace/news/pipeline/ai-provider/tests/test-n1.2-wire.cjs
   A  workspace/news/pipeline/ai-provider/tests/out-n1.2.txt
   A  docs/产品/资讯模块/N1.2 Implementation-01 落地报告.txt
+  A  docs/产品/资讯模块/N1.2 Implementation-01 落地报告-精简版.txt
+  M  workspace/news/engine/registry/source-registry.json
+  M  workspace/news/pipeline/ai-provider/tests/test-n1.1.cjs
+  M  workspace/news/pipeline/runner/tests/test-d1d2.cjs
+  M  .gitignore
 
 ----------------------------------------------------------------
 十一、四分类（已实施 / 已验证 / 未实施 / 候选）+ 问题与遗留
@@ -146,6 +156,7 @@ test-n1.2-wire.cjs · §C（覆盖任务四 8 类）：
   - bridge.cjs、runner.cjs、manual-capture-loader.cjs、scheduler.cjs、failure-record.cjs 五个新模块。
   - source-registry.json S001 crawl_policy 修正（D6）。
   - test-n1.2-wire.cjs 全量回归（53 PASS / 0 FAIL）。
+  - 测试夹具隔离加固（test-n1.1 / test-d1d2 / test-n1.2 改用每轮唯一临时目录）+ .gitignore 忽略测试临时目录。
 
 【本次已验证】
   - 主链路 raw→Adapter→7字段→bridge→ai-normalizer 全绿（含第 8 类：Provider 无 ai_model、bridge 注入后 normalizer 获得）。

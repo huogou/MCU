@@ -13,6 +13,7 @@ N1.2 Implementation-01 落地报告（精简版，V1.0）
 5. failure-record.cjs：recordFailure/recordFromCollectErrors，8 字段结构化、append-only、无重试。
 6. D6：source-registry.json S001 crawl_policy auto_allowed→manual_only（登记表=代码行为）。
 7. test-n1.2-wire.cjs：A–J 全量回归（53 PASS / 0 FAIL）。
+8. 测试夹具隔离加固：test-n1.1/test-d1d2/test-n1.2 改用每轮唯一临时目录（位于 pipeline 内、去 rmSync 依赖）；.gitignore 忽略测试临时目录。断言零改动。
 
 ---------------- 二、本次已验证（关键链路）----------------
 - 主链路 raw→Adapter→7字段→bridge(ai_model)→ai-normalizer 全绿；第 8 类证明 Provider 不输出 ai_model、bridge 注入后 normalizer 获得合法 ai_model。
@@ -31,6 +32,7 @@ news.js 内容/SHA256 未变（ebf67de0…56fcaf）；H5/G1–G10/D1/D2/N1.1 val
 ---------------- 六、问题与遗留（须知会策划 AI）----------------
 设计文档曾写 createProvider(name,impl,meta)；本实现以 opts.meta 等价实现且未改 adapter.cjs（更保守，契约不变）。
 人工入口为 JSON 投递（G5.2 parser 不支持 html-parse）；收原始 HTML 需单独评估，不在本阶段。
+测试夹具原依赖 rmSync 清理固定临时目录，受限环境删除被拦截会产生假失败（首轮 51/2、48/5 皆此因，非代码回归）；已改每轮唯一临时目录消除该依赖。
 
 ---------------- 七、置信度 --------------------------------
 高：53 断言 + N1.1(32)/D1/D2(42) 子进程全绿 + news.js SHA256/git 冻结边界双重实证；主链路零网络零真实采集稳定。
