@@ -1,0 +1,67 @@
+============================================================
+N1 · D1/D2 行为矩阵验收
+============================================================
+
+■ 验收 1 · dry-run（不写 run-history、不动正式业务目录）
+  PASS  1.1 runHistoryRecorded = false
+  PASS  1.2 run_id = null
+  PASS  1.3 run-history 数量不增加
+  PASS  1.4 正式 capture 目录无变化
+  PASS  1.5 dry-run 不产生任何文件（含 scratch）
+
+■ 验收 2 · production-capture（无 --persist）
+  PASS  2.1 runHistoryRecorded = true
+  PASS  2.2 run-history +1
+  PASS  2.3 正式 capture-store 不变化
+  PASS  2.4 可写临时 scratch（captures.json 在场）
+
+■ 验收 3 · production-capture --persist
+  PASS  3.1 runHistoryRecorded = true
+  PASS  3.2 run-history +1
+  PASS  3.3 正式 capture-store 写入 5 条
+  PASS  3.4 落盘结果含 added=5
+
+■ 验收 4 · production-review（无 --persist）
+  PASS  4.1 runHistoryRecorded = true
+  PASS  4.2 run-history +1
+  PASS  4.3 正式 candidate-store 不变化
+  PASS  4.4 可写临时 scratch（candidates.json 在场）
+  PASS  4.5 审核队列全部 pending
+
+■ 验收 5 · production-review --persist
+  PASS  5.1 runHistoryRecorded = true
+  PASS  5.2 run-history +1
+  PASS  5.3 正式 candidate-store 写入 6 条
+
+■ 验收 6 · production-delivery-preview（无 --persist）
+  PASS  6.1 runHistoryRecorded = true
+  PASS  6.2 run-history +1
+  PASS  6.3 正式 deliveries 不变化（0 个预览文件）
+  PASS  6.4 approved=4
+  PASS  6.5 rejected=2
+  PASS  6.6 delivery_count=4（仅 approved 进交付）
+  PASS  6.7 可写临时 scratch（delivery-preview.json 在场）
+
+■ 验收 7 · production-delivery-preview --persist
+  PASS  7.1 runHistoryRecorded = true
+  PASS  7.2 run-history +1
+  PASS  7.3 正式 deliveries 写入 1 个预览文件
+  PASS  7.4 预览文件每条键集为 33 字段
+
+■ 验收 8 · dry-run + --persist 语义冲突（拒绝）
+  PASS  8.1 抛 PARAM_CONFLICT
+  PASS  8.2 拒绝后 run-history 仍不增加
+
+■ 验收 9 · 重复运行（run-history append-only / 业务持久化遵循 --persist / 不污染真实归档）
+  PASS  9.1 run-history 再次 +1（append-only，无 dup）
+  PASS  9.2 capture 幂等：正式 capture 仍为 5（skipped>0）
+  PASS  9.3 幂等 skipped=5
+  PASS  9.4 同 run_id 二次写入 → RUN_ID_DUP
+  PASS  9.5 真实 captures 目录文件数不变
+  PASS  9.6 真实 candidates 目录文件数不变
+  PASS  9.7 真实 deliveries 目录文件数不变
+  PASS  9.8 真实 run-history 目录文件数不变
+
+============================================================
+D1/D2 验收结果：42 PASS / 0 FAIL
+============================================================

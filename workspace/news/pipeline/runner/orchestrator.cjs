@@ -1,0 +1,279 @@
+/* ============================================================
+ * N1 · 生产运行编排器（D1/D2 裁定落地）
+ * ------------------------------------------------------------
+ * 职责：把既有的「采集 → 候选 → 审核 → Gate → Delivery」冻结管道
+ *       串成一个可重复运行的生产流程，并严格按 D1/D2 矩阵接线
+ *       run-history 与业务数据持久化。
+ *
+ * ★ 本模块是「接线层」，不重写/不重构/不重新设计任何冻结件：
+ *   - 采集用 base-collector.collectLive（含 LIVE_ALLOWED 守卫、S001 不在内）
+ *   - 候选用 candidate-store、审核用 review-queue / review-actions
+ *   - Gate 用 gate.review、交付用 delivery-converter（零网络、不写 h5）
+ *   - run-history 用 run-history.record（10 字段封闭集、append-only）
+ *   - 不自动 approve、不自动写 news.js、不改 8 态 / 33 字段 / 判定语义
+ *
+ * 行为矩阵（见 run-modes.cjs）：
+ *   dry-run                  → 纯内存计算 + 终端/报告输出；不写 run-history、不落盘
+ *   production-*            → 必须写 run-history
+ *   production-* + --persist→ 额外正式写业务归档（capture/candidate/deliveries）
+ *   production-*（无persist）→ 可写临时 scratch，但不碰正式业务归档
+ * ============================================================ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const M = require('./run-modes.cjs');
+const RH = require('../run-history/run-history.cjs');
+const CS = require('../capture-store.cjs');
+const CandS = require('../candidate-store.cjs');
+const RQ = require('../review/review-queue.cjs');
+const RA = require('../review/review-actions.cjs');
+const GATE = require('../gate/gate.cjs');
+const DC = require('../delivery/delivery-converter.cjs');
+
+function fail(code, message) {
+  const e = new Error('[' + code + '] ' + message);
+  e.code = code;
+  throw e;
+}
+
+function nowIso() { return new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'); }
+
+function writeJson(file, obj) {
+  const dir = path.dirname(file);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(file, JSON.stringify(obj, null, 2), 'utf8');
+}
+
+/* ---------------- 阶段 1：采集（L0 RawCapture） ---------------- */
+
+/**
+ * 产出 RawCapture 数组。
+ *   - opts.captures 直接给定（测试 / 离线）→ 原样返回，source 统计为 0；
+ *   - 否则走真实采集器 collectLive（可注入 transport；S001 不在 LIVE_ALLOWED，
+ *     强行传入会被 collectLive 的守卫拒绝 → fail closed）。
+ */
+async function collectStage(opts) {
+  if (Array.isArray(opts.captures)) {
+    return { captures: opts.captures.slice(), source_success: 0, source_failed: 0, reasons: [] };
+  }
+  const BC = require('../collectors/base-collector.cjs');
+  const sources = (Array.isArray(opts.sources) && opts.sources.length)
+    ? opts.sources : M.DEFAULT_CAPTURE_SOURCES.slice();
+  const o = { date: opts.date, now: opts.now };
+  /* 注入取数通道（测试 / 离线）；未注入 → 真实 http-transport（live，需人工触发） */
+  if (typeof opts.transport === 'function') {
+    o.httpTransport = { transport: opts.transport, summary: function () { return {}; } };
+  }
+  let success = 0, failed = 0;
+  const reasons = [];
+  const captures = [];
+  for (let i = 0; i < sources.length; i++) {
+    const sid = sources[i];
+    try {
+      const r = await BC.collectLive(sid, o);
+      if (r.captures && r.captures.length) captures.push.apply(captures, r.captures);
+      if (r.errors && r.errors.length) { failed++; reasons.push({ source: sid, errors: r.errors }); }
+      else success++;
+    } catch (e) {
+      failed++;
+      reasons.push({ source: sid, errors: [{ code: e.code || 'ERROR', message: e.message }] });
+    }
+  }
+  return { captures: captures, source_success: success, source_failed: failed, reasons: reasons };
+}
+
+/* ---------------- 阶段 2：候选（L1） ---------------- */
+
+function loadDefaultCandidates() {
+  const f = path.join(__dirname, '..', 'ai-normalizer', 'output', '20260923.json');
+  const doc = JSON.parse(fs.readFileSync(f, 'utf8'));
+  return doc.candidates || [];
+}
+
+function reviewStage(opts) {
+  if (Array.isArray(opts.candidates)) return opts.candidates.slice();
+  return loadDefaultCandidates();
+}
+
+/* ---------------- 阶段 3：人工审核决策（保留闸门语义） ---------------- */
+
+/**
+ * 应用人工审核决策（approve / reject）。
+ *   - reject 必须附 reason（review-actions 已 fail closed）；
+ *   - 不自动 approve、不修改状态字段、不碰 DeliveryItem；
+ *   - 目标候选找不到 → 计入 anomaly，不中断批。
+ */
+function applyDecisions(candidates, decisions, operator, now) {
+  const byId = {};
+  candidates.forEach(function (c) { byId[c.candidate_id] = c; });
+  const approved = [], rejected = [], anomalies = [];
+  (Array.isArray(decisions) ? decisions : []).forEach(function (d, i) {
+    const c = byId[d.candidate_id];
+    if (!c) { anomalies.push({ candidate_id: d.candidate_id, reason: 'DECISION_TARGET_NOT_FOUND' }); return; }
+    try {
+      const r = RA.applyDecision(c, {
+        action: d.action,
+        reason: d.reason,
+        operator: operator || 'manual-reviewer',
+        now: now,
+        reviewSeq: i + 1
+      });
+      if (d.action === 'approve') approved.push(r.candidate);
+      else if (d.action === 'reject') rejected.push(r.candidate);
+      else anomalies.push({ candidate_id: d.candidate_id, reason: 'UNKNOWN_ACTION:' + String(d.action) });
+    } catch (e) {
+      anomalies.push({ candidate_id: d.candidate_id, code: e.code, message: e.message });
+    }
+  });
+  return { approved: approved, rejected: rejected, anomalies: anomalies };
+}
+
+/* ---------------- 主入口 ---------------- */
+
+/**
+ * @param {object} opts {
+ *   mode, persist(bool), sources?, captures?, candidates?, decisions?,
+ *   transport?(fn), operator?, date, now,
+ *   dirs: { captures, candidates, deliveries, runHistory, scratch }
+ * }
+ * @returns {Promise<object>} { mode, persist, isDryRun, runHistoryRecorded,
+ *   runId, metrics(15+), persisted, artifacts }
+ */
+async function runPipeline(opts) {
+  opts = opts || {};
+  const mode = M.validateMode(opts.mode);
+  const persist = !!opts.persist;
+  M.checkPersistConflict(mode, persist);          /* dry-run + --persist → 抛 PARAM_CONFLICT */
+  const isDry = M.isDryRun(mode);
+  const now = opts.now || nowIso();
+  const start = now;
+  const dirs = opts.dirs || {};
+
+  const metrics = {
+    mode: mode, persist: persist,
+    run_id: null,
+    start_time: start, end_time: null,
+    source_success: 0, source_failed: 0,
+    rawcapture_count: 0, capture_count: 0, candidate_count: 0,
+    ai_normalized_count: 0,
+    approved_count: 0, rejected_count: 0,
+    delivery_count: 0, actual_writes: 0,        /* N1 恒为 0：preview 不写 news.js */
+    skipped_count: 0, event_count: 0, anomaly_count: 0,
+    source_fail_reasons: []
+  };
+  const result = {
+    mode: mode, persist: persist, isDryRun: isDry,
+    runHistoryRecorded: false, runId: null,
+    metrics: metrics, persisted: {}, artifacts: {}
+  };
+
+  /* production 模式：提前分配唯一 run_id（run-history 与 deliveries 预览文件名共用） */
+  let runId = null;
+  if (!isDry) runId = RH.nextRunId({ dir: dirs.runHistory, date: opts.date });
+
+  /* ---- 采集阶段（dry-run 与 production-capture 都跑，用于预览/落盘） ---- */
+  if (mode === 'dry-run' || mode === 'production-capture') {
+    const cs = await collectStage(opts);
+    metrics.rawcapture_count = cs.captures.length;
+    metrics.capture_count = cs.captures.length;
+    metrics.source_success = cs.source_success;
+    metrics.source_failed = cs.source_failed;
+    metrics.source_fail_reasons = cs.reasons;
+    metrics.anomaly_count = cs.reasons.length;
+    result.artifacts.captures = cs.captures;
+    if (mode === 'production-capture') {
+      if (persist) {
+        const r = CS.appendCaptures(cs.captures, { dir: dirs.captures, date: opts.date });
+        metrics.skipped_count += r.skipped;
+        result.persisted.captures = r;
+      } else if (dirs.scratch) {
+        /* D2：可写临时 scratch，不碰正式业务归档 */
+        writeJson(path.join(dirs.scratch, 'captures.json'),
+          { mode: mode, count: cs.captures.length, captures: cs.captures });
+      }
+    }
+  }
+
+  /* ---- 审核队列阶段（production-review） ---- */
+  if (mode === 'production-review') {
+    const candidates = reviewStage(opts);
+    metrics.candidate_count = candidates.length;
+    metrics.ai_normalized_count = candidates.length;   /* AI 整理视为上游已完成（§5 未落地） */
+    result.artifacts.candidates = candidates;
+    const q = RQ.buildQueue(candidates, { date: opts.date, generated_at: now });
+    result.artifacts.reviewQueue = q.doc;
+    if (persist) {
+      const r = CandS.appendCandidates(candidates, { dir: dirs.candidates, date: opts.date });
+      metrics.skipped_count += r.skipped;
+      result.persisted.candidates = r;
+    } else if (dirs.scratch) {
+      writeJson(path.join(dirs.scratch, 'candidates.json'),
+        { mode: mode, count: candidates.length, candidates: candidates, reviewQueue: q.doc });
+    }
+  }
+
+  /* ---- 交付预览阶段（production-delivery-preview，不写 news.js） ---- */
+  if (mode === 'production-delivery-preview') {
+    const candidates = (Array.isArray(opts.candidates) ? opts.candidates.slice() : reviewStage(opts));
+    const dec = applyDecisions(candidates, opts.decisions, opts.operator, now);
+    metrics.candidate_count = candidates.length;
+    metrics.approved_count = dec.approved.length;
+    metrics.rejected_count = dec.rejected.length;
+    metrics.anomaly_count = dec.anomalies.length;
+    result.artifacts.anomalies = dec.anomalies;
+
+    const gate = GATE.review(dec.approved, {});
+    const conv = DC.toDeliveries(gate.approved, { now: now });
+    metrics.delivery_count = conv.items.length;
+    metrics.event_count = gate.approved.length;
+    result.artifacts.deliveries = conv.items;
+    result.artifacts.report = conv.report;
+
+    if (persist) {
+      const file = path.join(dirs.deliveries, runId + '.delivery-preview.json');
+      CS.assertInsidePipeline(file);                  /* 守卫：仍须在 pipeline/ 内 */
+      writeJson(file, {
+        schema_version: '1.0', layer: 'L3-PREVIEW', run_id: runId,
+        generated_at: now, mode: mode, count: conv.items.length,
+        items: conv.items, report: conv.report
+      });
+      result.persisted.deliveries = { file: file, run_id: runId, count: conv.items.length };
+    } else if (dirs.scratch) {
+      writeJson(path.join(dirs.scratch, 'delivery-preview.json'),
+        { mode: mode, count: conv.items.length, items: conv.items, report: conv.report });
+    }
+  }
+
+  metrics.end_time = nowIso();
+
+  /* ---- run-history 接线（仅 production 模式；dry-run 不写） ---- */
+  if (!isDry) {
+    const entry = {
+      run_id: runId,
+      start_time: metrics.start_time,
+      end_time: metrics.end_time,
+      source_success: metrics.source_success,
+      source_failed: metrics.source_failed,
+      capture_count: metrics.capture_count,
+      candidate_count: metrics.candidate_count,
+      approved_count: metrics.approved_count,
+      rejected_count: metrics.rejected_count,
+      delivery_count: metrics.delivery_count
+    };
+    RH.record(entry, { dir: dirs.runHistory });     /* 10 字段封闭集、append-only、原子写 */
+    result.runId = runId;
+    result.runHistoryRecorded = true;
+    metrics.run_id = runId;
+  }
+
+  return result;
+}
+
+module.exports = {
+  runPipeline: runPipeline,
+  collectStage: collectStage,
+  reviewStage: reviewStage,
+  applyDecisions: applyDecisions
+};

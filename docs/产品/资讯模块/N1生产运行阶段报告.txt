@@ -1,0 +1,185 @@
+================================================================
+N1 资讯生产运行阶段 · D1/D2 落地报告（V1.0）
+================================================================
+生成时间：2026-09-24
+范围：仅落实策划裁定 D1 + D2，未自行扩展其他产品决策（§5 AI Provider Adapter 等不在本次范围）。
+基线 HEAD：7e25678（G10.1 资讯模块 H5 生产部署同步）
+news.js 状态：35 条，SHA256 = ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf（与 G9 写入后一致，未改动）
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【新增代码 · 本次 D1/D2 实现】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\run-modes.cjs
+   —— 运行模式定义 + D1/D2 持久化边界（行为矩阵、PARAM_CONFLICT、run-history 接线条件）
+2) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\orchestrator.cjs
+   —— 生产运行编排器，串接冻结管道并严格按 D1/D2 矩阵接线 run-history 与业务落盘
+3) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\run-n1.cjs
+   —— CLI 入口，解析 --mode/--persist/--sources 等，退出码 0/1/2
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\tests\test-d1d2.cjs
+   —— D1/D2 行为矩阵验收测试（42 断言，隔离临时目录，零网络）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\tests\out-d1d2.txt
+   —— 测试运行输出（42 PASS / 0 FAIL 证据留存）
+
+【冻结模块 · 仅被接线，源码零改动】
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\run-history\run-history.cjs
+   —— 10 字段封闭集、append-only、原子写、RUN_ID_DUP 守卫（本次首次正式接线，未改其代码）
+7) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\capture-store.cjs
+8) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\candidate-store.cjs
+9) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\review\review-queue.cjs / review-actions.cjs
+10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\gate\gate.cjs
+11) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\delivery\delivery-converter.cjs
+12) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\collectors\base-collector.cjs
+
+【同步报告（本报告）】
+13) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1生产运行阶段报告.txt
+14) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1生产运行阶段报告-精简版.txt
+
+----------------------------------------------------------------
+§1 策划裁定落地结论（D1 / D2）
+----------------------------------------------------------------
+【D1｜dry-run 是否写 run-history】
+- 裁定：dry-run 是纯模拟，不写 run-history、不落任何生产持久化数据、无持久化副作用。
+- 落地：run-modes.requiresRunHistory(m) = isProduction(m)；orchestrator 仅在 !isDry 时调用 RH.record。
+- 验证：验收 1（dry-run）runHistoryRecorded=false、run_id=null、run-history 数量不增加、不产生任何文件（含 scratch）。PASS。
+
+【D2｜生产业务数据持久化开关】
+- 裁定：production-* 默认不持久化业务数据；仅显式 --persist 才正式落盘；run-history 属运行审计记录，
+  与业务持久化解耦，production-* 必写；dry-run+--persist 语义冲突必须拒绝。
+- 落地：run-modes.checkPersistConflict 在 dry-run+persist 时抛 PARAM_CONFLICT；
+  orchestrator 仅在 persist=true 时调用 CS.appendCaptures / CandS.appendCandidates / 写 deliveries 预览。
+- 行为矩阵（代码实现，与裁定一致）：
+    dry-run                         → 业务落盘 NO  / run-history NO
+    production-capture              → 业务落盘 NO  / run-history YES
+    production-capture  + --persist → 业务落盘 YES / run-history YES
+    production-review               → 业务落盘 NO  / run-history YES
+    production-review   + --persist → 业务落盘 YES / run-history YES
+    production-delivery-preview     → 业务落盘 NO  / run-history YES
+    production-delivery-preview+--persist → 业务落盘 YES / run-history YES
+- 验证：验收 2–8 全 PASS（含 dry-run+--persist 拒绝、production-* 写 run-history、--persist 才落盘）。
+
+----------------------------------------------------------------
+§2 修改文件清单
+----------------------------------------------------------------
+新增（5 个文件）：
+- workspace/news/pipeline/runner/run-modes.cjs
+- workspace/news/pipeline/runner/orchestrator.cjs
+- workspace/news/pipeline/runner/run-n1.cjs
+- workspace/news/pipeline/runner/tests/test-d1d2.cjs
+- workspace/news/pipeline/runner/tests/out-d1d2.txt
+新增目录（空 sample/ 不纳入版本库）：
+- workspace/news/pipeline/runner/
+- workspace/news/pipeline/runner/tests/
+修改（0 个）：G1–G10 全部冻结模块源码未改；news.js / H5 未改。
+
+----------------------------------------------------------------
+§3 CLI 行为
+----------------------------------------------------------------
+入口：node workspace/news/pipeline/runner/run-n1.cjs [--mode MODE] [--persist] [--sources S002,S004,S006]
+      [--capture-file X] [--candidate-file Y] [--decisions-file Z] [--out DIR]
+      [--business-dir DIR] [--run-history-dir DIR] [--date DATE] [--operator OP]
+默认业务目录：pipeline/ 下 captures / candidates / deliveries / run-history（满足 capture-store 写入守卫）。
+默认采集来源：S002 / S004 / S006（LIVE_ALLOWED 守卫，S001 不在内，强行传入 fail closed）。
+真实 live 爬取（无 --capture-file 且未注入 transport）由人工显式触发，本沙箱不自动联网。
+退出码：0 成功 / 2 参数错误或语义冲突（dry-run+--persist）/ 1 运行异常。
+典型调用：
+- 纯模拟：--mode dry-run --capture-file caps.json
+- 采集预览（写审计不落业务）：--mode production-capture --sources S002,S004,S006
+- 采集正式落盘：--mode production-capture --sources S002,S004,S006 --persist
+- 审核预览：--mode production-review --candidate-file cands.json
+- 交付预览（不写 news.js）：--mode production-delivery-preview --candidate-file cands.json --decisions-file dec.json
+- 交付预览正式落盘：--mode production-delivery-preview ... --decisions-file dec.json --persist
+
+----------------------------------------------------------------
+§4 测试结果
+----------------------------------------------------------------
+测试套件：test-d1d2.cjs（D1/D2 行为矩阵验收）
+断言总数：42 PASS / 0 FAIL
+覆盖验收组：
+- 验收1 dry-run（不写 run-history、不动正式业务目录、不产生文件）：5 断言 PASS
+- 验收2 production-capture 无 --persist（写 run-history、不落 capture-store、可写 scratch）：4 断言 PASS
+- 验收3 production-capture --persist（写 run-history、capture-store 落 5 条、added=5）：4 断言 PASS
+- 验收4 production-review 无 --persist（写 run-history、不落 candidate-store、队列全 pending）：5 断言 PASS
+- 验收5 production-review --persist（candidate-store 落 6 条）：3 断言 PASS
+- 验收6 production-delivery-preview 无 --persist（approved=4/rejected=2/delivery=4、可写 scratch）：7 断言 PASS
+- 验收7 production-delivery-preview --persist（deliveries 落 1 预览文件、每条 33 字段）：4 断言 PASS
+- 验收8 dry-run+--persist 拒绝（PARAM_CONFLICT、run-history 不增）：2 断言 PASS
+- 验收9 重复运行（append-only 无 dup、capture 幂等 skipped=5、RUN_ID_DUP 守卫、真实 4 目录文件数不变）：8 断言 PASS
+测试环境：隔离临时目录 pipeline/runner/tests/tmp-d1d2/，真实生产归档（captures/candidates/deliveries/run-history）文件数零变化。
+证据文件：workspace/news/pipeline/runner/tests/out-d1d2.txt
+
+----------------------------------------------------------------
+§5 run-history 前后数量（10 字段封闭集日志）
+----------------------------------------------------------------
+真实生产归档 pipeline/run-history/ 现状：
+- 提交前：无 10 字段 run-history.json 数据日志（仅有 run-history.cjs 模块、production-baseline-20260923.json、
+  deploy-diff-20260923.json 等基线/工具文件）。业务数据条目 = 0。
+- 本次 D1/D2 是否在真实归档写入：否（遵循验收9「不污染真实归档」原则，首个真实条目由运营首次真实生产运行写入）。
+隔离样例验证（tmp-d1d2/run-history/run-history.json）：
+- production-* 7 组 + 重复运行共生成 8 条 10 字段条目，逐条字段齐备：
+  run_id / start_time / end_time / source_success / source_failed / capture_count /
+  candidate_count / approved_count / rejected_count / delivery_count
+- 示例条目：
+  {
+    "run_id": "run-20260924-001",
+    "start_time": "2026-09-24T03:38:01Z",
+    "end_time": "2026-09-24T03:38:01Z",
+    "source_success": 0, "source_failed": 0,
+    "capture_count": 5, "candidate_count": 0,
+    "approved_count": 0, "rejected_count": 0, "delivery_count": 0
+  }
+结论：run-history 接线机制已验证可用（隔离 8 条全过）；真实归档保持 0 条未污染，待运营真实生产周期写入。
+
+----------------------------------------------------------------
+§6 正式业务目录是否发生变化
+----------------------------------------------------------------
+- captures/：文件数不变（无 --persist 不落盘；--persist 仅写入隔离/显式目录，未触真实归档）。
+- candidates/：文件数不变（同上）。
+- deliveries/：文件数不变（production-delivery-preview 无 --persist 不写；--persist 落盘至显式目录）。
+- run-history/：真实数据日志 0 条未变（仅模块与基线文件）；业务数据日志与基线文件解耦。
+- news.js：35 条未变，SHA256 未变（见 §0 顶部）。
+- H5（h5/ 站）：未改动、未部署。
+结论：正式业务目录与现网数据零变化，符合 N1 安全红线（不自动写 news.js / H5）。
+
+----------------------------------------------------------------
+§7 十项必填字段速查
+----------------------------------------------------------------
+1) 实际完成：D1/D2 代码实现 + 编排器接线 + CLI + 验收测试（42 PASS），run-history 接线机制就绪。
+2) 未完成：§5 AI Provider Adapter（7 字段适配层）未落地；§3 真实 RSS 常态化采集通道未启用（仅接线、人工触发）；
+           三端复用、S001 人工 HTML 通道、规范 V1.1 均不在本次 D1/D2 范围。
+3) 是否改 news.js：否（35 条，SHA256 不变）。
+4) 是否改 H5：否。
+5) 是否改 G1–G8 冻结规则：否（8 态 / 33 字段 / 判定语义 / 审核闸门全部未改；仅 orchestrator 接线调用）。
+6) 测试数量：42 断言（test-d1d2.cjs）。
+7) PASS-FAIL：42 PASS / 0 FAIL。
+8) Git HEAD：基线 7e25678（G10.1）；本次 D1/D2 代码提交为其直接子提交（见 git log）。
+9) SHA256（news.js）：ebf67de08bf8c391c59f05ed82cb43144a2726f879ef7185388ca7939e56fcaf（未变）。
+10) 下一阶段建议：见 §8。
+
+----------------------------------------------------------------
+§8 下一阶段同步报告（待拍板项）
+----------------------------------------------------------------
+N1 剩余项（需负责人拍板后推进，非本次 D1/D2）：
+- N1.1 §5 AI Provider Adapter：定义 7 字段输出契约（title/summary/category/related_movies/
+  related_series/related_characters/related_phases 等），仅允许 7 字段，越权抛 FORBIDDEN_FIELD。
+- N1.2 §3 真实 RSS 常态化：S002/S004/S006 定时采集；S003/S005 失败留痕；S001 单列人工 HTML 通道（设计待拍板）。
+- N1.3 三端复用评估：小程序端必须 CloudBase，抖音有类目风险（沿用方案 V3.0 结论）。
+- N1.4 运行指标看板：N1 指标 15 项（source_success/failed、capture/candidate/approved/rejected/
+  delivery_count、actual_writes=0、anomaly_count、event_count 等）已纳入 metrics 对象，待可视化。
+- N1.5 规范 V1.1：基于 G8 审核规范收口，补充 production 模式操作 SOP（干跑→采集→审核→交付预览→人工确认→落盘）。
+安全红线重申：任何 production 模式均不自动 approve、不自动写 news.js；人工审核闸门（review-queue 全 pending）
+  与 G6 Gate（仅过滤不升 approved）语义不变。
+
+----------------------------------------------------------------
+§9 置信度
+----------------------------------------------------------------
+结论置信度：高。
+依据：
+- D1/D2 行为矩阵 100% 由代码实现并 42 条断言逐条验证（含 dry-run 不写、production-* 必写、--persist 才落盘、冲突拒绝）。
+- run-history 10 字段封闭集、append-only、原子写、RUN_ID_DUP 守卫由既有冻结模块保证，本次仅接线未改。
+- news.js / H5 / G1–G8 未改动，有 SHA256 与文件数不变双重证据。
+局限：
+- §5 AI Provider Adapter、§3 真实 RSS 常态化为后续阶段，本次未交付，结论不覆盖其正确性。
+- 真实 live 爬取未在沙箱执行（治理红线 + 需人工触发），其网络行为以 base-collector LIVE_ALLOWED 守卫为证据，
+  非端到端实跑。
+================================================================
