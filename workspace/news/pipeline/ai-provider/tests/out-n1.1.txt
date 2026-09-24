@@ -1,0 +1,61 @@
+============================================================
+N1.1 · AI Provider Adapter 专项验收
+============================================================
+
+■ 1 · 合法 7 字段结果
+  PASS  1.1 合法 7 字段 validate 通过
+  PASS  1.2 通过结果恰为 7 字段
+
+■ 2 · 缺失字段
+  PASS  2.1 抛 MISSING_FIELD
+
+■ 3 · 越权字段
+  PASS  3.1 抛 FORBIDDEN_FIELD
+
+■ 4 · 多个越权字段
+  PASS  4.1 抛 FORBIDDEN_FIELD
+  PASS  4.2 错误信息列全越权字段
+
+■ 5 · 类型错误
+  PASS  5.1 数组字段传 string → TYPE_ERROR
+  PASS  5.2 字符串字段传 number → TYPE_ERROR
+  PASS  5.3 空字符串 → MISSING_FIELD（既有契约必填）
+
+■ 6 · Adapter 正常调用
+  PASS  6.1 runAdapter 返回校验通过结果
+  PASS  6.2 输出恰为 7 字段（与 ai-normalizer 契约互通，无 ai_model 泄漏）
+  PASS  6.3 注册表取 provider 正常调用
+
+■ 7 · Provider 错误传播
+  PASS  7.1 抛 PROVIDER_ERROR
+  PASS  7.2 保留原始错误 cause
+
+■ 8 · Validator 不修改输入
+  PASS  8.1 输入键集未变
+  PASS  8.2 输入值未变
+  PASS  8.3 返回为隔离副本（非同一引用）
+
+■ 9 · N1.1 不破坏 D1/D2 行为矩阵
+  PASS  9.1 validateMode 合法
+  PASS  9.2 未知模式拒绝
+  PASS  9.3 isDryRun(dry-run)=true
+  PASS  9.4 isProduction(production-capture)=true
+  PASS  9.5 requiresRunHistory(production-capture)=true
+  PASS  9.6 requiresRunHistory(dry-run)=false
+  PASS  9.7 dry-run+--persist → PARAM_CONFLICT
+  PASS  9.8 默认采集来源封闭集
+
+■ 10 · D1/D2 测试套件回归（子进程）
+  PASS  10.1 D1/D2 测试退出码 0
+  PASS  10.2 输出含「42 PASS / 0 FAIL」
+
+■ 冻结自检
+  PASS  F.1 news.js SHA256 = N1 D1/D2 基线
+  PASS  F.2 真实 captures 目录文件数不变
+  PASS  F.3 真实 candidates 目录文件数不变
+  PASS  F.4 真实 deliveries 目录文件数不变
+  PASS  F.5 真实 run-history 目录文件数不变
+
+============================================================
+N1.1 验收结果：32 PASS / 0 FAIL
+============================================================
