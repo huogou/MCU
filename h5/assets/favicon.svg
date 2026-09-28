@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- MCU Atlas favicon：深空圆底 + 金色星轨轨道环 + 蓝色导航锚点 -->
+  <!-- 深空圆底（品牌底色 #080B12） -->
+  <circle cx="32" cy="32" r="32" fill="#080B12"/>
+  <!-- 金色星轨轨道环（品牌金 #F2B233，270° 弧：从正下顺时针经左、上、右，开口朝右下） -->
+  <path d="M32 59 A 27 27 0 1 1 59 32" fill="none" stroke="#F2B233" stroke-width="13" stroke-linecap="round"/>
+  <!-- 蓝色导航锚点（accent-blue #4A9EF5，环顶部定位记忆点，放大保证小尺寸醒目） -->
+  <circle cx="32" cy="7" r="5" fill="#4A9EF5"/>
+</svg>

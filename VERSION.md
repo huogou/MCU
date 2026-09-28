@@ -1,5 +1,35 @@
 # MCU小程序版本记录
 
+## H5-FAVICON（H5 端 · 全站 favicon 部署）
+
+版本：
+H5-FAVICON（原创星轨导航图标）
+
+状态：
+**已部署上线**（2026-09-28，https://mcuatlas.xyz/）
+
+适用端：
+H5（纯静态多页）；微信/抖音小程序**零改动**
+
+本轮内容：
+- 新增原创 favicon 三件套（设计基因：深空圆底 `#080B12` + 品牌金 `#F2B233` 星轨轨道环 + 蓝锚点 `#4A9EF5`）：
+  - `h5/assets/favicon.svg`（矢量主力，现代浏览器标签页矢量渲染、16px 锐利）
+  - `h5/assets/favicon.ico`（六帧位图 16/32/48/64/128/256，老浏览器兜底）
+  - `h5/assets/apple-touch-icon.png`（180px，iOS/Android 主屏图标）
+- 全站 13 个线上页面 `<head>` 注入 favicon 引用（index / routes / movie / map / map-pc / community / my-community / news / news-detail / next / post-create / route-detail / topic-detail）
+- 设计过程三轮小尺寸辨识度校验（识图复核 16px/32px），最终采用「SVG 矢量主力 + ICO 位图兜底」分层方案
+
+验收：
+- 服务器部署：`/www/wwwroot/mcu-h5/`，先备份 `.bak-favicon-20260928/` 可回滚
+- sha256 本地与服务器逐字节一致（favicon 三件套 + 抽查 index/news/routes）
+- 线上公网验证：favicon.svg / favicon.ico / apple-touch-icon.png 均 200 且 MIME 正确；index.html / news.html head 引用在场；子页面 200
+
+备注：
+- favicon 属浏览器强缓存资源，老访客需刷新（Ctrl+F5）后可见新图标
+- `review/index.html` 为本地审查页，服务器无此目录，未部署
+
+---
+
 ## H5 资讯模块 V2.2（H5 端 · 模拟数据施工完成，未部署）
 
 版本：
@@ -77,6 +107,47 @@ V2.0.0 驳回（驳回点=作品详情页仍具明显「影视/文娱作品详�
 审核结果路由：
 - 通过 → 记录闭环
 - 驳回且仍判「文娱→文娱→资讯」→ 不改代码，同步策划 → 第二阶段全局文娱内容信号分析（journey/library/about/synopsis/reason/角色 note/海报文本组合/数据密度）
+
+---
+
+## V2.4（抖音小程序 · 引流清除整改 · 待提审）
+
+版本：
+V2.4（第三方引流清除）
+
+状态：
+**整改完成、待提审**（2026-09-23；本地 commit `7b43ddd`，待代理恢复推送远端）
+
+背景：
+V2.3 驳回——驳回点「小程序页面内容不得存在第三方引流行为」（小程序运营规则：第三方引流；审核截图指向首页 H5 引导入口）
+
+本轮内容（git `7b43ddd`，18 文件 +80/-223）：
+- **删除** `components/h5-guide` 组件（4 文件）与 `models/h5Link.js`（H5_URL + 复制逻辑）
+- home：删「宇宙关系 → 前往 H5」入口卡、goH5、h5Guide 数据、组件注册
+- journey：删 allDone「分享你的成就」按钮（实为复制 H5 链接）+ h5-guide 卡 + goH5
+- movie / my-mcu：删 h5-guide 卡与组件注册
+- journey.wxss 清理 ad-share 死样式；about 版本 V2.3 → V2.4 / 09-23
+- 全端零外部链接：抖音包内不再含 mcuatlas.xyz 或任何 H5 出口
+
+自检（workspace/verify-v24.cjs）：
+- 全目录零引流残留（12 特征 × 全部源码行，注释剔除后判定）
+- 10 页 json/js 无悬空引用（组件注册与 require 全清）
+- V2.3 功能全保持：宇宙节点卡/关联节点/进入宇宙导航/节点互跳/入口 6 处兼容
+- H5 端与微信端零改动
+
+---
+
+## V2.3（抖音小程序 · 已驳回存档）
+
+版本：
+V2.3（宇宙节点信息页）
+
+状态：
+**驳回**（2026-09-22 提审；驳回点=第三方引流，非宇宙节点页本身问题）
+
+说明：
+宇宙节点信息页整改内容全部保留在 V2.4 中继续有效；驳回点为 H5 引导引流元素，
+已由 V2.4 清除。详见 V2.4 条目。
 
 ---
 
