@@ -6,7 +6,6 @@
   "updated_at": "2026-10-08",
   "stage": "development",
   "status": "active",
-  "strategy": "🟢 持续迭代 · 全库两个持续投入项目之一（2026-10-08 彦祖裁定，见 00_项目总览\\项目治理策略.md）。⏸ 当前无排期：彦祖指令仍在调研中，本 AI 不代裁优先级",
   "tech_stack": [
     "原生 H5 (HTML/CSS/JS)",
     "微信小程序",
@@ -14,11 +13,6 @@
     "静态 JS 元数据单一可信源",
     "资讯生产流水线 (Node 24 + DashScope 百炼)"
   ],
-  "ai_roles": {
-    "planner": "GPT + 彦祖（最终拍板）",
-    "designer": "豆包 / LOOMY（2026-09-23 变更，原 QoderWork CN）",
-    "developer": "CodeBuddy（2026-09-24 C1 裁定后由 CodeBuddy 承担）"
-  },
   "repo": {
     "type": "git",
     "path": "D:\\SEO\\发挥余热\\漫威电影宇宙导航",
@@ -88,5 +82,6 @@
     "抖音小程序",
     "Monorepo",
     "漫威"
-  ]
+  ],
+  "note": "原协作分工与策略字段已移除，不对外展示"
 }
