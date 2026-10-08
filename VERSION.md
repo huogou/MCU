@@ -369,4 +369,4 @@ v1.2.0-release
 
 - 数据层（`shared/data/*.js`）为跨端唯一可信源，版本号不由数据变更驱动。
 - 每次修改须落 Git 提交，并同步 VERSION.md / MCU项目总览.md / README.md。
-- 跨 AI 协作通过根目录三份同步文件与 `.workbuddy/memory/` 长期记忆完成。
+- 跨角色协作通过 `docs/同步/` 同步文件与项目记忆完成。
