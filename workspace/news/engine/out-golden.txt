@@ -2,7 +2,7 @@
 G1 · 资讯状态判定器 V1.0 —— 黄金用例回归（现有 15 条 news.js）
 ============================================================
 判定器规则版本：V1.0｜path 策略：legacy
-数据：MCU_NEWS 15 条
+数据：MCU_NEWS 35 条
 
 ■ 1. 15 条黄金用例逐条比对（数据现状 + 任务书期望表）
   PASS  【A1】15 条判定状态 = 数据现状 verification_status
@@ -58,6 +58,26 @@ G1 · 资讯状态判定器 V1.0 —— 黄金用例回归（现有 15 条 news.
   news-2026-09-19-013   official_confirmed      Step 1  1
   news-2026-09-19-014   corrected               Step 3  0
   news-2026-09-17-015   single_source           Step 6  1
+  news-2026-09-23-001   single_source           Step 6  1
+  news-2026-09-23-002   single_source           Step 6  1
+  news-2026-09-23-003   single_source           Step 6  1
+  news-2026-09-23-004   single_source           Step 6  1
+  news-2026-09-23-005   single_source           Step 6  1
+  news-2026-09-23-006   single_source           Step 6  1
+  news-2026-09-23-007   single_source           Step 6  1
+  news-2026-09-23-008   single_source           Step 6  1
+  news-2026-09-23-009   single_source           Step 6  1
+  news-2026-09-23-010   single_source           Step 6  1
+  news-2026-09-23-011   single_source           Step 6  1
+  news-2026-09-23-012   single_source           Step 6  1
+  news-2026-09-23-013   single_source           Step 6  1
+  news-2026-09-23-014   single_source           Step 6  1
+  news-2026-09-23-015   single_source           Step 6  1
+  news-2026-09-23-016   single_source           Step 6  1
+  news-2026-09-23-017   single_source           Step 6  1
+  news-2026-09-23-018   single_source           Step 6  1
+  news-2026-09-23-019   single_source           Step 6  1
+  news-2026-09-23-020   single_source           Step 6  1
 
 ============================================================
 结果：25 PASS / 0 FAIL

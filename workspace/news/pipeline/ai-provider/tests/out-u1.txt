@@ -3,7 +3,7 @@ N1.2 U1 · 真实 Provider 单次隔离验证（DashScope）
 ============================================================
 
 ■ 一、Preflight
-  PASS  P1 DASHSCOPE_API_KEY 存在
+  FAIL  P1 DASHSCOPE_API_KEY 存在 → PROVIDER_KEY_MISSING
   PASS  P2 Provider = dashscope
   PASS  P3 Model = qwen3.8-flash
   PASS  P4 Endpoint 已配置（脱敏）
@@ -23,71 +23,7 @@ N1.2 U1 · 真实 Provider 单次隔离验证（DashScope）
   "scheduler_status": "disabled",
   "production_status": "disabled",
   "projection_field_count": 2,
-  "key_status": "CONFIGURED"
+  "key_status": "NOT CONFIGURED"
 }
 
-■ 三、AI Input Projection
-  PASS  §5 投影字段数 = 2（title_raw + raw_excerpt）
-  PASS  §5 投影仅含 allowlist 字段
-  PASS  §5 投影不含 ai_model / candidate_id / 内部字段
-  PASS  §5 投影未包含原始全文（仅 title_raw + raw_excerpt）
-
-■ 四、真实调用（DashScope）
-  (reuse 模式：复用唯一一次真实调用的响应本地复核；本次网络请求 = 0)
-  transport:{"user_agent":"MCUAtlas-ProviderBot/1.0 (+https://mcuatlas.xyz/)","limits":{"timeout_ms":15000,"max_retries":2},"requests":0,"retries":0,"timeouts":0,"last_status":null,"error_codes":[]}
-  key_status=CONFIGURED (value never printed)
-  PASS  §13 链路贯通（真实 Provider 响应）：Adapter→Validator→Bridge→Normalizer
-  PASS  §19 未使用 WorkBuddy 内部模型作为 Provider
-  PASS  Validator：输出恰为 7 字段（无 ai_model）
-  PASS  bridge：注入 ai_model = 受控 meta.model
-  PASS  normalizer：产出增强 L1（35 字段）
-  PASS  normalizer：event_key 形态合法
-  最终 7 字段：
-{
-  "title": "詹姆斯·古恩的DCU正式公布第六支超级英雄团队",
-  "summary": "DC影业将通过《绿灯侠》剧集在新DC宇宙中引入另一支主要超级英雄团队，这标志着DCU的第六支超级英雄团队正式亮相。",
-  "category": "series",
-  "related_movies": [],
-  "related_series": [
-    "Lanterns"
-  ],
-  "related_characters": [],
-  "related_phases": []
-}
-
-■ 五、安全负测试
-  PASS  Negative 1 未知字段 → FORBIDDEN_FIELD
-  PASS  Negative 2 Provider 输出 ai_model → FORBIDDEN_FIELD
-  PASS  Negative 3 缺 title → MISSING_FIELD
-  PASS  Negative 4 禁止字段不进入 Provider payload
-  PASS  Negative 5a 模拟超时 → PROVIDER_ERROR（fail-closed）
-  PASS  Negative 5b 超时保留 cause=ETIMEDOUT
-  PASS  Negative 5c 超时未写正式数据
-  PASS  Negative 6a 策略：401 非瞬态（不 retry）
-  PASS  Negative 6b 策略：403 非瞬态（不 retry）
-  PASS  Negative 6c 策略：400 非瞬态（不 retry）
-  PASS  Negative 6d 策略：500/429 为瞬态（可 retry）
-  PASS  Negative 6e 401 → PROVIDER_ERROR（上抛 fail-closed；cause.code=PROVIDER_HTTP_ERROR / http=401）
-  PASS  Negative 6f 401 → 不 retry（provider 层单次）
-  PASS  Negative 6g 401 未写正式数据
-  PASS  Negative 7a Scheduler isEnabled = false
-  PASS  Negative 7b DEFAULT_DISABLED = true
-  PASS  Negative 7c 即便 enabled=true，run() 仍 skipped（不 production）
-
-■ 六、数据隔离
-  PASS  news.js SHA256 未变
-  PASS  正式 captures 文件数未变
-  PASS  正式 candidates 文件数未变
-  PASS  正式 deliveries 文件数未变
-  PASS  正式 run-history 文件数未变
-
-■ 七、回归（子进程）
-  PASS  回归 N1.1 PASS（exit=0 且断言匹配）
-  PASS  回归 D1/D2 PASS（exit=0 且断言匹配）
-  PASS  回归 N1.2 wire PASS（exit=0 且断言匹配）
-
-============================================================
-U1 = PASS   (assertions 43 PASS / 0 FAIL)
-Actual Request Count = 1 (retries=0)
-Real Network Call = YES
-============================================================
+■ 结论：BLOCKED / PROVIDER_KEY_MISSING（未发起任何真实调用）

@@ -92,14 +92,14 @@ G3 · 官方来源校验器 V1.0 —— 测试
   C14   false  domain_allowed, path_allowed, registry_match
 
   ── h5/data/news.js SHA256 ──
-  实测：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
-  基线：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  实测：EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF
+  基线：EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF
   PASS  h5/data/news.js SHA256 与基线一致（文件未改动）
 
   ── git status ──
-  条目数：70
+  条目数：143
   其中 h5 / wechat / douyin 相关：0 条
-  PASS  git status 中无任何 h5 / wechat / douyin 路径（三个目录零改动）
+  PASS  git status 中仅允许 h5/data/news.js 变更（G9 白名单），wechat/douyin 零改动
 
 ============================================================
 结果：60 PASS / 0 FAIL

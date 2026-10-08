@@ -31,6 +31,7 @@ const RQ = require('../review/review-queue.cjs');
 const RA = require('../review/review-actions.cjs');
 const GATE = require('../gate/gate.cjs');
 const DC = require('../delivery/delivery-converter.cjs');
+const SM = require('../status/status-machine.cjs');   /* N1.2 P1-A 状态追踪层（隔离于 L0/L1/L2） */
 
 function fail(code, message) {
   const e = new Error('[' + code + '] ' + message);
@@ -161,7 +162,9 @@ async function runPipeline(opts) {
     approved_count: 0, rejected_count: 0,
     delivery_count: 0, actual_writes: 0,        /* N1 恒为 0：preview 不写 news.js */
     skipped_count: 0, event_count: 0, anomaly_count: 0,
-    source_fail_reasons: []
+    source_fail_reasons: [],
+    ai_processed_count: 0,                     /* N1.2 P1-B：AI 分析成功条数 */
+    analyze_fail_reasons: []                    /* N1.2 P1-B：ANALYZE 阶段失败原因 */
   };
   const result = {
     mode: mode, persist: persist, isDryRun: isDry,
@@ -173,8 +176,18 @@ async function runPipeline(opts) {
   let runId = null;
   if (!isDry) runId = RH.nextRunId({ dir: dirs.runHistory, date: opts.date });
 
-  /* ---- 采集阶段（dry-run 与 production-capture 都跑，用于预览/落盘） ---- */
-  if (mode === 'dry-run' || mode === 'production-capture') {
+  /* N1.2 P1-A · 状态追踪层接线：仅当显式配置 dirs.status 且非 dry-run 时启用。
+   * test-d1d2 等测试不传 dirs.status → 状态层完全关闭，不影响既有测试。 */
+  const statusDir = (dirs && dirs.status) ? dirs.status : null;
+  const statusEnabled = !!statusDir && !isDry;
+  let itemStore = null, runStore = null;
+  if (statusEnabled) {
+    itemStore = SM.createItemStore({ dir: statusDir, date: opts.date });
+    runStore = SM.createRunStore({ dir: statusDir, runId: runId, mode: mode, start_time: start });
+  }
+
+  /* ---- 采集阶段（dry-run / dry-run-full / production-capture 都跑，用于预览/落盘） ---- */
+  if (mode === 'dry-run' || mode === 'dry-run-full' || mode === 'production-capture') {
     const cs = await collectStage(opts);
     metrics.rawcapture_count = cs.captures.length;
     metrics.capture_count = cs.captures.length;
@@ -183,6 +196,14 @@ async function runPipeline(opts) {
     metrics.source_fail_reasons = cs.reasons;
     metrics.anomaly_count = cs.reasons.length;
     result.artifacts.captures = cs.captures;
+    /* P1-A 状态通知：采集完成 → FETCHED（item 级，仅 production + 已配置 status） */
+    if (statusEnabled && itemStore) {
+      cs.captures.forEach(function (c) {
+        itemStore.mark('cap-' + (c.capture_id || '?'), 'L0', 'FETCHED',
+          { by: 'collector', evidence: 'collect:' + (c.registry_id || ''), note: 'L0 captured' });
+      });
+      if (runStore) runStore.setStage('COLLECT', { status: 'done', count: cs.captures.length, source_success: cs.source_success, source_failed: cs.source_failed });
+    }
     if (mode === 'production-capture') {
       if (persist) {
         const r = CS.appendCaptures(cs.captures, { dir: dirs.captures, date: opts.date });
@@ -196,12 +217,71 @@ async function runPipeline(opts) {
     }
   }
 
-  /* ---- 审核队列阶段（production-review） ---- */
-  if (mode === 'production-review') {
+  /* ---- 审核队列阶段（dry-run-full / production-review） ---- */
+  if (mode === 'dry-run-full' || mode === 'production-review') {
     const candidates = reviewStage(opts);
     metrics.candidate_count = candidates.length;
-    metrics.ai_normalized_count = candidates.length;   /* AI 整理视为上游已完成（§5 未落地） */
     result.artifacts.candidates = candidates;
+
+    const hasAi = !!(opts.aiProvider && opts.aiMeta && opts.aiMeta.model);
+    if (hasAi) {
+      /* N1.2 P1-B · NewsAnalyzer 生产分析路径（单条失败不阻断批量） */
+      const NA = require('../ai/news-analyzer.cjs');
+      const DD = require('../dedup/index.cjs');
+      const analyzedInputs = [];
+      for (let ci = 0; ci < candidates.length; ci++) {
+        const c = candidates[ci];
+        const id = 'cand-' + (c.candidate_id || '?');
+        try {
+          const res = await NA.analyzeCandidate({
+            provider: opts.aiProvider,
+            candidate: c,
+            meta: opts.aiMeta,
+            sourceInfo: opts.sourceInfo || null,
+            reportCount: opts.reportCount,
+            idSpace: opts.idSpace || null,
+            seq: ci + 1
+          });
+          if (statusEnabled && itemStore) {
+            itemStore.setAnalysis(id, res.extensions);       /* 扩展字段落 status（不进 L1） */
+            itemStore.mark(id, 'L1', 'AI_ANALYZED',
+              { by: 'news-analyzer', evidence: 'ai:' + (res.ai_model || ''), note: 'enriched' });
+          }
+          metrics.ai_processed_count++;
+          analyzedInputs.push({
+            id: id,
+            title: c.title || (res.seven && res.seven.title) || '',
+            content: c.summary || (res.seven && res.seven.summary) || '',
+            eventKey: c.event_key || ''
+          });
+        } catch (e) {
+          /* 失败条目：不推进 AI_ANALYZED（维持 FETCHED），记录 fail_reasons，不吞异常 */
+          metrics.analyze_fail_reasons.push({
+            stage: 'ANALYZE', source: (c.candidate_id || ''),
+            code: (e && e.code) || 'ERROR', message: (e && e.message) || String(e)
+          });
+          metrics.anomaly_count++;
+        }
+      }
+      metrics.ai_normalized_count = metrics.ai_processed_count;
+      /* N1.2 P1-B · 语义去重预筛（只标记不删除，写入 status 并行映射） */
+      if (statusEnabled && itemStore && analyzedInputs.length) {
+        const hints = DD.detectHints(analyzedInputs, {});
+        hints.forEach(function (h) { itemStore.addDedupHint(h.id, h); });
+      }
+      if (runStore) runStore.setStage('ANALYZE', { status: 'done', count: metrics.ai_processed_count, failed: metrics.analyze_fail_reasons.length });
+    } else {
+      /* 既有路径（§5 前：AI 整理视为上游已完成，直接标记 AI_ANALYZED） */
+      metrics.ai_normalized_count = candidates.length;
+      if (statusEnabled && itemStore) {
+        candidates.forEach(function (c) {
+          itemStore.mark('cand-' + (c.candidate_id || '?'), 'L1', 'AI_ANALYZED',
+            { by: 'news-analyzer', evidence: 'ai:' + (c.ai_model || ''), note: 'L1 AI analyzed' });
+        });
+        if (runStore) runStore.setStage('ANALYZE', { status: 'done', count: candidates.length });
+      }
+    }
+
     const q = RQ.buildQueue(candidates, { date: opts.date, generated_at: now });
     result.artifacts.reviewQueue = q.doc;
     if (persist) {
@@ -214,8 +294,8 @@ async function runPipeline(opts) {
     }
   }
 
-  /* ---- 交付预览阶段（production-delivery-preview，不写 news.js） ---- */
-  if (mode === 'production-delivery-preview') {
+  /* ---- 交付预览阶段（dry-run-full / production-delivery-preview，不写 news.js） ---- */
+  if (mode === 'dry-run-full' || mode === 'production-delivery-preview') {
     const candidates = (Array.isArray(opts.candidates) ? opts.candidates.slice() : reviewStage(opts));
     const dec = applyDecisions(candidates, opts.decisions, opts.operator, now);
     metrics.candidate_count = candidates.length;
@@ -230,6 +310,19 @@ async function runPipeline(opts) {
     metrics.event_count = gate.approved.length;
     result.artifacts.deliveries = conv.items;
     result.artifacts.report = conv.report;
+    /* P1-A 状态通知：Gate 通过 → VERIFIED；交付预览产出 → PUBLISHED
+     * 交付预览项与 approved 候选 1:1 对应，故直接对 approved 候选标记两态（避免交付物 id 缺失导致误聚合） */
+    if (statusEnabled && itemStore) {
+      dec.approved.forEach(function (c) {
+        const id = 'cand-' + (c.candidate_id || '?');
+        itemStore.mark(id, 'L1', 'VERIFIED', { by: 'gate', evidence: 'gate:approve', note: 'verified' });
+        itemStore.mark(id, 'L1', 'PUBLISHED', { by: 'delivery', evidence: 'delivery-preview', note: 'delivered' });
+      });
+      if (runStore) {
+        runStore.setStage('VERIFY', { status: 'done', approved: dec.approved.length, rejected: dec.rejected.length });
+        runStore.setStage('DELIVER', { status: 'done', count: conv.items.length });
+      }
+    }
 
     if (persist) {
       const file = path.join(dirs.deliveries, runId + '.delivery-preview.json');
@@ -250,6 +343,12 @@ async function runPipeline(opts) {
 
   /* ---- run-history 接线（仅 production 模式；dry-run 不写） ---- */
   if (!isDry) {
+    const failReasons = (metrics.source_fail_reasons || []).map(function (r) {
+      const e = (r.errors && r.errors[0]) || {};
+      return { stage: 'COLLECT', source: r.source || '', code: e.code || '', message: e.message || '' };
+    }).concat((metrics.analyze_fail_reasons || []).map(function (r) {
+      return { stage: r.stage || 'ANALYZE', source: r.source || '', code: r.code || '', message: r.message || '' };
+    }));
     const entry = {
       run_id: runId,
       start_time: metrics.start_time,
@@ -260,12 +359,21 @@ async function runPipeline(opts) {
       candidate_count: metrics.candidate_count,
       approved_count: metrics.approved_count,
       rejected_count: metrics.rejected_count,
-      delivery_count: metrics.delivery_count
+      delivery_count: metrics.delivery_count,
+      /* N1.2 P1-A 增强：可选扩展字段（向后兼容，不纳入 10 字段封闭集） */
+      ai_processed_count: (typeof metrics.ai_processed_count === 'number' ? metrics.ai_processed_count : 0),
+      fail_reasons: failReasons
     };
-    RH.record(entry, { dir: dirs.runHistory });     /* 10 字段封闭集、append-only、原子写 */
+    RH.record(entry, { dir: dirs.runHistory });     /* 10 必填 + 可选扩展、append-only、原子写 */
     result.runId = runId;
     result.runHistoryRecorded = true;
     metrics.run_id = runId;
+
+    /* P1-A 状态层落盘（production + 已配置 status 时） */
+    if (statusEnabled) {
+      if (itemStore) itemStore.persist();
+      if (runStore) { runStore.finalize(); runStore.persist(); }
+    }
   }
 
   return result;

@@ -1,0 +1,819 @@
+/* ============================================================
+   MCU Atlas × 小红书小工具 — 视觉系统「MCU 星图 · 深空能量」
+   Chrome 61 基线层 + @supports 增强层，无 gap/clamp/aspect-ratio
+   ============================================================ */
+
+/* ---------- 全局深空星云基底 ---------- */
+body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(242, 178, 51, 0.22), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, rgba(226, 60, 60, 0.16), transparent 55%),
+    radial-gradient(800px 700px at 50% 110%, rgba(88, 101, 242, 0.24), transparent 60%),
+    radial-gradient(700px 500px at 30% 60%, rgba(168, 85, 247, 0.08), transparent 60%),
+    #080B12;
+}
+
+/* 星空粒子层（box-shadow 点阵，零图片资源） */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.9;
+  background-image:
+    radial-gradient(2px 2px at 4% 18%, rgba(232, 236, 244, 0.9), transparent 100%),
+    radial-gradient(1.5px 1.5px at 8% 46%, rgba(232, 236, 244, 0.6), transparent 100%),
+    radial-gradient(2px 2px at 13% 78%, rgba(242, 178, 51, 0.9), transparent 100%),
+    radial-gradient(1.5px 1.5px at 18% 8%, rgba(232, 236, 244, 0.7), transparent 100%),
+    radial-gradient(2px 2px at 22% 62%, rgba(226, 60, 60, 0.8), transparent 100%),
+    radial-gradient(1.5px 1.5px at 27% 34%, rgba(232, 236, 244, 0.9), transparent 100%),
+    radial-gradient(1px 1px at 31% 88%, rgba(232, 236, 244, 0.5), transparent 100%),
+    radial-gradient(2px 2px at 36% 12%, rgba(242, 178, 51, 0.85), transparent 100%),
+    radial-gradient(1.5px 1.5px at 41% 52%, rgba(88, 101, 242, 0.8), transparent 100%),
+    radial-gradient(1px 1px at 46% 26%, rgba(232, 236, 244, 0.9), transparent 100%),
+    radial-gradient(2px 2px at 51% 72%, rgba(232, 236, 244, 0.55), transparent 100%),
+    radial-gradient(1.5px 1.5px at 56% 6%, rgba(226, 60, 60, 0.7), transparent 100%),
+    radial-gradient(2px 2px at 60% 44%, rgba(232, 236, 244, 0.85), transparent 100%),
+    radial-gradient(1px 1px at 64% 82%, rgba(242, 178, 51, 0.75), transparent 100%),
+    radial-gradient(1.5px 1.5px at 69% 20%, rgba(232, 236, 244, 0.6), transparent 100%),
+    radial-gradient(2px 2px at 74% 58%, rgba(168, 85, 247, 0.75), transparent 100%),
+    radial-gradient(1px 1px at 78% 36%, rgba(232, 236, 244, 0.8), transparent 100%),
+    radial-gradient(1.5px 1.5px at 83% 68%, rgba(88, 101, 242, 0.7), transparent 100%),
+    radial-gradient(2px 2px at 88% 14%, rgba(232, 236, 244, 0.75), transparent 100%),
+    radial-gradient(1px 1px at 93% 48%, rgba(226, 60, 60, 0.6), transparent 100%),
+    radial-gradient(1.5px 1.5px at 97% 84%, rgba(232, 236, 244, 0.5), transparent 100%),
+    radial-gradient(1px 1px at 6% 92%, rgba(242, 178, 51, 0.6), transparent 100%),
+    radial-gradient(1.5px 1.5px at 48% 96%, rgba(232, 236, 244, 0.45), transparent 100%),
+    radial-gradient(1px 1px at 71% 90%, rgba(232, 236, 244, 0.5), transparent 100%),
+    radial-gradient(2px 2px at 16% 30%, rgba(232, 236, 244, 0.35), transparent 100%),
+    radial-gradient(1.5px 1.5px at 86% 30%, rgba(242, 178, 51, 0.4), transparent 100%);
+}
+
+/* ---------- App 骨架 ---------- */
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ---------- 顶部栏：盾牌品牌 + 能量细线 ---------- */
+.app-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  padding-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* 顶部能量细线：金 → 红 → 金（对称通栏，避免右端视觉断裂） */
+.app-header::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg,
+    rgba(242, 178, 51, 0.9),
+    rgba(226, 60, 60, 0.55),
+    rgba(242, 178, 51, 0.9));
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.brand-mark {
+  font-size: 18px;
+  line-height: 1;
+  margin-right: 8px;
+  filter: drop-shadow(0 0 6px rgba(242, 178, 51, 0.6));
+}
+
+.app-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #E8ECF4;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.brand-en {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: rgba(242, 178, 51, 0.7);
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #E8ECF4;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.icon-btn:active {
+  background: rgba(242, 178, 51, 0.18);
+  border-color: rgba(242, 178, 51, 0.4);
+  transform: scale(0.94);
+}
+
+.header-spacer { width: 36px; flex-shrink: 0; }
+
+/* ---------- 主滚动区 ---------- */
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 8px;
+  padding-bottom: 24px;
+  padding-bottom: calc(24px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
+.view { display: block; }
+.hidden { display: none !important; }
+
+/* ---------- 页面头部 ---------- */
+.view-head {
+  margin-bottom: 16px;
+}
+
+.view-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #E8ECF4;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.view-sub {
+  font-size: 13px;
+  color: #8E98AA;
+}
+
+/* ---------- 首页 Hero：盾牌 + 双层光环 ---------- */
+.hero {
+  text-align: center;
+  padding: 36px 0 34px;
+}
+
+.hero-badge {
+  position: relative;
+  width: 116px;
+  height: 116px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-icon {
+  font-size: 56px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 12px rgba(242, 178, 51, 0.7));
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  display: block;
+}
+
+.ring-a {
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  border: 2px solid rgba(242, 178, 51, 0.6);
+  border-top-color: rgba(242, 178, 51, 1);
+  border-bottom-color: rgba(226, 60, 60, 0.65);
+  box-shadow: 0 0 18px rgba(242, 178, 51, 0.35);
+  animation: spin 9s linear infinite;
+}
+
+.ring-b {
+  top: 16px; left: 16px; right: 16px; bottom: 16px;
+  border: 1.5px dashed rgba(232, 236, 244, 0.42);
+  box-shadow: 0 0 10px rgba(232, 236, 244, 0.12);
+  animation: spin-rev 14s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin-rev { to { transform: rotate(-360deg); } }
+
+.hero-title {
+  font-size: 23px;
+  font-weight: 800;
+  color: #E8ECF4;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.hero-subtitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: rgba(242, 178, 51, 0.92);
+}
+
+/* ---------- 首页四象限入口 ---------- */
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -7px;
+}
+
+.menu-card {
+  position: relative;
+  width: calc(50% - 14px);
+  margin: 7px;
+  background: linear-gradient(160deg, rgba(32, 43, 64, 0.95), rgba(20, 27, 40, 0.96));
+  border-radius: 18px;
+  padding: 20px 14px 16px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+/* 每张卡的顶部能量细线 */
+.menu-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10px; right: 10px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(242, 178, 51, 1), transparent);
+}
+
+.menu-card:nth-child(2)::before {
+  background: linear-gradient(90deg, transparent, rgba(88, 101, 242, 1), transparent);
+}
+
+.menu-card:nth-child(3)::before {
+  background: linear-gradient(90deg, transparent, rgba(226, 60, 60, 1), transparent);
+}
+
+.menu-card:nth-child(4)::before {
+  background: linear-gradient(90deg, transparent, rgba(76, 209, 165, 1), transparent);
+}
+
+.menu-card:active {
+  transform: translateY(1px) scale(0.97);
+  border-color: rgba(242, 178, 51, 0.5);
+  box-shadow: 0 0 24px rgba(242, 178, 51, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.menu-orb {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, rgba(242, 178, 51, 0.2), rgba(22, 29, 43, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 0 12px rgba(242, 178, 51, 0.08);
+}
+
+.menu-svg {
+  width: 30px;
+  height: 30px;
+  display: block;
+}
+
+.menu-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E8ECF4;
+  margin-bottom: 5px;
+  letter-spacing: 0.5px;
+}
+
+.menu-desc {
+  font-size: 11.5px;
+  color: #C2CBDC;
+  line-height: 1.45;
+}
+
+.menu-code {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(242, 178, 51, 0.55);
+}
+
+.home-footer-note {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(163, 173, 192, 0.85);
+  letter-spacing: 1px;
+}
+
+/* ---------- 通用文本 ---------- */
+.secondary { color: #A3ADC0; }
+
+.tip {
+  font-size: 12px;
+  color: #8E99AD;
+  line-height: 1.6;
+  margin-top: 12px;
+  text-align: center;
+}
+
+/* ---------- 结果面板（玻璃卡） ---------- */
+.result-panel {
+  background: rgba(22, 29, 43, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+  .result-panel, .menu-card, .random-card, .route-item, .card-form input, .search-bar input {
+    background: rgba(22, 29, 43, 0.62);
+  }
+  .result-panel {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+.result-header { margin-bottom: 14px; }
+.result-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #E8ECF4;
+  margin-bottom: 6px;
+}
+.result-header p { font-size: 13px; line-height: 1.5; }
+
+/* ---------- 按钮 ---------- */
+.primary-btn, .secondary-btn {
+  display: inline-block;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.4;
+  letter-spacing: 0.3px;
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #F2B233, #E8A020);
+  color: #10141C;
+  box-shadow: 0 4px 14px rgba(242, 178, 51, 0.25);
+}
+
+.primary-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(242, 178, 51, 0.3);
+}
+
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.07);
+  color: #E8ECF4;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.secondary-btn:active {
+  transform: scale(0.96);
+  background: rgba(226, 60, 60, 0.16);
+  border-color: rgba(226, 60, 60, 0.45);
+}
+
+/* ---------- F1 路线 ---------- */
+.route-list { margin-top: 4px; }
+
+.route-item {
+  position: relative;
+  background: linear-gradient(160deg, rgba(30, 40, 60, 0.9), rgba(18, 24, 36, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* 左侧金色能量条 */
+.route-item::before {
+  content: '';
+  position: absolute;
+  top: 14px; bottom: 14px; left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, #F2B233, #E23C3C);
+}
+
+.route-item:active {
+  border-color: rgba(242, 178, 51, 0.45);
+  background: rgba(28, 36, 53, 0.95);
+}
+
+.route-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #E8ECF4;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.route-tagline {
+  font-size: 12.5px;
+  color: #8E98AA;
+  line-height: 1.5;
+}
+
+.route-kind {
+  float: right;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #F2B233;
+  background: rgba(242, 178, 51, 0.13);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+}
+
+.content-list { max-height: none; }
+
+.content-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.content-item:last-child { border-bottom: none; }
+
+.content-index {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(242, 178, 51, 0.28), rgba(226, 60, 60, 0.18));
+  color: #F2B233;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  margin-right: 12px;
+  border: 1px solid rgba(242, 178, 51, 0.25);
+}
+
+.content-body { flex: 1; min-width: 0; }
+
+.content-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #E8ECF4;
+  margin-bottom: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content-meta {
+  font-size: 12px;
+  color: #8E98AA;
+}
+
+.content-role {
+  font-size: 13px;
+  color: #8E98AA;
+  margin-top: 6px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ---------- F2 搜索 ---------- */
+.search-bar {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  background: rgba(22, 29, 43, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #E8ECF4;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.search-bar input:focus {
+  border-color: rgba(242, 178, 51, 0.55);
+}
+
+.search-bar input::placeholder { color: #6E7889; }
+
+.search-bar .primary-btn { margin-left: 10px; flex-shrink: 0; }
+
+.filter-row {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #8E98AA;
+  border-radius: 20px;
+  padding: 7px 15px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.filter-btn:last-child { margin-right: 0; }
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #F2B233, #E8A020);
+  border-color: transparent;
+  color: #10141C;
+  box-shadow: 0 3px 10px rgba(242, 178, 51, 0.25);
+}
+
+.empty-tip {
+  text-align: center;
+  color: #6E7889;
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+/* 节点详情 */
+.node-detail h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #E8ECF4;
+  margin-bottom: 8px;
+}
+
+.node-detail .node-en {
+  font-size: 13px;
+  color: #8E98AA;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.node-detail .node-note {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #B8C0CC;
+  margin-bottom: 16px;
+}
+
+.node-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #F2B233;
+  letter-spacing: 1px;
+  margin: 16px 0 10px;
+  padding-left: 10px;
+  border-left: 3px solid rgba(242, 178, 51, 0.6);
+}
+
+.relation-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.relation-item:last-child { border-bottom: none; }
+
+.relation-target {
+  font-size: 14px;
+  font-weight: 600;
+  color: #E8ECF4;
+  margin-bottom: 4px;
+}
+
+.relation-why {
+  font-size: 13px;
+  color: #8E98AA;
+  line-height: 1.5;
+}
+
+/* ---------- F3 随机 ---------- */
+.random-stage {
+  display: flex;
+  justify-content: center;
+  padding: 26px 0 20px;
+}
+
+.random-card {
+  position: relative;
+  width: 226px;
+  height: 226px;
+  background: linear-gradient(165deg, rgba(30, 40, 60, 0.92), rgba(14, 19, 30, 0.95));
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.45), inset 0 0 40px rgba(242, 178, 51, 0.05);
+  overflow: hidden;
+}
+
+/* 六色无限宝石能量环（旋转虚线环 + 六颗宝石光点，box-shadow 实现） */
+.gem-ring {
+  position: absolute;
+  top: 14px; left: 14px; right: 14px; bottom: 14px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(242, 178, 51, 0.3);
+  animation: spin 20s linear infinite;
+  box-shadow:
+    0 -78px 0 -1px rgba(226, 60, 60, 0.75),
+    67px -39px 0 -1px rgba(242, 141, 40, 0.75),
+    67px 39px 0 -1px rgba(242, 178, 51, 0.8),
+    0 78px 0 -1px rgba(76, 209, 165, 0.75),
+    -67px 39px 0 -1px rgba(88, 101, 242, 0.8),
+    -67px -39px 0 -1px rgba(168, 85, 247, 0.75);
+}
+
+.random-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 62px;
+  line-height: 1;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 12px rgba(242, 178, 51, 0.45));
+}
+
+.random-label {
+  position: relative;
+  z-index: 2;
+  font-size: 14px;
+  color: #B8C0CC;
+  line-height: 1.5;
+  padding: 0 10px;
+}
+
+.random-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.random-actions .primary-btn,
+.random-actions .secondary-btn {
+  flex: 1;
+  text-align: center;
+  margin-right: 12px;
+}
+
+.random-actions .primary-btn:last-child,
+.random-actions .secondary-btn:last-child { margin-right: 0; }
+
+.random-result-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #E8ECF4;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+
+.random-result-sub {
+  font-size: 13px;
+  color: #8E98AA;
+  margin-bottom: 12px;
+}
+
+.random-result-desc {
+  font-size: 14px;
+  color: #B8C0CC;
+  line-height: 1.7;
+}
+
+/* ---------- F4 卡片 ---------- */
+.card-preview-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+#shareCanvas {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 16px;
+  background: #0A0E17;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.card-form {
+  margin-top: 8px;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* F4 视图内标题与 320px 卡片列统一左基准 */
+.f4-view .view-head {
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.field-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #B4BED0;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  margin-top: 14px;
+}
+
+.card-form input {
+  width: 100%;
+  background: rgba(22, 29, 43, 0.92);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #E8ECF4;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-form input:focus {
+  border-color: rgba(242, 178, 51, 0.7);
+  box-shadow: 0 0 0 3px rgba(242, 178, 51, 0.12);
+}
+
+.card-form input::placeholder { color: #6E7889; }
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  margin-left: -6px;
+  margin-right: -6px;
+}
+
+.card-actions .primary-btn,
+.card-actions .secondary-btn {
+  flex: 1;
+  min-width: 88px;
+  margin: 6px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* ---------- 滚动条美化 ---------- */
+.app-main::-webkit-scrollbar { width: 0; height: 0; }
+
+/* ---------- 响应式兜底 ---------- */
+@media (max-width: 360px) {
+  .menu-card { width: calc(50% - 14px); padding: 16px 10px 14px; }
+  .menu-orb { width: 50px; height: 50px; font-size: 24px; }
+  .menu-label { font-size: 14px; }
+  .menu-desc { font-size: 11px; }
+  .hero-title { font-size: 21px; }
+  .random-card { width: 200px; height: 200px; }
+}

@@ -16,7 +16,10 @@
  *   - dry-run + --persist 语义冲突，必须拒绝。
  *
  * 行为矩阵（最终裁定）：
- *   dry-run                        → 业务落盘 NO  / run-history NO
+ *   dry-run                        → 业务落盘 NO  / run-history NO  / 零文件（D1/D2 验收锁定）
+ *   dry-run-full（P1-C 新增）      → 全链路模拟（collect→review/AI/dedup→delivery-preview
+ *                                     + G4 只读诊断）；业务落盘 NO / run-history NO /
+ *                                     可写 scratch 诊断（不碰正式归档）；用于 scheduler dry-run
  *   production-capture             → 业务落盘 NO  / run-history YES
  *   production-capture  + --persist→ 业务落盘 YES / run-history YES
  *   production-review              → 业务落盘 NO  / run-history YES
@@ -30,6 +33,7 @@ const path = require('path');
 
 const MODES = Object.freeze([
   'dry-run',
+  'dry-run-full',
   'production-capture',
   'production-review',
   'production-delivery-preview'
@@ -39,9 +43,11 @@ const PRODUCTION_MODES = Object.freeze([
   'production-review',
   'production-delivery-preview'
 ]);
+const DRY_MODES = Object.freeze(['dry-run', 'dry-run-full']);
 /* §4：首选已验证成功来源；S003/S005 失败留痕、S001 单列人工通道（不进 RSS collector） */
 const DEFAULT_CAPTURE_SOURCES = Object.freeze(['S002', 'S004', 'S006']);
 const DRY_RUN = 'dry-run';
+const DRY_RUN_FULL = 'dry-run-full';
 
 function fail(code, message) {
   const e = new Error('[' + code + '] ' + message);
@@ -57,10 +63,10 @@ function validateMode(m) {
   return m;
 }
 
-function isDryRun(m) { return m === DRY_RUN; }
+function isDryRun(m) { return DRY_MODES.indexOf(m) >= 0; }
 function isProduction(m) { return PRODUCTION_MODES.indexOf(m) >= 0; }
 
-/** D1：仅 production 模式写 run-history；dry-run 不写 */
+/** D1：仅 production 模式写 run-history；dry-run / dry-run-full 均不写 */
 function requiresRunHistory(m) { return isProduction(m); }
 
 /** D2 安全边界：dry-run + --persist 语义冲突，必须拒绝（不写、不静默忽略） */
@@ -79,15 +85,19 @@ function defaultDirs(pipelineDir) {
     captures: path.join(p, 'captures'),
     candidates: path.join(p, 'candidates'),
     deliveries: path.join(p, 'deliveries'),
-    runHistory: path.join(p, 'run-history')
+    runHistory: path.join(p, 'run-history'),
+    /* N1.2 P1-A：状态追踪层目录（仅 production + 本目录存在时启用） */
+    status: path.join(p, 'status')
   };
 }
 
 module.exports = {
   MODES: MODES,
   PRODUCTION_MODES: PRODUCTION_MODES,
+  DRY_MODES: DRY_MODES,
   DEFAULT_CAPTURE_SOURCES: DEFAULT_CAPTURE_SOURCES,
   DRY_RUN: DRY_RUN,
+  DRY_RUN_FULL: DRY_RUN_FULL,
   validateMode: validateMode,
   isDryRun: isDryRun,
   isProduction: isProduction,

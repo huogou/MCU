@@ -1,0 +1,134 @@
+================================================================
+N1.2 P1-D · 真实 ECS Preflight 清单（V1.0）
+================================================================
+生成时间：2026-09-30
+用途：在真实阿里云 ECS 生产服务器上，于执行「人工最小批量 Production」之前，
+      逐项核验环境 / 环境变量 / 网络 / 文件权限 / 时间。全部 PASS 后才允许进入 Production。
+约束：本清单由运维/负责人在真实 ECS 上填写；本角色（文档管理）不执行、不代填真实值。
+      DASHSCOPE_API_KEY 仅检查「是否存在且非空」，绝不记录真实 Key 明文 / 片段 / 长度推断。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 P1-D 真实 ECS 验证准备报告.txt（状态登记 + 执行顺序）
+2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 P1-D 人工 Production 验证记录模板.txt（Production 结果回填）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\scheduler.config.cjs（护栏配置，复核对象）
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\run-n1.cjs（生产运行入口）
+
+----------------------------------------------------------------
+§1 填写说明
+----------------------------------------------------------------
+  - 每张检查项结果填：PASS / FAIL / N/A（并备注）。
+  - 不要只写「curl 成功」，要写实际验证动作与结论（命令摘要 + 结果摘要）。
+  - 涉及密钥：只填「已注入 / 未注入 / 注入方式」，严禁填写真实 Key 任何部分。
+  - 本清单为单次 ECS 环境快照；若环境重建/重装，须重新填表。
+
+----------------------------------------------------------------
+§2 ECS 环境（主机层）
+----------------------------------------------------------------
+  [ ] ECS 是否为实际生产服务器（非本地工作区 / 非沙箱）
+        结果：____   备注：实例 ID / 公网 IP / 是否生产环境
+  [ ] Linux 发行版与版本
+        结果：____   命令：cat /etc/os-release
+  [ ] 当前运行用户
+        结果：____   命令：whoami
+  [ ] 是否 root（建议非 root 运行 pipeline；若 root 须确认权限收敛）
+        结果：____   命令：id -u
+  [ ] Node.js 版本（须满足 pipeline 运行要求）
+        结果：____   命令：node -v
+  [ ] 包管理器（npm / pnpm / yarn）及版本
+        结果：____   命令：npm -v  (或 pnpm -v / yarn -v)
+  [ ] 当前工作目录（pipeline 实际部署位置）
+        结果：____   命令：pwd
+  [ ] pipeline 实际路径（workspace/news/pipeline 在 ECS 上的绝对路径）
+        结果：____   预期：<deploy_root>/workspace/news/pipeline
+  [ ] scheduler.cjs 路径
+        结果：____   预期：<pipeline>/runner/scheduler.cjs
+  [ ] scheduler.config.cjs 路径
+        结果：____   预期：<pipeline>/runner/scheduler.config.cjs
+
+----------------------------------------------------------------
+§3 环境变量（密钥安全）
+----------------------------------------------------------------
+  [ ] DASHSCOPE_API_KEY 已通过环境变量提供
+        结果：____   注入方式：□ 临时 export  □ /etc/environment  □ systemd EnvironmentFile  □ 其他____
+        ⚠ 仅勾选「已注入」；本清单及任何报告均不记录 Key 明文 / 前缀 / 长度。
+  [ ] 未进入 Git（仓库内无真实 Key；.gitignore 含 .env / .env.*）
+        结果：____   核验：grep -r "DASHSCOPE" --include=*.cjs --include=*.json . 应为 0 命中真实值
+  [ ] 未写入代码 / 项目文档 / 截图 / 报告
+        结果：____   说明：Key 仅存活于 ECS 运行时环境，不持久化到仓库或文档
+  [ ] 不通过明文透露给本项目 AI
+        结果：____   说明：运维自行在 ECS 侧注入，AI 不接触真实值
+
+----------------------------------------------------------------
+§4 网络出口验证（真实连通性）
+----------------------------------------------------------------
+  【DashScope API 出口】（Provider 通道，独立于采集出口）
+  [ ] ECS → DashScope API 域名可达（HTTPS 200 或鉴权 401 均算出口通；纯网络超时/拒连算 FAIL）
+        结果：____   命令摘要：curl -sS -o /dev/null -w "%{http_code}" https://<dashscope-endpoint>  (带 Key 仅作连通探针，不记录)
+        结论：____   （PASS=出口通；FAIL=需放通出网/安全组/DNS）
+  【RSS / 采集来源出口】（http-transport 通道）
+  [ ] ECS → 实际 RSS 来源（S002 等白名单来源）可达
+        结果：____   来源清单：S002=____  命令摘要：curl -sS -I <source-url>
+        结论：____   （PASS=可达；FAIL=需放通出网/安全组/DNS）
+  要求：两处出口均须记录「实际验证结果」，不得仅写「应可访问」。
+
+----------------------------------------------------------------
+§5 文件权限（运行用户具备所需权限）
+----------------------------------------------------------------
+  [ ] pipeline 目录（可读 + 可执行脚本）
+        结果：____   路径：<pipeline>/
+  [ ] captures 目录（Production 可写）
+        结果：____   路径：<pipeline>/captures
+  [ ] candidates 目录（Production 可写）
+        结果：____   路径：<pipeline>/candidates
+  [ ] events 目录（Production 可写）
+        结果：____   路径：<pipeline>/events
+  [ ] status 目录（item-status 落盘，Production 可写）
+        结果：____   路径：<pipeline>/status
+  [ ] run-history 目录（run-history 落盘，Production 可写）
+        结果：____   路径：<pipeline>/run-history
+  [ ] delivery / preview 目录（delivery-preview 可写）
+        结果：____   路径：<pipeline>/deliveries  (含 preview 子目录)
+  [ ] scratch / 临时目录（诊断产物可写）
+        结果：____   路径：<pipeline>/runner/tmp-cli  (或 run-n1 --out 指定)
+  说明：确认运行用户对以上目录具备 rwx（或对应最小权限），避免 Production 因 EACCES 失败。
+
+----------------------------------------------------------------
+§6 时间与时区（与每日调度设计一致）
+----------------------------------------------------------------
+  [ ] ECS 系统时间（与真实日期一致，无漂移）
+        结果：____   命令：date
+  [ ] ECS 时区（须与每日调度设计约定一致，避免 run_id 日期错位）
+        结果：____   命令：cat /etc/timezone  (或 timedatectl)
+  重点：pipeline 以 --date 参数驱动当日标记与 run_id；须确认 ECS 时区下
+        「当日」语义与调度设计一致，避免同日重复触发防护（P1-D C 段）误判。
+
+----------------------------------------------------------------
+§7 调度护栏复核（执行前最后确认）
+----------------------------------------------------------------
+  [ ] scheduler.config.cjs: enabled = false
+        结果：____   核验：grep "enabled" scheduler.config.cjs
+  [ ] scheduler.config.cjs: productionAllowed = false
+        结果：____   核验：grep "productionAllowed" scheduler.config.cjs
+  [ ] scheduler.config.cjs: autoProduction = false
+        结果：____   核验：grep "autoProduction" scheduler.config.cjs
+  [ ] scheduler.config.cjs: mode = 'capture-only'（安全默认）
+        结果：____   核验：grep "mode" scheduler.config.cjs
+  说明：三项护栏须全部为 false、mode 为 capture-only，方可进入人工 Production；
+        P1-D 阶段严禁将其置 true（自动运行属下一阶段，需新指令）。
+
+----------------------------------------------------------------
+§8 Preflight 汇总判定
+----------------------------------------------------------------
+  ECS 环境         ：____ PASS / FAIL
+  环境变量（Key）  ：____ PASS / FAIL（不记录值）
+  DashScope 出口   ：____ PASS / FAIL
+  RSS 出口         ：____ PASS / FAIL
+  文件权限         ：____ PASS / FAIL
+  时间 / 时区      ：____ PASS / FAIL
+  调度护栏         ：____ PASS / FAIL
+
+  汇总：____ PASS / NOT PASS
+  若任一项 FAIL ⇒ Preflight NOT PASS ⇒ 不得进入人工 Production，回报阻断项。
+================================================================

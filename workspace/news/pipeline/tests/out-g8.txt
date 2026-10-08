@@ -29,12 +29,12 @@ G8 规则收口与上线准备 测试
 
 ■ G8-5 上线前检查
   PASS  T4.1 news.js 备份存在
-  PASS  T4.2 备份 SHA256 == 现网（备份完整）
+  PASS  T4.2 备份 SHA256 == G8 基线（G8 时刻完整快照）
   PASS  T4.3 备份未落在 C 盘（用户环境约定）
 
 ■ 基线不破坏
   PASS  T5.1 news.js SHA256 前后一致（全程只读）
-  INFO  news.js SHA256 = 589A39347EF6BEEA…
+  INFO  news.js SHA256 = EBF67DE08BF8C391…
   PASS  T5.2 review-history 正式决策链未被 G8 草案写入（仍为 G7 的 12 条）
   PASS  T5.3 review-queue 的 gate_status 仍全为 pending（草案未触碰队列）
 

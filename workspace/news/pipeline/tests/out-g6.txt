@@ -51,15 +51,15 @@ G6 审核闸门与 DeliveryItem 转换测试（T1 – T6）
   PASS  S8 签名映射留档（from/to/signature）
 
 ■ G6-T6 news.js 写入前模拟测试（news.js 15 条反向端到端）
-  PASS  T6.0a 现网 15 条
+  PASS  T6.0a 现网 35 条（G9 写入后基线 = 15 + 20）
   PASS  T6.0b 现网条目 33 字段
-  PASS  T6.1a 反向候选合法数 = 14（现网 007 的 reported_by=[] 与 L1-10 契约差异）
+  PASS  T6.1a 反向候选合法数 = 34（现网 007 的 reported_by=[] 与 L1-10 契约差异；G9 写入 20 条全部合法）
   PASS  T6.1b 唯一非法条 = news-2026-09-21-007 且原因唯一指向 L1-10
-  PASS  T6.1c 通过闸门 14 条（007 被 L1 契约拦截，属预期差异）
-  PASS  T6.2a 生成的 14 个 id 与现网全等（id 复现）
-  PASS  T6.2b 稳定字段集 14 条逐条全等（29 项 × 14 条）
+  PASS  T6.1c 通过闸门 34 条（007 被 L1 契约拦截，属预期差异）
+  PASS  T6.2a 生成的 34 个 id 与现网全等（id 复现）
+  PASS  T6.2b 稳定字段集 34 条逐条全等（29 项 × 34 条）
   PASS  T6.2c supersedes 互链复现（010←014）
-  INFO  judged_by 分布（转换输出）：{"human_confirmed":8,"rule_validated":2,"ai_suggested":4}
+  INFO  judged_by 分布（转换输出）：{"human_confirmed":8,"rule_validated":22,"ai_suggested":4}
   INFO  official_source 校验（G3）：[{"valid":true,"reason":"六项检查全部通过：可进入 official_confirm 判断"},{"valid":true,"reason":"六项检查全部通过：可进入 official_confirm 判断"},{"valid":true,"reason":"六项检查全部通过：可进入 official_confirm 判断"}]
 
 ■ T6.3 写入前模拟（前端契约 + id 冲突 + 模拟 diff）
@@ -74,7 +74,7 @@ G6 审核闸门与 DeliveryItem 转换测试（T1 – T6）
   PASS  T6.4b reports_preserved 不变（无记录丢失）
   PASS  T6.4c CTO 对（语义措辞差异）签名后 key 仍不同（边界如实，记入报告）
   PASS  T6.5 news.js SHA256 前后一致（测试全程只读）
-  INFO  news.js SHA256 = 589A39347EF6BEEA…
+  INFO  news.js SHA256 = EBF67DE08BF8C391…
 
 ============================================================
 结果：52 PASS / 0 FAIL

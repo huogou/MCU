@@ -1,0 +1,92 @@
+{
+  "project_name": "漫威电影宇宙导航",
+  "project_id": "mcu_atlas",
+  "alias": "MCU Atlas",
+  "created_at": "2026-08-24",
+  "updated_at": "2026-10-08",
+  "stage": "development",
+  "status": "active",
+  "strategy": "🟢 持续迭代 · 全库两个持续投入项目之一（2026-10-08 彦祖裁定，见 00_项目总览\\项目治理策略.md）。⏸ 当前无排期：彦祖指令仍在调研中，本 AI 不代裁优先级",
+  "tech_stack": [
+    "原生 H5 (HTML/CSS/JS)",
+    "微信小程序",
+    "抖音小程序",
+    "静态 JS 元数据单一可信源",
+    "资讯生产流水线 (Node 24 + DashScope 百炼)"
+  ],
+  "ai_roles": {
+    "planner": "GPT + 彦祖（最终拍板）",
+    "designer": "豆包 / LOOMY（2026-09-23 变更，原 QoderWork CN）",
+    "developer": "CodeBuddy（2026-09-24 C1 裁定后由 CodeBuddy 承担）"
+  },
+  "repo": {
+    "type": "git",
+    "path": "D:\\SEO\\发挥余热\\漫威电影宇宙导航",
+    "remote": "https://github.com/huogou/MCU.git"
+  },
+  "entry": {
+    "readme": "README.md",
+    "progress": "D:\\SEO\\发挥余热\\漫威电影宇宙导航\\README.md （2026-10-08 起以 README「最新事实」小节为进度权威；MCU项目总览.md 头部停留 2026-09-16 已滞后）",
+    "sync_dir": "docs/同步"
+  },
+  "milestones": [
+    {
+      "name": "微信小程序 V1.2.2 已上线",
+      "date": "2026-09-22",
+      "done": true
+    },
+    {
+      "name": "H5-FAVICON 全站 favicon 部署上线",
+      "date": "2026-09-28",
+      "done": true
+    },
+    {
+      "name": "N1 资讯模块 CLOSED（N1.3 收口 + N1.4 最终验收）",
+      "date": "2026-09-24",
+      "done": true
+    },
+    {
+      "name": "N1.2 P1 生产流水线 A/B/C/D 隔离验证 PASS",
+      "date": "2026-09-30",
+      "done": true
+    },
+    {
+      "name": "N1.2 服务器部署 + 真实 Provider U1 验证 PASS",
+      "date": "2026-09-30",
+      "done": true
+    },
+    {
+      "name": "N1.2 真实人工 Production 验证（P1-D LIVE）",
+      "date": "",
+      "done": false,
+      "note": "BLOCKED：需真实 ECS + DASHSCOPE_API_KEY + 出网；Scheduler 护栏仍冻结"
+    },
+    {
+      "name": "复联5补课路线专题（H5）",
+      "date": "",
+      "done": false,
+      "note": "方案与配图已出，代码零落地；硬阻塞：完整 15 部作品清单全仓库不存在；待策划拍板 5 项 + 设计出稿"
+    },
+    {
+      "name": "抖音小程序 V2.4 提审",
+      "date": "",
+      "done": false,
+      "note": "待确认：截至 2026-09-28 文档均记「待提审」，无提审动作与结果记录"
+    }
+  ],
+  "next_actions": [
+    "N1.2 P1-D 真实人工 Production 验证（最小批次 sources=['S002']）→ 回填记录模板 → 项目总控拍板最终判定",
+    "复联5专题：策划拍板 5 项（15 部作品清单 / 8 部计数口径 / 作品名口径 / 底部入口落点 / 对外路由口径）+ 设计出稿后方可开工",
+    "抖音 V2.4：确认是否提审、是否需恢复代理推送远端",
+    "复核 V1.2 UI/视觉重构是否继续（2026-09-24 起无任何推进证据）",
+    "Git 工作区清理：171 项未提交改动待处理（2026-10-08 实测）"
+  ],
+  "tags": [
+    "跨端",
+    "H5",
+    "微信小程序",
+    "抖音小程序",
+    "Monorepo",
+    "漫威"
+  ]
+}

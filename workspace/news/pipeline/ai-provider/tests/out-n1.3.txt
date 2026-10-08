@@ -3,13 +3,13 @@ N1.3 · 最小生产化收口 dry-run（真实 idSpace 约束）
 ============================================================
 
 ■ 一、Preflight
-  PASS  P1 DASHSCOPE_API_KEY 存在
+  FAIL  P1 DASHSCOPE_API_KEY 存在 → PROVIDER_KEY_MISSING
   PASS  P2 Provider
   PASS  P3 Model
   PASS  P4 API compatibility
   PASS  P5 Scheduler disabled
   PASS  P6 Production disabled
-  快照：{"provider":"dashscope","model":"qwen3.8-flash","endpoint":"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions","structured_output":"json_schema","timeout_ms":15000,"retry":"max 2 transient-only","key_status":"CONFIGURED","reuse":false}
+  快照：{"provider":"dashscope","model":"qwen3.8-flash","endpoint":"https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions","structured_output":"json_schema","timeout_ms":15000,"retry":"max 2 transient-only","key_status":"NOT CONFIGURED","reuse":false}
 
 ■ 二、项目真实 idSpace（复用 h5/data，不建第二套）
   source = h5/data/{movies,series,special,short,content,characters}.js（既有单一可信源）
@@ -31,37 +31,4 @@ N1.3 · 最小生产化收口 dry-run（真实 idSpace 约束）
   PASS  ID.13 validateRelated：干净结果 ok
   PASS  ID.14 validateRelated：脏结果被识别
 
-■ 四、dry-run（fixture → Projection → Provider → Validator → idSpace → bridge → Normalizer）
-  PASS  DR.1 Projection 生效（2 字段 allowlist）
-  PASS  DR.1b Projection 仅含 allowlist
-  PASS  DR.2 真实 DashScope 调用成功（或复用真实响应）
-  PASS  DR.3 Validator：恰 7 字段（无 ai_model）
-  PASS  DR.3b Validator 拒绝 ai_model（Provider 不得自带）
-  idSpace 约束：dropped=2 {"movies":[],"series":["Lanterns"],"characters":["Lanterns"],"phases":[]}
-  PASS  DR.4 idSpace 约束已应用（related_* ⊆ 真实空间）
-  PASS  DR.5 bridge 注入 ai_model（受控 meta）
-  PASS  DR.6 Normalizer PASS（增强 L1，35 字段）
-  PASS  DR.7 final idSpace validation：最终结果 related_* 全部属于真实空间
-  最终 related_*：movies=[] series=[] characters=[] phases=[]
-  PASS  DR.8 链路级：不存在实体（lanterns / FAKE-CHAR）不进最终结果
-  PASS  DR.9 链路级：合法实体（endgame / tony）保留
-  PASS  DR.10 链路级：final validateRelated ok（mock 路径）
-  PASS  DR.11 链路级：非法 phase（9）被移除
-
-■ 五、数据隔离
-  PASS  news.js SHA256 未变
-  PASS  正式 captures 文件数未变
-  PASS  正式 candidates 文件数未变
-  PASS  正式 deliveries 文件数未变
-  PASS  正式 run-history 文件数未变
-
-■ 六、回归（子进程）
-  PASS  回归 N1.1 PASS（exit=0 且断言匹配）
-  PASS  回归 N1.2 PASS（exit=0 且断言匹配）
-  PASS  回归 D1/D2 PASS（exit=0 且断言匹配）
-  PASS  回归 Normalizer PASS（exit=0）
-
-============================================================
-N1.3 = PASS   (assertions 42 PASS / 0 FAIL)
-Actual Request Count = 2 (this-run network=2, retries=1)
-============================================================
+■ 结论：BLOCKED / PROVIDER_KEY_MISSING

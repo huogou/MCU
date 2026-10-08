@@ -1,0 +1,164 @@
+================================================================
+N1.2 P1-D · 真实 ECS 环境验证准备报告（V1.0）
+================================================================
+生成时间：2026-09-30
+性质：项目状态登记 + 验证准备（文档管理，非代码开发）。
+职责边界：本报告仅登记状态、建立清单与模板、澄清执行顺序与待办；
+           不修改代码 / Scheduler / Orchestrator / Provider / 测试 / G4 / Gate / H5 / news.js；
+           不启用 Cron / Timer / GitHub Actions；不触发真实 Production。
+权限来源：本任务由项目总控（彦祖）明确指令发起，属 N1 FINAL CLOSE REPORT §5 所述
+         「新的明确指令」范畴内的「生产就绪验证」，不突破 N1 冻结边界
+         （不启 Production 发布、不部署 H5、不改动新闻模块、不扩 Provider）。
+
+----------------------------------------------------------------
+§0 关联文件索引（绝对路径）
+----------------------------------------------------------------
+【本任务产出】
+1) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 P1-D 真实 ECS 验证准备报告.txt（本报告：状态登记 + 执行顺序 + 待办）
+2) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 P1-D ECS Preflight 清单.txt（ECS 环境 / 环境变量 / 网络 / 权限 / 时间 检查表）
+3) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 P1-D 人工 Production 验证记录模板.txt（真实 Production 结果回填模板）
+【P1-A/B/C/D 既有证据（只读参照）】
+4) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-p1a.txt（P1-A：51 PASS / 0 FAIL · 状态与日志基础设施）
+5) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-p1b.txt（P1-B：40 PASS / 0 FAIL · NewsAnalyzer + 语义去重）
+6) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-p1c.txt（P1-C：40 PASS / 0 FAIL · Scheduler + 全链路 Dry-Run）
+7) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\tests\out-p1d.txt（P1-D 隔离：27 PASS / 0 FAIL · 同日幂等 + 生产路径安全自检）
+【调度与运行入口（只读参照，不修改）】
+8) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\scheduler.cjs
+9) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\scheduler.config.cjs（enabled=false / productionAllowed=false / autoProduction=false）
+10) D:\SEO\发挥余热\漫威电影宇宙导航\workspace\news\pipeline\runner\run-n1.cjs（--mode production-capture --sources S002 支持来源白名单）
+【既有体系（关系说明见 §4）】
+11) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1 FINAL CLOSE REPORT.txt
+12) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\N1.2 实施任务清单.txt
+13) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G9首次生产写入报告.txt
+14) D:\SEO\发挥余热\漫威电影宇宙导航\docs\产品\资讯模块\G10生产运行阶段报告.txt
+
+----------------------------------------------------------------
+§1 当前 N1.2 总体状态（P1-A / B / C / D 汇总）
+----------------------------------------------------------------
+【P1-A · 状态与日志基础设施验收】PASS（51 PASS / 0 FAIL，见 out-p1a.txt）
+  - 状态层隔离与单向流转、run-history 兼容、orchestrator 状态通知接线，全部通过。
+【P1-B · NewsAnalyzer + 语义去重验收】PASS（40 PASS / 0 FAIL，见 out-p1b.txt）
+  - Provider 单测、语义去重标记（只标记不删除）、orchestrator 集成、G4 冒烟，全部通过。
+【P1-C · Scheduler + 全链路 Dry-Run 验收】PASS（40 PASS / 0 FAIL，见 out-p1c.txt）
+  - 默认 disabled、plan-only、dry-run 无副作用、production 未开启、并发锁、真实副作用扫描，全部通过。
+【P1-D · 同日幂等 + 生产路径安全自检】NOT PASS（分层判定见 §2）
+  - CODE / ISOLATED VALIDATION = PASS（27 PASS / 0 FAIL，见 out-p1d.txt，隔离环境等价 Production）
+  - LIVE PRODUCTION VALIDATION = BLOCKED（真实 ECS 环境未就位）
+
+说明：用户任务摘要同时记载「27/27 P1-D 测试 / 15/15 全量回归」——其中 P1-D 27/27
+     与本报告引用的 out-p1d.txt（27 PASS / 0 FAIL）一致；「15/15 全量回归」属 CodeBuddy
+     汇报的回归门禁汇总，其明细证据未随本任务附入，本报告按用户陈述原文登记并标注为
+     「用户报告口径」，与下述逐项证据文件并行存证，不互相覆盖。
+
+----------------------------------------------------------------
+§2 P1-D 状态登记（权威判定）
+----------------------------------------------------------------
+N1.2 P1-D 判定矩阵：
+
+  ┌─────────────────────────────┬──────────┐
+  │ CODE / ISOLATED VALIDATION   │  PASS    │  （隔离环境等价 Production，27/27）
+  ├─────────────────────────────┼──────────┤
+  │ LIVE PRODUCTION VALIDATION   │  BLOCKED │  （真实 ECS 未就位）
+  ├─────────────────────────────┼──────────┤
+  │ P1-D 整体                   │ NOT PASS │  （Live 未完成 ⇒ 整体未过）
+  └─────────────────────────────┴──────────┘
+
+阻断原因（均属环境/运维侧，非代码实现失败）：
+  - 真实 ECS 环境尚未完成 Preflight（是否为实际生产服务器、运行用户、路径、Node 版本等未核验）
+  - DASHSCOPE_API_KEY 尚未注入真实 ECS 环境变量
+  - DashScope 真实网络出口尚未验证
+  - RSS 真实网络出口尚未验证
+  - 真实人工 Production 尚未执行
+
+明确结论：P1-D 当前 NOT PASS 是「环境就绪度」问题，不是代码缺陷。
+           代码侧（collectStage / Orchestrator / Scheduler / Gate / G4 / 幂等 / 并发）
+           已在隔离环境完整验证通过。
+
+----------------------------------------------------------------
+§3 阻断项清单（唯一阻断来源）
+----------------------------------------------------------------
+【B-1】真实 ECS 登录/执行环境
+       状态：未提供。当前工作区 ≠ 阿里云 ECS 生产服务器。
+【B-2】DASHSCOPE_API_KEY 注入
+       状态：未注入真实 ECS 环境变量。要求仅经环境变量提供，不进 Git / 不写代码 /
+             不写文档 / 不写截图 / 不在任何报告中记录真实 Key。
+【B-3】DashScope 网络出口
+       状态：真实 ECS → DashScope API 连通性未验证（Provider 出口 ≠ 采集出口，独立通道）。
+【B-4】RSS 来源网络出口
+       状态：真实 ECS → 实际 RSS 来源连通性未验证（http-transport 通道）。
+【B-5】真实人工 Production 执行
+       状态：未执行（依赖 B-1~B-4 全部 PASS 后方可进行）。
+
+以上 5 项全部解除后，方可进入「人工最小批量 Production」；任一未解除 ⇒ P1-D 维持 NOT PASS。
+
+----------------------------------------------------------------
+§4 与既有文档的关系（避免冲突）
+----------------------------------------------------------------
+【与 N1 FINAL CLOSE REPORT 的关系】
+  - N1 FINAL CLOSE REPORT（2026-09-24）裁定「N1 = CLOSED」：指 N1 Provider 接入链路完成
+    验证并冻结（代码不再开发，不扩 Provider、不启 Production 发布、不部署 H5、不改新闻模块）。
+  - 本任务 P1-D 真实 ECS 验证是「生产就绪验证」：在冻结代码上，于真实环境复核
+    网络出口 / 环境变量 / 文件权限 / 时区一致性，并跑一次「不回流 news.js」的人工最小批量
+    Production。它不修改冻结代码，不发布到 news.js/H5，不启用自动调度——
+    完全落在 N1 冻结声明的允许范围内（属「新的明确指令」授权的验证活动）。
+  - 二者不冲突：N1 代码冻结依旧有效；P1-D 是冻结代码的真实环境安全复核。
+
+【与 N1.2 实施任务清单 的关系】
+  - N1.2 实施任务清单（T1–T9）是「最小接线」实现编排，不含 P1-A/B/C/D 验收阶段。
+  - P1-A/B/C/D 为后续追加的「生产就绪验收」层级，本任务为其补建权威状态登记与模板，
+    不回溯修改 T1–T9 清单（避免与既有体系口径冲突）。
+
+【与 G9 / G10 的关系】
+  - G9 已完成「news.js 首次生产写入」（35 条，历史事实）；G10 为「生产运行阶段」基线。
+  - 本 P1-D 的「人工最小批量 Production」特指 P1-D 验证性运行，明确「不进行 H5/news.js 回流」
+    （见模板 §6 SHA256 前后一致校验），与 G9 的实际数据发布是不同动作，须严格区分。
+
+----------------------------------------------------------------
+§5 真实执行顺序（强制，不得跳步）
+----------------------------------------------------------------
+  1)  ECS Preflight（填《ECS Preflight 清单》，见关联文件 2）
+  2)  DASHSCOPE_API_KEY 环境变量准备（仅环境变量，不落任何文件）
+  3)  DashScope 网络出口验证（PASS/FAIL 记录实际结果）
+  4)  RSS 网络出口验证（PASS/FAIL 记录实际结果）
+  5)  文件权限验证（pipeline / captures / candidates / events / status / run-history /
+      delivery / preview / scratch）
+  6)  Scheduler 默认配置复核（确认 scheduler.config.cjs 三项护栏仍为 false）
+  7)  保持：enabled=false / productionAllowed=false / autoProduction=false（mode=capture-only）
+  8)  Preflight 全 PASS 后，方可进行人工 Production
+  9)  人工最小批量 Production（sources=['S002']，优先无 --persist 纯校验，再视需 --persist）
+  10) Production 后检查（按《人工 Production 验证记录模板》逐项回填，见关联文件 3）
+  11) 记录结果（归档回填模板 + 更新本报告的 §1/§2 状态）
+  12) P1-D 最终判定（Live PASS ⇒ P1-D 整体置 PASS；否则维持 NOT PASS）
+
+----------------------------------------------------------------
+§6 用户 / 运维待办（下一步）
+----------------------------------------------------------------
+【必须提供 / 完成】
+  U-1  真实 ECS 登录与执行环境（确认是实际生产服务器，非本工作区）
+  U-2  DASHSCOPE_API_KEY —— 仅经环境变量提供，不写仓库 / 不写文档 / 不给本项目 AI 明文
+  U-3  ECS 出网能力（DashScope API 域名可达）
+  U-4  实际 RSS 来源出网能力（采集通道可达）
+【验证后动作（由运维/负责人执行，非本角色）】
+  U-5  人工最小批量 Production（sources=['S002']）
+  U-6  Production 结果按模板回填
+  U-7  P1-D 最终验收（由项目总控拍板）
+
+【本角色（文档管理）已停手项】
+  - 不修改任何代码 / Scheduler / Orchestrator / Provider / 测试 / G4 / Gate
+  - 不启用 ECS Cron / Function Compute Timer / GitHub Actions
+  - 不将 enabled / productionAllowed 置 true
+  - 不在无真实 ECS 时声称 P1-D 完成或 Production 已运行
+
+----------------------------------------------------------------
+§7 置信度
+----------------------------------------------------------------
+结论置信度：高
+  - P1-D 隔离环境 27 PASS / 0 FAIL 为已落盘证据（out-p1d.txt），事实清楚。
+  - 状态登记（CODE PASS / LIVE BLOCKED / 整体 NOT PASS）与用户指令及证据一致，逻辑自洽。
+  - 阻断项（B-1~B-5）均为环境/运维事实缺口，非代码假设。
+局限（中置信度区间）：
+  - 「15/15 全量回归」为用户汇报口径，明细证据未随附，按原文登记、未独立复算。
+  - 真实 ECS 的具体 OS / Node 版本 / 运行用户 / 路径，须待 U-1 完成后由 Preflight 清单填实，
+    当前无法预判。
+  - P1-D 最终判定依赖真实环境执行结果，当前不可前置给出。
+================================================================

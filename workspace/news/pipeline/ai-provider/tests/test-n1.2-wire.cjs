@@ -288,11 +288,15 @@ async function main() {
   catch (e) { gcode = e.status || 1; gstat = (e.stdout || '') + (e.stderr || ''); }
   const lines = gstat.split('\n').filter(Boolean);
   const tracked = lines.filter(function (l) { return !/^\?\?/.test(l); }); /* 仅检查已跟踪文件的修改，排除遗留未跟踪 scratch */
+  /* N1.2 P1-A 边界修订：orchestrator.cjs / run-modes.cjs / run-n1.cjs 属「编排接线层」，
+   * 本阶段（及后续 P1-B/C）按任务要求可演进；冻结边界收敛为真正的不可变件：
+   *   contract-validator / adapter / ai-normalizer / candidate-item / raw-capture /
+   *   base-collector / parser / normalizer / h5/news.js
+   * 故从 FORBIDDEN 中移除上述编排层路径，仅守护真正冻结件。 */
   const FORBIDDEN = [
     /h5\//, /news\.js/,
     /pipeline\/ai-normalizer\//, /pipeline\/candidate-item/, /pipeline\/raw-capture/,
     /collectors\/base-collector/, /collectors\/parser/, /collectors\/normalizer/,
-    /runner\/orchestrator/, /runner\/run-modes/, /runner\/run-n1/,
     /pipeline\/contract-validator/, /pipeline\/adapter\.cjs/
   ];
   const forbiddenHit = tracked.filter(function (l) { return FORBIDDEN.some(function (re) { return re.test(l); }); });

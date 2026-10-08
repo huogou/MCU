@@ -36,6 +36,13 @@ const FIELDS = Object.freeze([
   'approved_count', 'rejected_count', 'delivery_count'
 ]);
 
+/* N1.2 P1-A 增强：可选扩展字段（向后兼容，不纳入 FIELDS 封闭集，
+ * 因此既有「恰 10 字段」断言与 411 条回归不受影响）。
+ *   ai_processed_count : 本次 AI 处理（AI_ANALYZED）条目数
+ *   fail_reasons       : 各阶段失败原因数组 [{stage, source, code, message}] */
+const OPTIONAL_FIELDS = Object.freeze(['ai_processed_count', 'fail_reasons']);
+const ALLOWED_FIELDS = Object.freeze(FIELDS.concat(OPTIONAL_FIELDS));
+
 const RUN_ID_RE = /^run-\d{8}-\d{3}$/;
 const ISO_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
@@ -77,13 +84,22 @@ function nextRunId(opts) {
   return prefix + String(max + 1).padStart(3, '0');
 }
 
-/** 校验一条记录（恰 10 字段 / run_id / 时间 ISO / 计数非负整数） */
+/** 校验一条记录（10 必填字段 + 可选扩展字段；run_id / 时间 ISO / 计数非负整数）
+ *  - 历史 10 字段记录：通过（向后兼容，不写扩展字段也合法）
+ *  - 新记录：可含 ai_processed_count / fail_reasons（仍受 ALLOWED_FIELDS 管控）
+ *  - 任何 10 字段 / 可选字段之外的越权字段 → FIELD_SET_MISMATCH（守住封闭集） */
 function validate(entry) {
   if (!entry || typeof entry !== 'object') fail('ENTRY_INVALID', '运行记录不是对象');
-  const keys = Object.keys(entry).sort();
-  const want = FIELDS.slice().sort();
-  if (keys.join(',') !== want.join(',')) {
-    fail('FIELD_SET_MISMATCH', '运行记录字段集 ≠ 规范 10 字段\n实际：' + keys.join(','));
+  const keys = Object.keys(entry);
+  /* 1) 必填 10 字段缺一不可（缺字段 → FIELD_SET_MISMATCH，兼容 T1.4） */
+  const missing = FIELDS.filter(function (f) { return !(f in entry); });
+  if (missing.length) {
+    fail('FIELD_SET_MISMATCH', '运行记录缺必填字段：' + missing.join(','));
+  }
+  /* 2) 不得出现 10 必填 + 可选扩展 之外的越权字段（兼容 T1.5：note → 拒绝） */
+  const unknown = keys.filter(function (k) { return ALLOWED_FIELDS.indexOf(k) < 0; });
+  if (unknown.length) {
+    fail('FIELD_SET_MISMATCH', '运行记录含越权字段（非 10 必填/可选扩展）：' + unknown.join(','));
   }
   if (!RUN_ID_RE.test(String(entry.run_id))) fail('BAD_RUN_ID', 'run_id 形态非法：' + entry.run_id);
   [entry.start_time, entry.end_time].forEach(function (t) {
@@ -95,6 +111,17 @@ function validate(entry) {
         fail('BAD_COUNT', k + ' 须为非负整数：' + entry[k]);
       }
     });
+  /* 3) 可选扩展字段软校验（存在时才校验） */
+  if ('ai_processed_count' in entry) {
+    if (!Number.isInteger(entry.ai_processed_count) || entry.ai_processed_count < 0) {
+      fail('BAD_COUNT', 'ai_processed_count 须为非负整数：' + entry.ai_processed_count);
+    }
+  }
+  if ('fail_reasons' in entry) {
+    if (!Array.isArray(entry.fail_reasons)) {
+      fail('BAD_TYPE', 'fail_reasons 须为数组');
+    }
+  }
   return true;
 }
 
@@ -124,4 +151,4 @@ function record(entry, opts) {
   return { file: file, count: doc.count, run_id: entry.run_id };
 }
 
-module.exports = { LAYER, SCHEMA_VERSION, FIELDS, DEFAULT_DIR, load, nextRunId, validate, record };
+module.exports = { LAYER, SCHEMA_VERSION, FIELDS, OPTIONAL_FIELDS, ALLOWED_FIELDS, DEFAULT_DIR, load, nextRunId, validate, record };

@@ -65,3 +65,23 @@ workspace/news/pipeline/**/tmp-*/
 .env
 .env.*
 !.env.example
+
+# ===== 2026-10-08 新增：测试输出与临时产物 =====
+# 测试运行输出（每次跑都变，属可重建产物，不入版本库）
+workspace/**/out-*.txt
+workspace/**/shots-out.txt
+workspace/**/archive-check.txt
+workspace/**/git-commit*.txt
+workspace/**/sources-probe*.txt
+workspace/**/sync-archive-log*.txt
+workspace/news/shots/
+workspace/map-shots/
+workspace/v23-preview/
+# 运行时数据目录（含运行记录与状态文件）
+workspace/news/pipeline/status/
+workspace/news/pipeline/dedup/
+workspace/news/pipeline/ai/
+# AI 工具产物
+.loomy-attachments/
+# 服务器访问凭据（含 ed25519 公钥，不入库）
+workspace/deploy/workbench-key-install-*.txt

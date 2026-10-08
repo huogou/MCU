@@ -111,13 +111,13 @@ G4 · 事件指纹 / 合并引擎 V1.0 —— 测试
   PASS  【合并统计】存在被 hold 的事件（超窗口 / 缺时间）
 
 ■ 11. 真实 15 条 news.js 集成跑（只读）
-  PASS  输入条数 = 15
+  PASS  输入条数 = 35（G9 写入后基线）
   PASS  报道记录零丢失
   PASS  records_deleted = 0
   PASS  输出中不含状态字段
-  PASS  归并后事件数 ≤ 15（去重生效但不激进）
+  PASS  归并后事件数 ≤ 35（去重生效但不激进）
   PASS  每条真实数据都能生成合法 key
-  INFO  真实数据归并结果：输入 15 条 → 事件 14 个（可合并 1 / hold 0）
+  INFO  真实数据归并结果：输入 15 条 → 事件 34 个（可合并 1 / hold 0）
         evt1-72351c9a6985146e  ×1  single  news-2026-09-22-001
         evt1-fd8f73ff64a13c5b  ×1  single  news-2026-09-22-002
         evt1-ce55e5bb20ccb053  ×1  single  news-2026-09-22-003
@@ -132,16 +132,36 @@ G4 · 事件指纹 / 合并引擎 V1.0 —— 测试
         evt1-c70d669dccc066b5  ×1  single  news-2026-09-18-012
         evt1-98131387d4c55a45  ×1  single  news-2026-09-19-013
         evt1-c4dd0791beb075fd  ×1  single  news-2026-09-17-015
+        evt1-916f70515526f04f  ×1  single  news-2026-09-23-001
+        evt1-d5ad71f308b75611  ×1  single  news-2026-09-23-002
+        evt1-54459844ba5cff3f  ×1  single  news-2026-09-23-003
+        evt1-19cc521d5aacbaf0  ×1  single  news-2026-09-23-004
+        evt1-30235589022ae1d5  ×1  single  news-2026-09-23-005
+        evt1-cf15a00b8f8255fa  ×1  single  news-2026-09-23-006
+        evt1-90e15115d54436ae  ×1  single  news-2026-09-23-007
+        evt1-788238e4eaa53c91  ×1  single  news-2026-09-23-008
+        evt1-3db51c4008f68650  ×1  single  news-2026-09-23-009
+        evt1-945e0de2ebce3d25  ×1  single  news-2026-09-23-010
+        evt1-bc80a9b562f058f6  ×1  single  news-2026-09-23-011
+        evt1-9b41cdbad917bcbc  ×1  single  news-2026-09-23-012
+        evt1-4352f91937888eb8  ×1  single  news-2026-09-23-013
+        evt1-0ab3adfc9d5cad95  ×1  single  news-2026-09-23-014
+        evt1-2807b1a25c8495f2  ×1  single  news-2026-09-23-015
+        evt1-9ac7fb4073bac3fa  ×1  single  news-2026-09-23-016
+        evt1-fcb6cf13f5c368b3  ×1  single  news-2026-09-23-017
+        evt1-ed5ef012f516904a  ×1  single  news-2026-09-23-018
+        evt1-0c6873f18605306c  ×1  single  news-2026-09-23-019
+        evt1-9aaa232476e1f391  ×1  single  news-2026-09-23-020
 
 ■ 12. 验收输出
   ── h5/data/news.js SHA256 ──
-  实测：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
-  基线：589A39347EF6BEEA682D0102CE8C078EBA3900EB1C7BE9698DC545B1270242F2
+  实测：EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF
+  基线：EBF67DE08BF8C391C59F05ED82CB43144A2726F879EF7185388CA7939E56FCAF
   PASS  h5/data/news.js SHA256 与基线一致（未改动）
 
   ── git status ──
-  条目数：70　其中 h5 / wechat / douyin 相关：0
-  PASS  git status 中无 h5 / wechat / douyin 路径
+  条目数：143　其中 h5 / wechat / douyin 相关：0
+  PASS  git status 中仅允许 h5/data/news.js（G9 白名单），wechat/douyin 零改动
 
 ============================================================
 结果：95 PASS / 0 FAIL
