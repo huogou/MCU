@@ -122,7 +122,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 4. 复核 V1.2 UI/视觉重构是否继续（当前无推进证据）。
 
 - **图像资源**：小程序端 `visuals.js` CDN = `https://mcu.yaokaixin.top`（**保持不切换**；该域继续作为小程序图片资源域，已实测存活）；H5 端为同域相对路径设计。
-- **Git 仓库**：双分支收口完成（2026-09-22，A 方案）——`main` 与 `master` 均为 `eca2e66`，**默认分支已切换为 `master`**；备份 tag `backup-master/main-20260922` 留存。此后 `master` 推进至 `79daebd`（09-28），本地与 `origin/master` 一致。
+- **Git 仓库**：双分支收口完成（2026-09-22，A 方案）——`main` 与 `master` 均为 `eca2e66`，**默认分支已切换为 `master`**；备份 tag `backup-master/main-20260922` 留存。此后 `master` 推进至 `2de76d3`（2026-10-13，复联5专题页 + 首页横幅）。⚠️ **该提交尚未推送**：`github.com:443` 从当前网络不可达（与项目既有「待代理恢复推送」状态一致），本地领先 `origin/master` 1 个提交，恢复后执行 `git push origin master` 即可。
 - **设计口径**：三端 Token 已于 2026-09-10 **统一为单一体系**（bg `#080B12` / surface `#161D2B` / gold `#F2B233`），权威源 `DESIGN.md` + `h5/assets/css/style.css` `:root`，勿再按旧"两套 Token"记录跨端套用。详见总览 §8。
 
 
