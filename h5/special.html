@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="icon" href="assets/favicon.ico" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<title>复联5补课路线：8 部核心 + 15 部完整 - MCU 宇宙导航</title>
+<meta name="description" content="复联5补课路线：8 部核心补课路线 + 15 部完整补课路线，看懂 MCU 多元宇宙如何走向下一阶段。MCU 宇宙导航提供作品关系与观看顺序。">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/v2.css">
+<link rel="stylesheet" href="assets/css/v1-special.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<main class="sp" id="sp-root"></main>
+
+<div id="app-foot"></div>
+
+<!-- 数据层：按需加载（弱网首屏关键）。
+     不加载 news.js / community.js / relations.js / routes.js / characters.js。
+     注：visuals.js 依赖 posters.js 提供海报映射，故 posters.js 必须在其之前加载。 -->
+<script src="data/movies.js"></script>
+<script src="data/series.js"></script>
+<script src="data/special.js"></script>
+<script src="data/short.js"></script>
+<script src="data/content.js"></script>
+<script src="data/upcoming.js"></script>
+<script src="data/posters.js"></script>
+<script src="data/visuals.js"></script>
+<script src="data/special-routes.js"></script>
+<script src="assets/js/app.js"></script>
+<script>
+/* ============================================================
+ * MCU 宇宙导航 H5 · 复联5补课路线专题页
+ * ------------------------------------------------------------
+ * 页面：special.html   路由：/special?id=avengers-doomsday
+ * 规格：docs/同步/复联5补课路线专题-H5-设计AI正式规格-V1.md
+ *
+ * 数据纪律：
+ *   - 作品名称一律 MCU.data.get(workId).cn，本文件不写任何作品中文名
+ *   - 上映日期 / 英文片名 / 复联5 中文片名一律取自 MCU_UPCOMING[upcomingId]
+ *   - 已看状态读写 MCU.progress（localStorage key mcu_nav_user_v1），零新增 key
+ *   - 洛基 S1/S2 共用 id 'loki'：label 仅用于区分，标记任一节点两者同时变已看
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  var MCU = window.MCU;
+  var esc = MCU.ui.esc;
+
+  MCU.ui.mount('special.html');
+
+  /* ---------- 图形常量（与 route-detail.html 同一套 SVG 路径） ---------- */
+  var IC = {
+    check: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
+    chev:  'M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z',
+    right: 'M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'
+  };
+  function svg(path, cls) {
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"'
+      + (cls ? ' class="' + cls + '"' : '') + '><path d="' + path + '"/></svg>';
+  }
+
+  /* ---------- 取专题数据 ---------- */
+  var SPECIALS = window.MCU_SPECIAL_ROUTES || [];
+  var id = MCU.ui.param('id');
+  var route = null;
+  for (var i = 0; i < SPECIALS.length; i++) if (SPECIALS[i].id === id) { route = SPECIALS[i]; break; }
+  if (!route) route = SPECIALS[0];               /* id 缺省或非法 → 回落到首条，页面仍可用 */
+
+  /* ---------- 复联5：日期 / 英文片名 / 中文片名全部运行时取自 upcoming ---------- */
+  var U = null;
+  var UPCOMING = window.MCU_UPCOMING || [];
+  for (var u = 0; u < UPCOMING.length; u++) {
+    if (UPCOMING[u].id === route.upcomingId) { U = UPCOMING[u]; break; }
+  }
+  function fmtDate(s) {                       /* ISO 日期 → 点分隔形式（示例见 upcoming.js） */
+    var d = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return d ? (d[1] + '.' + d[2] + '.' + d[3]) : '';
+  }
+  var U_DATE = fmtDate(U && U.date);
+  var U_EN   = U ? String(U.en || '').toUpperCase() : '';        /* 英文片名大写，取自 upcoming */
+  /* MCU_UPCOMING 的中文字段名为 title（与 movies/series 的 cn 不同），此处兼容读取 */
+  var U_CN   = U ? String(U.title || U.cn || '') : '';            /* 中文片名，取自 upcoming */
+  /* 短英文名从 en 的冒号后半段派生，不落库、不硬编码 */
+  var U_SHORT = U ? (String(U.en || '').split(':').pop().trim()) : '';
+  /* 终点圆点数字从中文片名里的序号派生，不硬编码 */
+  var U_NUM = U_CN.match(/联盟(\d+)/);
+  U_NUM = U_NUM ? U_NUM[1] : '';
+
+  /* ---------- SEO（title / description 由数据拼装，无作品名硬编码） ---------- */
+  document.title = route.title + '：' + route.core.items.length + ' 部核心 + '
+    + (route.full ? route.full.items.length + ' 部完整' : '完整路线')
+    + ' - MCU 宇宙导航';
+  var descEl = document.querySelector('meta[name="description"]');
+  if (descEl) {
+    descEl.content = ('如果不想重刷整个 MCU，先看这 ' + route.core.items.length
+      + ' 部就能看懂' + U_CN + '。'
+      + (route.full ? '另有完整 ' + route.full.items.length + ' 部路线，'
+          + '含人物、多元宇宙与新一代英雄线索。' : '')
+      + 'MCU 宇宙导航提供作品关系与观看顺序。').slice(0, 150);
+  }
+
+  /* ---------- 片段：海报盒（无图用阶段色 + 首字兜底，绝不破图） ---------- */
+  function posterHtml(m) {
+    var v = m ? MCU.data.visual(m.id) : null;
+    var pc = m ? MCU.data.phaseColor(m.phase) : 'var(--surface-3)';
+    var ch = esc(String((m && m.cn) || '?').slice(0, 1));
+    var img = (v && v.poster)
+      ? '<img src="' + esc(v.poster) + '" alt="" loading="lazy" decoding="async"'
+        + ' onerror="this.style.display=\'none\'">'
+      : '';
+    return '<span class="sp-ph" style="--pc:' + pc + '"><b>' + ch + '</b>' + img + '</span>';
+  }
+
+  /* ---------- 片段：节点卡 ----------
+   * 整卡为 <a href="movie.html?id=" + workId>；序号位为 <button data-toggle>，
+   * 点击序号由事件委托 preventDefault + stopPropagation，**不跳转**。
+   * opts: { kw: 带一句话关键词, tag: 带阶段标, yr: 带年份, type: 带类型行 } */
+  function itemHtml(it, i, nextIdx, opts) {
+    opts = opts || {};
+    var m = MCU.data.get(it.workId);
+    var name = it.label || (m ? m.cn : '？');     /* label 仅覆盖洛基 S1/S2，其余一律数据 cn */
+    var seen = m ? MCU.progress.isSeen(m.id) : false;
+    var isNext = (i === nextIdx);
+    var cls = 'sp-item' + (seen ? ' is-watched' : '') + (isNext ? ' is-next' : '');
+    var href = m ? 'movie.html?id=' + encodeURIComponent(m.id) : '#';
+
+    return '<a class="' + cls + '" href="' + href + '">'
+      + '<button class="sp-num" type="button" data-toggle="' + esc(it.workId) + '"'
+      + ' aria-label="标记已看《' + esc(name) + '》">' + (seen ? svg(IC.check) : String(i + 1)) + '</button>'
+      + posterHtml(m)
+      + '<span class="sp-info">'
+      +   '<span class="sp-row">'
+      +     '<span class="sp-nm">' + esc(name) + '</span>'
+      +     (opts.yr && m ? '<span class="sp-yr">' + m.year + '</span>' : '')
+      +   '</span>'
+      +   (opts.kw && it.kw ? '<span class="sp-kw">' + esc(it.kw) + '</span>' : '')
+      +   (opts.tag && m ? '<span class="sp-tag" style="color:' + MCU.data.phaseColor(m.phase) + '">P' + m.phase + '</span>' : '')
+      +   (opts.type && m ? '<span class="sp-type">' + esc(MCU.data.typeLabel[m.type] || '') + '</span>' : '')
+      + '</span>'
+      + '<span class="sp-view"><span>查看作品</span>' + svg(IC.chev) + '</span>'
+      + '</a>';
+  }
+
+  /* ---------- 片段：金线分隔「你看到这里了」 ---------- */
+  var splitHtml = '<div class="sp-split"><span class="sp-split-l"></span>'
+    + '<span class="sp-split-tx"><i></i>你看到这里了</span>'
+    + '<span class="sp-split-l"></span></div>';
+
+  /* ---------- ① Hero ---------- */
+  var STARS = [[8,15,2],[12,72,2],[25,45,3],[18,88,1],[35,22,2],[5,55,1],[42,78,2]];
+  var stars = STARS.map(function (p) {
+    return '<span class="sp-star" style="top:' + p[0] + '%;left:' + p[1] + '%;width:'
+      + p[2] + 'px;height:' + p[2] + 'px"></span>';
+  }).join('');
+
+  var dateHtml = (U_DATE && U_EN)
+    ? '<div class="sp-hero-date">'
+      + '<span class="sp-hero-date-d">' + esc(U_DATE) + '</span>'
+      + '<span class="sp-hero-date-l"></span>'
+      + '<span class="sp-hero-date-en">' + esc(U_EN) + '</span>'
+    + '</div>'
+    : '';
+
+  var heroHtml = ''
+    + '<section class="sp-hero" data-section-label="复联5补课路线">'
+    +   '<div class="sp-hero-bg" aria-hidden="true"></div>'
+    +   '<div class="sp-hero-stars" aria-hidden="true">' + stars + '</div>'
+    +   '<div class="sp-hero-in">'
+    +     '<h1 class="sp-name">' + esc(route.title) + '</h1>'
+    +     '<p class="sp-tagline">' + esc(route.tagline) + '</p>'
+    +     dateHtml
+    +     '<div class="sp-actions">'
+    +       '<button class="v2-btn v2-btn-primary" type="button" data-go="core">'
+    +         svg(IC.right) + '先补这 ' + route.core.items.length + ' 部</button>'
+    +       (route.full
+            ? '<button class="v2-btn v2-btn-ghost" type="button" data-go="full">'
+              + svg(IC.right) + '完整补课 ' + route.full.items.length + ' 部</button>'
+            : '')
+    +     '</div>'
+    +     '<div class="sp-actions-note">' + esc(route.heroNote) + '</div>'
+    +   '</div>'
+    + '</section>';
+
+  /* ---------- ② 核心路线（起点条 + 节点 + 进度徽章 + 终点条） ---------- */
+  var coreItems = route.core.items;
+  var coreTotal = coreItems.length;
+  var originM = MCU.data.get(route.origin.workId);
+
+  function coreSeenCount() {
+    return coreItems.filter(function (it) { return MCU.progress.isSeen(it.workId); }).length;
+  }
+  function badgeHtml() {
+    var n = coreSeenCount();
+    var txt = (n >= coreTotal) ? ('已看完 ' + n + ' / ' + coreTotal) : ('已看 ' + n + ' / ' + coreTotal);
+    return '<span class="sp-badge"><i></i>' + esc(txt) + '</span>';
+  }
+
+  var originHtml = '<div class="sp-origin">'
+    + '<span class="sp-origin-d" aria-hidden="true"></span>'
+    + '<span class="sp-origin-tx">'
+    +   '<span class="sp-origin-t">你已看完《' + esc(originM ? originM.cn : '？') + '》</span>'
+    +   '<span class="sp-origin-k">' + esc(route.origin.kw) + '</span>'
+    + '</span></div>';
+
+  var endpointHtml = '<div class="sp-endpoint">'
+    + '<span class="sp-endpoint-d">' + esc(U_NUM) + '</span>'
+    + '<span class="sp-endpoint-tx">'
+    +   '<span class="sp-endpoint-en">' + esc(U_SHORT.toUpperCase()) + '</span>'
+    +   '<span class="sp-endpoint-cn">' + esc(U_CN + ' · ' + U_DATE) + '</span>'
+    + '</span></div>';
+
+  function coreListHtml() {
+    var seenArr = coreItems.map(function (it) { return MCU.progress.isSeen(it.workId); });
+    var nextIdx = seenArr.indexOf(false);          /* 首个未看节点 = 当前建议观看 */
+    var hasProgress = seenArr.indexOf(true) >= 0;
+    var all = nextIdx < 0;
+
+    var out = '';
+    for (var i = 0; i < coreItems.length; i++) {
+      out += itemHtml(coreItems[i], i, nextIdx, { kw: true, tag: true, yr: true });
+      if (hasProgress && !all && i === nextIdx - 1) out += splitHtml;
+    }
+    return out || '<div class="sp-empty">这条路线暂无内容。</div>';
+  }
+
+  var coreHtml = ''
+    + '<section class="sp-sec" id="sp-core" data-section-label="核心补课路线">'
+    +   '<div class="sp-sec-hd"><h2 class="sp-sec-t">' + esc(route.core.title) + '</h2>'
+    +     '<span id="sp-core-badge">' + badgeHtml() + '</span></div>'
+    +   originHtml
+    +   '<div class="sp-list" id="sp-core-list">' + coreListHtml() + '</div>'
+    +   endpointHtml
+    + '</section>';
+
+  /* ---------- ③ 完整路线（原生 details，默认折叠；full 为 null 则整块不渲染） ---------- */
+  var fullHtml = '';
+  if (route.full) {
+    fullHtml = '<details class="sp-full" id="sp-full" data-section-label="完整补课路线">'
+      + '<summary>'
+      +   '<span class="sp-full-hd">'
+      +     '<span class="sp-full-t">' + esc(route.full.title) + '</span>'
+      +     '<span class="sp-full-num">' + route.full.items.length + ' 部</span>'
+      +     svg(IC.chev, 'sp-full-chev')
+      +   '</span>'
+      +   '<span class="sp-full-desc">' + esc(route.full.desc) + '</span>'
+      + '</summary>'
+      + '<div class="sp-full-body" id="sp-full-body"></div>'
+      + '</details>';
+  }
+
+  function fullListHtml() {
+    var items = route.full.items;
+    var seenArr = items.map(function (it) { return MCU.progress.isSeen(it.workId); });
+    var nextIdx = seenArr.indexOf(false);
+    var hasProgress = seenArr.indexOf(true) >= 0;
+    var all = nextIdx < 0;
+
+    var out = '';
+    for (var i = 0; i < items.length; i++) {
+      out += itemHtml(items[i], i, nextIdx, { type: true });
+      if (hasProgress && !all && i === nextIdx - 1) out += splitHtml;
+    }
+    return out || '<div class="sp-empty">这条路线暂无内容。</div>';
+  }
+
+  /* ---------- ④ 「为什么要补」五段链 ---------- */
+  var chainRows = route.chain.items.map(function (c) {
+    return '<div class="sp-chain-item">'
+      + '<span class="sp-chain-rail" aria-hidden="true"></span>'
+      + '<span class="sp-chain-tx">'
+      +   '<span class="sp-chain-t">' + esc(c.t) + '</span>'
+      +   '<span class="sp-chain-d">' + esc(c.d) + '</span>'
+      + '</span></div>';
+  }).join('');
+  chainRows += '<div class="sp-chain-item">'
+    + '<span class="sp-chain-rail" aria-hidden="true"></span>'
+    + '<div class="sp-chain-end">'
+    +   '<div class="sp-chain-end-t">' + esc(U_SHORT) + '</div>'
+    +   '<div class="sp-chain-end-d">' + esc(U_CN + ' · ' + U_DATE) + '</div>'
+    +   '<div class="sp-chain-d">' + esc(route.chain.end.d) + '</div>'
+    + '</div></div>';
+
+  var chainHtml = ''
+    + '<section class="sp-sec" id="sp-chain" data-section-label="为什么要补">'
+    +   '<div class="sp-sec-hd"><h2 class="sp-sec-t">' + esc(route.chain.title) + '</h2></div>'
+    +   '<div class="sp-chain-body">' + chainRows + '</div>'
+    + '</section>';
+
+  /* ---------- ⑤ 底部入口 ---------- */
+  var entryLinksHtml = route.entry.links.map(function (l) {
+    return '<a class="sp-entry-link" href="' + esc(l.href) + '">' + esc(l.text) + '</a>';
+  }).join('');
+
+  var entryHtml = ''
+    + '<section class="sp-entry" id="sp-entry" data-section-label="继续探索">'
+    +   '<div class="sp-entry-in">'
+    +     '<div class="sp-brand">MCU Atlas</div>'
+    +     '<div class="sp-entry-t">' + esc(route.entry.title) + '</div>'
+    +     '<a class="v2-btn v2-btn-primary" href="' + esc(route.entry.primary.href) + '">'
+    +       svg(IC.right) + esc(route.entry.primary.text) + '</a>'
+    +     entryLinksHtml
+    +   '</div>'
+    + '</section>';
+
+  var root = document.getElementById('sp-root');
+  root.innerHTML = heroHtml + coreHtml + fullHtml + chainHtml + entryHtml;
+  if (route.full) {
+    document.getElementById('sp-full-body').innerHTML = fullListHtml();
+  }
+
+  /* ============================================================
+   * 交互
+   * ============================================================ */
+  var badgeSlot = document.getElementById('sp-core-badge');
+  var coreList  = document.getElementById('sp-core-list');
+  var fullBody  = document.getElementById('sp-full-body');
+
+  /* 已看切换后**局部**重渲染：徽章 + 核心列表 + 折叠区列表。
+     Hero / 五段链 / 底部入口不重绘，页面不刷新、不跳转。 */
+  function renderProgress() {
+    if (badgeSlot) badgeSlot.innerHTML = badgeHtml();
+    if (coreList)  coreList.innerHTML = coreListHtml();
+    if (fullBody)  fullBody.innerHTML = fullListHtml();
+  }
+
+  function scrollToId(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var nav = document.querySelector('.nav');
+    var off = nav ? nav.getBoundingClientRect().height : 0;
+    var top = el.getBoundingClientRect().top + window.pageYOffset - off - 8;
+    window.scrollTo({
+      top: top < 0 ? 0 : top,
+      behavior: MCU.ui.reducedMotion() ? 'auto' : 'smooth'
+    });
+  }
+
+  root.addEventListener('click', function (e) {
+    var t = e.target;
+    while (t && t !== root) {
+      if (t.getAttribute) {
+        var toggleId = t.getAttribute('data-toggle');
+        if (toggleId) {                    /* 序号圆点：切换已看，禁止跳转 */
+          e.preventDefault();
+          e.stopPropagation();
+          MCU.progress.toggle(toggleId);
+          renderProgress();
+          return;
+        }
+        var go = t.getAttribute('data-go');
+        if (go === 'core') {              /* CTA1：滚动到核心路线 */
+          e.preventDefault();
+          scrollToId('sp-core');
+          return;
+        }
+        if (go === 'full') {              /* CTA2：打开折叠区并滚动 */
+          e.preventDefault();
+          var d = document.getElementById('sp-full');
+          if (d) { d.open = true; scrollToId('sp-full'); }
+          return;
+        }
+      }
+      t = t.parentNode;
+    }
+  });
+})();
+</script>
+</body>
+</html>

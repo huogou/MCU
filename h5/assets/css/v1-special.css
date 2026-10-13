@@ -1,0 +1,307 @@
+/* ============================================================
+ * MCU 宇宙导航 - 复联5补课路线专题（sp-*）
+ * ------------------------------------------------------------
+ * 页面：h5/special.html   路由：/special?id=avengers-doomsday
+ * 规格：docs/同步/复联5补课路线专题-H5-设计AI正式规格-V1.md
+ *
+ * ── 铁律 ──────────────────────────────────────────────
+ *  1. 本文件是本页**唯一**的样式来源；style.css / v2.css 零改动。
+ *  2. 所有类名统一 sp-* 前缀，与 .rd-*（路线详情页）完全隔离，
+ *     两页样式互不牵连。
+ *  3. **不新增、不改值任何 CSS 变量**：颜色 / 字号 / 圆角 / 阴影
+ *     一律引用 style.css :root 既有 Token。
+ *  4. 视觉基线继承 route-detail.html 的 .rd-* 同值，仅改类名。
+ *  5. 动效边界：仅 chevron 旋转 + 既有 .v2-btn:active / .sp-item:active，
+ *     本页不新增任何动画。
+ * ============================================================ */
+
+/* ---------- 页面外壳 ---------- */
+body { overflow-x: hidden; }          /* 390/375 防横向溢出 */
+
+.sp { display: block; padding-bottom: 8px; }
+
+/* ---------- 区块通用 ---------- */
+.sp-sec { padding: 20px var(--page-x); }
+.sp-sec-hd { display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 12px; }
+.sp-sec-t { display: flex; align-items: center; gap: 8px;
+  font-size: var(--fs-title); font-weight: 700; color: var(--text); }
+.sp-sec-t::before { content: ''; width: 3px; height: 16px; flex: 0 0 auto;
+  border-radius: 2px; background: var(--gold); }
+
+/* ============================================================
+ * ① Hero
+ * ============================================================ */
+.sp-hero { position: relative; overflow: hidden; padding: 18px var(--page-x) 22px; }
+.sp-hero-bg { position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 20%, rgba(242,178,51,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 30% 80%, rgba(91,141,239,0.03) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%); }
+.sp-hero-stars { position: absolute; inset: 0; overflow: hidden; }
+.sp-star { position: absolute; border-radius: 50%; background: #fff; opacity: .28; }
+.sp-hero-in { position: relative; z-index: 2; }
+
+.sp-name { font-size: var(--fs-display); font-weight: 700; line-height: 1.22;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--text) 0%, var(--gold-light) 52%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.sp-tagline { font-size: var(--fs-body); color: var(--text-2);
+  line-height: 1.6; margin-bottom: 13px; }
+
+/* 日期锁定排版：日期与英文名一律运行时取自 MCU_UPCOMING，禁硬编码 */
+.sp-hero-date { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.sp-hero-date-d { font-family: var(--font-display); font-size: 22px; font-weight: 600;
+  color: var(--gold); letter-spacing: .04em; white-space: nowrap; }
+.sp-hero-date-l { flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-a30), transparent); }
+.sp-hero-date-en { font-size: var(--fs-mini); font-weight: 600; color: var(--gold);
+  letter-spacing: .18em; white-space: nowrap; }
+
+.sp-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.sp-actions .v2-btn { width: 100%; }
+.sp-actions-note { font-size: var(--fs-mini); color: var(--text-3); text-align: center; }
+
+/* ============================================================
+ * ② 进度徽章（复用 .rd-badge 同值）
+ * ============================================================ */
+.sp-badge { display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto;
+  padding: 5px 13px; border-radius: var(--r-full);
+  background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  font-size: var(--fs-caption); color: var(--gold); white-space: nowrap; }
+.sp-badge i { width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); flex: 0 0 auto; }
+
+/* ---------- 起点条 ---------- */
+.sp-origin { display: flex; gap: 10px; align-items: center;
+  padding: 10px 12px; border-radius: var(--r-md);
+  background: var(--surface-0); border: 1px solid rgba(255,255,255,0.03);
+  margin-bottom: 10px; }
+.sp-origin-d { position: relative; width: 10px; height: 10px; flex: 0 0 auto;
+  border-radius: 50%; background: var(--gold-a30); }
+.sp-origin-d::after { content: ''; position: absolute; inset: 3px;
+  border-radius: 50%; background: var(--gold); }
+.sp-origin-tx { min-width: 0; }
+.sp-origin-t { display: block; font-size: var(--fs-caption); font-weight: 600; color: var(--text-2);
+  line-height: 1.4; }
+.sp-origin-k { display: block; font-size: var(--fs-mini); color: var(--text-3); margin-top: 1px; }
+
+/* ---------- 节点卡（核心组件） ---------- */
+.sp-list { display: flex; flex-direction: column; gap: 10px; }
+.sp-item { display: flex; gap: 12px; align-items: flex-start; padding: 12px;
+  border-radius: var(--r-md); background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: background .18s ease, border-color .18s ease; }
+.sp-item:active { background: var(--surface-2); }
+.sp-item.is-watched { opacity: .5; }
+.sp-item.is-next { border-color: var(--gold-a30);
+  background: linear-gradient(135deg, rgba(242,178,51,0.06) 0%, var(--surface) 100%);
+  box-shadow: var(--glow-gold); }
+
+/* 序号圆点 = 「标记已看」按钮；视觉 28px，热区外扩至 44×44 */
+.sp-num { position: relative; width: 28px; height: 28px; flex: 0 0 auto;
+  padding: 0; border-radius: 50%; border: none; background: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-caption); font-weight: 700;
+  background: var(--surface-2); color: var(--text-2);
+  -webkit-tap-highlight-color: transparent; }
+.sp-num::before { content: ''; position: absolute; left: -8px; right: -8px;
+  top: -8px; bottom: -8px; }                     /* 44×44 热区，不占布局 */
+.sp-num svg { width: 14px; height: 14px; fill: currentColor; }
+.sp-item.is-watched .sp-num { background: rgba(40,180,135,0.15); color: var(--green); }
+.sp-item.is-next .sp-num { background: var(--gold-a10); color: var(--gold);
+  border: 1px solid var(--gold-a20); }
+
+/* 海报盒 44×62（双固定尺寸，不依赖 aspect-ratio） */
+.sp-ph { position: relative; overflow: hidden; flex: 0 0 auto;
+  width: 44px; height: 62px; border-radius: var(--r-sm);
+  border: 1px solid var(--pc, var(--surface-3));
+  background: var(--surface-2);
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--pc, var(--surface-4)) 26%, var(--surface-2)) 0%,
+    var(--surface-3) 100%); }
+.sp-ph b, .sp-ph img { position: absolute; inset: 0; }
+.sp-ph b { display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff; opacity: .85; }
+.sp-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.sp-info { flex: 1; min-width: 0; }
+.sp-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.sp-nm { font-size: var(--fs-body); font-weight: 600; color: var(--text-main);
+  line-height: 1.35; white-space: normal; }
+.sp-item.is-watched .sp-nm { color: var(--text-2); }
+.sp-item.is-next .sp-nm { color: var(--gold); }
+.sp-yr { font-size: var(--fs-mini); color: var(--text-3); }
+.sp-kw { display: block; font-size: var(--fs-caption); font-weight: 300; color: var(--text-2);
+  letter-spacing: .02em; margin-top: 3px; line-height: 1.45; }
+.sp-tag { display: inline-block; padding: 1px 6px; border-radius: var(--r-full);
+  font-size: 9px; font-weight: 600; background: var(--surface-2); margin-top: 4px; }
+.sp-type { display: block; font-size: var(--fs-mini); color: var(--text-3); margin-top: 3px; }
+
+/* 右侧「查看作品」入口 */
+.sp-view { flex: 0 0 auto; margin-top: 2px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.sp-view span { font-size: var(--fs-mini); color: var(--text-3); white-space: nowrap; }
+.sp-view svg { width: 16px; height: 16px; fill: var(--text-3); }
+.sp-item.is-next .sp-view span { color: var(--gold); }
+.sp-item.is-next .sp-view svg { fill: var(--gold); }
+
+/* 「你看到这里了」金线分隔（复用 .rd-split 同值） */
+.sp-split { display: flex; align-items: center; gap: 12px; margin: 2px 0; }
+.sp-split-l { flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-a30), transparent); }
+.sp-split-tx { display: flex; align-items: center; gap: 4px; white-space: nowrap;
+  font-size: var(--fs-mini); font-weight: 600; color: var(--gold); }
+.sp-split-tx i { width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold); flex: 0 0 auto; }
+
+/* ---------- 终点条 ---------- */
+.sp-endpoint { display: flex; gap: 10px; align-items: center;
+  padding: 10px 14px; border-radius: var(--r-full);
+  background: var(--gold-a10); border: 1px solid var(--gold-a20); margin-top: 4px; }
+.sp-endpoint-d { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%;
+  background: var(--gold); color: var(--text-inverse);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-caption); font-weight: 700; }
+.sp-endpoint-tx { min-width: 0; }
+.sp-endpoint-en { display: block; font-size: var(--fs-mini); font-weight: 700; color: var(--gold);
+  letter-spacing: .18em; }
+.sp-endpoint-cn { display: block; font-size: var(--fs-mini); color: var(--text-2); margin-top: 1px; }
+
+/* ============================================================
+ * ③ 完整路线折叠区（原生 details，零 JS 依赖）
+ * ============================================================ */
+.sp-full { padding: 20px var(--page-x); }
+.sp-full > summary { list-style: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+  padding: 12px 16px; border-radius: var(--r-md);
+  background: var(--surface); border: 1px solid rgba(255,255,255,0.04); }
+.sp-full > summary::-webkit-details-marker { display: none; }
+.sp-full > summary::marker { content: ''; }
+.sp-full-hd { display: flex; align-items: center; gap: 10px; }
+.sp-full-t { flex: 1; min-width: 0; font-size: var(--fs-title); font-weight: 600;
+  color: var(--text); }
+.sp-full-num { flex: 0 0 auto; padding: 3px 10px; border-radius: var(--r-full);
+  background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  font-size: var(--fs-mini); color: var(--gold); font-weight: 600; white-space: nowrap; }
+.sp-full-chev { width: 16px; height: 16px; flex: 0 0 auto; fill: var(--text-3);
+  transition: transform .2s ease; }
+.sp-full[open] .sp-full-chev { transform: rotate(180deg); }
+.sp-full-desc { font-size: var(--fs-mini); color: var(--text-3);
+  margin-top: 6px; line-height: 1.55; }
+.sp-full-body { padding: 10px 0 2px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ============================================================
+ * ④ 「为什么要补」五段链
+ * ============================================================ */
+.sp-chain-body { position: relative; }
+.sp-chain-item { display: flex; gap: 14px; padding: 6px 0; }
+.sp-chain-rail { position: relative; width: 2px; flex: 0 0 2px;
+  margin: -6px 0;                        /* 上下外扩填掉行间距，使竖线贯穿五环不断线 */
+  background: linear-gradient(180deg, var(--gold-a30), rgba(242,178,51,0.06)); }
+.sp-chain-rail::before { content: ''; position: absolute; left: 50%; top: 15px;
+  width: 10px; height: 10px; margin-left: -5px; border-radius: 50%;
+  background: var(--gold); box-shadow: 0 0 0 4px rgba(242,178,51,0.12); }
+.sp-chain-tx { flex: 1; min-width: 0; }
+.sp-chain-t { display: block; font-size: var(--fs-body); font-weight: 600; color: var(--text-main);
+  margin-bottom: 2px; }
+.sp-chain-d { display: block; font-size: var(--fs-caption); color: var(--text-2); line-height: 1.6;
+  max-width: 300px; }
+
+.sp-chain-end { flex: 1; min-width: 0; padding: 14px 16px; border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-0) 100%);
+  border: 1px solid var(--gold-a20); box-shadow: var(--glow-gold); }
+.sp-chain-end-t { font-family: var(--font-display); font-size: 16px; font-weight: 700;
+  color: var(--gold); }
+.sp-chain-end-d { font-size: var(--fs-caption); color: var(--gold-light); margin-top: 3px;
+  line-height: 1.55; }
+.sp-chain-end .sp-chain-d { margin-top: 6px; color: var(--text-2); }
+
+/* ============================================================
+ * ⑤ 底部入口
+ * ============================================================ */
+.sp-entry { padding: 28px 16px calc(20px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(255,255,255,0.04); text-align: center; }
+.sp-brand { font-family: var(--font-display); font-size: var(--fs-body); font-weight: 700;
+  color: var(--gold); letter-spacing: .08em; margin-bottom: 6px; }
+.sp-entry-t { font-size: 16px; font-weight: 600; color: var(--text-main); }
+.sp-entry .v2-btn { width: 100%; margin: 12px 0 14px; }
+.sp-entry-link { display: block; padding: 4px 0;
+  font-size: var(--fs-caption); color: var(--text-3); }
+
+/* ---------- 空态 ---------- */
+.sp-empty { padding: 12px 2px; font-size: var(--fs-caption); color: var(--text-3); }
+
+/* ============================================================
+ * 首页专题入口横幅（v2-topic-*）
+ * ------------------------------------------------------------
+ * 规格：docs/同步/复联5补课路线专题-首页入口卡规格-V1.md
+ * 位置：首页 v2-hero 之后、v2-routes 之前
+ * 撤除：影片上映后，删 index.html 新 section + 本样式块
+ * Token：全部复用 style.css :root，未新增/未改值
+ * ============================================================ */
+.v2-topic { padding: 18px var(--page-x) 16px; }
+.v2-topic-card { display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px; border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-0) 100%);
+  border: 1px solid var(--gold-a20); box-shadow: var(--glow-gold); }
+.v2-topic-txt { flex: 1 1 auto; min-width: 0; }
+
+.v2-topic-tag { display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; background: var(--gold-a10); border: 1px solid var(--gold-a20);
+  border-radius: var(--r-full); font-size: var(--fs-mini); color: var(--gold);
+  letter-spacing: .06em; white-space: nowrap; }
+.v2-topic-tag i { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex: 0 0 auto; }
+
+.v2-topic-title { font-size: 22px; font-weight: 700; line-height: 1.3; margin: 10px 0 12px;
+  background: linear-gradient(135deg, var(--text-main) 0%, var(--gold-light) 52%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: var(--gold); }
+
+.v2-topic-line { display: block; width: 36px; height: 2px;
+  background: var(--gold); margin-bottom: 12px; }
+
+.v2-topic-sub { font-size: 13px; color: var(--text-sub); line-height: 1.6;
+  margin-bottom: 14px; max-width: 22em;
+  white-space: normal; overflow-wrap: break-word; }
+
+/* 金描边胶囊（次级于 Hero 实金主按钮，避免抢焦） */
+.v2-topic-btn { display: inline-block; padding: 10px 20px; border-radius: var(--r-full);
+  background: var(--gold-a10); color: var(--gold); border: 1px solid var(--gold-a20);
+  font-size: var(--fs-caption); font-weight: 600; white-space: nowrap; }
+
+.v2-topic-date { flex: 0 0 112px; text-align: right; }
+.v2-topic-date-d { display: block; font-family: var(--font-display); font-size: 22px;
+  font-weight: 700; color: var(--gold); line-height: 1.1; white-space: nowrap; }
+.v2-topic-date-en { display: block; font-size: var(--fs-mini); color: var(--gold-light);
+  letter-spacing: .14em; margin-top: 6px; white-space: nowrap; }
+
+/* PC：与 Hero 内容列（.v2-hero-inner：1280 + 40px 内边距）对齐 */
+@media (min-width: 1024px) {
+  .v2-topic { max-width: 1280px; margin: 0 auto; padding: 22px 40px 20px; }
+  .v2-topic-card { gap: 24px; }
+  .v2-topic-date { flex: 0 0 220px; }
+}
+/* ============================================================
+ * 响应式（专题页 sp-*：PC 只做最小适配，不放大密度）
+ * ============================================================ */
+@media (min-width: 560px) {
+  .sp-actions { flex-direction: row; }
+  .sp-actions .v2-btn-primary { flex: 1.3; }
+  .sp-actions .v2-btn-ghost { flex: 1; }
+}
+
+@media (min-width: 720px) {
+  .sp-hero { padding: 26px 0 32px; }
+  .sp-hero-in { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+  .sp-hero-stars { min-width: 100%; }
+  .sp-sec, .sp-full { max-width: 720px; margin-left: auto; margin-right: auto;
+    padding-left: 20px; padding-right: 20px; }
+  .sp-chain-body { max-width: 720px; margin: 0 auto; }
+  .sp-entry-in { max-width: 720px; margin: 0 auto; }
+}
+
+/* 动效边界：仅在用户未要求减弱动效时保留 chevron 旋转 */
+@media (prefers-reduced-motion: reduce) {
+  .sp-full-chev { transition: none; }
+  .sp-item { transition: none; }
+}

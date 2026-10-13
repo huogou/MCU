@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="assets/css/v2.css">
 <link rel="stylesheet" href="assets/css/v3-forum.css">
 <link rel="stylesheet" href="assets/css/v2n-news.css">
+<link rel="stylesheet" href="assets/css/v1-special.css">
 </head>
 <body>
 
@@ -45,6 +46,27 @@
         <div class="v2-stat"><b id="stat-phases">—</b><span>个叙事阶段</span></div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ 1.5 专题入口横幅（复联5补课路线 · 影片上映后撤除） ============
+       规格：docs/同步/复联5补课路线专题-首页入口卡规格-V1.md
+       样式：assets/css/v1-special.css 的 .v2-topic-* 块（Token 全复用，禁改 v2.css / style.css）
+       日期与英文名运行时取 MCU_UPCOMING['avengers-5']，禁硬编码（见本文件脚本「专题入口横幅」）
+       撤除：删除本 section + head 的 v1-special.css link + CSS 中 .v2-topic-* 块 -->
+  <section class="v2-topic" id="v2-topic" data-section-label="专题">
+    <a class="v2-topic-card" id="v2-topic-card" href="special.html?id=avengers-doomsday">
+      <div class="v2-topic-txt">
+        <span class="v2-topic-tag"><i></i>专题</span>
+        <h2 class="v2-topic-title">复联5补课路线</h2>
+        <span class="v2-topic-line"></span>
+        <p class="v2-topic-sub">复联5之前，先看这 8 部</p>
+        <span class="v2-topic-btn">进入专题 →</span>
+      </div>
+      <div class="v2-topic-date">
+        <b class="v2-topic-date-d" id="topic-date-d">—</b>
+        <span class="v2-topic-date-en" id="topic-date-en"></span>
+      </div>
+    </a>
   </section>
 
   <!-- ============ 2. 观影路线 ============ -->
@@ -252,6 +274,25 @@
    * 数据独立来源：data/upcoming.js → window.MCU_UPCOMING
    * ========================================================== */
   var UP = window.MCU_UPCOMING || [];
+
+  /* ==========================================================
+   * 模块 1.5：专题入口横幅（复联5补课路线）
+   * 规格：docs/同步/复联5补课路线专题-首页入口卡规格-V1.md
+   * 数据纪律：日期与英文名一律运行时取自 MCU_UPCOMING['avengers-5']，
+   *           本文件不出现任何字面量上映日期 / 英文片名。
+   * 撤除：影片上映后连同 .v2-topic-* 样式一并移除，首页即恢复原状。
+   * ========================================================== */
+  (function topicBanner() {
+    var u = null;
+    for (var i = 0; i < UP.length; i++) if (UP[i].id === 'avengers-5') { u = UP[i]; break; }
+    if (!u) return;
+    var d = String(u.date || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    var dEl = document.getElementById('topic-date-d');
+    var eEl = document.getElementById('topic-date-en');
+    if (dEl && d) dEl.textContent = d[1] + '.' + d[2] + '.' + d[3];
+    /* 短英文名取 en 冒号后半段（与专题页终点条同一口径），不落库、不硬编码 */
+    if (eEl) eEl.textContent = String(u.en || '').split(':').pop().trim().toUpperCase();
+  })();
   document.getElementById('upcoming-title').innerHTML = V2.sectionTitle({
     eyebrow: 'WHAT\'S NEXT',
     title: '漫威未来计划',

@@ -1,5 +1,131 @@
 # MCU小程序版本记录
 
+## SPECIAL-DOOMSDAY（H5 端 · 复联5补课路线专题页 · 已上线）
+
+版本：
+SPECIAL-DOOMSDAY V1（复联5补课路线专题 · 社交流量落地页）
+
+时间：2026-10-13
+
+状态：
+**已上线**（2026-10-13 13:25）
+
+适用端：
+H5（纯静态多页）；微信/抖音小程序**零改动**，`shared/data/` 未动，未执行 `sync_data.sh`
+
+线上地址：
+- 主入口 `https://mcuatlas.xyz/special?id=avengers-doomsday`
+- 等价入口 `https://mcuatlas.xyz/special.html?id=avengers-doomsday`
+- 短链 `/special/avengers-doomsday` **尚未配置**（Nginx rewrite 待放行，当前 404）
+
+新增文件：
+- `h5/special.html`（页面壳 + 内联渲染/交互脚本，ES5 IIFE，同构 route-detail.html）
+- `h5/data/special-routes.js`（`window.MCU_SPECIAL_ROUTES`，1 条 `avengers-doomsday`）
+- `h5/assets/css/v1-special.css`（`sp-*` 全套样式，Token 全复用，零新增变量）
+
+修改文件：
+- `h5/assets/js/app.js`（**仅 2 处常量**，净增 7 行）
+  ① `injectSeoTags` 的 `KEEP` 增 `'special.html': ['id']`（否则 canonical 被洗掉 `?id=`）
+  ② `mount()` 页面键映射增 `special` + `{ specialId }` 载荷
+
+页面结构（6 区块，顶栏/页脚由 `MCU.ui.mount` 注入）：
+`sp-hero`（双 CTA 锚点）→ `sp-core`（起点条 + 8 节点 + 进度徽章 + 终点条）→ `sp-full`（原生 details，默认折叠，15 节点）→ `sp-chain`（五段链 + Doomsday 金卡）→ `sp-entry`（底部入口）
+
+核心数据纪律：
+- 作品名一律运行时取 `MCU.data.get(workId).cn`；数据文件只存引用，**不复制作品数据**
+- `label` 仅用于洛基 S1/S2（共用 `id: 'loki'`），其余为 `null`，**禁止二次命名**
+- 上映日期 / 英文片名 / 中文片名一律取 `MCU_UPCOMING['avengers-5']`；短英文名由 `en.split(':').pop()` 派生，终点圆点数字由 `title.match(/联盟(\d+)/)` 派生 —— **全程零硬编码**
+- 15 个唯一 workId 全部命中既有 CONTENT 59 条，**无缺失、无编造数据**
+
+关键口径（项目负责人 2026-10-13 锁定）：
+- 底部主入口落点：`index.html`
+- 「8 部」进度按**节点数**计（洛基 S1/S2 为两个节点，勾其一即 2/8）
+- 洛基「一勾两亮」为已知设计决策，页面不提示
+- 一级导航不新增（`NAV` 仍 4 项）
+
+用户状态：
+- **零新增 localStorage key**，复用既有 `mcu_nav_user_v1`（`MCU.progress`）
+- 与 `movie.html` 作品详情页共用同一份进度，**双向同步已验证**
+- 无账号系统、无后端、无第二套数据源
+
+验收：
+- 本地自动化两轮 **78 / 78 PASS**（功能正确性 45 + 设备模拟/点击热区/数据降级/跨页闭环 33）
+- 设计 AI 独立验收 **32 / 32 PASS**，规格符合度 95%+，5 项偏差登记放行
+- 线上自动化 **31 / 31 PASS**（页面 / 状态持久化 / SEO / 资源海报 / console + 全站 8 页回归零影响）
+- SEO：canonical 保留 `?id=`、`og:url` 同步、`title`/`description` 数据驱动（85 字符 ≤150）
+- 缓存：`.html` 为 `no-cache`；`app.js` / `.css` / `.js` 为 7 天强缓存 —— `app.js` 旧缓存仅影响 canonical 与埋点，**不影响页面渲染**
+
+服务器：
+- 站点根 `/www/wwwroot/mcu-h5/`
+- 回滚点 `.bak-special-20261013/assets/js/app.js`（MD5 `89fca35acafa0b365f2fc8471255ff07`，=部署前线上原版）
+
+待办：
+- Nginx 短链 rewrite（前置条件已满足，待负责人放行）
+- 内置浏览器真机检验（已移交设计 AI，见 `docs/同步/复联5补课路线专题-上线后同步.md`）
+
+交付文档：
+- 规格 `docs/同步/复联5补课路线专题-H5-设计AI正式规格-V1.md`
+- 设计验收 `docs/同步/复联5补课路线专题-设计AI验收结论.md`
+- 落地方案 / 实现报告 / 上线验收记录 `AI生成文件/H5/复联5补课路线专题/`
+
+---
+
+## H5-HOME-TOPIC-CARD（H5 端 · 首页专题入口横幅 · 已上线）
+
+版本：
+H5-HOME-TOPIC-CARD V1（首页横幅，指向复联5补课路线专题）
+
+时间：2026-10-13
+
+状态：
+**已上线**（2026-10-13 15:34，https://mcuatlas.xyz/）
+
+适用端：
+H5 首页（`h5/index.html`，**仅此一个页面**）；专题页与专题本体共用样式文件；微信/抖音小程序零改动
+
+口径变更：
+**原口径「首页专题入口卡 V1 暂不上线」已由项目负责人推翻**，本横幅为 V1 正式交付内容
+
+规格与设计稿：
+- 规格 `docs/同步/复联5补课路线专题-首页入口卡规格-V1.md`
+- 设计稿 `AI生成文件/H5/复联5补课路线专题/首页入口卡-设计稿.png`
+
+修改文件（仅 2 个，线上 MD5 与本地逐字节一致）：
+| 文件 | MD5 | 改动 |
+| --- | --- | --- |
+| `h5/index.html` | `3591bbe8a5e3ccd8db35020d2cacaaf9` | 新增 `.v2-topic` section + head 一行 CSS link + 数据填充脚本 |
+| `h5/assets/css/v1-special.css` | `d64435927e445ec43a8d9df93cb7916c` | 追加 `.v2-topic-*` 样式块（含 `@media ≥1024` 3 行） |
+
+实现要点：
+- 位置：`v2-hero` 之后、`v2-routes` 之前（符合规格第一节）
+- 整卡 `<a>` 包裹 → `special.html?id=avengers-doomsday`
+- 日期 `2026.12.18` 与英文名 `DOOMSDAY` **运行时取 `MCU_UPCOMING['avengers-5']`**，英文短名由 `en.split(':').pop()` 派生（与专题页终点条同一口径）
+- 副文案按规格第七节拍板①：「复联5之前，先看这 8 部」
+- 样式类名 `.v2-topic-*`，与专题页 `.sp-*` 分离；Token 全复用，零新增变量
+- **一级导航未新增**（`NAV` 仍 4 项）
+
+与规格的 1 处判断差异（已登记，待设计 AI 确认）：
+规格第三节两处写「PC 卡片 `max-width: 760px` 居中」，但设计稿中横幅**与 Hero 内容列同宽**。实现按设计稿对齐 `.v2-hero-inner`（≥1024px 时 `max-width:1280px; padding:22px 40px 20px`，日期列 `flex: 0 0 220px`）。若设计 AI 认为应按字面 760 执行，改 1 行 CSS 即可。
+
+另一处登记：规格预计「CSS 增量约 1KB」，实际因要求不新增 CSS 文件，首页引入整个 `v1-special.css`（约 16KB / gzip 约 4KB）。首页本已加载 `news.js`(72KB)，无实质影响。
+
+验收：
+- 本地 **44 / 44 PASS**（390/430/360/PC1440 四档渲染、位置、无溢出、整卡跳转、源码无字面量日期片名、首页 7 模块未受影响、一级导航仍 4 项）
+- 线上 **36 / 36 PASS**（四宽度线上渲染 + 跳转 + 首页回归 + 全站 7 页回归 + 缓存头）
+- 首页零 JS 错误、零 console.error、零 4xx
+
+服务器：
+- 站点根 `/www/wwwroot/mcu-h5/`
+- 回滚点 `.bak-homecard-20261013/`（`index.html` MD5 `8f434b103fdbfbd4247e302d607fbf74`、`assets/css/v1-special.css` MD5 `f9301e183bbc8f7b81f24062caea5369`）
+
+撤除预案（影片上映后）：
+1. `index.html` 删除 `.v2-topic` section + head 的 `v1-special.css` link
+2. `v1-special.css` 删除 `.v2-topic-*` 样式块
+3. 首页视觉抽查一次；无持久化、无缓存 key、无残留
+4. ⚠️ `index.html` 为 `no-cache` 撤除即时生效；`v1-special.css` 为 7 天强缓存，老客户端最长 7 天可能仍带样式，因 section 已删最多表现为无样式裸元素，不影响其他区块
+
+---
+
 ## H5-FAVICON（H5 端 · 全站 favicon 部署）
 
 版本：

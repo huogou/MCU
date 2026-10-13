@@ -1135,7 +1135,10 @@ var VIEW_MODES = {
         var KEEP = {
           'movie.html': ['id'],
           'routes.html': ['r'],
-          'route-detail.html': ['id']
+          'route-detail.html': ['id'],
+          /* 专题页：?id= 是「内容定义参数」（avengers-doomsday），必须保留，
+             否则 canonical 会被洗成无参 URL 与首页重复收录。 */
+          'special.html': ['id']
         };
         var u = new URL(global.location.href);
         var q = new URLSearchParams();
@@ -1197,8 +1200,10 @@ var VIEW_MODES = {
         else if (_base === 'map') _pg = 'panorama';
         else if (_base === 'movie') _pg = 'movie';
         else if (_base === 'next') _pg = 'next';
+        else if (_base === 'special') _pg = 'special';
         var _pvPayload = null;
         if (_base === 'movie') { var _mid = _qs.get('id'); if (_mid) _pvPayload = { id: _mid }; }
+        else if (_base === 'special') { var _sid = _qs.get('id'); if (_sid) _pvPayload = { specialId: _sid }; }
         else if (_base === 'routes' && _qs.get('r')) { _pvPayload = { routeId: _qs.get('r') }; }
         else if (_base === 'route-detail' && _qs.get('id')) { _pvPayload = { routeId: _qs.get('id') }; }
         if (global.MCU && global.MCU.stats) global.MCU.stats.pageView(_pg, { payload: _pvPayload });

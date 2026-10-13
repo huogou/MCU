@@ -108,7 +108,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 | **N1.2 P1 生产流水线** | **P1-A / P1-B / P1-C / P1-D 均 PASS（隔离验证）**；**真实 ECS 环境验证 BLOCKED → 整体 NOT PASS** | `docs\产品\资讯模块\N1.2 P1-D 真实 ECS 验证准备报告.txt`（09-30） |
 | **N1.2 服务器部署（09-30 新）** | **已完成并验证**：百炼 API Key 落位 `/etc/mcu-atlas/dashscope.env`（600）；`GET /models` 200；服务器实跑 `test-n1.2-u1.cjs` → **U1 = PASS（43/0，真实网络调用）**；pipeline 首次部署至 `/www/wwwroot/mcu-atlas-news/` | `AI生成文件\H5\N1.2-P1资讯生产流水线\N1.2 百炼 API Key 服务器配置与部署验证报告.md`（09-30 16:48） |
 | **N1.2 真实 Production** | **未执行**（Scheduler 护栏仍冻结：`enabled=false` / `productionAllowed=false` / `autoProduction=false`；未启用 Cron/Timer；`news.js` SHA256 零变化） | 同上 + `项目记忆日志` |
-| **复联5补课路线专题（H5 新）** | **方案与配图已出，代码零落地**：`h5\special.html` 不存在；产出《技术落地方案》+ 4 张社媒配图；**存在硬阻塞**（完整 15 部作品清单全仓库不存在）+ 5 项待策划拍板 | `AI生成文件\H5\复联5补课路线专题\复联5补课路线专题 V1 技术落地方案.md`（09-30）、`docs\同步\给设计AI同步文件.txt` §六-§九 |
+| **复联5补课路线专题（H5）** | **已上线（2026-10-13，两批）**：① 专题页 `https://mcuatlas.xyz/special?id=avengers-doomsday`（`h5\special.html` + `data\special-routes.js` + `v1-special.css`，`app.js` 仅 2 处常量；核心 8 部 + 完整 15 部折叠区 + 五段链 + 底部入口）② 首页专题入口横幅（`h5\index.html` 的 `.v2-topic`，位于 Hero 与观影路线之间）。**口径已锁定**：底部入口 `index.html`、「8 部」按节点数计（洛基 S1/S2 为两节点）、一级导航仍 4 项。零新增 localStorage key、零新增 Token、三端小程序零改动。**本地 78/78 + 设计 AI 32/32 + 线上 31/31 + 首页横幅线上 36/36 全 PASS**；设计 AI 验收通过（符合度 95%+）。短链 `/special/avengers-doomsday` **待 Nginx rewrite（当前 404）** | `VERSION.md`（`SPECIAL-DOOMSDAY` / `H5-HOME-TOPIC-CARD`）、`AI生成文件\H5\复联5补课路线专题\复联5补课路线专题 V1 上线验收记录.md`、`docs\同步\复联5补课路线专题-设计AI验收结论.md` |
 | **V1.2 UI/视觉重构** | ⚠️ **无任何推进证据**——设计锁定 6 模块、7 页顺序、截图闸门均见 09-22 之前的文档；09-24 至 10-08 期间 Git 无对应提交、无验收报告、无同步文件更新 → **[待确认：是否已暂停/推迟]** | Git log（09-24~10-08 提交全部集中在资讯流水线与 favicon）、`docs\同步\` 无 V1.2 重构记录 |
 | **V3.0 论坛** | **H5 线已闭环**（4 页 + 后端在线运行）；微信/抖音只读版（⑫⑬）与联调（⑭）**无规划、未启动** | `MCU项目总览.md` §13 |
 | **Git 状态** | ⚠️ **工作区不干净：171 项未提交改动**（含 `README.md`、`docs\版本\设计文件索引.md`、`workspace/news/**` 多个运行输出、`project.json`、新增 `docs\外宣物料\`、`07_AI协作记录\` 等） | `git status --short` 实测 |
@@ -117,7 +117,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 **下一步（已明确）**：
 1. N1.2 P1-D 真实人工 Production 验证（最小批次 `sources=['S002']`）→ 回填验证记录模板 → 项目总控拍板最终判定；**自动调度属下一阶段，需新指令**。
-2. 复联5专题：策划拍板 5 项（15 部作品清单 / 8 部计数口径 / 作品名称口径 / 底部入口落点 / 对外路由口径）+ 设计出稿 → 方可开工。
+2. 复联5专题：**已上线**，剩 3 项待办 —— ① Nginx 短链 rewrite（`/special/avengers-doomsday`，前置条件已满足，待放行）② 首页横幅 PC 宽度判断（规格写 760px、设计稿为 Hero 列同宽，实现按设计稿，已交设计 AI 确认）③ 内置浏览器真机检验（已移交设计 AI）。撤除预案见上线验收记录（影片上映后执行）。
 3. 抖音 V2.4：确认是否提审 + 是否需恢复代理推送远端。
 4. 复核 V1.2 UI/视觉重构是否继续（当前无推进证据）。
 
