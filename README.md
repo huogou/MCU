@@ -97,13 +97,15 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 
 ### 最新事实（2026-10-08 状态同步核验 · 依据实际交付物与 Git 记录）
 
-**判定依据**：Git 提交记录（最后提交 `79daebd`，2026-09-28 15:33，与 `origin/master` 一致）、`VERSION.md`、`docs\版本\CHANGELOG.md`、09-30 新增交付文档。
+**判定依据**：Git 提交记录（最后提交 `c2ecf80`，2026-10-13，已推送与 `origin/master` 一致）、`VERSION.md`、`docs\版本\CHANGELOG.md`、09-30 新增交付文档、10-13 专题上线记录。
+
+> ⚠️ 下方「H5 主站」「Git 状态」「Git 仓库」三行已随 2026-10-13 复联5专题两批上线同步更新；其余各行仍为 2026-10-08 核验时的快照。
 
 | 项 | 最新事实 | 证据 |
 |---|---|---|
 | **微信小程序** | **V1.2.2 已上线**（2026-09-22 11:42）——**本轮无新版本** | `VERSION.md` 无 V1.2.3+ 条目；Git 无 wechat/ 相关提交 |
 | **抖音小程序** | **V2.4 仍为「待提审」**，截至 2026-09-28 无提审动作、无审核结果记录 → **[待确认：是否已提审]** | `VERSION.md` / `CHANGELOG.md` 09-28 条目均记「待提审」；`docs\同步\给设计AI同步文件.txt`（09-30）表述为「V2.4 已清除」但未记提审 |
-| **H5 主站** | **运行中**，最近一次上线为 **H5-FAVICON（2026-09-28 全站 favicon 部署并验证）** | git `79daebd`；`VERSION.md` 记「已部署上线」+ 服务器备份可回滚 + 公网验证通过 |
+| **H5 主站** | **运行中**，最近一次上线为 **复联5补课路线专题（2026-10-13 两批：专题页 + 首页入口横幅）**；上一次为 H5-FAVICON（09-28） | git `2de76d3` / `c2ecf80`（已推送）；服务器备份 `.bak-special-20261013`、`.bak-homecard-20261013` 可回滚；线上自动化全 PASS |
 | **H5 资讯模块** | **已从「模拟数据阶段」推进到「后端生产流水线 + 真实 Provider 验证」**：N1 资讯模块 **N1 = CLOSED**（09-24，git `65da639`：N1.3 idSpace 收口 + N1.4 最终验收）；资讯页 6 文件已上线生产（09-23，git `7e25678`，news.js 35 条） | `VERSION.md`、git log、CHANGELOG |
 | **N1.2 P1 生产流水线** | **P1-A / P1-B / P1-C / P1-D 均 PASS（隔离验证）**；**真实 ECS 环境验证 BLOCKED → 整体 NOT PASS** | `docs\产品\资讯模块\N1.2 P1-D 真实 ECS 验证准备报告.txt`（09-30） |
 | **N1.2 服务器部署（09-30 新）** | **已完成并验证**：百炼 API Key 落位 `/etc/mcu-atlas/dashscope.env`（600）；`GET /models` 200；服务器实跑 `test-n1.2-u1.cjs` → **U1 = PASS（43/0，真实网络调用）**；pipeline 首次部署至 `/www/wwwroot/mcu-atlas-news/` | `AI生成文件\H5\N1.2-P1资讯生产流水线\N1.2 百炼 API Key 服务器配置与部署验证报告.md`（09-30 16:48） |
@@ -111,7 +113,7 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 | **复联5补课路线专题（H5）** | **已上线（2026-10-13，两批）**：① 专题页 `https://mcuatlas.xyz/special?id=avengers-doomsday`（`h5\special.html` + `data\special-routes.js` + `v1-special.css`，`app.js` 仅 2 处常量；核心 8 部 + 完整 15 部折叠区 + 五段链 + 底部入口）② 首页专题入口横幅（`h5\index.html` 的 `.v2-topic`，位于 Hero 与观影路线之间）。**口径已锁定**：底部入口 `index.html`、「8 部」按节点数计（洛基 S1/S2 为两节点）、一级导航仍 4 项。零新增 localStorage key、零新增 Token、三端小程序零改动。**本地 78/78 + 设计 AI 32/32 + 线上 31/31 + 首页横幅线上 36/36 全 PASS**；设计 AI 验收通过（符合度 95%+）。短链 `/special/avengers-doomsday` **待 Nginx rewrite（当前 404）** | `VERSION.md`（`SPECIAL-DOOMSDAY` / `H5-HOME-TOPIC-CARD`）、`AI生成文件\H5\复联5补课路线专题\复联5补课路线专题 V1 上线验收记录.md`、`docs\同步\复联5补课路线专题-设计AI验收结论.md` |
 | **V1.2 UI/视觉重构** | ⚠️ **无任何推进证据**——设计锁定 6 模块、7 页顺序、截图闸门均见 09-22 之前的文档；09-24 至 10-08 期间 Git 无对应提交、无验收报告、无同步文件更新 → **[待确认：是否已暂停/推迟]** | Git log（09-24~10-08 提交全部集中在资讯流水线与 favicon）、`docs\同步\` 无 V1.2 重构记录 |
 | **V3.0 论坛** | **H5 线已闭环**（4 页 + 后端在线运行）；微信/抖音只读版（⑫⑬）与联调（⑭）**无规划、未启动** | `MCU项目总览.md` §13 |
-| **Git 状态** | ⚠️ **工作区不干净：171 项未提交改动**（含 `README.md`、`docs\版本\设计文件索引.md`、`workspace/news/**` 多个运行输出、`project.json`、新增 `docs\外宣物料\`、`07_AI协作记录\` 等） | `git status --short` 实测 |
+| **Git 状态** | ⚠️ **工作区仍不干净：21 项未提交**，但**已与本专题无关** —— 复联5专题 13 个文件已于 `2de76d3` / `c2ecf80` 提交并推送。剩余为：已跟踪 2 项（`h5\data\news.js` 仅 CRLF 归一化、`07_AI协作记录\AI协作角色说明.md`）+ 未跟踪 19 项（**GenUI 小程序项目** `genui-app\` `genui-app-tools\` `genui-app.zip` `generated-images\`、`docs\产品\资讯模块\`、`docs\同步\GenUI-*`、`.codebuddy\`、`scratch\`、`workspace\news\pipeline\tools\`），属其他项目在途工作，**未擅自提交** | `git status --short` 实测（2026-10-13） |
 
 **当前阶段判定**：**开发中**，但主线已从「V1.2 UI/视觉重构」转移到「资讯生产流水线（N1.2 P1）+ 新专题策划」。小程序端处于**被动等待审核**状态，无阻塞开发项。
 
@@ -122,7 +124,11 @@ node workspace-check-data-v11.js     # 数据一致性 35 断言
 4. 复核 V1.2 UI/视觉重构是否继续（当前无推进证据）。
 
 - **图像资源**：小程序端 `visuals.js` CDN = `https://mcu.yaokaixin.top`（**保持不切换**；该域继续作为小程序图片资源域，已实测存活）；H5 端为同域相对路径设计。
-- **Git 仓库**：双分支收口完成（2026-09-22，A 方案）——`main` 与 `master` 均为 `eca2e66`，**默认分支已切换为 `master`**；备份 tag `backup-master/main-20260922` 留存。此后 `master` 推进至 `2de76d3`（2026-10-13，复联5专题页 + 首页横幅）。⚠️ **该提交尚未推送**：`github.com:443` 从当前网络不可达（与项目既有「待代理恢复推送」状态一致），本地领先 `origin/master` 1 个提交，恢复后执行 `git push origin master` 即可。
+- **Git 仓库**：双分支收口完成（2026-09-22，A 方案）——`main` 与 `master` 均为 `eca2e66`，**默认分支已切换为 `master`**；备份 tag `backup-master/main-20260922` 留存。此后 `master` 推进至 `c2ecf80`（2026-10-13，复联5专题页 + 首页横幅），**已推送，本地与 `origin/master` 一致**。
+
+> ⚠️ **网络提示**：当前网络直连 `github.com:443` 不通，推送需经本地代理。2026-10-13 的推送已用一次性参数完成，**未修改任何 git 配置**：
+> `git -c http.proxy=http://127.0.0.1:7890 -c https.proxy=http://127.0.0.1:7890 push origin master`
+> （本机 7890 有代理在跑，但 Windows 系统代理开关 `ProxyEnable=0`，故命令行默认不走代理。）
 - **设计口径**：三端 Token 已于 2026-09-10 **统一为单一体系**（bg `#080B12` / surface `#161D2B` / gold `#F2B233`），权威源 `DESIGN.md` + `h5/assets/css/style.css` `:root`，勿再按旧"两套 Token"记录跨端套用。详见总览 §8。
 
 
