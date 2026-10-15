@@ -1,0 +1,69 @@
+MCU V1.2 微信小程序 · 小程序基础配置检查报告
+生成时间：2026-08-27
+检查范围：app.json / project.config.json / sitemap.json
+检查角色：开发 AI（Work）
+
+============================================================
+一、app.json 检查
+============================================================
+1.1 pages 路径完整性
+  [通过] pages 共 12 个，全部存在且四件套（.js/.wxml/.wxss/.json）齐全（已逐页校验，缺失 0）。
+        列表：home, routes, route-detail, movie, explore, panorama,
+              characters, character, browse, my-mcu, feedback, share。
+
+1.2 tabBar 配置
+  [通过] 4 个 tab（首页 / 路线 / 探索 / 我的MCU），color #555F73、selectedColor #F2B233、
+        backgroundColor #161D2B、borderStyle black，符合深色主题。
+  [通过] 8 个图标文件（home/routes/explore/my-mcu 各 active 版）均存在。
+  [说明] tab 目录中未使用的 star.png/star-active.png 及 12 个 _*-preview.png 已在
+        packOptions.ignore 排除，不影响打包。
+
+1.3 window 配置
+  [通过] navigationBarBackgroundColor #080B12、navigationBarTextStyle white、
+        navigationBarTitleText "MCU观影导航"、backgroundColor #080B12 —— 与 V1.2 深色基调一致。
+  [通过] style: "v2"、lazyCodeLoading: "requiredComponents"（按需注入，性能良好）。
+
+1.4 分包配置
+  [通过/合理] 当前未配置 subPackages。
+        理由：经 packOptions.ignore 排除开发产物与 CDN 重复本地副本后，主包预计 ≈ 0.6MB，
+              远低于 2MB 主包上限，无需分包。若后续引入大量本地资源可再评估分包。
+
+============================================================
+二、project.config.json 检查
+============================================================
+2.1 AppID
+  [通过] appid = wx78f00e7f0a5948b7，与 app.js globalData.appId 一致，
+        与 CloudBase 环境 mcu-d6gw0brqoa9521b58 配套。
+        （注意：此 AppID 为「漫威电影宇宙导航」小程序，与上线名称「漫威电影观影指南」的
+         一致性需在微信后台「基本信息-小程序名称」处核对，见第四/六步。）
+
+2.2 上传配置
+  [通过] setting.minified = true（上传压缩）
+        setting.es6 = true（ES6 转译）
+        setting.minifyWXSS / minifyWXML = true
+        setting.bigPackageSizeSupport = true（大包支持，作为安全冗余）
+  [说明-可选] setting.uploadWithSourceMap = true：上传 sourceMap 便于线上排错，
+             但会暴露源码映射；对工具类小程式可接受，如介意可置 false（非阻塞）。
+  [说明] setting.urlCheck = false：仅开发者工具本地绕过域名校验，
+         生产环境仍需在微信后台配置 downloadFile 合法域名（见代码检查报告 3.1）。
+
+2.3 compileType / libVersion
+  [通过] compileType = "miniprogram"，libVersion = "3.0.0"（较新基础库，功能完整）。
+
+============================================================
+三、sitemap.json 检查
+============================================================
+  [通过] rules: [{ action: "allow", page: "*" }]。
+        含义：允许微信索引全站页面，符合微信对 sitemap 的合规要求
+        （工具类小程序允许被索引；若希望不被搜索收录可改为 disallow，非强制）。
+  [通过] desc 含官方文档链接，格式合规。
+
+============================================================
+四、配置检查结论
+============================================================
+  三项配置文件均合法、字段合理，无阻断性配置错误。
+  关联注意项（非代码层，需人工/后续步骤）：
+    A. 微信后台「小程序名称」需与上线名称「漫威电影观影指南」核对一致（第六步）。
+    B. downloadFile 合法域名需在后台配置（代码检查报告 3.1，第一步）。
+    C. 类目需在后台设置为「工具 / 信息查询」（第五步）。
+    D. 用户隐私保护指引需在后台填写并关联隐私政策页（第三步 / 第四步）。

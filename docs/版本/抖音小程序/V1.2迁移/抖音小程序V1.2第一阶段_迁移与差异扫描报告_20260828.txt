@@ -1,0 +1,157 @@
+================================================================
+抖音小程序 V1.2 · 第一阶段：正式版迁移与平台差异扫描报告
+================================================================
+生成日期：2026-08-28
+基准版本：微信小程序 V1.2 正式版（mcu-miniprogram/，分支 wechat-production → baf309b，零改动）
+目标版本：抖音小程序 V1.2（MCU-miniapp-douyin/，分支 douyin-migration → 1242a65）
+执行原则：将已验收微信 V1.2 完整适配为抖音 V1.2；不做功能重构、不做视觉重新设计、不改 MCU 数据、不接云服务。
+
+----------------------------------------------------------------
+一、执行结论（TL;DR）
+----------------------------------------------------------------
+迁移完成度：
+- 代码层：100%。15 个页面 + data×11 + models×6 + assets + utils 全部就位，所有 wx.* 运行时调用已替换为 tt.* 或本地兜底，无残留未处理平台 API。
+- 数据层：100%。11 个 data/*.js 与微信基线逐字节一致（diff 全 identical），禁第二套数据。
+- 配置层：已适配。appid→tt00eb76569e914af801；app.json 已移除 style / sitemapLocation / lazyCodeLoading 并删除 sitemap.json；project.config.json 已抖音化。
+- 遗留（不阻塞）：6 处用户可见文案仍写「微信」需中性化；2 个遗留空目录（空白模板 + macOS 元数据）需清理；运行时表现 R1–R5 需在抖音开发者工具真机确认。
+
+----------------------------------------------------------------
+二、微信 API → 抖音 API 对照表
+----------------------------------------------------------------
+编号 | 能力                | 微信                 | 抖音                          | 分类 | 状态
+1    | 本地存储            | wx.get/setStorageSync | tt.get/setStorageSync         | A    | 已替换（userState/shareData/achievements/feedback）
+2    | 页面路由            | wx.navigateTo         | tt.navigateTo                 | A    | 已替换（10 个页面）
+3    | 返回/切换 Tab       | wx.navigateBack/switchTab | tt.navigateBack/switchTab   | A    | 已替换
+4    | 导航栏标题          | wx.setNavigationBarTitle | tt.setNavigationBarTitle     | A    | 已替换（character/route-detail，已加 tt 判空守卫）
+5    | 轻提示/弹窗         | wx.showToast/showModal   | tt.showToast/showModal       | A    | 已替换
+6    | 打开设置            | wx.openSetting        | tt.openSetting                 | A    | 已替换（share 相册授权）
+7    | 节点查询            | wx.createSelectorQuery | tt.createSelectorQuery        | A    | 已替换（explore/share）
+8    | 系统信息            | wx.getSystemInfoSync  | tt.getSystemInfoSync          | A    | 已替换（explore/share，取 pixelRatio）
+9    | 保存相册            | wx.saveImageToPhotosAlbum | tt.saveImageToPhotosAlbum   | A    | 已替换（share）
+10   | 转发给朋友          | onShareAppMessage     | onShareAppMessage（同名）     | A    | 保留
+11   | 转发按钮            | open-type="share"     | open-type="share"（同名）     | A    | 保留（share.wxml）
+12   | 画布导出图片        | wx.canvasToTempFilePath | canvas.toDataURL + tt.getFileSystemManager().writeFile | B/C | 重写（share.js 海报导出链路）
+13   | 云开发              | wx.cloud.init/database | tt.createCloud（环境不互通）  | D    | 选【选项一 本地】，不调用云，已加 typeof wx 守卫
+14   | 网络请求            | wx.request/downloadFile | 未使用                       | E    | 无需迁移
+15   | WebView             | web-view 组件         | 未使用                       | E    | 无需迁移
+16   | 登录/用户           | wx.login/getUserProfile | 未使用（游客免登录）         | E    | 无需迁移
+17   | 朋友圈分享          | onShareTimeline        | 微信版未使用                 | E    | 无需迁移
+
+分类说明：
+A = 抖音存在等价 API，可直接替换（已全部替换）
+B = 抖音存在类似能力但参数/返回值不同，需适配（画布导出已重写）
+C = 抖音无对应能力，需重新实现（同 B，已用 toDataURL 实现）
+D = 抖音平台不支持/不互通，保留替代方案（本地队列）
+E = 代码未实际使用，可删除/不迁移
+
+----------------------------------------------------------------
+三、【1】可以直接复用的代码
+----------------------------------------------------------------
+- data/ 全部 11 个静态数据文件：content.js / movies.js / relations.js / routes.js / characters.js / series.js / short.js / special.js / visuals.js / constants.js / resources.js。与微信逐字节一致，跨端零改动。
+- assets/ 全部图片资源：avatars×26、backgrounds×1、entries×4、hero×1、icons/tab×15、phases×6、preview×8。静态资源跨端零改动。
+- models/mcuData.js、models/recommend.js、models/pano.js：纯数据/计算逻辑，无平台 API。
+- pages/ 全部 15 个页面的 .wxml / .wxss / .json：布局与样式跨端一致（抖音开发工具对 .wxss/.wxml 可正常编译识别，详见【9】扩展名说明）。
+- utils/check-home-conformance.js、utils/render-tab-icons.js：不参与运行的自检脚本，可原样保留。
+
+----------------------------------------------------------------
+四、【2】必须修改的代码
+----------------------------------------------------------------
+（甲）前序阶段已完成、本阶段核验通过：
+- 全部 wx.navigateTo / navigateBack / switchTab → tt.*
+- 全部 wx.getStorageSync / setStorageSync → tt.*（userState / shareData / achievements / feedback）
+- wx.createSelectorQuery → tt.createSelectorQuery（explore / share）
+- wx.getSystemInfoSync → tt.getSystemInfoSync（explore / share）
+- wx.canvasToTempFilePath → canvas.toDataURL + tt.getFileSystemManager().writeFile（share.js 海报导出链路重写）
+- wx.saveImageToPhotosAlbum / showModal / openSetting / showToast → tt.*（share / feedback / movie / my-mcu）
+- app.js：wx.cloud 加 typeof wx === 'undefined' 判空守卫，抖音端不初始化云、不崩溃
+- feedback.js：改纯本地队列（选项一），不再调用 wx.cloud.database
+- project.config.json：appid→tt00eb76569e914af801、移除微信专属字段
+- app.json：移除 style / sitemapLocation / lazyCodeLoading；删除 sitemap.json
+
+（乙）本阶段新发现、仅列出未改动、建议确认后修（非阻塞）：
+- pages/privacy/privacy.wxml:7  「微信本地存储 wx.storage」→ 应改为「本机本地存储」
+- pages/privacy/privacy.wxml:12 「微信相册写入权限（scope.writePhotosAlbum）」→ 应改为「抖音相册写入权限」
+- pages/privacy/privacy.wxml:17 「你可随时在微信中管理已分享内容」→ 应改为「抖音」
+- pages/about/about.wxml:13   「以微信后台实际上传版本号为准」→ 应改为「抖音开发者后台」
+- pages/about/about.wxml:19   「见微信小程序后台设置」→ 应改为「抖音小程序后台」
+- pages/share/share.wxml:20  「可在微信 / 小红书 / 社群中传播」→ 应中性化
+- app.js:15 console.warn 文案「非微信端」→ 可改为「非抖音端 / 非微信环境」（仅日志，无用户影响）
+- 注释残留（无害）：explore.js:7、feedback.js:5、userState.js:5、app.wxss:245 等注释提及「微信」，建议统一但非必须
+
+----------------------------------------------------------------
+五、【3】微信 API → 抖音 API 对照表 见 第二节
+六、【4】抖音不支持的微信能力
+----------------------------------------------------------------
+- wx.canvasToTempFilePath：抖音对 type="2d" canvas 的该接口行为不一致，已用 canvas.toDataURL 替代（B2b 重写）。
+- wx.cloud（CloudBase）：抖音有 tt.createCloud，但环境不互通；本版既定【选项一 本地】，不引入云，无影响。
+- onShareTimeline（微信朋友圈）：微信版本身未使用，抖音亦无直接等价，无影响。
+- 其余微信专属能力（订阅消息 / 客服 / 支付 / 开放标签 / 直播 等）微信版均未使用，N/A。
+
+----------------------------------------------------------------
+七、【5】需要替代方案的功能
+----------------------------------------------------------------
+- 「我要吐槽」feedback：原计划 wx.cloud 写集合 → 抖音版采用【选项一 本地队列】（tt.getStorageSync / setStorageSync），不联网、不汇总。已落地，行为表现：提交成功但反馈仅存本机，不与 H5/微信 feedback 集合汇总（策划已拍板）。
+- 分享海报导出：wx.canvasToTempFilePath → canvas.toDataURL + tt.getFileSystemManager().writeFile + tt.saveImageToPhotosAlbum。已重写。
+
+----------------------------------------------------------------
+八、【6】可能影响用户体验的地方
+----------------------------------------------------------------
+- 分享目标差异：抖音「转发给朋友」走抖音分享面板（抖音好友 / 私信 / 动态），不再发到微信；海报「保存到相册」仍可正常使用。
+- 相册授权文案：scope.writePhotosAlbum 抖音同名，但隐私文案现写「微信」会令用户困惑（见【2】乙）。
+- Canvas 渲染表现：explore 关系网络图、panorama 全景图、share 海报均依赖 Canvas 2D，抖音渲染引擎与微信存在差异，需真机确认清晰度 / 性能（R1–R5）。
+- 暗色导航栏：window.navigationBarTextStyle=white + 深色背景在抖音端表现需真机核对。
+
+----------------------------------------------------------------
+九、【7】可能影响审核的地方
+----------------------------------------------------------------
+- 隐私政策与事实一致性（高优先级）：privacy.wxml 现写「微信本地存储 / 微信相册权限 / 微信中管理」，与抖音实际不符。抖音审核要求隐私政策如实描述，建议上线前修正（见【2】乙）。
+- 应用名称商标：微信版名「MCU观影导航 / 漫威电影宇宙导航」含 Marvel「漫威 / MCU」商标词，抖音审核同样存在驳回风险；备选名建议沿用微信版结论（如「观影顺序导航」等），需策划确认。
+- 包体整洁度：根目录下存在 漫威电影导航/（空白模板残留）与 __MACOSX/（macOS 元数据），虽不影响运行，提交审核包建议清理，避免审核侧疑问。
+- 无其余违规内容：内容为电影观影顺序指南（工具-信息查询类），无 UGC / 支付 / 隐私采集。
+
+----------------------------------------------------------------
+十、【8】预计需要修改的文件列表（待确认项）
+----------------------------------------------------------------
+- pages/privacy/privacy.wxml        （3 处文案）
+- pages/about/about.wxml            （2 处文案）
+- pages/share/share.wxml            （1 处文案）
+- app.js                            （1 处 console 文案，可选）
+- 清理：MCU-miniapp-douyin/漫威电影导航/   （整目录，空白模板残留，31K）
+- 清理：MCU-miniapp-douyin/__MACOSX/       （整目录，macOS 元数据，18K）
+
+----------------------------------------------------------------
+十一、【9】预计需要修改的代码范围
+----------------------------------------------------------------
+- 文案类：6 处字符串替换，纯文本，无逻辑风险，单文件改动 < 10 行/处。
+- 文件清理：删除 2 个非运行目录（漫威电影导航/ 31K、__MACOSX/ 18K），不影响编译。
+- 扩展名（可选、非阻塞）：抖音规范页面样式扩展名为 .ttss，当前复用 .wxss 在抖音开发者工具可正常编译；正式发布建议重命名或在 project.config 声明。.wxml/.js/.json 当前命名抖音可正常识别，无需重命名。
+- 注：以上【8】【9】项均为「待确认」建议项，本阶段未执行改动，遵守「不擅自修改、第一阶段完成后停止、等待确认」规则。
+
+----------------------------------------------------------------
+十二、【10】是否具备进入第二阶段适配开发的条件
+----------------------------------------------------------------
+结论：具备。
+- 代码迁移：已完成（11 类内容全部就位，wx.* 全部替换/兜底，无残留未处理平台 API）。
+- 数据一致：data/ 11 文件与微信逐字节一致，无数据改动。
+- 配置适配：appid / 工程配置 / app.json 已抖音化。
+- 阻塞项：0 项（B1 AppID、B2a explore、B2b share、B4 app.json、B5 sitemap 前序已修复；B3 选项一已落地）。
+- 待办（不阻塞进入第二阶段）：6 处文案中性化、2 目录清理、R1–R5 真机验证。
+- 建议：进入第二阶段前，先在抖音开发者工具做一次真机编译 + 运行验证（R1–R5），再大规模推进第二阶段，以降低返工风险。
+
+----------------------------------------------------------------
+十三、附：第一阶段事实校验
+----------------------------------------------------------------
+- WeChat 基线文件数：202（含 workspace/ 开发脚本 ~52 个、project.private.config.json、sitemap.json，均不参与运行、未迁移）。
+- 抖音当前文件数：175（含 漫威电影导航/ 8 个、__MACOSX/ 13 个遗留空文件）；运行代码与资源文件与微信 V1.2 一一对应。
+- Git：wechat-production → baf309b（只读零改动）；douyin-migration → 1242a65（最新修复）；当前工作分支 master 仅含同步文件。
+- 全量 grep 确认：MCU-miniapp-douyin 运行代码中已无未守卫的 wx.* API 调用；仅 privacy.wxml / about.wxml / share.wxml / app.js 残留「微信」字样文案（见【2】乙）。
+- 运行时验证项 R1–R5（需用户在抖音开发者工具真机确认）：
+  R1 explore createSelectorQuery 节点查询是否正确返回
+  R2 share canvas.toDataURL 导出海报是否正常（含像素比）
+  R3 相册授权 scope.writePhotosAlbum 流程（拒绝→openSetting→重试）
+  R4 panorama / explore Canvas 2D 渲染清晰度与性能
+  R5 整体视觉与暗色导航栏在抖音端表现
+
+================================================================
+（报告完。本阶段仅扫描 + 迁移核验 + 汇报，未执行任何文件改动、未上传、未提交审核、未发布。）
+================================================================

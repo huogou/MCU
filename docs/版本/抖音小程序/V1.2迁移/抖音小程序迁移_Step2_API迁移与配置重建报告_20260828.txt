@@ -1,0 +1,132 @@
+================================================================
+MCU 观影导航｜微信 → 抖音小程序迁移 Step 2 报告
+执行方：开发 AI（Work）｜日期：2026-08-28
+分支：douyin-migration @ 25b718a（wechat-production @ baf309b 只读未动）
+================================================================
+
+【前提校准（事实，非推断）】
+指令第 二 节含显式条件分支：「如果当前尚未提供抖音 AppID…先停止配置重建，向 GPT 报告『等待真实 AppID』」。
+实测：全项目（排除微信 AppID wx78f00e7f0a5948b7）检索不到任何抖音 AppID → 条件成立 → 配置重建停止。
+指令第 五 节假设「已有 CloudBase HTTP API 可复用」→ 实测：全项目 wx.request/云函数/tt.request/fetch 后端调用均为 0，仅存在静态托管 CDN（海报图片源）→ 无可用后端 → A 方案按指令停止，不自建。
+
+----------------------------------------------------------------
+一、第 二 节 抖音基础配置：已停止，等待真实 AppID
+----------------------------------------------------------------
+- project.config.json：未重建（仍硬编码微信 AppID wx78f00e7f0a5948b7）。
+- app.json 微信专属字段（lazyCodeLoading / style:"v2"）：未清理（属配置重建范畴，被 AppID 前置阻塞）。
+- sitemap.json：未处理（同上）。
+→ 向 GPT 报告：等待真实 AppID。收到后重建配置并清微信字段，不动微信项目。
+
+----------------------------------------------------------------
+二、第 三 节 低风险 API 一对一迁移：已完成（逐族验证）
+----------------------------------------------------------------
+迁移采用「逐 API 族」脚本替换（非全量全局 wx.→tt. 盲替换），每族替换后 grep 复核调用上下文与参数结构（签名在 wx/tt 间 1:1 一致）。
+
+| 微信 API | 调用数 | 涉及文件 | 用途 | 验证结论 |
+|---|---|---|---|---|
+| wx.navigateTo → tt.navigateTo | 23 | 12 页 js + models | 页面跳转 | 参数结构一致，含 events 透传用法，无需改 |
+| wx.navigateBack → tt.navigateBack | 3 | home/routes/route-detail | 返回 | 一致 |
+| wx.switchTab → tt.switchTab | 3 | home/my-mcu/routes | Tab 切换 | 一致 |
+| wx.setNavigationBarTitle → tt.setNavigationBarTitle | 3 | route-detail/home/panorama | 导航栏标题 | 一致（含 1 处守卫修复，见下） |
+| wx.getStorageSync → tt.getStorageSync | 6 | models(userState/shareData/achievements) + feedback | 本地读 | 一致 |
+| wx.setStorageSync → tt.setStorageSync | 6 | 同上 + home/my-mcu | 本地写 | 一致 |
+| wx.showToast → tt.showToast | 10 | 多页 | 轻提示 | 一致（含 icon/duration 参数） |
+| wx.showModal → tt.showModal | 1 | share | 确认弹窗 | 一致（含 success 回调） |
+
+合计：8 族 55 处调用完成迁移。
+
+【两处必要的守卫修复（属第 三 节完整性，非全局盲替换）】
+1) pages/route-detail/route-detail.js:60
+   原（混合态，抖音端会失效）：if (wx && wx.setNavigationBarTitle) tt.setNavigationBarTitle(...)
+   改：if (tt && tt.setNavigationBarTitle) tt.setNavigationBarTitle(...)
+   原因：调用已为 tt. 但守卫仍检查 wx，抖音端 wx 未定义→守卫恒假→标题永不设置。
+2) app.js:14  onLaunch 云初始化守卫
+   原：if (!wx.cloud) { ...; return; }
+   改：if (typeof wx === 'undefined' || !wx.cloud) { ... }
+   原因：抖音端 wx 未定义，原写法 `!wx.cloud` 抛 ReferenceError 致整个小程序启动崩溃。
+   该改法仅做判空防崩溃，未创建任何生产后端接口（不违反第 五 节禁止项）。
+
+----------------------------------------------------------------
+三、第 四 节 系统信息 API（getSystemInfoSync）：已评估，未改动
+----------------------------------------------------------------
+- 现状：2 处调用（explore.js:249、share.js:225），均用于 Canvas 的 pixelRatio（dpr）计算。
+- 抖音对应：tt.getWindowInfo().pixelRatio / tt.getDeviceInfo() 为推荐替代；tt.getSystemInfoSync() 抖音仍兼容但已弃用。
+- 决定：Canvas 适配属第 六 节「暂不做」范围，且改动 getSystemInfoSync 直接影响 Canvas 计算逻辑（指令明确「如有兼容风险先报告，不擅自改变计算逻辑」）→ 本 Step 保留 wx.getSystemInfoSync，待 Canvas Step 与 tt.getWindowInfo 一并适配验证。
+- 结论：无兼容性破坏风险（因未改），建议后续 Canvas Step 统一替换。
+
+----------------------------------------------------------------
+四、第 五 节 「我要吐槽」A 方案：已停止，需新增后端接口
+----------------------------------------------------------------
+- 指令确定的 A 方案：tt.request → CloudBase HTTP API → feedback 集合。
+- 前置核查结果：当前项目无任何 CloudBase HTTP API（无云函数、无 HTTP 触发、无 tt.request 封装、无后端 endpoint；feedback 仅经 wx.cloud.database() 直写）。
+- 处置：按指令「如果没有现成 HTTP API：先停止并向 GPT 报告需要新增的后端接口，不要自行创建不可控的生产接口」→ 停止，未实现 tt.request 写库。
+- 当前抖音端行为（预期降级，非崩溃）：feedback.js:65 已有 `typeof wx === 'undefined'` 守卫 → 抖音端自动走本地队列兜底，反馈不落 cloud（即 B 方案效果）。
+- 待 GPT 提供/部署：CloudBase HTTP API（云函数 + HTTP 触发 + 访问令牌），到位后本 AI 实现 tt.request 写库，保留 feedback UI 与数据结构。
+
+----------------------------------------------------------------
+五、第 六 节 本 Step 暂不做项（进入后续 Step）
+----------------------------------------------------------------
+保留 wx. 原样、不改动：
+- Canvas 最终适配：wx.createSelectorQuery（explore/share 各 1）、wx.canvasToTempFilePath（share 1）
+- 相册保存：wx.saveImageToPhotosAlbum（share 1）、wx.openSetting（share 1，权限引导）
+- 分享：onShareAppMessage（share.js:680）、wxml open-type="share"
+- 系统信息：wx.getSystemInfoSync（2，见第三节）
+- 关系探索/全景图视觉、分享海报设计、UI 重设计、图片替换
+
+----------------------------------------------------------------
+六、第 七 节 验证
+----------------------------------------------------------------
+- 静态语法检查：node --check 对全部 15 个含改动的 JS 文件（含 app.js / route-detail.js）通过，0 语法错误。
+- 迁移完整性：8 个低风险族调用 0 处残留 wx.（grep 复核）；中高风险族按第六节保留 wx.。
+- 逐页逻辑核对（静态，未真机）：首页/路线/电影详情/关系探索/全景图/我的MCU/我要吐槽/分享 的导航、存储、提示 API 均已指向 tt.，参数结构未变。
+- 真机编译：无法执行——缺抖音 AppID（配置重建停滞）+ 缺抖音开发者工具环境（阶段 2 人工项，GPT 执行）。已做防崩溃守卫确保抖音端可启动。
+
+----------------------------------------------------------------
+七、第 九 节 交付清单（10 项）
+----------------------------------------------------------------
+1) 实际迁移了哪些 wx.* → tt.*
+   navigateTo(23)/navigateBack(3)/switchTab(3)/setNavigationBarTitle(3)/getStorageSync(6)/setStorageSync(6)/showToast(10)/showModal(1)，共 55 处 + 2 处守卫修复（route-detail 守卫 wx→tt、app.js 防崩溃判空）。
+
+2) 哪些 API 没有直接对应关系
+   - wx.cloud：抖音无云开发对应物（高风险的架构级缺口，需后端）。
+   - 其余（createSelectorQuery/canvasToTempFilePath/saveImageToPhotosAlbum/openSetting/getSystemInfoSync/onShareAppMessage）抖音均有对应 tt.* API，但按第六节暂不做。
+
+3) wx.cloud 最终如何处理
+   app.js 加 typeof wx 判空（抖音端跳过云初始化，不崩溃）；feedback.js 已有 typeof wx 守卫→抖音走本地队列兜底。A 方案（tt.request→cloud）因无后端未实现。云能力在抖音端暂不可用（预期降级）。
+
+4) feedback 是否已经能够正常调用后端
+   否。无现有 HTTP API，按指令停止，未自建。当前抖音端反馈仅落本地队列（不写 cloud），待后端到位。
+
+5) project.config.json 是否已经完成抖音配置
+   否。等待真实 AppID（第 二 节已停止配置重建）。
+
+6) app.json / sitemap.json 做了哪些处理
+   未处理（同属配置重建，被 AppID 前置阻塞）。已读取现状，留待 AppID 到位后清理微信字段（lazyCodeLoading/style:"v2"）与 sitemap 取舍。
+
+7) 编译是否通过
+   静态语法检查全部通过；真机/开发者工具编译未执行（缺 AppID + 开发者工具，阶段 2 人工项）。防崩溃守卫确保抖音端可启动。
+
+8) 是否存在阻塞问题
+   是，两个硬阻塞：
+   (a) 抖音 AppID 缺失 → 阻塞第 二 节配置重建；
+   (b) 无 CloudBase HTTP API 后端 → 阻塞第 五 节 feedback A 方案；
+   (c) Canvas/分享/相册/getSystemInfoSync 按第六节进入后续 Step（非阻塞，属计划内递延）。
+
+9) Git commit hash
+   douyin-migration：25b718ae9319f0656814cbc2d0fbce9ae7ca5813
+   wechat-production：baf309b（只读基线，未提交、未改动）
+
+10) 明确声明：微信正式版没有被修改
+    mcu-miniprogram/（202 文件）零写入/零删除；wechat-production 分支 baf309b 未提交；
+    所有 Step2 改动仅发生在 MCU-miniapp-douyin/ 目录与 douyin-migration 分支。
+
+----------------------------------------------------------------
+待 GPT 决策/确认
+----------------------------------------------------------------
+A. 提供抖音小程序真实 AppID（解锁第 二 节配置重建）。
+B. 提供或部署 CloudBase HTTP API 后端（云函数+HTTP触发+令牌），解锁 feedback A 方案。
+C. app.json 微信字段（lazyCodeLoading/style:"v2"）清理确认 / sitemap 取舍。
+D. 确认 app.js 防崩溃守卫改法（判空跳云初始化）是否符合预期（属必要防崩溃，非 A 方案实现）。
+
+→ Step 2 已停止于此，等待 GPT 验收后再进入 Step 3（Canvas/分享/相册适配）。
+================================================================

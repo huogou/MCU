@@ -1,0 +1,179 @@
+{
+  "url": "http://127.0.0.1:62036",
+  "viewports": {
+    "360": {
+      "found": true,
+      "A": {
+        "cardW": 324,
+        "cardH": 324,
+        "ratio": 1,
+        "demoPct": 59,
+        "eyebrow": "INFINITY SAGA · ROUTE",
+        "routeTitle": "新手入坑",
+        "pills": 2,
+        "tlItems": 12,
+        "currentItems": 1,
+        "phaseDots": 12,
+        "footerText": "当前推荐：《钢铁侠》",
+        "timelineScrollable": true,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "nameTruncated": false,
+        "hasRouteCanvas": true
+      },
+      "tapFooter": true,
+      "B": {
+        "opened": true,
+        "archiveNo": "MCU-001",
+        "title": "钢铁侠",
+        "hasPoster": true,
+        "hasPosterClass": true,
+        "programmatic": false,
+        "filmIcon": false,
+        "desc": "整个 MCU 的起点。它确立了这个宇宙的基调",
+        "tags": 1,
+        "demoPct": 69.4,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "externalRes": 2
+      },
+      "tapCardBack": true,
+      "tapTabRandom": true,
+      "C": {
+        "badgeGone": true,
+        "heroTitle": "钢铁侠",
+        "phaseTagOnPoster": false,
+        "metaText": "第一阶段2008主线必看",
+        "phaseOccurrencesInMeta": 1,
+        "reasonLabel": "为什么看这部",
+        "reasonText": "整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。",
+        "reasonLen": 42,
+        "bodyTitleGone": true,
+        "dividerGone": true,
+        "poster": true,
+        "foot": "换一部继续探索",
+        "footClickable": true,
+        "archiveNo": "MCU-001",
+        "bottomBtnGone": true,
+        "layerHeights": {
+          "canvas": 225,
+          "header": null,
+          "card": 205,
+          "hero": 81,
+          "body": 122,
+          "meta": 15,
+          "reason": 58,
+          "foot": 22
+        },
+        "bodyScrollH": 122,
+        "bodyClientH": 122,
+        "reasonClamp": {
+          "clamp": "2",
+          "lh": "19px",
+          "fs": "13px",
+          "h": 38
+        },
+        "demoPct": 69.4,
+        "docOverflow": false,
+        "boxOverflow": false
+      },
+      "shuffle": {
+        "from": "钢铁侠",
+        "to": "奇异博士2：疯狂多元宇宙",
+        "changed": true
+      },
+      "C_programmatic": {
+        "title": "蜘蛛侠：英雄归来",
+        "roman": "III",
+        "filmIcon": true
+      }
+    },
+    "414": {
+      "found": true,
+      "A": {
+        "cardW": 378,
+        "cardH": 378,
+        "ratio": 1,
+        "demoPct": 64.8,
+        "eyebrow": "INFINITY SAGA · ROUTE",
+        "routeTitle": "新手入坑",
+        "pills": 2,
+        "tlItems": 12,
+        "currentItems": 1,
+        "phaseDots": 12,
+        "footerText": "当前推荐：《钢铁侠》",
+        "timelineScrollable": true,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "nameTruncated": false,
+        "hasRouteCanvas": true
+      },
+      "tapFooter": true,
+      "B": {
+        "opened": true,
+        "archiveNo": "MCU-001",
+        "title": "钢铁侠",
+        "hasPoster": true,
+        "hasPosterClass": true,
+        "programmatic": false,
+        "filmIcon": false,
+        "desc": "整个 MCU 的起点。它确立了这个宇宙的基调",
+        "tags": 1,
+        "demoPct": 73.8,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "externalRes": 2
+      },
+      "tapCardBack": true,
+      "tapTabRandom": true,
+      "C": {
+        "badgeGone": true,
+        "heroTitle": "钢铁侠",
+        "phaseTagOnPoster": false,
+        "metaText": "第一阶段2008主线必看",
+        "phaseOccurrencesInMeta": 1,
+        "reasonLabel": "为什么看这部",
+        "reasonText": "整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。",
+        "reasonLen": 42,
+        "bodyTitleGone": true,
+        "dividerGone": true,
+        "poster": true,
+        "foot": "换一部继续探索",
+        "footClickable": true,
+        "archiveNo": "MCU-001",
+        "bottomBtnGone": true,
+        "layerHeights": {
+          "canvas": 279,
+          "header": null,
+          "card": 259,
+          "hero": 103,
+          "body": 154,
+          "meta": 15,
+          "reason": 58,
+          "foot": 22
+        },
+        "bodyScrollH": 154,
+        "bodyClientH": 154,
+        "reasonClamp": {
+          "clamp": "2",
+          "lh": "19px",
+          "fs": "13px",
+          "h": 38
+        },
+        "demoPct": 73.8,
+        "docOverflow": false,
+        "boxOverflow": false
+      },
+      "shuffle": {
+        "from": "钢铁侠",
+        "to": "蜘蛛侠：英雄归来",
+        "changed": true
+      },
+      "C_programmatic": {
+        "title": "奇异博士2：疯狂多元宇宙",
+        "roman": "IV",
+        "filmIcon": true
+      }
+    }
+  }
+}

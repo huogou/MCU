@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const src = 'D:/SEO/发挥余热/漫威电影宇宙导航/小红书小工具/dist';
-const out = 'D:/SEO/发挥余热/漫威电影宇宙导航/小红书小工具/mcu-atlas-minitool.zip';
+const src = path.join(__dirname, 'dist');
+const out = path.join(__dirname, 'mcu-atlas-minitool.zip');
 
 try { fs.unlinkSync(out); } catch (e) {}
 
