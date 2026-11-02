@@ -88,3 +88,14 @@ workspace/deploy/workbench-key-install-*.txt
 
 # AI 技能工具包（对外展示不应包含）
 .skill/
+
+# CodeBuddy IDE 本地缓存（个人工具目录，不进版本库）
+.codebuddy/
+
+# 本地备份产物（可由脚本重新生成，不进版本库）
+backup-*/
+*.zip.bak
+*.bak-pre-*.zip
+
+# 上传附件副本（正式素材已在 docs/外宣物料/，此处仅为上传中转，不进版本库）
+版本迭代/GenUI小工具/上传附件/
