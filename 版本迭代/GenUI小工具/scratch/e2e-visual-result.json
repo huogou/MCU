@@ -1,179 +1,1443 @@
 {
-  "url": "http://127.0.0.1:62036",
+  "url": "http://127.0.0.1:65258",
   "viewports": {
     "360": {
       "found": true,
-      "A": {
-        "cardW": 324,
-        "cardH": 324,
+      "initial": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 326,
+        "cardH": 326,
         "ratio": 1,
-        "demoPct": 59,
-        "eyebrow": "INFINITY SAGA · ROUTE",
-        "routeTitle": "新手入坑",
-        "pills": 2,
-        "tlItems": 12,
-        "currentItems": 1,
-        "phaseDots": 12,
-        "footerText": "当前推荐：《钢铁侠》",
-        "timelineScrollable": true,
         "docOverflow": false,
         "boxOverflow": false,
-        "nameTruncated": false,
-        "hasRouteCanvas": true
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 142,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "tapFooter": true,
-      "B": {
-        "opened": true,
-        "archiveNo": "MCU-001",
-        "title": "钢铁侠",
-        "hasPoster": true,
-        "hasPosterClass": true,
-        "programmatic": false,
-        "filmIcon": false,
-        "desc": "整个 MCU 的起点。它确立了这个宇宙的基调",
-        "tags": 1,
-        "demoPct": 69.4,
+      "afterEssential": {
+        "title": "漫威观影顺序",
+        "routeTag": "想理清主线剧情，按这个顺序看这 18 部",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "主线精选",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "奇异博士",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "蜘蛛侠：英雄归来",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "13",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "14",
+            "name": "蜘蛛侠：英雄远征",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "15",
+            "name": "蜘蛛侠：英雄无归",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "16",
+            "name": "奇异博士2：疯狂多元宇宙",
+            "year": "2022",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "17",
+            "name": "神奇四侠：初露锋芒",
+            "year": "2025",
+            "phase": "第六阶段",
+            "isSeries": false
+          },
+          {
+            "no": "18",
+            "name": "蜘蛛侠：崭新之日",
+            "year": "2026",
+            "phase": "第六阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 18,
+        "seriesCount": 0,
+        "cardW": 326,
+        "cardH": 326,
+        "ratio": 1,
         "docOverflow": false,
         "boxOverflow": false,
-        "externalRes": 2
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 580,
+        "listClientH": 142,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "tapCardBack": true,
-      "tapTabRandom": true,
-      "C": {
-        "badgeGone": true,
-        "heroTitle": "钢铁侠",
-        "phaseTagOnPoster": false,
-        "metaText": "第一阶段2008主线必看",
-        "phaseOccurrencesInMeta": 1,
-        "reasonLabel": "为什么看这部",
-        "reasonText": "整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。",
-        "reasonLen": 42,
-        "bodyTitleGone": true,
-        "dividerGone": true,
-        "poster": true,
-        "foot": "换一部继续探索",
-        "footClickable": true,
-        "archiveNo": "MCU-001",
-        "bottomBtnGone": true,
-        "layerHeights": {
-          "canvas": 225,
-          "header": null,
-          "card": 205,
-          "hero": 81,
-          "body": 122,
-          "meta": 15,
-          "reason": 58,
-          "foot": 22
-        },
-        "bodyScrollH": 122,
-        "bodyClientH": 122,
-        "reasonClamp": {
-          "clamp": "2",
-          "lh": "19px",
-          "fs": "13px",
-          "h": 38
-        },
-        "demoPct": 69.4,
+      "afterDoomsday": {
+        "title": "漫威观影顺序",
+        "routeTag": "已看完《终局之战》，补这 8 项接上复联5",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "复联5补课",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "洛基 S1",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": true
+          },
+          {
+            "no": "02",
+            "name": "洛基 S2",
+            "year": "2023",
+            "phase": "第四阶段",
+            "isSeries": true
+          },
+          {
+            "no": "03",
+            "name": "奇异博士2：疯狂多元宇宙",
+            "year": "2022",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "蜘蛛侠：英雄无归",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "死侍与金刚狼",
+            "year": "2024",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "美国队长4：勇敢新世界",
+            "year": "2025",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "雷霆特攻队*",
+            "year": "2025",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "神奇四侠：初露锋芒",
+            "year": "2025",
+            "phase": "第六阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 8,
+        "seriesCount": 2,
+        "cardW": 326,
+        "cardH": 326,
+        "ratio": 1,
         "docOverflow": false,
-        "boxOverflow": false
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 260,
+        "listClientH": 142,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "shuffle": {
-        "from": "钢铁侠",
-        "to": "奇异博士2：疯狂多元宇宙",
-        "changed": true
+      "backToNewcomer": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 326,
+        "cardH": 326,
+        "ratio": 1,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 142,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "C_programmatic": {
-        "title": "蜘蛛侠：英雄归来",
-        "roman": "III",
-        "filmIcon": true
+      "scrollReset": {
+        "scrolledTop": 40,
+        "resetTopAfterSwitch": 0,
+        "ok": true
+      },
+      "afterReset": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 326,
+        "cardH": 326,
+        "ratio": 1,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 142,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       }
     },
     "414": {
       "found": true,
-      "A": {
-        "cardW": 378,
-        "cardH": 378,
+      "initial": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 380,
+        "cardH": 380,
         "ratio": 1,
-        "demoPct": 64.8,
-        "eyebrow": "INFINITY SAGA · ROUTE",
-        "routeTitle": "新手入坑",
-        "pills": 2,
-        "tlItems": 12,
-        "currentItems": 1,
-        "phaseDots": 12,
-        "footerText": "当前推荐：《钢铁侠》",
-        "timelineScrollable": true,
         "docOverflow": false,
         "boxOverflow": false,
-        "nameTruncated": false,
-        "hasRouteCanvas": true
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 196,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "tapFooter": true,
-      "B": {
-        "opened": true,
-        "archiveNo": "MCU-001",
-        "title": "钢铁侠",
-        "hasPoster": true,
-        "hasPosterClass": true,
-        "programmatic": false,
-        "filmIcon": false,
-        "desc": "整个 MCU 的起点。它确立了这个宇宙的基调",
-        "tags": 1,
-        "demoPct": 73.8,
+      "afterEssential": {
+        "title": "漫威观影顺序",
+        "routeTag": "想理清主线剧情，按这个顺序看这 18 部",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "主线精选",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "奇异博士",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "蜘蛛侠：英雄归来",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "13",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "14",
+            "name": "蜘蛛侠：英雄远征",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "15",
+            "name": "蜘蛛侠：英雄无归",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "16",
+            "name": "奇异博士2：疯狂多元宇宙",
+            "year": "2022",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "17",
+            "name": "神奇四侠：初露锋芒",
+            "year": "2025",
+            "phase": "第六阶段",
+            "isSeries": false
+          },
+          {
+            "no": "18",
+            "name": "蜘蛛侠：崭新之日",
+            "year": "2026",
+            "phase": "第六阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 18,
+        "seriesCount": 0,
+        "cardW": 380,
+        "cardH": 380,
+        "ratio": 1,
         "docOverflow": false,
         "boxOverflow": false,
-        "externalRes": 2
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 580,
+        "listClientH": 196,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "tapCardBack": true,
-      "tapTabRandom": true,
-      "C": {
-        "badgeGone": true,
-        "heroTitle": "钢铁侠",
-        "phaseTagOnPoster": false,
-        "metaText": "第一阶段2008主线必看",
-        "phaseOccurrencesInMeta": 1,
-        "reasonLabel": "为什么看这部",
-        "reasonText": "整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。",
-        "reasonLen": 42,
-        "bodyTitleGone": true,
-        "dividerGone": true,
-        "poster": true,
-        "foot": "换一部继续探索",
-        "footClickable": true,
-        "archiveNo": "MCU-001",
-        "bottomBtnGone": true,
-        "layerHeights": {
-          "canvas": 279,
-          "header": null,
-          "card": 259,
-          "hero": 103,
-          "body": 154,
-          "meta": 15,
-          "reason": 58,
-          "foot": 22
-        },
-        "bodyScrollH": 154,
-        "bodyClientH": 154,
-        "reasonClamp": {
-          "clamp": "2",
-          "lh": "19px",
-          "fs": "13px",
-          "h": 38
-        },
-        "demoPct": 73.8,
+      "afterDoomsday": {
+        "title": "漫威观影顺序",
+        "routeTag": "已看完《终局之战》，补这 8 项接上复联5",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "复联5补课",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "洛基 S1",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": true
+          },
+          {
+            "no": "02",
+            "name": "洛基 S2",
+            "year": "2023",
+            "phase": "第四阶段",
+            "isSeries": true
+          },
+          {
+            "no": "03",
+            "name": "奇异博士2：疯狂多元宇宙",
+            "year": "2022",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "蜘蛛侠：英雄无归",
+            "year": "2021",
+            "phase": "第四阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "死侍与金刚狼",
+            "year": "2024",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "美国队长4：勇敢新世界",
+            "year": "2025",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "雷霆特攻队*",
+            "year": "2025",
+            "phase": "第五阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "神奇四侠：初露锋芒",
+            "year": "2025",
+            "phase": "第六阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 8,
+        "seriesCount": 2,
+        "cardW": 380,
+        "cardH": 380,
+        "ratio": 1,
         "docOverflow": false,
-        "boxOverflow": false
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 260,
+        "listClientH": 196,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "shuffle": {
-        "from": "钢铁侠",
-        "to": "蜘蛛侠：英雄归来",
-        "changed": true
+      "backToNewcomer": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 380,
+        "cardH": 380,
+        "ratio": 1,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 196,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       },
-      "C_programmatic": {
-        "title": "奇异博士2：疯狂多元宇宙",
-        "roman": "IV",
-        "filmIcon": true
+      "scrollReset": {
+        "scrolledTop": 40,
+        "resetTopAfterSwitch": 0,
+        "ok": true
+      },
+      "afterReset": {
+        "title": "漫威观影顺序",
+        "routeTag": "第一次看漫威，照这个顺序看这 12 部就够了",
+        "hint": "列表可上下滑动 · 点下方切换路线",
+        "activeTab": "新手入门",
+        "tabs": [
+          "新手入门",
+          "主线精选",
+          "复联5补课"
+        ],
+        "items": [
+          {
+            "no": "01",
+            "name": "钢铁侠",
+            "year": "2008",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "02",
+            "name": "美国队长：复仇者先锋",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "03",
+            "name": "雷神",
+            "year": "2011",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "04",
+            "name": "复仇者联盟",
+            "year": "2012",
+            "phase": "第一阶段",
+            "isSeries": false
+          },
+          {
+            "no": "05",
+            "name": "美国队长2：冬日战士",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "06",
+            "name": "银河护卫队",
+            "year": "2014",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "07",
+            "name": "复仇者联盟2：奥创纪元",
+            "year": "2015",
+            "phase": "第二阶段",
+            "isSeries": false
+          },
+          {
+            "no": "08",
+            "name": "美国队长3：内战",
+            "year": "2016",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "09",
+            "name": "雷神3：诸神黄昏",
+            "year": "2017",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "10",
+            "name": "黑豹",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "11",
+            "name": "复仇者联盟3：无限战争",
+            "year": "2018",
+            "phase": "第三阶段",
+            "isSeries": false
+          },
+          {
+            "no": "12",
+            "name": "复仇者联盟4：终局之战",
+            "year": "2019",
+            "phase": "第三阶段",
+            "isSeries": false
+          }
+        ],
+        "itemCount": 12,
+        "seriesCount": 0,
+        "cardW": 380,
+        "cardH": 380,
+        "ratio": 1,
+        "docOverflow": false,
+        "boxOverflow": false,
+        "canvasFitsDemo": true,
+        "listScrollable": true,
+        "listScrollH": 388,
+        "listClientH": 196,
+        "externalRes": 0,
+        "externalResGlobal": 2,
+        "externalResDetail": [
+          "LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css",
+          "LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css"
+        ],
+        "truncatedNames": []
       }
     }
-  }
+  },
+  "assertions": [
+    {
+      "viewport": "360",
+      "name": "1:1 卡片比例 (0.99~1.01)",
+      "pass": true,
+      "detail": "ratio=1"
+    },
+    {
+      "viewport": "360",
+      "name": "无文档横向溢出",
+      "pass": true,
+      "detail": "docOverflow=false"
+    },
+    {
+      "viewport": "360",
+      "name": "无容器横向溢出",
+      "pass": true,
+      "detail": "boxOverflow=false"
+    },
+    {
+      "viewport": "360",
+      "name": "画布完整落在 demo 内",
+      "pass": true,
+      "detail": "canvasFitsDemo=true"
+    },
+    {
+      "viewport": "360",
+      "name": "Tabs 三项齐全",
+      "pass": true,
+      "detail": "tabs=新手入门|主线精选|复联5补课"
+    },
+    {
+      "viewport": "360",
+      "name": "默认进入新手入门",
+      "pass": true,
+      "detail": "active=新手入门 count=12"
+    },
+    {
+      "viewport": "360",
+      "name": "标题=漫威观影顺序",
+      "pass": true,
+      "detail": "title=漫威观影顺序"
+    },
+    {
+      "viewport": "360",
+      "name": "底部提示文案正确",
+      "pass": true,
+      "detail": "hint=列表可上下滑动 · 点下方切换路线"
+    },
+    {
+      "viewport": "360",
+      "name": "产品内无外部网络资源引用",
+      "pass": true,
+      "detail": "product=0 docGlobal=2 → [\"LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css\",\"LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css\"]"
+    },
+    {
+      "viewport": "360",
+      "name": "长片名无截断",
+      "pass": true,
+      "detail": "truncated=[]"
+    },
+    {
+      "viewport": "360",
+      "name": "切到主线精选=18 项",
+      "pass": true,
+      "detail": "count=18 active=主线精选"
+    },
+    {
+      "viewport": "360",
+      "name": "主线精选可滚动",
+      "pass": true,
+      "detail": "scroll 580/142"
+    },
+    {
+      "viewport": "360",
+      "name": "切到复联5补课=8 项",
+      "pass": true,
+      "detail": "count=8 active=复联5补课"
+    },
+    {
+      "viewport": "360",
+      "name": "复联5补课含 2 部剧集",
+      "pass": true,
+      "detail": "series=2"
+    },
+    {
+      "viewport": "360",
+      "name": "洛基 S2 年份=2023 且为剧",
+      "pass": true,
+      "detail": "name=洛基 S2 year=2023 series=true"
+    },
+    {
+      "viewport": "360",
+      "name": "洛基 S1 年份=2021 且为剧",
+      "pass": true,
+      "detail": "name=洛基 S1 year=2021"
+    },
+    {
+      "viewport": "360",
+      "name": "复联5补课电影非剧集",
+      "pass": true,
+      "detail": "movies=6"
+    },
+    {
+      "viewport": "360",
+      "name": "切回新手入门正常",
+      "pass": true,
+      "detail": "count=12"
+    },
+    {
+      "viewport": "360",
+      "name": "切换路线后列表位置重置",
+      "pass": true,
+      "detail": "scrolled=40 reset=0"
+    },
+    {
+      "viewport": "360",
+      "name": "重置按钮回到默认路线",
+      "pass": true,
+      "detail": "active=新手入门"
+    },
+    {
+      "viewport": "414",
+      "name": "1:1 卡片比例 (0.99~1.01)",
+      "pass": true,
+      "detail": "ratio=1"
+    },
+    {
+      "viewport": "414",
+      "name": "无文档横向溢出",
+      "pass": true,
+      "detail": "docOverflow=false"
+    },
+    {
+      "viewport": "414",
+      "name": "无容器横向溢出",
+      "pass": true,
+      "detail": "boxOverflow=false"
+    },
+    {
+      "viewport": "414",
+      "name": "画布完整落在 demo 内",
+      "pass": true,
+      "detail": "canvasFitsDemo=true"
+    },
+    {
+      "viewport": "414",
+      "name": "Tabs 三项齐全",
+      "pass": true,
+      "detail": "tabs=新手入门|主线精选|复联5补课"
+    },
+    {
+      "viewport": "414",
+      "name": "默认进入新手入门",
+      "pass": true,
+      "detail": "active=新手入门 count=12"
+    },
+    {
+      "viewport": "414",
+      "name": "标题=漫威观影顺序",
+      "pass": true,
+      "detail": "title=漫威观影顺序"
+    },
+    {
+      "viewport": "414",
+      "name": "底部提示文案正确",
+      "pass": true,
+      "detail": "hint=列表可上下滑动 · 点下方切换路线"
+    },
+    {
+      "viewport": "414",
+      "name": "产品内无外部网络资源引用",
+      "pass": true,
+      "detail": "product=0 docGlobal=2 → [\"LINK|https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_9e6338b.css\",\"LINK|https://ms.bdstatic.com/se/static/@baidu/cosmic/tokens_1498a811.css\"]"
+    },
+    {
+      "viewport": "414",
+      "name": "长片名无截断",
+      "pass": true,
+      "detail": "truncated=[]"
+    },
+    {
+      "viewport": "414",
+      "name": "切到主线精选=18 项",
+      "pass": true,
+      "detail": "count=18 active=主线精选"
+    },
+    {
+      "viewport": "414",
+      "name": "主线精选可滚动",
+      "pass": true,
+      "detail": "scroll 580/196"
+    },
+    {
+      "viewport": "414",
+      "name": "切到复联5补课=8 项",
+      "pass": true,
+      "detail": "count=8 active=复联5补课"
+    },
+    {
+      "viewport": "414",
+      "name": "复联5补课含 2 部剧集",
+      "pass": true,
+      "detail": "series=2"
+    },
+    {
+      "viewport": "414",
+      "name": "洛基 S2 年份=2023 且为剧",
+      "pass": true,
+      "detail": "name=洛基 S2 year=2023 series=true"
+    },
+    {
+      "viewport": "414",
+      "name": "洛基 S1 年份=2021 且为剧",
+      "pass": true,
+      "detail": "name=洛基 S1 year=2021"
+    },
+    {
+      "viewport": "414",
+      "name": "复联5补课电影非剧集",
+      "pass": true,
+      "detail": "movies=6"
+    },
+    {
+      "viewport": "414",
+      "name": "切回新手入门正常",
+      "pass": true,
+      "detail": "count=12"
+    },
+    {
+      "viewport": "414",
+      "name": "切换路线后列表位置重置",
+      "pass": true,
+      "detail": "scrolled=40 reset=0"
+    },
+    {
+      "viewport": "414",
+      "name": "重置按钮回到默认路线",
+      "pass": true,
+      "detail": "active=新手入门"
+    }
+  ],
+  "ALL_PASS": true,
+  "consoleErrors": []
 }

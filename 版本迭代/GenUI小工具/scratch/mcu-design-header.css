@@ -1,0 +1,62 @@
+/* ============================================================
+         * 画布内容区 · 设计稿 V1.0 实现
+         * 依据：docs/产品/GenUI-MCU观影助手-画布视觉设计V1.0.html
+         * 纪律：--mcu-* token 仅在 .mcu-* 作用域内声明，不触碰 --cos-* 官方变量。
+         * ============================================================ */
+
+        /* Token 容器：三个画布根容器各自声明，避免污染全局 */
+        .mcu-route-canvas,
+        .mcu-film-card,
+        .mcu-discover-canvas {
+            --mcu-archive-gold: #b8860b;
+            --mcu-archive-gold-bg: #faf3e0;
+            --mcu-archive-gold-line: #e6d5a8;
+            --mcu-ink: #1a1d23;
+            --mcu-paper: #ffffff;
+            --mcu-line: #ececec;
+            --mcu-mono-font: "SF Mono", "Menlo", "Consolas", monospace;
+            --mcu-phase-1: #4a7fd4;
+            --mcu-phase-2: #2a9d7a;
+            --mcu-phase-3: #d4922a;
+            --mcu-phase-4: #7b5fd4;
+            --mcu-phase-5: #d4453d;
+            --mcu-phase-6: #b04d7d;
+        }
+
+        /* 1:1 小屏适配：设计稿视觉区的固定高度在小屏会挤压内容区，
+           改为 flex 占比 + max-height 兜底，保持设计稿比例关系。 */
+        /* 移除「今日发现」徽章行后腾出 33px，hero 回收到 40%（实测约 82px），
+           海报恢复为可辨识的视觉焦点。 */
+        /* V1.3 返工：档案视觉区改为可弹性伸缩（下限 64px 保底、上限 132px 防海报喧宾夺主）。
+           360px 下压缩至 ~66px 让出理由区空间；414px 下自动放大填满卡片，避免底部空置。 */
+        .mcu-archive-visual { flex: 1 1 96px; min-height: 64px; max-height: 132px; }
+        .mcu-discover-hero { flex: 0 0 40%; min-height: 80px; max-height: 140px; }
+
+        /* 竖版 2:3 海报放入横向视觉区必然裁切，取景偏上保留人物头部 */
+        .mcu-archive-poster { object-position: center 18%; }
+        .mcu-discover-hero-poster { object-position: center 20%; }
+
+        /* 海报态隐藏程序化标记与胶片孔装饰 */
+        .mcu-archive-visual.has-poster::before,
+        .mcu-archive-visual.has-poster::after { display: none; }
+
+        /* 交互反馈 */
+        .mcu-tl-item { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .mcu-route-footer { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .mcu-route-footer:active { opacity: 0.7; }
+
+        /* 今日发现徽章脉冲点（设计稿 @keyframes pulse-dot，重命名为 mcu- 前缀避免全局污染） */
+        @keyframes mcu-pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.35;
+                transform: scale(0.82);
+            }
+        }
+
