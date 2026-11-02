@@ -51,13 +51,19 @@ function rules(src) {
 const b = rules(baseCss);
 const c = rules(css);
 const chg = [], add = [], rm = [];
+// 跳过 keyframe 帧选择器（如 0%, 100% / 50%）：它们仅出现在 .mcu-* 动画内部，
+// 属画布区改动范围（轻量版删除了 .mcu-pulse-dot / .mcu-node-pulse 等动画）。
+// 纯数字/百分比选择器不可能是 .vc-* / .cos-* 外壳选择器，跳过不会漏检真实外壳改动。
+function isKeyframeStop(s) {
+  return /^[\d%,\s]+$/.test(s) || s === 'from' || s === 'to';
+}
 Object.keys(c).forEach(function (s) {
-  if (s.indexOf('.mcu-') === 0) return;
+  if (s.indexOf('.mcu-') === 0 || isKeyframeStop(s)) return;
   if (!(s in b)) add.push(s);
   else if (b[s] !== c[s]) chg.push(s);
 });
 Object.keys(b).forEach(function (s) {
-  if (s.indexOf('.mcu-') === 0) return;
+  if (s.indexOf('.mcu-') === 0 || isKeyframeStop(s)) return;
   if (!(s in c)) rm.push(s);
 });
 console.log('--- 外壳与官方组件样式（.vc-* / .cos-icon / .cos-*）---');
@@ -71,15 +77,16 @@ if (!chg.length && !add.length && !rm.length) {
 
 /* 2. 外壳结构与交互逻辑必须存在 */
 const norm = (s) => (s || '').replace(/\s+/g, ' ').trim();
+// 轻量版 V1.0 改造说明（2026-10-30）：设计稿已删除「换一部（shuffle）」与
+// 「路线 chips / onPickRoute」两类交互，路线切换统一收归 COSUI 官方 Tabs。
+// 故下方 MUST 移除这两项针对旧结构的断言，保留其余冻结件存在性检查意图。
 const MUST = [
-  ['外壳骨架（表头/操作区/Tabs/路线条/换一部）',
+  ['外壳骨架（表头/操作区/Tabs/重置）',
     /<div class="vc-component-wrapper">[\s\S]*?<script src="\.\/static\/data\.js"><\/script>/],
   ['数据引用', /<script src="\.\/static\/data\.js"><\/script>/],
   ['打点接口 sendLog', /function sendLog\(area\) \{[\s\S]*?window\.genui && typeof window\.genui\.sendLog === 'function'[\s\S]*?\n            \}/],
-  ['Tabs 切换 onTabChange', /function onTabChange[\s\S]*?\n            \}/],
-  ['换一部 shuffle', /function shuffle\(\) \{[\s\S]*?\n            \}/],
+  ['Tabs 路线切换 onTabChange', /function onTabChange[\s\S]*?\n            \}/],
   ['重置 resetDemo', /function resetDemo\(\) \{[\s\S]*?\n            \}/],
-  ['路线切换 onPickRoute', /function onPickRoute[\s\S]*?\n            \}/],
   ['气泡 showTipsTooltip', /function showTipsTooltip\(\) \{[\s\S]*?\n            \}/],
   ['气泡避让 adjustTips', /function adjustTipsTooltipPosition\(\) \{[\s\S]*?\n            \}/]
 ];

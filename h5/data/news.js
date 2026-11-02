@@ -2034,5 +2034,744 @@ window.MCU_NEWS = [
       chain_steps_hit: 'Step 6',
       conflict_resolved_at: null,
       conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-12-001',
+      title: '《VisionQuest》主创澄清《旺达幻视》三部曲结论传闻',
+      summary: '《VisionQuest》主创特里·马塔拉斯澄清该剧实际作为《旺达幻视》三部曲的一部分开发，并驳斥了将其视为三部曲结论的传闻。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-12T07:38:58Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-visionquest-wandavision-trilogy-conclusion',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        4
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-12T08:24:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-visionquest-wandavision-trilogy-conclusion'
+      }
+      ],
+      status_changed_at: '2026-10-12T08:24:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-visionquest-wandavision-trilogy-conclusion',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-12-002',
+      title: 'Disney+确认三部漫威剧集将于2026年10月上线',
+      summary: 'Disney+确认将在2026年10月上线三部新的漫威电视剧，为流媒体服务增添内容。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-12T07:38:58Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/disney-plus-marvel-tv-shows-october-2026',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-12T08:24:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/disney-plus-marvel-tv-shows-october-2026'
+      }
+      ],
+      status_changed_at: '2026-10-12T08:24:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/disney-plus-marvel-tv-shows-october-2026',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-13-001',
+      title: '漫威影业正式公布第三位MCU极速者战衣',
+      summary: '漫威影业公布第三位进入MCU的极速者战衣，为现有闪电系英雄阵容增添全新造型。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-13T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-13T02:55:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume'
+      }
+      ],
+      status_changed_at: '2026-10-13T02:55:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-13-002',
+      title: '《VisionQuest》影评：保罗·贝坦尼在复杂心灵旅程中表现出色',
+      summary: 'The Direct评论指出，漫威剧集《VisionQuest》成功承接《WandaVision》的烧脑情感主线，保罗·贝坦尼在探索幻视心理的复杂叙事中表现突出。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-13T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/reviews-ratings/visionquest-review',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [
+        'wandavision'
+      ],
+      related_characters: [
+        'vision'
+      ],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-13T02:55:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/reviews-ratings/visionquest-review'
+      }
+      ],
+      status_changed_at: '2026-10-13T02:55:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/reviews-ratings/visionquest-review',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-13-003',
+      title: '《蜘蛛侠：崭新之日》导演谈未来回应《尚气》剧情线索',
+      summary: 'MCU导演Destin Daniel Cretton计划在未来电影中解答《尚气》遗留的一个重大悬念。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-13T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [
+        'shang-chi'
+      ],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        4,
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-13T02:55:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie'
+      }
+      ],
+      status_changed_at: '2026-10-13T02:55:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-13-004',
+      title: '《复仇者联盟：末日》宣传物料暂未出现幽灵角色，引发关注',
+      summary: '距离《复仇者联盟：末日》上映不足三个月，漫威影业仍未在其营销和官方宣传周边中包含汉娜·约翰-卡门饰演的幽灵角色。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-13T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'industry',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/avengers-doomsday-hannah-john-kamen-ghost-mcu-movie-promotional-merchandise',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-13T02:55:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/avengers-doomsday-hannah-john-kamen-ghost-mcu-movie-promotional-merchandise'
+      }
+      ],
+      status_changed_at: '2026-10-13T02:55:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/avengers-doomsday-hannah-john-kamen-ghost-mcu-movie-promotional-merchandise',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-13-005',
+      title: '乔什·布洛林回应《复仇者联盟：末日》相关提问，灭霸回归引发讨论',
+      summary: '乔什·布洛林在被问及是否会在漫威《复仇者联盟：末日》中回归饰演灭霸时，给出了一个意味深长的单字回应，引发外界对其在第六阶段电影中回归的猜测。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-13T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/avengers-doomsday-josh-brolin-thanos-marvel-phase-6-movie',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [
+        'thanos'
+      ],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-13T02:55:22Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/avengers-doomsday-josh-brolin-thanos-marvel-phase-6-movie'
+      }
+      ],
+      status_changed_at: '2026-10-13T02:55:22Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/avengers-doomsday-josh-brolin-thanos-marvel-phase-6-movie',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-001',
+      title: '漫威影业即将推出的幻视电视剧有望解开11年前的复仇者联盟电影谜团',
+      summary: '漫威影业即将推出的电视剧《幻视》有望解开一部早期复仇者联盟电影中遗留了11年的重要谜团。',
+      publish_time: '2026-10-13',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-studios-vision-tv-show-avengers-movie-mystery',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [
+        'vision'
+      ],
+      related_phases: [
+        2
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-studios-vision-tv-show-avengers-movie-mystery'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-studios-vision-tv-show-avengers-movie-mystery',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-002',
+      title: '《幻视之旅》主演詹姆斯·斯派德解释奥创人类形象与庄重感灵感源自宙斯和波塞冬',
+      summary: '据The Direct报道，《幻视之旅》主演詹姆斯·斯派德表示，奥创在该剧中的全新人类形象与庄重感受到希腊神话中宙斯和波塞冬的启发；这一改造旨在为角色赋予更强烈的分量与视觉新意。',
+      publish_time: '2026-10-13',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/visionquest-star-james-spader-explains-how-ultrons-human-look-and-gravitas-is-inspired-by-the-greek',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [
+        'vision'
+      ],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/visionquest-star-james-spader-explains-how-ultrons-human-look-and-gravitas-is-inspired-by-the-greek'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/visionquest-star-james-spader-explains-how-ultrons-human-look-and-gravitas-is-inspired-by-the-greek',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-003',
+      title: '《复仇者联盟：末日》宣传物料出现银河护卫队相关线索',
+      summary: 'The Direct报道指出，《复仇者联盟：末日》的宣传物料首次提及了一位银河护卫队角色，显示该片在推进自身剧情的同时向银河护卫队系列作出呼应。',
+      publish_time: '2026-10-13',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/avengers-doomsday-first-guardian-of-the-galaxy-mention',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/avengers-doomsday-first-guardian-of-the-galaxy-mention'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/avengers-doomsday-first-guardian-of-the-galaxy-mention',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-004',
+      title: '漫威影业发布《复仇者联盟：末日》中故事之神洛基首张官方形象',
+      summary: '漫威影业公开了《复仇者联盟：末日》中故事之神洛基的首张官方形象。此前洛基在Disney+剧集中将自己从时间线中移除，如今在《复仇者联盟5》中回归行动。',
+      publish_time: '2026-10-13',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-studios-god-of-stories-loki-avengers-doomsday',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [
+        'loki'
+      ],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-studios-god-of-stories-loki-avengers-doomsday'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-studios-god-of-stories-loki-avengers-doomsday',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-005',
+      title: '漫威影业正式公布第三个MCU超级速度英雄战衣',
+      summary: '漫威影业正式公布一款新的超级速度英雄战衣，标志着又一位速度型角色加入MCU，为现有闪电式英雄阵容增添全新造型。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'character',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-studios-mcu-super-speedster-costume',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-006',
+      title: '幻视之旅评测：保罗·贝坦尼在幻视心理复杂之旅中表现出色',
+      summary: 'The Direct 评测称漫威《幻视之旅》成功承接《旺达幻视》那种扭曲心智的情感主线，保罗·贝坦尼在展现幻视内心世界的复杂旅程中表现亮眼。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/reviews-ratings/visionquest-review',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [
+        'vision'
+      ],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/reviews-ratings/visionquest-review'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/reviews-ratings/visionquest-review',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-14-007',
+      title: '《蜘蛛侠：全新一天》导演谈未来探索《尚气》相关剧情可能性',
+      summary: '漫威电影宇宙导演德斯汀·丹尼尔·克雷顿计划在未来电影中解决《尚气》里的一个重要悬念。',
+      publish_time: '2026-10-12',
+      first_seen_at: '2026-10-14T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'industry',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: '',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [
+        'brand-new-day'
+      ],
+      related_series: [],
+      related_characters: [
+        'shangchi'
+      ],
+      related_phases: [
+        4
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-10-14T02:25:40Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie'
+      }
+      ],
+      status_changed_at: '2026-10-14T02:25:40Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/spider-man-brand-new-day-shang-chi-cliffhanger-movie',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
   }
 ];

@@ -1,41 +1,26 @@
 /**
- * MCU 观影助手 · GenUI 数据集构建器
+ * MCU 观影助手 · GenUI 数据集构建器（轻量版 V1.0）
  * ------------------------------------------------------------
  * 数据单一可信源：h5/data/*.js（母项目）
  * 输出：genui-app/static/data.js（构建期生成，请勿手工编辑）
  *
- * 纪律：
- *   1. 所有 movies 字段直接从母项目读取，不手工改写，杜绝人为误差。
- *   2. 只做「字段裁剪 + 体积压缩」，不改业务语义。
- *   3. 压缩：role/sf 截断到配置长度，避免 8MB 红线。
- *   4. hero（是否有随包海报）由海报白名单推导，不独立维护。
+ * 轻量版纪律（相对旧版 V1.4.1）：
+ *   1. 仅保留三条路线：新手入门 / 主线精选 / 复联5补课。
+ *   2. 路线数据全部取自母项目，不手工维护第二套电影数据。
+ *   3. 「复联5补课」取自 h5/data/special-routes.js 的 avengers-doomsday.core.items
+ *      （8 项：6 部电影 + 洛基 S1/S2 两部剧集），只读引用，不改母项目。
+ *   4. 剧集与电影均带 cn / year / phase，剧集以 isSeries 标记、列表加「剧」标签。
+ *   5. 删除海报白名单、随机探索池等旧版字段（包体由 ~714KB 降至 ~80KB）。
+ *   6. 构建可重复执行：母项目数据变化后重跑本脚本即可重新生成快照。
  */
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-const H5 = path.join(ROOT, 'h5', 'data');
+/* 母项目（单一可信源）位于工作区根目录的 h5/data，并非 GenUI 子目录内 */
+const WORKSPACE = path.resolve(ROOT, '..', '..');
+const H5 = path.join(WORKSPACE, 'h5', 'data');
 const OUT = path.join(ROOT, 'genui-app', 'static', 'data.js');
-
-/** 随包海报白名单：策划决策 C 混合方案，精选 15 张 */
-const HEROES = [
-  'iron-man', 'captain-america-first-avenger', 'thor', 'avengers',
-  'winter-soldier', 'guardians', 'age-of-ultron', 'civil-war',
-  'thor-ragnarok', 'black-panther', 'infinity-war', 'endgame',
-  'far-from-home', 'no-way-home', 'brand-new-day'
-];
-
-const MAX_ROLE = 46;
-const MAX_SF = 58;
-/* 设计稿要求的短文本字段（视觉集成 2026-10-13）：
-   noteShort  — F1 时间轴推荐理由，1 行，设计稿示例「一切的起点，托尼·斯塔克的蜕变奠定了整个MCU的基调」约 24 字
-   reasonShort— F3 发现卡「为什么看这部」，3 行内
-   eyebrow    — F1 路线头英文眉标（等宽小字 + 金线）
-   roman      — 阶段罗马数字（程序化视觉卡用）
-   phaseShort — 阶段短名（时间轴阶段标签用，避免「第一阶段 · 无限传奇开启」过长）
-*/
-const MAX_NOTE_SHORT = 26;
-const MAX_REASON_SHORT = 62;
 
 const PHASE_SHORT = {
   1: '第一阶段',
@@ -46,58 +31,16 @@ const PHASE_SHORT = {
   6: '第六阶段'
 };
 
-const PHASE_ROMAN = {
-  1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI'
-};
-
-/* 程序化视觉卡英文简称（设计稿 .mcu-archive-short，全大写、约 12 字符内） */
-const SHORT_EN = {
-  'iron-man': 'IRON MAN',
-  'incredible-hulk': 'HULK',
-  'iron-man-2': 'IRON MAN 2',
-  'thor': 'THOR',
-  'thor-dark-world': 'DARK WORLD',
-  'captain-america-first-avenger': 'CAPTAIN AMERICA',
-  'avengers': 'AVENGERS',
-  'iron-man-3': 'IRON MAN 3',
-  'winter-soldier': 'WINTER SOLDIER',
-  'guardians': 'GUARDIANS',
-  'age-of-ultron': 'AGE OF ULTRON',
-  'ant-man': 'ANT-MAN',
-  'civil-war': 'CIVIL WAR',
-  'doctor-strange': 'DOCTOR STRANGE',
-  'spider-man-homecoming': 'HOMEcoming',
-  'thor-ragnarok': 'RAGNAROK',
-  'black-panther': 'BLACK PANTHER',
-  'infinity-war': 'INFINITY WAR',
-  'ant-man-wasp': 'ANT-MAN WASP',
-  'endgame': 'ENDGAME',
-  'far-from-home': 'FAR FROM HOME',
-  'no-way-home': 'NO WAY HOME',
-  'multiverse-of-madness': 'MULTIVERSE',
-  'quantumania': 'QUANTUMANIA',
-  'deadpool-wolverine': 'DEADPOOL',
-  'brave-new-world': 'BRAVE NEW WORLD',
-  'fantastic-four': 'FANTASTIC FOUR',
-  'brand-new-day': 'BRAND NEW DAY'
-};
-
-/* 无专属简称时的兜底：取阶段英文名 */
-const PHASE_EN = {
-  1: 'INFINITY SAGA',
-  2: 'PHASE TWO',
-  3: 'PHASE THREE',
-  4: 'MULTIVERSE',
-  5: 'MULTIVERSE SAGA',
-  6: 'NEW ERA'
-};
-
-/* 路线眉标：与 routes.js 的 id 对应，设计稿要求英文等宽小字 */
-const ROUTE_EYEBROW = {
-  newcomer: 'INFINITY SAGA · ROUTE',
-  essential: 'MAINLINE · ROUTE',
-  release: 'RELEASE ORDER · ROUTE',
-  chrono: 'MCU CHRONOLOGY · ROUTE'
+/**
+ * 剧集分季年份覆盖表。
+ * 母项目 series.js 中《洛基》仅存整剧单一年份 2021，无「分季」字段；
+ * 设计稿 V1.0（已验收的轻量版唯一视觉/产品依据）明确指定洛基 S2 显示年份为 2023，
+ * 故此处以「设计稿指定显示值」覆盖 S2 年份。本表为构建期固定映射，可重复执行，
+ * 不依赖运行时推断，亦非据记忆编造影片。来源：docs/产品/GenUI-MCU观影助手-轻量版视觉设计V1.0.html。
+ */
+const SERIES_SEASON_YEAR = {
+  'loki|S1': 2021,
+  'loki|S2': 2023
 };
 
 function loadGlobal(file, key) {
@@ -109,88 +52,106 @@ function loadGlobal(file, key) {
   return v;
 }
 
-/** 按视觉估算截断，尽量在句子/词边界断开，避免半个词；结果长度恒不超过 max */
-function clip(text, max) {
-  const s = String(text || '').trim();
-  if (s.length <= max) return s;
-  let out = s.slice(0, max);
-  const stops = ['，', '。', '、', '：', ';', ' '];
-  for (let i = out.length - 1; i > max - 10; i--) {
-    if (stops.indexOf(out[i]) >= 0) return out.slice(0, i);
-  }
-  // 无合适断点时截到 max-1 再补省略号，保证总长不超过 max
-  return out.slice(0, max - 1) + '…';
+function phaseShortOf(phase) {
+  return PHASE_SHORT[phase] || ('第' + phase + '阶段');
 }
 
 function build() {
   const movies = loadGlobal('movies.js', 'MCU_MOVIES');
+  const series = loadGlobal('series.js', 'MCU_SERIES');
   const routes = loadGlobal('routes.js', 'MCU_ROUTES');
+  const special = loadGlobal('special-routes.js', 'MCU_SPECIAL_ROUTES');
 
-  const movieList = movies
-    .slice()
-    .sort((a, b) => a.ro - b.ro)
-    .map((m) => ({
+  const movieById = {};
+  movies.forEach(function (m) { movieById[m.id] = m; });
+  const seriesById = {};
+  series.forEach(function (s) { seriesById[s.id] = s; });
+
+  /* 母项目电影按上映顺序排序，保证「主线精选」等按母项目 ro 顺序输出 */
+  const moviesByRo = movies.slice().sort(function (a, b) { return a.ro - b.ro; });
+
+  function movieItem(m) {
+    if (!m) return null;
+    return {
       id: m.id,
-      cn: m.cn,
+      name: m.cn,
       year: m.year,
       phase: m.phase,
-      ro: m.ro,
-      co: m.co,
-      mainline: !!m.mainline,
-      starter: !!m.starter,
-      hero: HEROES.indexOf(m.id) >= 0,
-      role: clip(m.role, MAX_ROLE),
-      sf: clip(m.sf, MAX_SF),
-      /* 视觉集成新增：短文本字段（设计稿短文案位使用） */
-      noteShort: clip(m.role, MAX_NOTE_SHORT),
-      reasonShort: clip(m.role, MAX_REASON_SHORT),
-      phaseShort: PHASE_SHORT[m.phase] || ('第' + m.phase + '阶段'),
-      roman: PHASE_ROMAN[m.phase] || String(m.phase),
-      /* 程序化视觉卡的英文简称，例：CIVIL WAR（设计稿 .mcu-archive-short） */
-      shortEn: SHORT_EN[m.id] || PHASE_EN[m.phase] || 'MCU ' + m.ro,
-      /* 档案卡编号，例：MCU-015 */
-      archiveNo: 'MCU-' + String(m.ro).padStart(3, '0')
-    }));
+      phaseShort: phaseShortOf(m.phase),
+      isSeries: false,
+      type: 'movie'
+    };
+  }
 
-  // 只保留 V1 需要的基础观影路线；generator 路线在构建期展开为显式 items
-  // 注意：母项目中「精简主线」的 id 是 essential，generator 才是 mainline
-  const V1_ROUTES = ['newcomer', 'essential', 'release', 'chrono'];
-  const routeList = routes
-    .filter((r) => V1_ROUTES.indexOf(r.id) >= 0)
-    .map((r) => {
-      let items;
-      if (Array.isArray(r.items) && r.items.length) {
-        items = r.items.slice();
-      } else if (r.generator === 'release') {
-        items = movieList.map((m) => m.id); // 上映顺序 = ro 升序
-      } else if (r.generator === 'mainline' || r.generator === 'essential') {
-        items = movieList.filter((m) => m.mainline).map((m) => m.id);
-      } else if (r.generator === 'chrono') {
-        items = movieList.slice()
-          .sort((a, b) => a.co - b.co)
-          .map((m) => m.id);
-      } else {
-        items = [];
-      }
-      return {
-        id: r.id,
-        name: r.name,
-        tagline: r.tagline,
-        desc: clip(r.desc, 76),
-        count: items.length,
-        eyebrow: ROUTE_EYEBROW[r.id] || 'MCU · ROUTE',
-        items: items
-      };
-    });
+  function seriesItem(s, label) {
+    if (!s) return null;
+    const season = label ? (label.match(/S(\d+)/) || [])[1] : null;
+    const key = s.id + '|S' + (season || '1');
+    const year = (season && SERIES_SEASON_YEAR[key] != null) ? SERIES_SEASON_YEAR[key] : s.year;
+    return {
+      id: s.id,
+      name: label || s.cn,
+      year: year,
+      phase: s.phase,
+      phaseShort: phaseShortOf(s.phase),
+      isSeries: true,
+      type: 'series'
+    };
+  }
 
-  // 随机探索候选池：主线作品，优先有随包海报的（视觉更完整）
-  const randomPool = movieList
-    .filter((m) => m.mainline)
-    .sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0) || a.ro - b.ro)
-    .map((m) => m.id);
+  /* ── 路线一：新手入门（母项目 newcomer 显式 items，保留母项目原顺序）── */
+  const newcomer = routes.filter(function (r) { return r.id === 'newcomer'; })[0];
+  const newcomerItems = (newcomer.items || [])
+    .map(function (id) { return movieItem(movieById[id]); })
+    .filter(Boolean);
+
+  /* ── 路线二：主线精选（母项目 essential，generator=mainline → 主线电影，按上映顺序）── */
+  const essential = routes.filter(function (r) { return r.id === 'essential'; })[0];
+  let essentialIds;
+  if (Array.isArray(essential.items) && essential.items.length) {
+    essentialIds = essential.items.slice();
+  } else if (essential.generator === 'mainline' || essential.generator === 'essential') {
+    essentialIds = moviesByRo.filter(function (m) { return m.mainline; }).map(function (m) { return m.id; });
+  } else {
+    essentialIds = [];
+  }
+  const essentialItems = essentialIds
+    .map(function (id) { return movieItem(movieById[id]); })
+    .filter(Boolean);
+
+  /* ── 路线三：复联5补课（母项目 special-routes.js avengers-doomsday.core.items，8 项）── */
+  const ads = special.filter(function (s) { return s.id === 'avengers-doomsday'; })[0];
+  const adItems = (ads.core.items || [])
+    .map(function (it) {
+      const s = seriesById[it.workId];
+      if (s) return seriesItem(s, it.label);
+      return movieItem(movieById[it.workId]);
+    })
+    .filter(Boolean);
+
+  const routeDefs = [
+    {
+      id: 'newcomer',
+      name: '新手入门',
+      desc: '第一次看漫威，照这个顺序看这 12 部就够了',
+      items: newcomerItems
+    },
+    {
+      id: 'essential',
+      name: '主线精选',
+      desc: '想理清主线剧情，按这个顺序看这 18 部',
+      items: essentialItems
+    },
+    {
+      id: 'avengers-doomsday',
+      name: '复联5补课',
+      desc: '已看完《终局之战》，补这 8 项接上复联5',
+      items: adItems
+    }
+  ];
 
   const payload = {
-    version: '2026-10-13',
+    version: '2026-10-30',
     phases: {
       1: '第一阶段 · 无限传奇开启',
       2: '第二阶段 · 复仇者集结',
@@ -199,35 +160,42 @@ function build() {
       5: '第五阶段 · 多元宇宙新篇',
       6: '第六阶段 · 崭新之日'
     },
-    heroes: HEROES.slice(),
-    routes: routeList,
-    movies: movieList,
-    randomPool: randomPool
+    routes: routeDefs.map(function (r) {
+      return {
+        id: r.id,
+        name: r.name,
+        desc: r.desc,
+        count: r.items.length,
+        items: r.items
+      };
+    })
   };
 
   const banner = [
     '/* ============================================================',
-    ' * MCU 观影助手 · GenUI 专用数据集（构建期生成，请勿手工编辑）',
+    ' * MCU 观影助手 · GenUI 轻量版专用数据集（构建期生成，请勿手工编辑）',
     ' * ------------------------------------------------------------',
-    ' * 由 genui-app/tools/build-data.cjs 从 h5/data/{movies,routes}.js 自动生成。',
-    ' * 数据单一可信源为母项目；本文件仅做字段裁剪与体积压缩。',
+    ' * 由 genui-app/tools/build-data.cjs 从母项目 h5/data/{movies,series,routes,special-routes}.js 自动生成。',
+    ' * 数据单一可信源为母项目；本文件仅做字段裁剪。',
     ' * 重新生成：node genui-app/tools/build-data.cjs',
     ' * ============================================================ */'
   ].join('\n');
 
-  const body = 'window.MCU_GENUI_DATA = ' +
-    JSON.stringify(payload, null, 2) + ';\n';
+  const body = 'window.MCU_GENUI_DATA = ' + JSON.stringify(payload, null, 2) + ';\n';
 
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, banner + body, 'utf8');
 
   const bytes = fs.statSync(OUT).size;
   console.log('✔ 已生成 ' + path.relative(ROOT, OUT));
-  console.log('  movies      : ' + movieList.length + ' 部（母项目 ' + movies.length + ' 部，一致）');
-  console.log('  routes      : ' + routeList.length + ' 条');
-  routeList.forEach((r) => console.log('    - ' + r.id + ' → ' + r.count + ' 部'));
-  console.log('  heroes      : ' + movieList.filter((m) => m.hero).length + ' 部有随包海报');
-  console.log('  randomPool  : ' + randomPool.length + ' 部');
+  payload.routes.forEach(function (r) {
+    console.log('  - ' + r.name + ' (' + r.id + ') → ' + r.count + ' 项');
+    r.items.forEach(function (it, i) {
+      console.log('      ' + String(i + 1).padStart(2, '0') +
+        ' ' + it.name + ' · ' + it.year + ' · ' + it.phaseShort +
+        (it.isSeries ? ' · [剧]' : ''));
+    });
+  });
   console.log('  文件体积    : ' + (bytes / 1024).toFixed(1) + ' KB');
 }
 

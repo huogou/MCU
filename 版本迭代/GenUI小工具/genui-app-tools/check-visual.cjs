@@ -34,16 +34,20 @@ const DESIGN = ['mcu-route-canvas', 'mcu-route-header', 'mcu-route-eyebrow', 'mc
   'mcu-route-footer-text', 'mcu-film-card', 'mcu-archive', 'mcu-archive-header',
   'mcu-archive-no', 'mcu-archive-label', 'mcu-archive-visual', 'mcu-archive-mark',
   'mcu-archive-roman', 'mcu-archive-film-icon', 'mcu-archive-short', 'mcu-archive-poster',
-  'mcu-archive-poster-title', 'mcu-archive-body', 'mcu-archive-title',
-  'mcu-archive-meta-row', 'mcu-archive-meta-item', 'mcu-archive-divider',
-  'mcu-archive-desc', 'mcu-archive-footer', 'mcu-archive-tag', 'mcu-discover-canvas',
+  'mcu-archive-poster-title', 'mcu-archive-body',
+  'mcu-archive-meta-row', 'mcu-archive-meta-item',
+  /* V1.3：原 mcu-archive-title / mcu-archive-divider / mcu-archive-desc / mcu-archive-footer
+     已按返工指令移除（正文区与海报层重复的标题行被裁为 0 高度；独立标签行并入理由标签行） */
+  'mcu-archive-reason', 'mcu-archive-reason-label', 'mcu-archive-tag', 'mcu-discover-canvas',
   'mcu-discover-card', 'mcu-discover-hero',
   'mcu-discover-hero-poster', 'mcu-discover-hero-overlay', 'mcu-discover-hero-roman',
+  'mcu-discover-hero-prog', 'mcu-hero-badge',
   'mcu-discover-phase-tag', 'mcu-discover-body', 'mcu-discover-title', 'mcu-discover-meta',
   'mcu-discover-meta-item', 'mcu-discover-hero-title', 'mcu-discover-reason',
   'mcu-discover-reason-label', 'mcu-discover-reason-text', 'mcu-discover-foot',
-  'mcu-discover-foot-left', 'mcu-discover-foot-icon', 'mcu-discover-foot-text',
-  'mcu-discover-foot-right'];
+  /* V1.3：原 mcu-discover-foot-left / mcu-discover-foot-text 已由金色胶囊 mcu-discover-foot-btn 替代 */
+  'mcu-discover-foot-btn', 'mcu-discover-foot-icon',
+  'mcu-discover-foot-right', 'mcu-tl-hint'];
 /* V1.1：徽章行（header/badge/date）已按指令移除，不在必检清单内 */
 /* V1.1 已按设计指令移除「今日发现」徽章行（含 badge/date），
    以把 33px 空间归还海报区。故这些类不再作为必检项。 */
@@ -66,13 +70,18 @@ const TPL = [
   ['mcu-archive-no（MCU-0xx）', /mcu-archive-no/],
   ['mcu-archive-meta-row', /mcu-archive-meta-row/],
   ['mcu-archive-short（英文简称）', /mcu-archive-short/],
-  ['mcu-archive-divider', /mcu-archive-divider/],
-  ['mcu-archive-footer（标签区）', /mcu-archive-footer/],
+  /* V1.3：原 mcu-archive-divider / mcu-archive-footer 已按返工指令移除，
+     标签行并入 .mcu-archive-reason-label，理由正文由 .mcu-archive-reason 承载 */
+  ['mcu-archive-reason（推荐理由区）', /mcu-archive-reason/],
+  ['mcu-archive-reason-label（★为什么看这部+标签行）', /mcu-archive-reason-label/],
+  ['mcu-tl-hint（首屏辅助文案）', /mcu-tl-hint/],
   ['mcu-discover-meta-item', /mcu-discover-meta-item/],
   /* 反向校验：徽章行按 V1.1 已移除，此处标记为「不应出现」 */
   ['徽章行已移除（V1.1）', /class="mcu-discover-header"/, true],
   ['mcu-discover-hero-title（V1.1 海报片名层）', /mcu-discover-hero-title/],
-  ['mcu-discover-foot-left', /mcu-discover-foot-left/],
+  ['mcu-discover-foot-btn（换一部金色胶囊）', /mcu-discover-foot-btn/],
+  ['mcu-discover-hero-prog（程序化视觉卡）', /mcu-discover-hero-prog/],
+  ['mcu-hero-badge（程序化卡档案角标）', /mcu-hero-badge/],
   ['mcu-discover-foot-right', /mcu-discover-foot-right/],
   ['mcu-discover-foot 可点入口（V1.1 方案A）', /id="mcu-discover-foot"/],
   ['phase-N 修饰类', /phase-['"]?\s*\+|phase-'\s*\+/],

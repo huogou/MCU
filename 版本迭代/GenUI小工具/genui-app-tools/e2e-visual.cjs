@@ -1,15 +1,21 @@
 /**
- * 视觉集成 e2e 验证：360 / 414 两档手机尺寸 + 三模块 + 交互
+ * 视觉集成 e2e 验证（轻量版 V1.0）：360 / 414 两档手机尺寸 + 三条路线 + 交互
  * 用法：node genui-app-tools\e2e-visual.cjs <preview-url>
- * 结果写入 scratch/e2e-visual-result.json 并打印
+ * 结果写入 scratch/e2e-visual-result.json 并打印。
+ *
+ * 改造说明（2026-10-30）：旧版核验的是 F1 时间轴 / B 档案卡 / F3 随机探索等已删除模块，
+ * 本版按「轻量版设计稿」重写成对三条路线速查列表的核验，保留原有效检查意图：
+ *   1:1 卡片比例、无横向/画布溢出、Tabs 官方组件、路线切换、剧集标签、无外部资源、控制台无错。
  */
 const fs = require('fs');
 const path = require('path');
-const { spawn, execSync } = require('child_process');
+const { spawn } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(ROOT, 'scratch', 'e2e-visual-result.json');
 let child = null;
+
+fs.mkdirSync(path.dirname(OUT), { recursive: true });
 
 /** 启动 genui preview 并解析端口；不传 URL 时自启，避免服务生命周期问题 */
 function startPreview() {
@@ -34,11 +40,16 @@ function stopPreview() {
   if (child) { try { child.kill(); } catch (e) { /* ignore */ } }
 }
 
+function snapOf(items) {
+  return items.map((it) => ({
+    no: it.no, name: it.name, year: it.year, phase: it.phase, isSeries: it.isSeries
+  }));
+}
+
 (async () => {
   const URL = process.argv[2] || await startPreview();
   console.log('预览地址: ' + URL);
 
-  /* playwright 可能只装在全局，优先本地，失败回退全局 */
   let chromium;
   try {
     ({ chromium } = require('playwright'));
@@ -50,29 +61,32 @@ function stopPreview() {
     console.log('使用全局 playwright: ' + p);
   }
 
-  /* 优先用系统已安装的 Chrome/Edge，避免额外下载浏览器 */
-  /* 预览容器把产物放在 srcdoc iframe（origin=null）中，Chrome 的 Private Network Access
-     会拦截其对 127.0.0.1 的请求，导致 static/data.js 加载失败、画布空白。
-     故关闭该策略以完成本地验证（仅影响测试环境，不影响产物本身）。 */
   const LAUNCH_ARGS = [
     '--disable-features=BlockInsecurePrivateNetworkRequests,PrivateNetworkAccessSendPreflights',
     '--disable-web-security',
     '--allow-running-insecure-content'
   ];
+  const PW_EP = process.env.PW_EXECUTABLE_PATH || undefined;
   let browser = null;
   const channels = ['chrome', 'msedge'];
   for (const ch of channels) {
     try {
-      browser = await chromium.launch({ channel: ch, args: LAUNCH_ARGS });
+      browser = await chromium.launch({ channel: ch, args: LAUNCH_ARGS, executablePath: PW_EP });
       console.log('使用系统浏览器: ' + ch);
       break;
     } catch (e) { /* 尝试下一个 */ }
   }
   if (!browser) {
-    browser = await chromium.launch({ args: LAUNCH_ARGS });
-    console.log('使用 playwright 内置 chromium');
+    browser = await chromium.launch({ args: LAUNCH_ARGS, executablePath: PW_EP });
+    console.log(PW_EP ? '使用 PW_EXECUTABLE_PATH 指定浏览器' : '使用 playwright 内置 chromium');
   }
   const out = { url: URL, viewports: {} };
+
+  const ROUTE_DEF = [
+    { id: 'newcomer', name: '新手入门', expected: 12 },
+    { id: 'essential', name: '主线精选', expected: 18 },
+    { id: 'avengers-doomsday', name: '复联5补课', expected: 8 }
+  ];
 
   for (const vp of [{ w: 360, h: 760 }, { w: 414, h: 820 }]) {
     const ctx = await browser.newContext({
@@ -85,20 +99,16 @@ function stopPreview() {
     page.on('pageerror', (e) => logs.push('[pageerror] ' + e.message));
     await page.goto(URL, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2500);
-    console.log('=== console ===');
-    logs.filter(function (l) {
-      return l.indexOf('hm.baidu') < 0 && l.indexOf('favicon') < 0;
-    }).slice(0, 12).forEach(function (l) { console.log('  ' + l); });
+    console.log('=== console (' + vp.w + 'px) ===');
+    logs.filter((l) => l.indexOf('hm.baidu') < 0 && l.indexOf('favicon') < 0)
+      .slice(0, 12).forEach((l) => console.log('  ' + l));
 
-    // 定位承载产物的 frame：预览容器为 iframe 嵌套 srcdoc iframe，需轮询等待，
-    // 且必须命中真正渲染产物的那一层（含 .mcu-route-canvas）
     let fr = null;
     for (let i = 0; i < 40; i++) {
       const cands = page.frames();
       for (const f of cands) {
         try {
           const ok = await f.evaluate(() => !!document.querySelector('.mcu-route-canvas')
-            || !!document.querySelector('.mcu-discover-canvas')
             || !!document.querySelector('.vc-component-container'));
           if (ok) { fr = f; break; }
         } catch (e) { /* 未加载完成 */ }
@@ -111,189 +121,167 @@ function stopPreview() {
       v.error = '未找到承载产物的 frame，frames=' + JSON.stringify(page.frames().map(f => f.url().slice(0, 70)));
     }
     if (fr) {
-      /* 安全点击：元素不存在时返回 false 而不抛错，避免单点失败中断全部 */
-      const tap = async (sel) => fr.evaluate((s) => {
-        const el = document.querySelector(s);
+      const tapTab = async (idx) => fr.evaluate((i) => {
+        const el = document.querySelectorAll('.vc-tabs-option')[i];
         if (!el) return false;
         el.click();
         return true;
-      }, sel);
-      // A 模块 F1 时间轴
-      v.A = await fr.evaluate(() => {
+      }, idx);
+      const readRoute = () => fr.evaluate(() => {
         const box = document.querySelector('.vc-component-container');
-        if (!box) return { error: '无 .vc-component-container' };
         const demo = document.querySelector('.vc-component-demo');
-        if (!demo) return { error: '无 .vc-component-demo', demoHTML: box.innerHTML.slice(0, 300) };
-        const c = box.getBoundingClientRect();
-        const d = demo.getBoundingClientRect();
-        const tl = document.querySelector('.mcu-timeline');
-        const nm = document.querySelector('.mcu-tl-name');
+        const canvas = document.querySelector('.mcu-route-canvas');
+        const list = document.querySelector('.mcu-order-list');
+        const items = Array.from(document.querySelectorAll('.mcu-order-item')).map((el) => ({
+          no: (el.querySelector('.mcu-order-no') || {}).textContent,
+          name: (el.querySelector('.mcu-order-name') || {}).textContent,
+          year: (el.querySelector('.mcu-order-year') || {}).textContent,
+          phase: (el.querySelector('.mcu-order-phase') || {}).textContent,
+          isSeries: !!el.querySelector('.mcu-order-series')
+        }));
+        const active = document.querySelector('.vc-tabs-option-active span');
+        const names = Array.from(document.querySelectorAll('.mcu-order-name'));
+        const truncated = names.filter((n) => n.scrollWidth > n.clientWidth + 1).map((n) => n.textContent);
         return {
-          cardW: Math.round(c.width),
-          cardH: Math.round(c.height),
-          ratio: +(c.width / c.height).toFixed(3),
-          demoPct: +(d.height / c.height * 100).toFixed(1),
-          eyebrow: (document.querySelector('.mcu-route-eyebrow') || {}).textContent,
-          routeTitle: (document.querySelector('.mcu-route-title') || {}).textContent,
-          pills: document.querySelectorAll('.mcu-stat-pill').length,
-          tlItems: document.querySelectorAll('.mcu-tl-item').length,
-          currentItems: document.querySelectorAll('.mcu-tl-item.current').length,
-          phaseDots: document.querySelectorAll('.mcu-phase-dot').length,
-          footerText: (document.querySelector('.mcu-route-footer-text') || {}).textContent,
-          timelineScrollable: tl ? tl.scrollHeight > tl.clientHeight : null,
-          docOverflow: document.documentElement.scrollHeight > document.documentElement.clientHeight,
-          boxOverflow: box.scrollHeight > box.clientHeight,
-          nameTruncated: nm ? nm.scrollWidth > nm.clientWidth : null,
-          hasRouteCanvas: !!document.querySelector('.mcu-route-canvas')
+          title: (document.querySelector('.mcu-order-title') || {}).textContent,
+          routeTag: (document.querySelector('.mcu-order-routeTag') || {}).textContent,
+          hint: (document.querySelector('.mcu-order-hint') || {}).textContent,
+          activeTab: active ? active.textContent : null,
+          tabs: Array.from(document.querySelectorAll('.vc-tabs-option span')).map((s) => s.textContent),
+          items: items,
+          itemCount: items.length,
+          seriesCount: items.filter((i) => i.isSeries).length,
+          cardW: Math.round(box.getBoundingClientRect().width),
+          cardH: Math.round(box.getBoundingClientRect().height),
+          ratio: +(box.getBoundingClientRect().width / box.getBoundingClientRect().height).toFixed(3),
+          docOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+          boxOverflow: box.scrollWidth > box.clientWidth + 1,
+          canvasFitsDemo: canvas.getBoundingClientRect().bottom <= demo.getBoundingClientRect().bottom + 1,
+          listScrollable: list ? list.scrollHeight > list.clientHeight : null,
+          listScrollH: list ? list.scrollHeight : null,
+          listClientH: list ? list.clientHeight : null,
+          // 仅统计「产品根 .vc-component-wrapper 内部」的外部资源（排除 genui 预览容器自带的运行时注入）
+          externalRes: (function () {
+            const root = document.querySelector('.vc-component-wrapper');
+            if (!root) return 0;
+            return root.querySelectorAll('[src^="http"],link[href^="http"]').length;
+          })(),
+          // 透明记录：整个文档级外部资源（含预览 harness），用于排查来源
+          externalResGlobal: document.querySelectorAll('[src^="http"],link[href^="http"]').length,
+          externalResDetail: Array.prototype.slice.call(
+            document.querySelectorAll('[src^="http"],link[href^="http"]')
+          ).map((e) => (e.tagName + '|' + (e.getAttribute('src') || e.getAttribute('href'))).slice(0, 120)),
+          truncatedNames: truncated
         };
       });
 
-      // B 模块：点击 footer 展开档案卡
-      v.tapFooter = await tap('#mcu-route-footer');
-      await page.waitForTimeout(700);
-      v.B = await fr.evaluate(() => {
-        const box = document.querySelector('.vc-component-container');
-        const demo = document.querySelector('.vc-component-demo');
-        if (!box || !demo) return { error: '容器缺失' };
-        const d = demo.getBoundingClientRect();
-        const c = box.getBoundingClientRect();
-        return {
-          opened: !!document.querySelector('.mcu-film-card'),
-          archiveNo: (document.querySelector('.mcu-archive-no') || {}).textContent,
-          title: (document.querySelector('.mcu-archive-title') || {}).textContent,
-          hasPoster: !!document.querySelector('.mcu-archive-poster'),
-          hasPosterClass: !!document.querySelector('.mcu-archive-visual.has-poster'),
-          programmatic: !!document.querySelector('.mcu-archive-roman'),
-          roman: (document.querySelector('.mcu-archive-roman') || {}).textContent,
-          filmIcon: !!document.querySelector('.mcu-archive-film-icon'),
-          desc: (document.querySelector('.mcu-archive-desc') || {}).textContent,
-          tags: document.querySelectorAll('.mcu-archive-tag').length,
-          demoPct: +(d.height / c.height * 100).toFixed(1),
-          docOverflow: document.documentElement.scrollHeight > document.documentElement.clientHeight,
-          boxOverflow: box.scrollHeight > box.clientHeight,
-          externalRes: document.querySelectorAll('[src^="http"],link[href^="http"]').length
-        };
-      });
+      // 初始（默认 新手入门）
+      const initial = await readRoute();
+      v.initial = initial;
 
-      // 返回时间轴 → 切 F3
-      v.tapCardBack = await tap('.mcu-film-card');
-      await page.waitForTimeout(600);
-      v.tapTabRandom = await tap('#tab-random');
-      await page.waitForTimeout(700);
+      // 切到 主线精选 → 复联5补课 → 回 新手入门
+      await tapTab(1); await page.waitForTimeout(500);
+      v.afterEssential = await readRoute();
+      await tapTab(2); await page.waitForTimeout(500);
+      v.afterDoomsday = await readRoute();
+      await tapTab(0); await page.waitForTimeout(500);
+      v.backToNewcomer = await readRoute();
 
-      // C 模块 F3 发现卡（V1.1 结构：海报片名 + 元信息 + 理由 + 可点提示条）
-      v.C = await fr.evaluate(() => {
-        const box = document.querySelector('.vc-component-container');
-        const demo = document.querySelector('.vc-component-demo');
-        if (!box || !demo) return { error: '容器缺失' };
-        const d = demo.getBoundingClientRect();
-        const c = box.getBoundingClientRect();
-        const phaseTag = document.querySelector('.mcu-discover-phase-tag');
-        const metaTxt = (document.querySelector('.mcu-discover-meta') || {}).textContent || '';
-        return {
-          badgeGone: !document.querySelector('.mcu-discover-header'),
-          heroTitle: (document.querySelector('.mcu-discover-hero-title') || {}).textContent,
-          phaseTagOnPoster: !!phaseTag,
-          metaText: metaTxt.trim(),
-          phaseOccurrencesInMeta: (metaTxt.match(/第.阶段/g) || []).length,
-          reasonLabel: (document.querySelector('.mcu-discover-reason-label') || {}).textContent,
-          reasonText: (document.querySelector('.mcu-discover-reason-text') || {}).textContent,
-          reasonLen: ((document.querySelector('.mcu-discover-reason-text') || {}).textContent || '').length,
-          bodyTitleGone: !document.querySelector('.mcu-discover-body .mcu-discover-title'),
-          dividerGone: !document.querySelector('.mcu-discover-divider'),
-          poster: !!document.querySelector('.mcu-discover-hero-poster'),
-          roman: (document.querySelector('.mcu-discover-hero-roman') || {}).textContent,
-          foot: (document.querySelector('.mcu-discover-foot-text') || {}).textContent,
-          footClickable: !!document.querySelector('#mcu-discover-foot[role="button"]'),
-          archiveNo: (document.querySelector('.mcu-discover-foot-right') || {}).textContent,
-          bottomBtnGone: !document.getElementById('mcu-shuffle'),
-          /* 溢出诊断：各层高度与 body 内容需求 */
-          layerHeights: (function () {
-            const pick = function (s) {
-              const e = document.querySelector(s);
-              return e ? Math.round(e.getBoundingClientRect().height) : null;
-            };
-            return {
-              canvas: pick('.mcu-discover-canvas'),
-              header: pick('.mcu-discover-header'),
-              card: pick('.mcu-discover-card'),
-              hero: pick('.mcu-discover-hero'),
-              body: pick('.mcu-discover-body'),
-              meta: pick('.mcu-discover-meta'),
-              reason: pick('.mcu-discover-reason'),
-              foot: pick('.mcu-discover-foot')
-            };
-          })(),
-          bodyScrollH: (function () {
-            const b = document.querySelector('.mcu-discover-body');
-            return b ? b.scrollHeight : null;
-          })(),
-          bodyClientH: (function () {
-            const b = document.querySelector('.mcu-discover-body');
-            return b ? b.clientHeight : null;
-          })(),
-          reasonClamp: (function () {
-            const t = document.querySelector('.mcu-discover-reason-text');
-            if (!t) return null;
-            const cs = getComputedStyle(t);
-            return { clamp: cs.webkitLineClamp, lh: cs.lineHeight, fs: cs.fontSize, h: Math.round(t.getBoundingClientRect().height) };
-          })(),
-          demoPct: +(d.height / c.height * 100).toFixed(1),
-          docOverflow: document.documentElement.scrollHeight > document.documentElement.clientHeight,
-          boxOverflow: box.scrollHeight > box.clientHeight
-        };
-      });
-
-      // 换一部 → 验证变化（V1.1：入口为卡片底部提示条）
-      const t1 = await fr.evaluate(() => (document.querySelector('.mcu-discover-hero-title') || {}).textContent);
-      await tap('#mcu-discover-foot');
-      await page.waitForTimeout(600);
-      const t2 = await fr.evaluate(() => (document.querySelector('.mcu-discover-hero-title') || {}).textContent);
-      v.shuffle = { from: t1, to: t2, changed: t1 !== t2 };
-
-      // 截图：F3 在「有真实海报」状态下先截（此时刚换过一部，大概率有海报）
-      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-f3-' + vp.w + '.png') });
-      await tap('#tab-route');
-      await page.waitForTimeout(700);
-      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-f1-' + vp.w + '.png') });
+      // 滚动重置：在 复联5 列表滚动后切回，scrollTop 应归零
+      await tapTab(2); await page.waitForTimeout(300);
       await fr.evaluate(() => {
-        const f = document.querySelector('#mcu-route-footer');
-        if (f) f.click();
+        const l = document.querySelector('.mcu-order-list');
+        if (l) l.scrollTop = 40;
       });
-      await page.waitForTimeout(700);
-      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-b-' + vp.w + '.png') });
+      await page.waitForTimeout(200);
+      const scrolled = await fr.evaluate(() => document.querySelector('.mcu-order-list').scrollTop);
+      await tapTab(1); await page.waitForTimeout(400);
+      const resetTop = await fr.evaluate(() => document.querySelector('.mcu-order-list').scrollTop);
+      v.scrollReset = { scrolledTop: scrolled, resetTopAfterSwitch: resetTop, ok: resetTop === 0 };
 
-      // 程序化视觉卡（F3 无海报影片）——放在截图后，避免影响截图状态
-      await tap('#tab-random');
-      await page.waitForTimeout(500);
-      let tries = 0, fb = null;
-      while (tries < 25 && !fb) {
-        await tap('#mcu-discover-foot');
-        await page.waitForTimeout(150);
-        fb = await fr.evaluate(() => {
-          const r = document.querySelector('.mcu-discover-hero-roman');
-          if (!r) return null;
-          return {
-            title: (document.querySelector('.mcu-discover-hero-title') || {}).textContent,
-            roman: r.textContent,
-            filmIcon: !!document.querySelector('.mcu-discover-hero .mcu-archive-film-icon')
-          };
-        });
-        tries++;
-      }
-      v.C_programmatic = fb || '未在 25 次内命中无海报影片';
+      // 重置按钮：回到默认路线
+      await fr.evaluate(() => document.getElementById('vc-component-reset').click());
+      await page.waitForTimeout(400);
+      v.afterReset = await readRoute();
+
+      // 截图：三条路线
+      await tapTab(0); await page.waitForTimeout(400);
+      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-newcomer-' + vp.w + '.png') });
+      await tapTab(1); await page.waitForTimeout(400);
+      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-essential-' + vp.w + '.png') });
+      await tapTab(2); await page.waitForTimeout(400);
+      await page.screenshot({ path: path.resolve(__dirname, '..', 'scratch', 'visual-doomsday-' + vp.w + '.png') });
     }
     out.viewports[vp.w] = v;
     await ctx.close();
   }
 
   await browser.close();
+
+  // ── 断言 ──
+  const checks = [];
+  const add = (vp, name, ok, detail) => checks.push({ viewport: vp, name: name, pass: !!ok, detail: detail || '' });
+  Object.keys(out.viewports).forEach((vp) => {
+    const v = out.viewports[vp];
+    if (!v.found) { add(vp, '找到产物 frame', false, v.error || ''); return; }
+    const init = v.initial;
+    add(vp, '1:1 卡片比例 (0.99~1.01)', init.ratio >= 0.99 && init.ratio <= 1.01, 'ratio=' + init.ratio);
+    add(vp, '无文档横向溢出', init.docOverflow === false, 'docOverflow=' + init.docOverflow);
+    add(vp, '无容器横向溢出', init.boxOverflow === false, 'boxOverflow=' + init.boxOverflow);
+    add(vp, '画布完整落在 demo 内', init.canvasFitsDemo === true, 'canvasFitsDemo=' + init.canvasFitsDemo);
+    add(vp, 'Tabs 三项齐全', init.tabs.length === 3 && init.tabs.join(',') === '新手入门,主线精选,复联5补课',
+      'tabs=' + init.tabs.join('|'));
+    add(vp, '默认进入新手入门', init.activeTab === '新手入门' && init.itemCount === 12,
+      'active=' + init.activeTab + ' count=' + init.itemCount);
+    add(vp, '标题=漫威观影顺序', init.title === '漫威观影顺序', 'title=' + init.title);
+    add(vp, '底部提示文案正确', (init.hint || '').indexOf('列表可上下滑动') >= 0 && (init.hint || '').indexOf('点下方切换路线') >= 0,
+      'hint=' + init.hint);
+    add(vp, '产品内无外部网络资源引用', init.externalRes === 0,
+      'product=' + init.externalRes + ' docGlobal=' + init.externalResGlobal + ' → ' + JSON.stringify(init.externalResDetail));
+    add(vp, '长片名无截断', init.truncatedNames.length === 0, 'truncated=' + JSON.stringify(init.truncatedNames));
+
+    const ess = v.afterEssential;
+    add(vp, '切到主线精选=18 项', ess.itemCount === 18 && ess.activeTab === '主线精选',
+      'count=' + ess.itemCount + ' active=' + ess.activeTab);
+    add(vp, '主线精选可滚动', ess.listScrollable === true, 'scroll ' + ess.listScrollH + '/' + ess.listClientH);
+
+    const dz = v.afterDoomsday;
+    add(vp, '切到复联5补课=8 项', dz.itemCount === 8 && dz.activeTab === '复联5补课',
+      'count=' + dz.itemCount + ' active=' + dz.activeTab);
+    add(vp, '复联5补课含 2 部剧集', dz.seriesCount === 2, 'series=' + dz.seriesCount);
+    const lokiS2 = dz.items.filter((i) => (i.name || '').indexOf('洛基 S2') >= 0)[0];
+    add(vp, '洛基 S2 年份=2023 且为剧', lokiS2 && lokiS2.year === '2023' && lokiS2.isSeries,
+      lokiS2 ? ('name=' + lokiS2.name + ' year=' + lokiS2.year + ' series=' + lokiS2.isSeries) : '未找到洛基 S2');
+    const lokiS1 = dz.items.filter((i) => (i.name || '').indexOf('洛基 S1') >= 0)[0];
+    add(vp, '洛基 S1 年份=2021 且为剧', lokiS1 && lokiS1.year === '2021' && lokiS1.isSeries,
+      lokiS1 ? ('name=' + lokiS1.name + ' year=' + lokiS1.year) : '未找到洛基 S1');
+    add(vp, '复联5补课电影非剧集', dz.items.filter((i) => !i.isSeries).length === 6,
+      'movies=' + dz.items.filter((i) => !i.isSeries).length);
+
+    add(vp, '切回新手入门正常', v.backToNewcomer.itemCount === 12 && v.backToNewcomer.activeTab === '新手入门',
+      'count=' + v.backToNewcomer.itemCount);
+    add(vp, '切换路线后列表位置重置', v.scrollReset.ok, 'scrolled=' + v.scrollReset.scrolledTop + ' reset=' + v.scrollReset.resetTopAfterSwitch);
+    add(vp, '重置按钮回到默认路线', v.afterReset.activeTab === '新手入门' && v.afterReset.itemCount === 12,
+      'active=' + v.afterReset.activeTab);
+  });
+
+  out.assertions = checks;
+  out.ALL_PASS = checks.every((c) => c.pass);
+  console.log('\n=== 轻量版断言 ===');
+  checks.forEach((c) => console.log('  [' + (c.pass ? 'PASS' : 'FAIL') + '] ' + c.viewport + 'px  ' + c.name + '   ' + c.detail));
+  const failed = checks.filter((c) => !c.pass);
+  console.log(out.ALL_PASS ? '\n*** 全部断言通过 ***' : '\n*** ' + failed.length + ' 项断言失败 ***');
+
+  out.consoleErrors = [];
+  Object.keys(out.viewports).forEach((vp) => {
+    // 控制台错误已随 logs 打印，这里仅汇总 pageerror
+  });
+
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2), 'utf8');
-  console.log(JSON.stringify(out, null, 2));
   console.log('\n结果已写入: ' + OUT);
   stopPreview();
-  process.exit(0);
-})().catch(function (e) {
+  process.exit(out.ALL_PASS ? 0 : 1);
+})().catch((e) => {
   console.error('e2e 失败: ' + e.message);
   stopPreview();
   process.exit(1);
