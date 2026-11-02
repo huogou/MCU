@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU观影助手 · V1.4 画布视觉稿（二轮驳回整改）</title>
+<style>
+:root{
+  --ink:#1a1d23; --ink2:#4a4f58; --slim:#8a8f99; --line:#e8e5de; --bg:#f7f5f0;
+  --paper:#ffffff; --gold:#b8860b; --gold-bg:#fdf6e8; --gold-line:#e8d5a8;
+  --p1:#3a5ba0; --p2:#a03a3a; --p3:#b8860b; --p4:#6b4fa0; --p5:#2a7a5a; --p6:#a04a2a;
+  --mono:'SF Mono',Menlo,Consolas,'Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e9e6df;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;padding:32px 16px;}
+h1{font-size:20px;color:var(--ink);margin-bottom:6px}
+.sub{font-size:13px;color:var(--slim);margin-bottom:28px}
+.row{display:flex;gap:28px;flex-wrap:wrap;justify-content:center}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.tag{font-size:12px;color:var(--ink2);font-weight:600}
+.canvas{width:326px;height:326px;background:var(--paper);border-radius:14px;overflow:hidden;
+  box-shadow:0 4px 16px rgba(26,29,35,.10);display:flex;flex-direction:column;position:relative}
+/* ============ 通用 ============ */
+.ids{font-family:var(--mono);font-size:10.5px;letter-spacing:.5px;color:var(--slim);
+  padding:10px 14px 0}
+.meta{font-size:11.5px;color:var(--ink2);display:flex;align-items:center;gap:6px;padding:0 14px}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.chip{font-size:10px;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-line);
+  border-radius:3px;padding:1px 6px;font-weight:600}
+.lbl{font-size:11px;font-weight:600;margin-bottom:3px;display:block}
+.body{flex:1;display:flex;flex-direction:column;min-height:0}
+/* ============ B 档案卡（七要素） ============ */
+.b-title{font-size:17px;font-weight:700;color:var(--ink);padding:6px 14px 0;line-height:22px}
+.b-title span{font-family:var(--mono);font-size:10px;color:var(--slim);font-weight:400;margin-left:6px;letter-spacing:1px}
+.b-visual{margin:8px 14px 0;border-radius:8px;flex:1 1 88px;min-height:88px;max-height:150px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#2a3038,#4a5568)}
+.b-visual .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:30px;color:rgba(255,255,255,.14);font-weight:700}
+.b-visual .pt{position:absolute;left:10px;bottom:6px;font-size:13px;font-weight:600;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.85)}
+.b-plot,.b-reason{padding:0 14px;font-size:12.5px;line-height:20px;color:var(--ink2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.b-plot{margin-top:8px}
+.b-plot b{color:var(--slim);font-size:11px;font-weight:600;margin-right:4px}
+.b-reason b{color:var(--gold);font-size:11px;font-weight:600;margin-right:4px}
+.b-reason{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.b-next{margin-top:auto;display:flex;align-items:center;gap:6px;padding:7px 14px;
+  border-top:1px dashed var(--line);font-size:10.5px;color:var(--slim)}
+.b-next b{color:var(--ink2);font-weight:600}
+.b-next .arr{margin-left:auto;color:var(--gold);font-weight:700}
+.b-meta{padding:5px 14px 0}
+/* ============ F3 发现卡 ============ */
+.f3-hero{flex:1 1 76px;min-height:76px;max-height:110px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#4a3a70,#241d38)}
+.f3-hero .rn{position:absolute;right:12px;top:6px;font-family:var(--mono);font-size:44px;
+  color:rgba(255,255,255,.16);font-weight:700;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.f3-hero .film{position:absolute;left:10px;top:10px;font-family:var(--mono);font-size:13px;color:rgba(255,255,255,.75)}
+.f3-hero .badge{position:absolute;right:8px;bottom:8px;font-size:9px;letter-spacing:1px;
+  color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.35);padding:2px 6px;border-radius:3px}
+.f3-hero .pt{position:absolute;left:12px;bottom:8px;font-size:15px;font-weight:700;color:#fff;
+  text-shadow:0 1px 6px rgba(0,0,0,.85)}
+.f3-title{font-size:15px;font-weight:700;color:var(--ink);padding:8px 14px 0}
+.f3-meta{padding:4px 14px 0}
+.f3-plot{padding:6px 14px 0;font-size:11.5px;line-height:16px;color:var(--slim);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f3-plot b{font-weight:600;color:var(--ink2);margin-right:4px}
+.f3-reason{padding:5px 14px 0;font-size:12.5px;line-height:20px;color:var(--ink2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.f3-reason b{color:var(--gold);font-size:11px;font-weight:600;display:block;margin-bottom:2px}
+.f3-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;border-top:1px dashed var(--line)}
+.f3-foot .btn{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;
+  color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-line);
+  padding:5px 14px;border-radius:999px}
+.f3-foot .cnt{font-size:10.5px;color:var(--slim);font-family:var(--mono)}
+/* ============ F1 路线卡 ============ */
+.f1-head{padding:10px 14px 6px}
+.f1-kicker{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:3px}
+.f1-title{font-size:17px;font-weight:700;color:var(--ink)}
+.f1-sub{font-size:11.5px;color:var(--slim);margin-top:2px}
+.f1-pills{display:flex;gap:6px;margin-top:6px}
+.f1-pills .pl{font-size:10.5px;color:var(--ink2);background:var(--bg);border-radius:3px;padding:2px 7px}
+.f1-pills .pl b{color:var(--gold);font-weight:700}
+.hint{font-size:10px;color:var(--slim);padding:0 14px 4px}
+.tl{flex:1;min-height:0;position:relative;padding:2px 14px 0}
+.tl-item{display:flex;gap:9px;padding:5px 0}
+.node{width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;font-weight:700;background:var(--bg);color:var(--slim);
+  border:1.5px solid var(--line);position:relative}
+.tl-item.cur .node{background:var(--gold);border-color:var(--gold);color:#fff}
+.tl-item.cur .node::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px solid var(--gold-line)}
+.tl-info{min-width:0}
+.tl-name{font-size:13.5px;font-weight:600;color:var(--ink)}
+.tl-item:not(.cur) .tl-name{font-size:12.5px;font-weight:500;color:var(--ink2)}
+.tl-name .yr{font-family:var(--mono);font-size:10px;color:var(--slim);font-weight:400;margin-left:5px}
+.tl-note{font-size:11.5px;line-height:16px;color:var(--slim);margin-top:1px}
+.tl-item.cur .tl-note{color:var(--ink2)}
+.tl-line{position:absolute;left:23px;top:8px;bottom:8px;width:1.5px;background:var(--line)}
+.more{flex:none;text-align:center;font-size:10px;color:var(--slim);padding:5px 0 3px;
+  background:linear-gradient(transparent,var(--paper))}
+.more b{color:var(--ink2)}
+.f1-foot{flex:none;background:var(--gold-bg);display:flex;align-items:center;gap:7px;
+  padding:7px 14px;font-size:12px;font-weight:600;color:var(--gold)}
+.f1-foot .ico{width:16px;height:16px;border-radius:50%;background:var(--gold);color:#fff;
+  display:inline-flex;align-items:center;justify-content:center;font-size:9px;flex:none}
+.f1-foot .prog{margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:400;color:var(--ink2)}
+/* tabs 装饰（画布外示意） */
+.tabs{display:flex;gap:8px;width:326px}
+.tabs div{flex:1;text-align:center;font-size:12.5px;padding:8px 0;border-radius:8px;color:var(--slim)}
+.tabs .on{background:#fff;font-weight:600;color:var(--ink);box-shadow:0 2px 8px rgba(26,29,35,.08)}
+.note{max-width:1050px;margin:32px auto 0;background:#fff;border-radius:10px;padding:18px 22px;
+  font-size:13px;line-height:22px;color:var(--ink2)}
+.note b{color:var(--ink)}
+.note code{font-family:var(--mono);font-size:12px;background:var(--bg);padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body>
+<h1>MCU观影助手 · V1.4 画布视觉稿</h1>
+<p class="sub">二轮驳回整改（信息价值 / 内容不全 / 拥挤）· 326px 1:1 实际比例 · 开发以本稿为像素级基准，配合《V1.4 整改指令》落地</p>
+
+<div class="row">
+  <!-- B 档案卡 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="ids">MCU-001 · 观影 #01 · 上映 #03</div>
+      <div class="b-visual"><div class="ph">01</div><div class="pt">钢铁侠</div></div>
+      <div class="b-title">钢铁侠<span>IRON MAN</span></div>
+      <div class="b-meta meta"><span class="dot" style="background:var(--p1)"></span>2008 · 第一阶段 <span class="chip">主线必看</span></div>
+      <div class="body" style="justify-content:flex-start">
+        <p class="b-plot" style="margin-top:8px"><b>剧情</b>军火商托尼·斯塔克在一次绑架中造出第一套动力装甲，从此走上英雄之路。</p>
+        <p class="b-reason"><b>★ 为什么看</b>整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。</p>
+        <div class="b-next">看完后看 → <b>无敌浩克 · 2008</b><span class="arr">›</span></div>
+      </div>
+    </div>
+    <div class="tabs"><div class="on">观影路线</div><div>随机探索</div></div>
+    <span class="tag">B · 电影档案卡（七要素）</span>
+  </div>
+
+  <!-- F3 发现卡 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="f3-hero">
+        <div class="film">▶▶</div><div class="rn">IV</div>
+        <div class="pt">奇异博士2：疯狂多元宇宙</div>
+        <div class="badge">MCU 档案</div>
+      </div>
+      <div class="f3-title">奇异博士2：疯狂多元宇宙</div>
+      <div class="f3-meta meta"><span class="dot" style="background:var(--p4)"></span>2022 · 第四阶段 <span class="chip">主线必看</span></div>
+      <p class="f3-plot"><b>剧情</b>斯特兰奇博士打开多元宇宙，遭遇另一个自己与强大的绯红女巫。</p>
+      <p class="f3-reason"><b>★ 为什么看</b>第一次真正带观众穿越多个平行宇宙。它也是旺达角色弧线的终点，情绪落点极重，是理解后续多元宇宙传奇的关键一环。</p>
+      <div class="f3-foot"><span class="btn">↻ 换一部</span><span class="cnt">已探索 2/18</span></div>
+    </div>
+    <div class="tabs"><div>观影路线</div><div class="on">随机探索</div></div>
+    <span class="tag">C · F3 随机探索卡（剧情钩子 + 理由）</span>
+  </div>
+
+  <!-- F1 路线卡 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="f1-head">
+        <div class="f1-kicker">— INFINITY SAGA · ROUTE</div>
+        <div class="f1-title">新手入坑</div>
+        <div class="f1-sub">第一次看漫威，就照这个来</div>
+        <div class="f1-pills"><span class="pl"><b>12</b> 部作品</span><span class="pl"><b>01</b> 起点</span></div>
+      </div>
+      <div class="hint">点击节点切换推荐 · 点底部提示条看档案</div>
+      <div class="tl">
+        <div class="tl-line"></div>
+        <div class="tl-item cur">
+          <div class="node">01</div>
+          <div class="tl-info">
+            <div class="tl-name">钢铁侠<span class="yr">2008</span></div>
+            <div class="tl-note">整个 MCU 的起点，它确立了这个宇宙的基调</div>
+          </div>
+        </div>
+        <div class="tl-item"><div class="node">02</div><div class="tl-info"><div class="tl-name">无敌浩克<span class="yr">2008</span></div><div class="tl-note">交代浩克来历，属于可跳过作品</div></div></div>
+        <div class="tl-item"><div class="node">03</div><div class="tl-info"><div class="tl-name">钢铁侠2<span class="yr">2010</span></div><div class="tl-note">黑寡妇登场，神盾局浮出水面</div></div></div>
+      </div>
+      <div class="more">↓ 其余 <b>9</b> 部 · 上滑查看完整路线</div>
+      <div class="f1-foot"><span class="ico">▶</span>当前推荐：《钢铁侠》<span class="prog">01/38</span></div>
+    </div>
+    <div class="tabs"><div class="on">观影路线</div><div>随机探索</div></div>
+    <span class="tag">A · F1 观影路线卡（引导条 + 进度）</span>
+  </div>
+</div>
+
+<div class="note">
+  <b>给开发的四句话</b><br>
+  ① B 卡：删 <code>FILM ARCHIVE</code> 装饰条，三编号合一为 <code>MCU-001 · 观影 #01 · 上映 #03</code>（等宽字体），新增<code>剧情</code>区（<code>sf</code> 字段，clamp 2 行、灰色标签）——本稿为无海报占位态，真实海报替换 <code>.b-visual</code> 渐变即可。<br>
+  ② <b>空白吸收机制（V1.4 核心）</b>：B 卡视觉区 <code>flex:1 1 88px;min-height:88px;max-height:150px</code>，理由区下新增<code>看完后看 → 下一部</code>衔接条（数据取路线中当前片的下一项 <code>ro+1</code>，<code>margin-top:auto</code> 吸底）；F3 卡 hero 同理弹性 <code>flex:1 1 76px;min-height:76px;max-height:110px</code>。任何视口下内容区不留 &gt;24px 连续空白，海报/hero 是第一吸收层，衔接条兜底。<br>
+  ③ F3 卡：剧情 1 行钩子（<code>sf</code> 截断）置于理由上方，理由保持 2 行；hero 底色按阶段色（本稿示例第四阶段紫）。<br>
+  ④ F1 卡：纯渐隐带改为可见引导条「↓ 其余 N 部 · 上滑查看」，footer 右侧加 <code>01/38</code> 进度；正文行高 20px、gap 8px。
+</div>
+</body>
+</html>

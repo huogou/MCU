@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCU观影助手 · 画布视觉设计 V1.0</title>
+<style>
+  /* ============================================================
+   * 文档样式：仅供设计评审使用，非交付代码
+   * ============================================================ */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+    background: #f0f2f5;
+    color: #1f2329;
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+  .doc-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .doc-header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .doc-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .doc-header .meta {
+    font-size: 14px;
+    color: #6b7280;
+  }
+  .section {
+    margin-bottom: 56px;
+  }
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #1f2329;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .section-desc {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 24px;
+    padding-left: 38px;
+  }
+
+  /* 设计稿展示区 */
+  .mockup-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: center;
+    padding: 24px;
+    background: #e8eaed;
+    border-radius: 16px;
+  }
+  .mockup-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .mockup-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+  .mockup-label strong {
+    color: #1f2329;
+    font-size: 14px;
+  }
+
+  /* ============================================================
+   * COSUI 模拟 Token（复刻百度搜索 GenUI 浅色主题）
+   * 实际环境由平台注入，此处仅用于设计稿展示
+   * ============================================================ */
+  :root {
+    --cos-vcard-color-bg: #f8f9fc;
+    --cos-color-text: #1f2329;
+    --cos-color-text-minor: #626675;
+    --cos-color-text-slim: #8f959e;
+    --cos-color-text-inverse: #ffffff;
+    --cos-color-bg: #ffffff;
+    --cos-color-bg-raised: #f0f3fa;
+    --cos-color-bg-bubble: #1f2329;
+    --cos-color-border-minor: #e5e6eb;
+    --cos-color-border: #c9cdd4;
+    --cos-color-fill-quaternary: #f2f3f5;
+    --cos-color-fill-tertiary: #e5e6eb;
+    --cos-rounded-sm: 8px;
+    --cos-rounded-md: 12px;
+    --cos-rounded-full: 999px;
+    --cos-space-xs: 6px;
+    --cos-space-sm: 10px;
+    --cos-font-medium: 500;
+    --cos-text-body: 15px;
+    --cos-text-body-lg: 16px;
+    --cos-text-headline-sm: 18px;
+    --font-size-scale: 1;
+
+    /* ── MCU 设计 Token（新增，派生自 COSUI 体系）── */
+    /* 阶段色：低饱和版本，适配浅色背景 */
+    --mcu-phase-1: #4a7fd4;
+    --mcu-phase-2: #2a9d7a;
+    --mcu-phase-3: #d4922a;
+    --mcu-phase-4: #7b5fd4;
+    --mcu-phase-5: #d4453d;
+    --mcu-phase-6: #b04d7d;
+    /* 档案金：MCU 品牌色，浅色背景下降低饱和度 */
+    --mcu-archive-gold: #b8860b;
+    --mcu-archive-gold-bg: #faf3e0;
+    --mcu-archive-gold-line: #e6d5a8;
+    /* 档案墨水：深色文字替代色，用于强调信息 */
+    --mcu-ink: #1a1d23;
+    /* 档案纸：卡片背景 */
+    --mcu-paper: #ffffff;
+    /* 档案灰：分隔线与边框 */
+    --mcu-line: #ececec;
+    /* 编号字体：等宽，强化数据库感 */
+    --mcu-mono-font: "SF Mono", "Menlo", "Consolas", monospace;
+  }
+
+  /* ============================================================
+   * GenUI 卡片外壳模拟（形态 A）
+   * ============================================================ */
+  .genui-card {
+    width: 360px;
+    aspect-ratio: 1 / 1;
+    background: var(--cos-vcard-color-bg);
+    border-radius: var(--cos-rounded-sm);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .genui-header {
+    height: 45px;
+    padding: 15px 15px 12px;
+    font-size: 15px;
+    line-height: 1;
+    color: var(--cos-color-text-minor);
+    font-weight: 400;
+    border-bottom: 0.5px solid var(--cos-color-border-minor);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .genui-header-title { font-size: 15px; }
+  .genui-canvas-wrapper {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .genui-canvas {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .genui-operate {
+    padding: 0 12px 12px;
+    flex-shrink: 0;
+  }
+  .mock-tabs {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 32px;
+    padding: 2px;
+    border-radius: 12px;
+    background: var(--cos-color-fill-quaternary);
+  }
+  .mock-tab {
+    flex: 1;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--cos-color-text-minor);
+  }
+  .mock-tab.active {
+    background: var(--cos-color-bg);
+    color: var(--cos-color-text);
+    font-weight: 500;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.08);
+  }
+
+  /* ============================================================
+   * A. F1 观影路线卡 —— 时间轴档案式
+   * ============================================================ */
+  .mcu-route-canvas {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 头部：路线信息条 */
+  .mcu-route-header {
+    padding: 14px 16px 12px;
+    flex-shrink: 0;
+    position: relative;
+    border-bottom: 1px solid var(--mcu-line);
+    background: linear-gradient(180deg, #fafbfc 0%, var(--cos-vcard-color-bg) 100%);
+  }
+  .mcu-route-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+      var(--mcu-phase-1) 0%, var(--mcu-phase-1) 16.66%,
+      var(--mcu-phase-2) 16.66%, var(--mcu-phase-2) 33.33%,
+      var(--mcu-phase-3) 33.33%, var(--mcu-phase-3) 50%,
+      var(--mcu-phase-4) 50%, var(--mcu-phase-4) 66.66%,
+      var(--mcu-phase-5) 66.66%, var(--mcu-phase-5) 83.33%,
+      var(--mcu-phase-6) 83.33%, var(--mcu-phase-6) 100%
+    );
+    opacity: 0.6;
+  }
+  .mcu-route-eyebrow {
+    font-family: var(--mcu-mono-font);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mcu-archive-gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mcu-route-eyebrow::before {
+    content: "";
+    width: 12px;
+    height: 1px;
+    background: var(--mcu-archive-gold);
+  }
+  .mcu-route-title {
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 600;
+    color: var(--mcu-ink);
+    margin-bottom: 2px;
+  }
+  .mcu-route-subtitle {
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--cos-color-text-minor);
+  }
+  .mcu-route-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .mcu-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    font-weight: 500;
+    background: var(--cos-color-fill-quaternary);
+    color: var(--cos-color-text-minor);
+    font-family: var(--mcu-mono-font);
+    letter-spacing: 0.3px;
+  }
+  .mcu-stat-pill strong {
+    color: var(--mcu-ink);
+    font-weight: 600;
+    margin-right: 3px;
+  }
+  .mcu-stat-pill.gold {
+    background: var(--mcu-archive-gold-bg);
+    color: var(--mcu-archive-gold);
+  }
+  .mcu-stat-pill.gold strong {
+    color: var(--mcu-archive-gold);
+  }
+
+  /* 时间轴列表 */
+  .mcu-timeline {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 16px 14px 16px;
+    scrollbar-width: none;
+  }
+  .mcu-timeline::-webkit-scrollbar { width: 0; }
+
+  .mcu-tl-item {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    padding-left: 2px;
+  }
+  .mcu-tl-item::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 0;
+    bottom: -10px;
+    width: 1px;
+    background: var(--mcu-line);
+  }
+  .mcu-tl-item:last-child::before { display: none; }
+
+  /* 时间轴节点 */
+  .mcu-tl-node {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--cos-vcard-color-bg);
+    border: 2px solid var(--cos-color-border-minor);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mcu-mono-font);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--cos-color-text-slim);
+    line-height: 1;
+    transition: all 0.2s ease;
+  }
+  .mcu-tl-item.core .mcu-tl-node {
+    border-color: var(--mcu-ink);
+    background: var(--mcu-ink);
+    color: #fff;
+  }
+  .mcu-tl-item.current .mcu-tl-node {
+    border-color: var(--mcu-archive-gold);
+    background: var(--mcu-archive-gold);
+    color: #fff;
+    box-shadow: 0 0 0 3px var(--mcu-archive-gold-bg);
+  }
+
+  /* 节点内容 */
+  .mcu-tl-content {
+    flex: 1;
+    min-width: 0;
+    padding-top: 2px;
+  }
+  .mcu-tl-top {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+  .mcu-tl-name {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--mcu-ink);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .mcu-tl-item.core .mcu-tl-name {
+    font-weight: 600;
+  }
+  .mcu-tl-year {
+    flex-shrink: 0;
+    font-family: var(--mcu-mono-font);
+    font-size: 11.5px;
+    color: var(--cos-color-text-slim);
+    font-weight: 500;
+  }
+  .mcu-tl-meta {
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .mcu-phase-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mcu-phase-dot.p1 { background: var(--mcu-phase-1); }
+  .mcu-phase-dot.p2 { background: var(--mcu-phase-2); }
+  .mcu-phase-dot.p3 { background: var(--mcu-phase-3); }
+  .mcu-phase-dot.p4 { background: var(--mcu-phase-4); }
+  .mcu-phase-dot.p5 { background: var(--mcu-phase-5); }
+  .mcu-phase-dot.p6 { background: var(--mcu-phase-6); }
+  .mcu-tl-phase {
+    font-size: 11px;
+    color: var(--cos-color-text-slim);
+    line-height: 1;
+  }
+  .mcu-tl-note {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 17px;
+    color: var(--cos-color-text-minor);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .mcu-tl-item.current .mcu-tl-note {
+    -webkit-line-clamp: 2;
+    color: var(--cos-color-text-minor);
+  }
+
+  /* 当前推荐提示条 */
+  .mcu-route-footer {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: var(--mcu-archive-gold-bg);
+    border-top: 1px solid var(--mcu-archive-gold-line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mcu-route-footer-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--mcu-archive-gold);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .mcu-route-footer-text {
+    font-size: 12px;
+    line-height: 18px;
+    color: #7a5d10;
+    font-weight: 500;
+  }
+  .mcu-route-footer-text strong {
+    color: var(--mcu-archive-gold);
+  }
+
+  /* ============================================================
+   * B. 电影节点卡 —— 档案卡式
+   * ============================================================ */
+  .mcu-film-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  /* 档案卡主体 */
+  .mcu-archive {
+    flex: 1;
+    min-height: 0;
+    background: var(--mcu-paper);
+    border: 1px solid var(--mcu-line);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  /* 档案卡顶条：阶段色条 + 编号 */
+  .mcu-archive-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    background: #fafbfc;
+    border-bottom: 1px solid var(--mcu-line);
+    position: relative;
+  }
+  .mcu-archive-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 4px;
+  }
+  .mcu-archive-header.phase-1::before { background: var(--mcu-phase-1); }
+  .mcu-archive-header.phase-2::before { background: var(--mcu-phase-2); }
+  .mcu-archive-header.phase-3::before { background: var(--mcu-phase-3); }
+  .mcu-archive-header.phase-4::before { background: var(--mcu-phase-4); }
+  .mcu-archive-header.phase-5::before { background: var(--mcu-phase-5); }
+  .mcu-archive-header.phase-6::before { background: var(--mcu-phase-6); }
+
+  .mcu-archive-no {
+    font-family: var(--mcu-mono-font);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cos-color-text-slim);
+    letter-spacing: 0.5px;
+    padding-left: 8px;
+  }
+  .mcu-archive-label {
+    margin-left: auto;
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--cos-color-text-slim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* 档案卡视觉区 */
+  .mcu-archive-visual {
+    flex-shrink: 0;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    /* 程序化视觉：档案式几何图形 */
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 19px,
+        rgba(0,0,0,0.03) 19px,
+        rgba(0,0,0,0.03) 20px
+      ),
+      linear-gradient(135deg, #f5f6f8 0%, #eef0f3 100%);
+  }
+  /* 胶片孔装饰 */
+  .mcu-archive-visual::before,
+  .mcu-archive-visual::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    width: 8px;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.08) 1.5px, transparent 1.5px);
+    background-size: 8px 16px;
+    background-repeat: repeat-y;
+  }
+  .mcu-archive-visual::before { left: 10px; }
+  .mcu-archive-visual::after { right: 10px; }
+
+  .mcu-archive-mark {
+    text-align: center;
+    z-index: 1;
+  }
+  .mcu-archive-roman {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--mcu-ink);
+    opacity: 0.15;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+  }
+  .mcu-archive-film-icon {
+    width: 36px;
+    height: 28px;
+    margin: 0 auto 8px;
+    border: 2px solid var(--cos-color-text-slim);
+    border-radius: 3px;
+    position: relative;
+    opacity: 0.4;
+  }
+  .mcu-archive-film-icon::before,
+  .mcu-archive-film-icon::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    width: 2px;
+    background: var(--cos-color-text-slim);
+  }
+  .mcu-archive-film-icon::before { left: 4px; }
+  .mcu-archive-film-icon::after { right: 4px; }
+  .mcu-archive-short {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--mcu-ink);
+    opacity: 0.6;
+    letter-spacing: 2px;
+  }
+
+  /* 有真实海报时的展示 */
+  .mcu-archive-visual.has-poster {
+    background: #000;
+  }
+  .mcu-archive-visual.has-poster .mcu-archive-mark { display: none; }
+  .mcu-archive-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    filter: saturate(0.9);
+  }
+  .mcu-archive-visual.has-poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.5) 100%);
+  }
+  .mcu-archive-poster-title {
+    position: absolute;
+    bottom: 10px;
+    left: 14px;
+    right: 14px;
+    z-index: 2;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* 档案卡信息区 */
+  .mcu-archive-body {
+    flex: 1;
+    min-height: 0;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mcu-archive-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    color: var(--mcu-ink);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .mcu-archive-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mcu-archive-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--cos-color-text-minor);
+  }
+  .mcu-archive-meta-item .label {
+    font-family: var(--mcu-mono-font);
+    color: var(--cos-color-text-slim);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .mcu-archive-divider {
+    height: 1px;
+    background: var(--mcu-line);
+    margin: 2px 0;
+  }
+  .mcu-archive-desc {
+    font-size: 12.5px;
+    line-height: 18px;
+    color: var(--cos-color-text-minor);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .mcu-archive-footer {
+    margin-top: auto;
+    padding-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mcu-archive-tag {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--cos-color-fill-quaternary);
+    color: var(--cos-color-text-minor);
+  }
+  .mcu-archive-tag.core {
+    background: var(--mcu-archive-gold-bg);
+    color: var(--mcu-archive-gold);
+  }
+
+  /* ============================================================
+   * C. F3 随机探索结果卡 —— 发现卡式
+   * ============================================================ */
+  .mcu-discover-canvas {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  /* 今日发现头部 */
+  .mcu-discover-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mcu-discover-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--mcu-archive-gold-bg);
+    border: 1px solid var(--mcu-archive-gold-line);
+    border-radius: 20px;
+  }
+  .mcu-discover-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--mcu-archive-gold);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+  .mcu-discover-badge-text {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--mcu-archive-gold);
+    letter-spacing: 0.5px;
+  }
+  .mcu-discover-date {
+    font-family: var(--mcu-mono-font);
+    font-size: 11px;
+    color: var(--cos-color-text-slim);
+  }
+
+  /* 发现卡主体 */
+  .mcu-discover-card {
+    flex: 1;
+    min-height: 0;
+    background: var(--mcu-paper);
+    border-radius: 10px;
+    border: 1px solid var(--mcu-line);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+    position: relative;
+  }
+
+  /* 发现卡视觉区 */
+  .mcu-discover-hero {
+    flex-shrink: 0;
+    height: 140px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0f2f5 0%, #e5e7eb 100%);
+  }
+  .mcu-discover-hero-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .mcu-discover-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.55) 100%);
+  }
+  .mcu-discover-hero-roman {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-family: Georgia, serif;
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--mcu-ink);
+    opacity: 0.08;
+    letter-spacing: 6px;
+    line-height: 1;
+  }
+  .mcu-discover-phase-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    letter-spacing: 0.5px;
+  }
+
+  /* 发现卡内容区 */
+  .mcu-discover-body {
+    flex: 1;
+    min-height: 0;
+    padding: 12px 14px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mcu-discover-title {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 24px;
+    color: var(--mcu-ink);
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .mcu-discover-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mcu-discover-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11.5px;
+    color: var(--cos-color-text-minor);
+  }
+  .mcu-discover-meta-item .icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .mcu-discover-divider {
+    height: 1px;
+    background: var(--mcu-line);
+    margin: 4px 0;
+  }
+
+  /* 推荐理由区 */
+  .mcu-discover-reason {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    padding-top: 4px;
+  }
+  .mcu-discover-reason-label {
+    font-family: var(--mcu-mono-font);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--mcu-archive-gold);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mcu-discover-reason-label::before {
+    content: "★";
+    font-size: 10px;
+  }
+  .mcu-discover-reason-text {
+    font-size: 13px;
+    line-height: 19px;
+    color: var(--cos-color-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 底部提示 */
+  .mcu-discover-foot {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px dashed var(--mcu-line);
+  }
+  .mcu-discover-foot-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mcu-discover-foot-icon {
+    font-size: 12px;
+  }
+  .mcu-discover-foot-text {
+    font-size: 11.5px;
+    color: var(--cos-color-text-slim);
+  }
+  .mcu-discover-foot-right {
+    font-family: var(--mcu-mono-font);
+    font-size: 11px;
+    color: var(--cos-color-text-slim);
+  }
+
+  /* ============================================================
+   * 规范说明区
+   * ============================================================ */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .spec-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .spec-card h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #1f2329;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spec-card h4::before {
+    content: "";
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: #b8860b;
+  }
+  .spec-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 13px;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-row .label { color: #6b7280; }
+  .spec-row .value { color: #1f2329; font-weight: 500; font-family: "SF Mono", Menlo, monospace; }
+
+  .color-swatch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .color-swatch:last-child { border-bottom: none; }
+  .color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.1);
+    flex-shrink: 0;
+  }
+  .color-info { flex: 1; min-width: 0; }
+  .color-name { font-size: 13px; font-weight: 500; color: #1f2329; }
+  .color-token { font-size: 11px; color: #9ca3af; font-family: "SF Mono", Menlo, monospace; }
+
+  .dev-section {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .dev-section h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2329;
+  }
+  .dev-class-list {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #374151;
+  }
+  .dev-class-list code {
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: "SF Mono", Menlo, monospace;
+    color: #dc2626;
+  }
+  .dev-note {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.6;
+  }
+  .dev-note strong { color: #78350f; }
+
+  /* 验收清单 */
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist .check {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #10b981;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="doc-container">
+
+  <!-- 文档头部 -->
+  <div class="doc-header">
+    <h1>MCU观影助手 · 画布视觉设计 V1.0</h1>
+    <div class="meta">
+      交付方：设计AI &nbsp;|&nbsp; 日期：2026-10-13 &nbsp;|&nbsp; 适用：百度搜索 GenUI 小工具 &nbsp;|&nbsp; 形态 A（表头+画布+操作区）
+    </div>
+  </div>
+
+  <!-- 一、设计方向 -->
+  <div class="section">
+    <div class="section-title"><span class="num">0</span>设计方向总览</div>
+    <div class="section-desc">
+      「科技资料库 × 电影档案」—— 不是漫威宣传页，而是专业MCU数据库工具。<br>
+      以时间轴、编号系统、阶段标识、档案卡片构建工具感，用金色细线与等宽字体传达电影档案的精密感。
+    </div>
+  </div>
+
+  <!-- 二、三张核心视觉稿 -->
+  <div class="section">
+    <div class="section-title"><span class="num">1</span>核心视觉稿（360px 1:1 画布）</div>
+    <div class="section-desc">以下为设计稿展示，背景色为 COSUI 卡片底色 <code style="background:#f3f4f6;padding:1px 4px;border-radius:3px;font-size:12px;">--cos-vcard-color-bg</code></div>
+
+    <div class="mockup-grid">
+
+      <!-- A. F1 观影路线卡 -->
+      <div class="mockup-item">
+        <div class="mockup-label"><strong>A.</strong> F1 观影路线卡</div>
+        <div class="genui-card">
+          <div class="genui-header">
+            <span class="genui-header-title">小工具 · MCU观影助手</span>
+          </div>
+          <div class="genui-canvas-wrapper">
+            <div class="genui-canvas">
+              <div class="mcu-route-canvas">
+                <!-- 路线头部 -->
+                <div class="mcu-route-header">
+                  <div class="mcu-route-eyebrow">INFINITY SAGA · ROUTE</div>
+                  <div class="mcu-route-title">无限传奇 · 入门路线</div>
+                  <div class="mcu-route-subtitle">第一次看漫威，就照这个来</div>
+                  <div class="mcu-route-stats">
+                    <span class="mcu-stat-pill gold"><strong>12</strong> 部作品</span>
+                    <span class="mcu-stat-pill"><strong>01</strong> 起点</span>
+                  </div>
+                </div>
+                <!-- 时间轴列表 -->
+                <div class="mcu-timeline">
+                  <div class="mcu-tl-item core current">
+                    <div class="mcu-tl-node">01</div>
+                    <div class="mcu-tl-content">
+                      <div class="mcu-tl-top">
+                        <span class="mcu-tl-name">钢铁侠</span>
+                        <span class="mcu-tl-year">2008</span>
+                      </div>
+                      <div class="mcu-tl-meta">
+                        <span class="mcu-phase-dot p1"></span>
+                        <span class="mcu-tl-phase">第一阶段</span>
+                      </div>
+                      <div class="mcu-tl-note">一切的起点，托尼·斯塔克的蜕变奠定了整个MCU的基调</div>
+                    </div>
+                  </div>
+                  <div class="mcu-tl-item core">
+                    <div class="mcu-tl-node">02</div>
+                    <div class="mcu-tl-content">
+                      <div class="mcu-tl-top">
+                        <span class="mcu-tl-name">美国队长</span>
+                        <span class="mcu-tl-year">2011</span>
+                      </div>
+                      <div class="mcu-tl-meta">
+                        <span class="mcu-phase-dot p1"></span>
+                        <span class="mcu-tl-phase">第一阶段</span>
+                      </div>
+                      <div class="mcu-tl-note">复仇者联盟的精神领袖</div>
+                    </div>
+                  </div>
+                  <div class="mcu-tl-item core">
+                    <div class="mcu-tl-node">03</div>
+                    <div class="mcu-tl-content">
+                      <div class="mcu-tl-top">
+                        <span class="mcu-tl-name">复仇者联盟</span>
+                        <span class="mcu-tl-year">2012</span>
+                      </div>
+                      <div class="mcu-tl-meta">
+                        <span class="mcu-phase-dot p1"></span>
+                        <span class="mcu-tl-phase">第一阶段</span>
+                      </div>
+                      <div class="mcu-tl-note">英雄首次集结，纽约大战</div>
+                    </div>
+                  </div>
+                  <div class="mcu-tl-item side">
+                    <div class="mcu-tl-node">04</div>
+                    <div class="mcu-tl-content">
+                      <div class="mcu-tl-top">
+                        <span class="mcu-tl-name">银河护卫队</span>
+                        <span class="mcu-tl-year">2014</span>
+                      </div>
+                      <div class="mcu-tl-meta">
+                        <span class="mcu-phase-dot p2"></span>
+                        <span class="mcu-tl-phase">第二阶段</span>
+                      </div>
+                      <div class="mcu-tl-note">宇宙线的开拓</div>
+                    </div>
+                  </div>
+                  <div class="mcu-tl-item core">
+                    <div class="mcu-tl-node">05</div>
+                    <div class="mcu-tl-content">
+                      <div class="mcu-tl-top">
+                        <span class="mcu-tl-name">美国队长3</span>
+                        <span class="mcu-tl-year">2016</span>
+                      </div>
+                      <div class="mcu-tl-meta">
+                        <span class="mcu-phase-dot p3"></span>
+                        <span class="mcu-tl-phase">第三阶段</span>
+                      </div>
+                      <div class="mcu-tl-note">复联内战，阵营分裂</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- 底部推荐提示 -->
+                <div class="mcu-route-footer">
+                  <div class="mcu-route-footer-icon">▶</div>
+                  <div class="mcu-route-footer-text">从 <strong>《钢铁侠》</strong> 开始你的MCU之旅</div>
+                </div>
+              </div>
+            </div>
+            <div class="genui-operate">
+              <div class="mock-tabs">
+                <div class="mock-tab active">观影路线</div>
+                <div class="mock-tab">随机探索</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B. 电影节点卡 -->
+      <div class="mockup-item">
+        <div class="mockup-label"><strong>B.</strong> 电影节点卡（档案卡式）</div>
+        <div class="genui-card">
+          <div class="genui-header">
+            <span class="genui-header-title">小工具 · MCU观影助手</span>
+          </div>
+          <div class="genui-canvas-wrapper">
+            <div class="genui-canvas">
+              <div class="mcu-film-card">
+                <div class="mcu-archive">
+                  <!-- 档案头 -->
+                  <div class="mcu-archive-header phase-3">
+                    <span class="mcu-archive-no">MCU-015</span>
+                    <span class="mcu-archive-label">FILM ARCHIVE</span>
+                  </div>
+                  <!-- 视觉区（程序化卡，无真实海报时） -->
+                  <div class="mcu-archive-visual">
+                    <div class="mcu-archive-mark">
+                      <div class="mcu-archive-roman">III</div>
+                      <div class="mcu-archive-film-icon"></div>
+                      <div class="mcu-archive-short">CIVIL WAR</div>
+                    </div>
+                  </div>
+                  <!-- 信息区 -->
+                  <div class="mcu-archive-body">
+                    <div class="mcu-archive-title">美国队长3：内战</div>
+                    <div class="mcu-archive-meta-row">
+                      <div class="mcu-archive-meta-item">
+                        <span class="label">YEAR</span>
+                        <span>2016</span>
+                      </div>
+                      <div class="mcu-archive-meta-item">
+                        <span class="label">PHASE</span>
+                        <span>第三阶段</span>
+                      </div>
+                      <div class="mcu-archive-meta-item">
+                        <span class="label">ORDER</span>
+                        <span>#15</span>
+                      </div>
+                    </div>
+                    <div class="mcu-archive-divider"></div>
+                    <div class="mcu-archive-desc">
+                      复仇者联盟因政府监管法案分裂为两大阵营，美国队长与钢铁侠各执一词，一场关乎信念与友情的内战一触即发。
+                    </div>
+                    <div class="mcu-archive-footer">
+                      <span class="mcu-archive-tag core">主线必看</span>
+                      <span class="mcu-archive-tag">无限传奇</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="genui-operate">
+              <div class="mock-tabs">
+                <div class="mock-tab active">观影路线</div>
+                <div class="mock-tab">随机探索</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- C. F3 随机探索结果卡 -->
+      <div class="mockup-item">
+        <div class="mockup-label"><strong>C.</strong> F3 随机探索结果卡</div>
+        <div class="genui-card">
+          <div class="genui-header">
+            <span class="genui-header-title">小工具 · MCU观影助手</span>
+          </div>
+          <div class="genui-canvas-wrapper">
+            <div class="genui-canvas">
+              <div class="mcu-discover-canvas">
+                <!-- 头部：今日发现 -->
+                <div class="mcu-discover-header">
+                  <div class="mcu-discover-badge">
+                    <div class="mcu-discover-badge-dot"></div>
+                    <span class="mcu-discover-badge-text">今日发现</span>
+                  </div>
+                  <span class="mcu-discover-date">NO.07 / 18</span>
+                </div>
+                <!-- 发现卡主体 -->
+                <div class="mcu-discover-card">
+                  <div class="mcu-discover-hero">
+                    <div class="mcu-discover-hero-roman">III</div>
+                    <span class="mcu-discover-phase-tag">第三阶段</span>
+                    <div class="mcu-discover-hero-overlay"></div>
+                  </div>
+                  <div class="mcu-discover-body">
+                    <div class="mcu-discover-title">奇异博士</div>
+                    <div class="mcu-discover-meta">
+                      <div class="mcu-discover-meta-item">
+                        <span class="icon" style="background:#d4922a;"></span>
+                        <span>2016</span>
+                      </div>
+                      <div class="mcu-discover-meta-item">
+                        <span class="icon" style="background:#2a9d7a;"></span>
+                        <span>魔法线</span>
+                      </div>
+                      <div class="mcu-discover-meta-item">
+                        <span>主线必看</span>
+                      </div>
+                    </div>
+                    <div class="mcu-discover-divider"></div>
+                    <div class="mcu-discover-reason">
+                      <div class="mcu-discover-reason-label">为什么看这部</div>
+                      <div class="mcu-discover-reason-text">
+                        漫威宇宙的魔法门户之作。奇异博士打开了多元宇宙的大门，为后续所有跨维度故事奠定了基础，视觉效果惊艳绝伦。
+                      </div>
+                    </div>
+                    <div class="mcu-discover-foot">
+                      <div class="mcu-discover-foot-left">
+                        <span class="mcu-discover-foot-icon">🎬</span>
+                        <span class="mcu-discover-foot-text">点击「换一部」继续探索</span>
+                      </div>
+                      <span class="mcu-discover-foot-right">MCU · FILM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="genui-operate">
+              <div class="mock-tabs">
+                <div class="mock-tab">观影路线</div>
+                <div class="mock-tab active">随机探索</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 三、设计规范 -->
+  <div class="section">
+    <div class="section-title"><span class="num">2</span>设计规范说明</div>
+    <div class="section-desc">所有新增 Token 均派生自 COSUI 体系，不修改官方变量，仅在 <code>.mcu-*</code> 作用域内使用。</div>
+
+    <div class="spec-grid">
+      <!-- 色彩规范 -->
+      <div class="spec-card">
+        <h4>色彩体系</h4>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#b8860b;"></div>
+          <div class="color-info">
+            <div class="color-name">档案金（主强调）</div>
+            <div class="color-token">--mcu-archive-gold</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#faf3e0;"></div>
+          <div class="color-info">
+            <div class="color-name">金色底</div>
+            <div class="color-token">--mcu-archive-gold-bg</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#1a1d23;"></div>
+          <div class="color-info">
+            <div class="color-name">档案墨水</div>
+            <div class="color-token">--mcu-ink</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#ffffff;"></div>
+          <div class="color-info">
+            <div class="color-name">档案纸（卡片底）</div>
+            <div class="color-token">--mcu-paper</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#ececec;"></div>
+          <div class="color-info">
+            <div class="color-name">档案灰线</div>
+            <div class="color-token">--mcu-line</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段色 -->
+      <div class="spec-card">
+        <h4>六阶段色（浅色适配版）</h4>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#4a7fd4;"></div>
+          <div class="color-info">
+            <div class="color-name">第一阶段</div>
+            <div class="color-token">--mcu-phase-1</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#2a9d7a;"></div>
+          <div class="color-info">
+            <div class="color-name">第二阶段</div>
+            <div class="color-token">--mcu-phase-2</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#d4922a;"></div>
+          <div class="color-info">
+            <div class="color-name">第三阶段</div>
+            <div class="color-token">--mcu-phase-3</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#7b5fd4;"></div>
+          <div class="color-info">
+            <div class="color-name">第四阶段</div>
+            <div class="color-token">--mcu-phase-4</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#d4453d;"></div>
+          <div class="color-info">
+            <div class="color-name">第五阶段</div>
+            <div class="color-token">--mcu-phase-5</div>
+          </div>
+        </div>
+        <div class="color-swatch">
+          <div class="color-dot" style="background:#b04d7d;"></div>
+          <div class="color-info">
+            <div class="color-name">第六阶段</div>
+            <div class="color-token">--mcu-phase-6</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 字体层级 -->
+      <div class="spec-card">
+        <h4>字体层级（360px 基准）</h4>
+        <div class="spec-row">
+          <span class="label">路线/卡片标题</span>
+          <span class="value">17px / 600</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">电影名（列表）</span>
+          <span class="value">14px / 500</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">正文/推荐理由</span>
+          <span class="value">13px / 400</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">辅助说明</span>
+          <span class="value">12px / 400</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">等宽编号</span>
+          <span class="value">10.5-11.5px / 600</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">标签小字</span>
+          <span class="value">10.5-11px / 500</span>
+        </div>
+      </div>
+
+      <!-- 间距与布局 -->
+      <div class="spec-card">
+        <h4>间距与布局</h4>
+        <div class="spec-row">
+          <span class="label">画布左右内边距</span>
+          <span class="value">16px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">卡片内边距</span>
+          <span class="value">12-14px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">时间轴节点直径</span>
+          <span class="value">24px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">列表项垂直间距</span>
+          <span class="value">10px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">区块间距</span>
+          <span class="value">8-12px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">档案卡圆角</span>
+          <span class="value">6px</span>
+        </div>
+        <div class="spec-row">
+          <span class="label">发现卡圆角</span>
+          <span class="value">10px</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四、设计元素说明 -->
+  <div class="section">
+    <div class="section-title"><span class="num">3</span>核心设计元素说明</div>
+    <div class="section-desc">每个设计决策的理由与使用场景</div>
+
+    <div class="spec-grid">
+      <div class="spec-card">
+        <h4>时间轴线（F1 路线卡）</h4>
+        <p style="font-size:13px;color:#374151;line-height:1.7;">
+          左侧 1px 细线贯穿列表，圆形节点承载序号。主线作品为深色实心节点，支线为浅色描边节点，当前推荐为金色高亮节点带光晕环。
+        </p>
+        <p style="font-size:12px;color:#6b7280;margin-top:8px;">
+          <strong>作用：</strong>3 秒内传达「按顺序观看」的工具属性；视觉重量集中在左侧序号，符合从上到下的阅读流。
+        </p>
+      </div>
+
+      <div class="spec-card">
+        <h4>档案式编号系统</h4>
+        <p style="font-size:13px;color:#374151;line-height:1.7;">
+          使用等宽字体（SF Mono / Menlo / Consolas）渲染编号、年份、阶段标签等数据类信息，强化「电影数据库」的工具感。
+        </p>
+        <p style="font-size:12px;color:#6b7280;margin-top:8px;">
+          <strong>作用：</strong>与中文片名形成字体对比，信息分层更清晰；替代海报作为视觉锚点。
+        </p>
+      </div>
+
+      <div class="spec-card">
+        <h4>阶段色条与色点</h4>
+        <p style="font-size:13px;color:#374151;line-height:1.7;">
+          F1 卡片顶部有六阶段渐变色条（呼应MCU六阶段结构），列表项用 6px 色点标识所属阶段。档案卡左侧用 4px 色条标识阶段。
+        </p>
+        <p style="font-size:12px;color:#6b7280;margin-top:8px;">
+          <strong>作用：</strong>用最小面积传递阶段信息，不喧宾夺主，保持整体工具调性。
+        </p>
+      </div>
+
+      <div class="spec-card">
+        <h4>程序化视觉卡（无海报时）</h4>
+        <p style="font-size:13px;color:#374151;line-height:1.7;">
+          几何化胶片图标 + 罗马数字阶段号 + 英文简称，背景为浅灰横格纸纹理（暗示档案本），两侧有胶片孔装饰。
+        </p>
+        <p style="font-size:12px;color:#6b7280;margin-top:8px;">
+          <strong>作用：</strong>23 部无海报作品的兜底方案，保持视觉统一，不依赖外部图片资源。
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 五、开发交付说明 -->
+  <div class="section">
+    <div class="section-title"><span class="num">4</span>开发交付说明</div>
+    <div class="section-desc">开发 AI 只需替换 <code>.mcu-*</code> 作用域内的样式，不触碰 GenUI 外壳与 COSUI 组件</div>
+
+    <div class="dev-section">
+      <h4>4.1 需替换的 .mcu-* 类列表</h4>
+      <div class="dev-class-list">
+
+        <p><strong>▌A. F1 观影路线卡（替换现有 .mcu-route-* 和 .mcu-step-*）</strong></p>
+        <ul style="padding-left: 20px; margin: 8px 0 16px;">
+          <li><code>.mcu-route-canvas</code> — 路线卡根容器（替换原 .mcu-canvas 在 route 视图的用法）</li>
+          <li><code>.mcu-route-header</code> — 路线头部信息区</li>
+          <li><code>.mcu-route-eyebrow</code> — 路线分类标签（英文+金线）</li>
+          <li><code>.mcu-route-title</code> — 路线名称</li>
+          <li><code>.mcu-route-subtitle</code> — 路线 slogan</li>
+          <li><code>.mcu-route-stats</code> — 数据统计行</li>
+          <li><code>.mcu-stat-pill</code> / <code>.mcu-stat-pill.gold</code> — 统计胶囊</li>
+          <li><code>.mcu-timeline</code> — 时间轴列表容器（替换原 .mcu-route-list）</li>
+          <li><code>.mcu-tl-item</code> / <code>.core</code> / <code>.current</code> — 时间轴项（替换原 .mcu-step）</li>
+          <li><code>.mcu-tl-node</code> — 时间轴节点圆（替换原 .mcu-step-no）</li>
+          <li><code>.mcu-tl-content</code> — 节点内容区</li>
+          <li><code>.mcu-tl-name</code> — 电影名（替换原 .mcu-step-cn）</li>
+          <li><code>.mcu-tl-year</code> — 年份（替换原 .mcu-step-year）</li>
+          <li><code>.mcu-phase-dot</code> / <code>.p1~.p6</code> — 阶段色点</li>
+          <li><code>.mcu-tl-phase</code> — 阶段文字</li>
+          <li><code>.mcu-tl-note</code> — 推荐理由（替换原 .mcu-step-role）</li>
+          <li><code>.mcu-route-footer</code> — 底部当前推荐提示条</li>
+        </ul>
+
+        <p><strong>▌B. 电影节点卡（新增，用于路线项展开态/详情态）</strong></p>
+        <ul style="padding-left: 20px; margin: 8px 0 16px;">
+          <li><code>.mcu-film-card</code> — 节点卡外层容器</li>
+          <li><code>.mcu-archive</code> — 档案卡主体</li>
+          <li><code>.mcu-archive-header</code> / <code>.phase-1~.phase-6</code> — 档案头条</li>
+          <li><code>.mcu-archive-no</code> — 档案编号</li>
+          <li><code>.mcu-archive-visual</code> / <code>.has-poster</code> — 视觉区</li>
+          <li><code>.mcu-archive-mark</code> — 程序化视觉标记</li>
+          <li><code>.mcu-archive-roman</code> — 罗马数字阶段号</li>
+          <li><code>.mcu-archive-film-icon</code> — 胶片图标（CSS 绘制）</li>
+          <li><code>.mcu-archive-body</code> — 信息区</li>
+          <li><code>.mcu-archive-title</code> — 电影标题</li>
+          <li><code>.mcu-archive-meta-row</code> / <code>.mcu-archive-meta-item</code> — 元信息行</li>
+          <li><code>.mcu-archive-desc</code> — 简介</li>
+          <li><code>.mcu-archive-footer</code> — 底部标签区</li>
+          <li><code>.mcu-archive-tag</code> / <code>.core</code> — 标签</li>
+        </ul>
+
+        <p><strong>▌C. F3 随机探索卡（替换现有 .mcu-random-*）</strong></p>
+        <ul style="padding-left: 20px; margin: 8px 0 16px;">
+          <li><code>.mcu-discover-canvas</code> — 发现卡根容器（替换原 .mcu-random）</li>
+          <li><code>.mcu-discover-header</code> — 头部（今日发现徽章 + 编号）</li>
+          <li><code>.mcu-discover-badge</code> — 「今日发现」徽章</li>
+          <li><code>.mcu-discover-badge-dot</code> — 脉冲点动画</li>
+          <li><code>.mcu-discover-card</code> — 发现卡主体</li>
+          <li><code>.mcu-discover-hero</code> — 主视觉区（替换原 .mcu-random-hero）</li>
+          <li><code>.mcu-discover-hero-roman</code> — 程序化背景罗马数字</li>
+          <li><code>.mcu-discover-phase-tag</code> — 阶段角标</li>
+          <li><code>.mcu-discover-body</code> — 内容区</li>
+          <li><code>.mcu-discover-title</code> — 电影标题（替换原 .mcu-random-title）</li>
+          <li><code>.mcu-discover-meta</code> — 元信息行（替换原 .mcu-random-meta）</li>
+          <li><code>.mcu-discover-reason</code> — 推荐理由区</li>
+          <li><code>.mcu-discover-reason-label</code> — 「为什么看这部」标签</li>
+          <li><code>.mcu-discover-reason-text</code> — 推荐理由正文</li>
+          <li><code>.mcu-discover-foot</code> — 底部提示栏</li>
+        </ul>
+
+        <p><strong>▌D. 全局新增 Token（在 :root 或 .mcu-canvas 内声明）</strong></p>
+        <ul style="padding-left: 20px; margin: 8px 0 0;">
+          <li><code>--mcu-archive-gold</code> — #b8860b</li>
+          <li><code>--mcu-archive-gold-bg</code> — #faf3e0</li>
+          <li><code>--mcu-archive-gold-line</code> — #e6d5a8</li>
+          <li><code>--mcu-ink</code> — #1a1d23</li>
+          <li><code>--mcu-paper</code> — #ffffff</li>
+          <li><code>--mcu-line</code> — #ececec</li>
+          <li><code>--mcu-phase-1 ~ --mcu-phase-6</code> — 六阶段色</li>
+          <li><code>--mcu-mono-font</code> — "SF Mono", "Menlo", "Consolas", monospace</li>
+        </ul>
+      </div>
+
+      <div class="dev-note">
+        <strong>开发注意事项：</strong><br>
+        1. 所有新增颜色/字体 Token 均在 <code>.mcu-*</code> 作用域内声明，不污染全局。<br>
+        2. 等宽字体优先使用系统等宽字体栈，不引入外部字体文件。<br>
+        3. 程序化视觉卡全部使用 CSS 绘制（渐变 + 伪元素），零图片依赖。<br>
+        4. 六阶段色值为浅色背景下调和版本，比母项目的深色模式阶段色饱和度低 15-20%。<br>
+        5. 金色使用 <code>--mcu-archive-gold: #b8860b</code>，比母项目金色 <code>#F2B233</code> 暗，确保在白底上的对比度 ≥ 4.5:1（WCAG AA）。
+      </div>
+    </div>
+  </div>
+
+  <!-- 六、验收标准 -->
+  <div class="section">
+    <div class="section-title"><span class="num">5</span>验收标准核对</div>
+    <div class="section-desc">对照任务书要求逐项确认</div>
+
+    <div class="dev-section">
+      <ul class="checklist">
+        <li>
+          <span class="check">✓</span>
+          <div><strong>适配 360px</strong> — 设计稿以 360px 宽度为基准，所有元素在该尺寸下完整显示无截断</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>1:1 画布可阅读</strong> — 画布区占比 ≥ 50%，信息密度适中，关键信息（片名/序号/年份）一屏可见</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>不依赖外部资源</strong> — 程序化视觉卡全部 CSS 绘制，等宽字体走系统字体栈，零外部请求</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>符合百度搜索工具轻量化场景</strong> — 无粒子特效、无游戏UI、无宣传海报感，工具属性明确</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>与 COSUI 外壳协调</strong> — 底色沿用 --cos-vcard-color-bg，不修改外壳 token，仅在 .mcu-* 内新增派生变量</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>用户 3 秒理解用途</strong> — 时间轴+编号+电影名的组合直观传达「观影顺序工具」属性</div>
+        </li>
+        <li>
+          <span class="check">✓</span>
+          <div><strong>开发可直接转换为 CSS</strong> — 所有设计元素均可用标准 CSS 实现，标注了完整的类名、Token、尺寸、颜色</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

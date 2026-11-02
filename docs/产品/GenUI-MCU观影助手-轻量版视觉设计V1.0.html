@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MCU观影助手 · 轻量版视觉设计 V1.0（观影顺序速查）</title>
+<style>
+:root{
+  --ink:#1a1d23; --ink2:#4a4f58; --slim:#8a8f99; --line:#e8e5de; --bg:#f7f5f0;
+  --paper:#ffffff; --gold:#b8860b; --gold-bg:#fdf6e8; --gold-line:#e8d5a8;
+  --p1:#3a5ba0; --p2:#a03a3a; --p3:#b8860b; --p4:#6b4fa0; --p5:#2a7a5a; --p6:#a04a2a;
+  --mono:'SF Mono',Menlo,Consolas,'Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e9e6df;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;padding:32px 16px;color:var(--ink2)}
+h1{font-size:20px;color:var(--ink);margin-bottom:6px}
+h2{font-size:15px;color:var(--ink);margin:34px 0 10px}
+.sub{font-size:13px;color:var(--slim);margin-bottom:24px}
+.row{display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.tag{font-size:12px;color:var(--ink2);font-weight:600}
+/* ===== 画布 ===== */
+.canvas{width:326px;height:326px;background:var(--paper);border-radius:14px;overflow:hidden;
+  box-shadow:0 4px 16px rgba(26,29,35,.10);display:flex;flex-direction:column;position:relative}
+.w380{width:380px;height:380px}
+.frozen{flex:none;background:repeating-linear-gradient(-45deg,#efece5 0 8px,#e7e3da 8px 16px);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;border-bottom:1px dashed #cfcbc1}
+.frozen .ft{font-size:10px;color:#a09a8d;font-weight:600;letter-spacing:1px}
+.frozen .fs{font-family:var(--mono);font-size:9px;color:#b5afa2}
+.zone{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--paper);overflow:hidden}
+/* 标题区 */
+.head{flex:none;padding:4px 14px 0}
+.kicker{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--gold);line-height:12px}
+.title{font-size:16px;font-weight:700;color:var(--ink);line-height:21px;margin-top:1px}
+.routeTag{font-size:11.5px;color:var(--ink2);line-height:16px;margin-top:2px}
+.routeTag b{color:var(--gold);font-weight:600}
+/* 列表 */
+.list{flex:1;min-height:0;overflow:hidden;padding:4px 14px 0;margin-top:4px}
+.li{display:flex;align-items:center;gap:8px;height:32px;border-bottom:1px solid #f2f0ea}
+.li:last-child{border-bottom:0}
+.no{flex:none;width:20px;font-family:var(--mono);font-size:11px;color:var(--slim);text-align:right}
+.nm{flex:1;min-width:0;font-size:14px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yr{flex:none;font-family:var(--mono);font-size:11px;color:var(--slim)}
+.ph{flex:none;display:inline-flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink2);width:66px;justify-content:flex-end}
+.ph .dot{width:6px;height:6px;border-radius:50%;flex:none}
+.seriesTag{flex:none;font-size:9px;color:var(--gold);background:var(--gold-bg);border:1px solid var(--gold-line);border-radius:3px;padding:0 4px;line-height:14px}
+/* 提示 */
+.hint{flex:none;font-size:10px;color:var(--slim);padding:5px 14px 6px;border-top:1px dashed var(--line);line-height:13px;background:var(--paper)}
+/* 操作区（COSUI Tabs，位于画布下方外壳内） */
+.tabs{display:flex;gap:6px;width:326px;background:rgba(0,0,0,.05);border-radius:10px;padding:3px}
+.w380 .tabs,.tabs.w380{width:380px}
+.tabs div{flex:1;text-align:center;font-size:12.5px;padding:7px 0;border-radius:8px;color:var(--ink2)}
+.tabs .on{background:#fff;font-weight:600;color:var(--ink);box-shadow:0 1px 3px rgba(26,29,35,.10)}
+.bill{font-family:var(--mono);font-size:10px;color:var(--slim);line-height:17px;background:#fff;border-radius:8px;padding:7px 12px;width:326px}
+.bill.w380{width:380px}
+.bill b{color:var(--ink2)}
+/* 说明区 */
+.note{max-width:1100px;margin:32px auto 0;background:#fff;border-radius:10px;padding:18px 22px;font-size:13px;line-height:22px}
+.note b{color:var(--ink)}
+.note code{font-family:var(--mono);font-size:12px;background:var(--bg);padding:1px 5px;border-radius:3px}
+.note h3{font-size:14px;color:var(--ink);margin:14px 0 6px}
+.note ul{padding-left:20px}
+.note .risk{color:#a03a3a;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg);color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<h1>MCU观影助手 · 轻量版视觉设计 V1.0</h1>
+<p class="sub">功能冻结为「漫威观影顺序速查」· 三个路线入口 · 文字优先、无图片依赖 · 326/380 实际比例 · 设计稿，未动开发代码</p>
+
+<!-- ================= 360 视口 ================= -->
+<h2>一、360px 视口（1:1 画布 326×326，内容区 227px）</h2>
+<div class="row">
+  <!-- 新手入门 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen" style="height:99px"><div class="ft">冻结区（勿改）</div><div class="fs">GenUI Header · 326−227=99</div></div>
+      <div class="zone">
+        <div class="head">
+          <div class="kicker">— MCU WATCH ORDER</div>
+          <div class="title">漫威观影顺序</div>
+          <div class="routeTag">第一次看漫威，照这个顺序看这 <b>12</b> 部就够了</div>
+        </div>
+        <div class="list">
+          <div class="li"><span class="no">01</span><span class="nm">钢铁侠</span><span class="yr">2008</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">02</span><span class="nm">美国队长：复仇者先锋</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">03</span><span class="nm">雷神</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">04</span><span class="nm">复仇者联盟</span><span class="yr">2012</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">05</span><span class="nm">美国队长2：冬日战士</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">06</span><span class="nm">银河护卫队</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">07</span><span class="nm">复仇者联盟2：奥创纪元</span><span class="yr">2015</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">08</span><span class="nm">美国队长3：内战</span><span class="yr">2016</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">09</span><span class="nm">雷神3：诸神黄昏</span><span class="yr">2017</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">10</span><span class="nm">黑豹</span><span class="yr">2018</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">11</span><span class="nm">复仇者联盟3：无限战争</span><span class="yr">2018</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">12</span><span class="nm">复仇者联盟4：终局之战</span><span class="yr">2019</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+        </div>
+        <div class="hint">列表可上下滑动 · 点下方切换路线</div>
+      </div>
+    </div>
+    <div class="tabs"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">路线一 · 新手入门（12 部）</span>
+    <div class="bill">实测 227：head 59 + 列表 142 + 提示 26（浏览器实测，零裁切）<br>列表项 32px 高 · 一屏可见 4.4 项，余项滑动</div>
+  </div>
+
+  <!-- 主线精选 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen" style="height:99px"><div class="ft">冻结区（勿改）</div><div class="fs">GenUI Header · 326−227=99</div></div>
+      <div class="zone">
+        <div class="head">
+          <div class="kicker">— MCU WATCH ORDER</div>
+          <div class="title">漫威观影顺序</div>
+          <div class="routeTag">想理清主线剧情，按这个顺序看这 <b>18</b> 部</div>
+        </div>
+        <div class="list">
+          <div class="li"><span class="no">01</span><span class="nm">钢铁侠</span><span class="yr">2008</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">02</span><span class="nm">雷神</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">03</span><span class="nm">美国队长：复仇者先锋</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">04</span><span class="nm">复仇者联盟</span><span class="yr">2012</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">05</span><span class="nm">美国队长2：冬日战士</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">06</span><span class="nm">银河护卫队</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">07</span><span class="nm">复仇者联盟2：奥创纪元</span><span class="yr">2015</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">08</span><span class="nm">美国队长3：内战</span><span class="yr">2016</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">09</span><span class="nm">奇异博士</span><span class="yr">2016</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">10</span><span class="nm">蜘蛛侠：英雄归来</span><span class="yr">2017</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">11</span><span class="nm">雷神3：诸神黄昏</span><span class="yr">2017</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">12</span><span class="nm">复仇者联盟3：无限战争</span><span class="yr">2018</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">13</span><span class="nm">复仇者联盟4：终局之战</span><span class="yr">2019</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+        </div>
+        <div class="hint">列表可上下滑动 · 点下方切换路线</div>
+      </div>
+    </div>
+    <div class="tabs"><div>新手入门</div><div class="on">主线精选</div><div>复联5补课</div></div>
+    <span class="tag">路线二 · 主线精选（18 部）</span>
+    <div class="bill">同上结构 · 列表共 18 项（稿内示意前 13 项），其余滑动可见</div>
+  </div>
+
+  <!-- 复联5补课 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen" style="height:99px"><div class="ft">冻结区（勿改）</div><div class="fs">GenUI Header · 326−227=99</div></div>
+      <div class="zone">
+        <div class="head">
+          <div class="kicker">— MCU WATCH ORDER</div>
+          <div class="title">漫威观影顺序</div>
+          <div class="routeTag">已看完《终局之战》，补这 <b>8</b> 项接上复联5</div>
+        </div>
+        <div class="list">
+          <div class="li"><span class="no">01</span><span class="nm">洛基 S1</span><span class="seriesTag">剧</span><span class="yr">2021</span><span class="ph"><span class="dot" style="background:var(--p4)"></span>第四阶段</span></div>
+          <div class="li"><span class="no">02</span><span class="nm">洛基 S2</span><span class="seriesTag">剧</span><span class="yr">2023</span><span class="ph"><span class="dot" style="background:var(--p4)"></span>第四阶段</span></div>
+          <div class="li"><span class="no">03</span><span class="nm">奇异博士2：疯狂多元宇宙</span><span class="yr">2022</span><span class="ph"><span class="dot" style="background:var(--p4)"></span>第四阶段</span></div>
+          <div class="li"><span class="no">04</span><span class="nm">蜘蛛侠：英雄无归</span><span class="yr">2021</span><span class="ph"><span class="dot" style="background:var(--p4)"></span>第四阶段</span></div>
+          <div class="li"><span class="no">05</span><span class="nm">死侍与金刚狼</span><span class="yr">2024</span><span class="ph"><span class="dot" style="background:var(--p5)"></span>第五阶段</span></div>
+          <div class="li"><span class="no">06</span><span class="nm">美国队长4：勇敢新世界</span><span class="yr">2025</span><span class="ph"><span class="dot" style="background:var(--p5)"></span>第五阶段</span></div>
+          <div class="li"><span class="no">07</span><span class="nm">雷霆特攻队*</span><span class="yr">2025</span><span class="ph"><span class="dot" style="background:var(--p5)"></span>第五阶段</span></div>
+          <div class="li"><span class="no">08</span><span class="nm">神奇四侠：初露锋芒</span><span class="yr">2025</span><span class="ph"><span class="dot" style="background:var(--p6)"></span>第六阶段</span></div>
+        </div>
+        <div class="hint">列表可上下滑动 · 点下方切换路线</div>
+      </div>
+    </div>
+    <div class="tabs"><div>新手入门</div><div>主线精选</div><div class="on">复联5补课</div></div>
+    <span class="tag">路线三 · 复联5补课（8 项，含 2 部剧集）</span>
+    <div class="bill">剧集项带「剧」标签 · 片名最长 12 字（奇异博士2）单行不截断</div>
+  </div>
+</div>
+
+<!-- ================= 414 视口 ================= -->
+<h2>二、414px 视口（1:1 画布 380×380，内容区 281px）</h2>
+<div class="row">
+  <div class="col">
+    <div class="canvas w380">
+      <div class="frozen" style="height:99px"><div class="ft">冻结区（勿改）</div><div class="fs">GenUI Header · 380−281=99</div></div>
+      <div class="zone">
+        <div class="head">
+          <div class="kicker">— MCU WATCH ORDER</div>
+          <div class="title">漫威观影顺序</div>
+          <div class="routeTag">第一次看漫威，照这个顺序看这 <b>12</b> 部就够了</div>
+        </div>
+        <div class="list">
+          <div class="li"><span class="no">01</span><span class="nm">钢铁侠</span><span class="yr">2008</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">02</span><span class="nm">美国队长：复仇者先锋</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">03</span><span class="nm">雷神</span><span class="yr">2011</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">04</span><span class="nm">复仇者联盟</span><span class="yr">2012</span><span class="ph"><span class="dot" style="background:var(--p1)"></span>第一阶段</span></div>
+          <div class="li"><span class="no">05</span><span class="nm">美国队长2：冬日战士</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">06</span><span class="nm">银河护卫队</span><span class="yr">2014</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">07</span><span class="nm">复仇者联盟2：奥创纪元</span><span class="yr">2015</span><span class="ph"><span class="dot" style="background:var(--p2)"></span>第二阶段</span></div>
+          <div class="li"><span class="no">08</span><span class="nm">美国队长3：内战</span><span class="yr">2016</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">09</span><span class="nm">雷神3：诸神黄昏</span><span class="yr">2017</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">10</span><span class="nm">黑豹</span><span class="yr">2018</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">11</span><span class="nm">复仇者联盟3：无限战争</span><span class="yr">2018</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+          <div class="li"><span class="no">12</span><span class="nm">复仇者联盟4：终局之战</span><span class="yr">2019</span><span class="ph"><span class="dot" style="background:var(--p3)"></span>第三阶段</span></div>
+        </div>
+        <div class="hint">列表可上下滑动 · 点下方切换路线</div>
+      </div>
+    </div>
+    <div class="tabs w380"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">414 · 内容区 281px，列表一屏可见 6.1 项</span>
+    <div class="bill w380">实测 281：head 59 + 列表 196 + 提示 26（浏览器实测，零裁切）<br>布局规则同 360，仅内容区更高 · 字号/行高不变</div>
+  </div>
+</div>
+
+<!-- ================= 规范与说明 ================= -->
+<div class="note">
+  <h3>交付 1 · 页面结构（自上而下）</h3>
+  ① 官方外壳 Header（冻结）② 画布内容：标题「漫威观影顺序」→ 当前路线一句话说明 → 电影顺序列表（可滑动）→ 底部提示 ③ 官方 Tabs（操作区，3 个路线入口）。<br>
+  <span class="risk">注意</span>：原「观影路线/随机探索」Tabs 与画布下方路线 chips 合并为同一组 COSUI 官方 Tabs（3 项），操作区由 ~84px 收至 ~56px，归还 ~28px 给画布。
+
+  <h3>交付 2 · 视觉规范</h3>
+  <table>
+    <tr><th>项</th><th>值</th></tr>
+    <tr><td>底色 / 纸色</td><td>画布 <code>#ffffff</code>；卡外沿用 COSUI 外壳</td></tr>
+    <tr><td>金色（强调色）</td><td><code>#b8860b</code>（沿用既有档案金，勿回退 <code>#F2B233</code>）</td></tr>
+    <tr><td>阶段六色</td><td>P1 <code>#3a5ba0</code> / P2 <code>#a03a3a</code> / P3 <code>#b8860b</code> / P4 <code>#6b4fa0</code> / P5 <code>#2a7a5a</code> / P6 <code>#a04a2a</code></td></tr>
+    <tr><td>文字色</td><td>深墨 <code>#1a1d23</code> / 次级 <code>#4a4f58</code> / 弱 <code>#8a8f99</code> / 分隔线 <code>#e8e5de</code></td></tr>
+    <tr><td>字体</td><td>正文系统栈；序号 / 年份 / kicker 用等宽栈（资料库感来源）</td></tr>
+    <tr><td>字号</td><td>标题 16/700 · 路线说明 11.5 · 片名 14/500 · 序号 11 等宽 · 年份 11 等宽 · 阶段 10.5 · 提示 10</td></tr>
+    <tr><td>列表项</td><td>高 32px，底部分隔线 <code>#f2f0ea</code>，末项无分隔线</td></tr>
+    <tr><td>阶段表达</td><td>6px 色点 + 阶段文字（色点是唯一装饰，承载阶段信息）</td></tr>
+    <tr><td>禁止</td><td>海报/图片、卡片嵌套、时间轴连线、罗马数字、装饰条纹、动画特效</td></tr>
+  </table>
+
+  <h3>交付 3 · 每模块文字内容（全部文案）</h3>
+  <ul>
+    <li>标题：<b>漫威观影顺序</b>（kicker：— MCU WATCH ORDER</li>
+    <li>路线一 · 新手入门：<b>第一次看漫威，照这个顺序看这 12 部就够了</b></li>
+    <li>路线二 · 主线精选：<b>想理清主线剧情，按这个顺序看这 18 部</b></li>
+    <li>路线三 · 复联5补课：<b>已看完《终局之战》，补这 8 项接上复联5</b></li>
+    <li>列表项：序号 · 片名 · 年份 · 阶段；剧集项加「剧」标签；<b>不加任何逐部介绍</b>（按任务要求不堆砌）</li>
+    <li>底部提示：<b>列表可上下滑动 · 点下方切换路线</b></li>
+    <li>Tabs：新手入门 / 主线精选 / 复联5补课</li>
+  </ul>
+
+  <h3>交付 4 · 360 / 414 布局说明</h3>
+  <ul>
+    <li>360（卡 326）：内容区 227px = 标题区 59 + 列表 142 + 提示 26；列表项 32px，一屏 4.4 项</li>
+    <li>414（卡 380）：内容区 281px = 标题区 59 + 列表 196 + 提示 26；一屏 6.1 项</li>
+    <li>两视口字号/行高/间距完全一致，仅列表可视高度变化；列表超出滑动，<b>不做任何行数截断</b></li>
+    <li>最长片名 12 字（奇异博士2：疯狂多元宇宙）单行完整显示，余量约 14px</li>
+  </ul>
+
+  <h3>交付 5 · 相对旧版（V1.4.1）删减清单</h3>
+  <ul>
+    <li><b>整卡删除</b>：F3 随机探索卡（<code>.mcu-discover-*</code> 全系列）、独立电影档案卡（<code>.mcu-film-card</code> / <code>.mcu-archive-*</code> 全系列）</li>
+    <li><b>元素删除</b>：海报与全部图片依赖（<code>static/posters/</code> 15 张 ~700KB）、视觉区/hero、罗马数字、胶片孔、档案角标、编号行、衔接条、剧情区、理由区、换一部、已探索计数、时间轴连线节点、KEEP 各级装饰条</li>
+    <li><b>文字删除</b>：全部逐部剧情/理由长文案（只保留路线级一句话说明）</li>
+    <li><b>交互删除</b>：随机探索、档案展开/返回、节点切换推荐</li>
+    <li><b>路线精简</b>：4 条（新手入坑/上映顺序/MCU 时间线/精简主线）→ 3 条（新手入门/主线精选/复联5补课）</li>
+  </ul>
+
+  <h3>交付 6 · 需开发修改的类名与组件范围</h3>
+  <ul>
+    <li><b>删除 CSS</b>：<code>.mcu-discover-*</code>、<code>.mcu-archive-*</code>、<code>.mcu-film-card</code>、<code>.mcu-timeline</code>/<code>.mcu-tl-*</code>、<code>.mcu-route-picker</code>/<code>.mcu-route-chip</code>（合并进 Tabs）</li>
+    <li><b>改造</b>：<code>.mcu-route-canvas</code> 保留为画布根；新增列表类 <code>.mcu-order-list</code> / <code>.mcu-order-item</code> / <code>.mcu-order-no</code> / <code>.mcu-order-name</code> / <code>.mcu-order-year</code> / <code>.mcu-order-phase</code>（建议命名，开发可调整）；Tabs 由 <code>.vc-tabs-*</code> 官方类承载 3 项</li>
+    <li><b>JS</b>：删 <code>renderRandom</code> / <code>renderFilmCard</code>；<code>renderRoute</code> 重写为极简列表；Tabs 由 2 项功能切换改为 3 项路线切换（沿用 <code>sendLog</code> 打点）</li>
+    <li><b>数据（build-data.cjs）</b>：<code>V1_ROUTES</code> 改为 <code>['newcomer','essential','special:avengers-doomsday']</code>；新增 series 数据（复联5补课含 2 部剧集，字段 <code>cn/year/phase</code> 已有，需并入输出）；复联5补课取自 <code>h5/data/special-routes.js</code> 的 <code>core.items</code>（8 项），<b>只读引用，不改母项目</b></li>
+    <li><b>资源</b>：<code>static/posters/</code> 可整体移除，包体预计由 ~714KB 降至 ~80KB</li>
+  </ul>
+
+  <h3 class="risk">待产品确认（3 项，不影响设计结构，仅影响数据映射）</h3>
+  <ol>
+    <li><b>「主线精选」的数据映射</b>：本稿采用母项目 <code>essential</code>（精简主线，18 部电影）。备选：<code>recommended</code>（推荐完整，含《洛基》等剧集）或 <code>chrono</code>（时间线 38 部全量）</li>
+    <li><b>「复联5补课」取核心还是完整</b>：母项目 H5 专题含 <code>core</code> 核心 8 项（默认展开）与 <code>full</code> 完整 15 项；本稿按「极简」原则取 core 8 项</li>
+    <li><b>剧集显示</b>：复联5补课含 2 部剧集（洛基 S1/S2），本稿以「剧」标签区分；若要求纯电影，需替换为电影版补课清单（母项目无此数据，不可编造）</li>
+  </ol>
+</div>
+</body>
+</html>
