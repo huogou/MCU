@@ -28,12 +28,12 @@ const KEY = 'mcu_nav_achievements_v1';
  * ---- 全部基于现有字段推导，零新增数据字段 ---- */
 const ACHIEVEMENTS = [
   {
-    id: 'first-step', name: '初入漫威', desc: '观看第一部 MCU 电影',
+    id: 'first-step', name: '初入漫威', desc: '标记第一部 MCU 电影',
     icon: '一', group: '里程',
     test: function () { return userState.count() >= 1; }
   },
   {
-    id: 'phase-1-done', name: '第一阶段完成', desc: '看完 Phase 1 核心电影（4 部）',
+    id: 'phase-1-done', name: '第一阶段完成', desc: '标记 Phase 1 核心电影（4 部）',
     icon: '壹', group: '阶段',
     test: function () {
       const cores = mcuData.all.filter(function (m) {
@@ -47,7 +47,7 @@ const ACHIEVEMENTS = [
     }
   },
   {
-    id: 'infinity-explorer', name: '无限传奇探索者', desc: '看完无限传奇 23 部电影',
+    id: 'infinity-explorer', name: '无限传奇探索者', desc: '标记无限传奇 23 部电影',
     icon: '无', group: '阶段',
     test: function () {
       const inf = mcuData.all.filter(function (m) { return m.saga === 'infinity'; });
@@ -59,7 +59,7 @@ const ACHIEVEMENTS = [
     }
   },
   {
-    id: 'newcomer-done', name: '新手入坑完成', desc: '看完新手入坑路线全部 12 部',
+    id: 'newcomer-done', name: '新手入坑完成', desc: '标记新手入坑路线全部 12 部',
     icon: '新', group: '路线',
     test: function () {
       const route = mcuData.routeById('newcomer');

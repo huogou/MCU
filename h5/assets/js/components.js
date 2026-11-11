@@ -144,9 +144,12 @@
       if (!u) return '';
       opts = opts || {};
       var featured = !!opts.featured;
-      var statusBadge = (u.status === 'dated')
-        ? '<span class="v2-badge v2-badge--soon">已定档</span>'
-        : '<span class="v2-badge v2-badge--tba">档期待定</span>';
+      /* pendingReview：档期尚未经官方来源核实，不对外表述为「已定档」。 */
+      var statusBadge = u.pendingReview
+        ? '<span class="v2-badge v2-badge--tba">档期待核实</span>'
+        : ((u.status === 'dated')
+            ? '<span class="v2-badge v2-badge--soon">已定档</span>'
+            : '<span class="v2-badge v2-badge--tba">档期待定</span>');
 
       /* V2.1 推荐关注：复用进度里的 want_to_watch（想看=关注），本地存储 */
       var wanted = MCU.progress.isWanted(u.id);

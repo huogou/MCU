@@ -9,7 +9,7 @@ const userState = require('../../models/userState.js');
 const STATUS = {
   unwatched: { text: '未观看', cls: 'unwatched' },
   watching:  { text: '正在观看', cls: 'watching' },
-  watched:   { text: '已观看', cls: 'watched' }
+  watched:   { text: '已标记', cls: 'watched' }
 };
 
 function statusOf(id) {
@@ -101,7 +101,7 @@ Page({
     if (currentNo > 0 && currentNo <= nodes.length) {
       nodes[currentNo - 1].isCurrent = true;
     }
-    var currentText = currentNo > 0 ? ('当前看到 · 第 ' + currentNo + ' / ' + total + ' 部') : '';
+    var currentText = currentNo > 0 ? ('当前进度 · 第 ' + currentNo + ' / ' + total + ' 部') : '';
 
     // 下一部（第一个未看）
     var nextNode = (firstUnwatched >= 0) ? nodes[firstUnwatched] : null;

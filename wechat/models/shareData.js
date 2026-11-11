@@ -34,7 +34,7 @@ const TEMPLATES = {
     label: '观影进度海报',
     title: '我的 MCU 旅程',
     slogan: SLOGAN.progress,
-    desc: '已观看数量 / 总数量 59 · 当前阶段'
+    desc: '已标记数量 / 总数量 59 · 当前阶段'
   },
   route: {
     type: 'route',

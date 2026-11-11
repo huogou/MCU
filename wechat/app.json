@@ -12,6 +12,7 @@
     "pages/my-mcu/my-mcu",
     "pages/feedback/feedback",
     "pages/share/share",
+    "pages/special/special",
     "pages/about/about",
     "pages/agreement/agreement",
     "pages/privacy/privacy"

@@ -1,0 +1,282 @@
+/* ============================================================
+ * 复联5补课路线专题（sp-*）· V1.3.0
+ * ------------------------------------------------------------
+ * 视觉基线对齐 h5/assets/css/v1-special.css，交互改为小程序条件渲染。
+ * 铁律：类名全部 sp- 前缀隔离；颜色/字号/圆角/间距一律引用
+ *       app.wxss 全局 Token，零新增 CSS 变量、零裸 hex。
+ * 适配：375 / 390 / 430 宽度 —— flex + min-width:0 + 文本省略，
+ *       海报 / 序号 / 右列为固定 rpx，中间信息列自适应收缩。
+ * ============================================================ */
+
+.sp-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--bg);
+  padding-bottom: var(--space-2xl);
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+  overflow-x: hidden;
+}
+
+/* ---------- 区块通用 ---------- */
+.sp-sec { padding: var(--space-lg) var(--page-x) 0; }
+.sp-sec-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--space-sm); margin-bottom: var(--space-md);
+}
+.sp-sec-t {
+  display: flex; align-items: center; min-width: 0;
+  font-size: var(--fs-title); font-weight: 700; color: var(--text-main);
+}
+.sp-sec-bar {
+  width: 6rpx; height: 32rpx; flex: 0 0 auto;
+  border-radius: var(--radius-sm); background: var(--gold);
+  margin-right: var(--space-sm);
+}
+.sp-sec-tx { min-width: 0; }
+
+/* ============================================================
+ * ① Hero
+ * ============================================================ */
+.sp-hero { position: relative; overflow: hidden; padding: var(--space-lg) var(--page-x) var(--space-xl); }
+.sp-hero-bg {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+  background: linear-gradient(180deg, var(--surface-0) 0%, var(--bg) 100%);
+}
+.sp-hero-in { position: relative; z-index: 2; }
+.sp-name {
+  font-size: var(--fs-display); font-weight: 700; line-height: 1.25;
+  color: var(--gold); margin-bottom: var(--space-xs);
+}
+.sp-tagline {
+  font-size: var(--fs-body); color: var(--text-sub);
+  line-height: 1.6; margin-bottom: var(--space-md);
+}
+.sp-hero-date { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-md); }
+.sp-hero-date-d {
+  font-size: var(--fs-title); font-weight: 600; color: var(--gold);
+  white-space: nowrap; flex: 0 0 auto;
+}
+.sp-hero-date-l { flex: 1; height: 1rpx; background: var(--gold-a30); min-width: 20rpx; }
+.sp-hero-date-en {
+  font-size: var(--fs-mini); font-weight: 600; color: var(--gold);
+  letter-spacing: 2rpx; max-width: 44%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+
+.sp-actions { display: flex; flex-direction: column; gap: var(--space-sm); }
+.sp-btn {
+  height: 88rpx; line-height: 88rpx; text-align: center;
+  border-radius: var(--radius-md); font-size: var(--fs-body); font-weight: 600;
+}
+.sp-btn-primary { background: var(--gold); color: var(--gold-btn-text); box-shadow: var(--glow-gold); }
+.sp-btn-ghost {
+  background: var(--gold-a06); color: var(--gold);
+  border: 2rpx solid var(--gold-a20);
+}
+.sp-btn-hover { opacity: 0.88; }
+.sp-actions-note {
+  font-size: var(--fs-mini); color: var(--text-weak);
+  text-align: center; margin-top: var(--space-sm);
+}
+.sp-disclaimer {
+  font-size: var(--fs-mini); color: var(--text-weak);
+  line-height: 1.6; margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-0); border-radius: var(--radius-md);
+}
+
+/* ============================================================
+ * ② 徽章 / 起点条 / 节点卡 / 终点条
+ * ============================================================ */
+.sp-badge {
+  display: flex; align-items: center; gap: var(--space-xs); flex: 0 0 auto;
+  padding: 6rpx 24rpx; border-radius: var(--radius-full);
+  background: var(--gold-a10); border: 1rpx solid var(--gold-a20);
+  font-size: var(--fs-caption); color: var(--gold); white-space: nowrap;
+}
+.sp-badge-dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: var(--gold); }
+
+.sp-origin {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md);
+  background: var(--surface-0); border: 1rpx solid var(--surface-3);
+  margin-bottom: var(--space-sm);
+}
+.sp-origin-d {
+  width: 20rpx; height: 20rpx; flex: 0 0 auto; border-radius: 50%;
+  background: var(--gold); box-shadow: 0 0 0 6rpx var(--gold-a20);
+}
+.sp-origin-tx { min-width: 0; }
+.sp-origin-t { font-size: var(--fs-caption); font-weight: 600; color: var(--text-sub); line-height: 1.4; }
+.sp-origin-k { font-size: var(--fs-mini); color: var(--text-weak); margin-top: 2rpx; }
+
+.sp-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.sp-item {
+  display: flex; align-items: flex-start; gap: var(--space-sm);
+  padding: var(--space-md) var(--space-sm);
+  border-radius: var(--radius-md); background: var(--surface-1);
+  border: 1rpx solid var(--surface-3);
+}
+.sp-item-hover { background: var(--surface-2); }
+.sp-item.is-watched { opacity: 0.55; }
+.sp-item.is-next {
+  border-color: var(--gold-a30);
+  background: var(--gold-a06);
+  box-shadow: var(--glow-gold);
+}
+
+/* 序号圆点：外扩热区 88rpx，catchtap 不冒泡 */
+.sp-num-hit {
+  width: 88rpx; height: 88rpx; flex: 0 0 88rpx;
+  display: flex; align-items: center; justify-content: center;
+}
+.sp-num {
+  width: 56rpx; height: 56rpx; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-2); color: var(--text-sub);
+  font-size: var(--fs-caption); font-weight: 700;
+}
+.sp-num.done { background: var(--success-a20); color: var(--success); }
+.sp-num.next { background: var(--gold-a10); color: var(--gold); border: 1rpx solid var(--gold-a20); }
+.sp-item.is-next .sp-nm { color: var(--gold); }
+
+/* 海报盒 88×124rpx；无图 / 加载失败一律阶段色 + 首字兜底 */
+.sp-ph {
+  position: relative; overflow: hidden; flex: 0 0 88rpx;
+  width: 88rpx; height: 124rpx; border-radius: var(--radius-sm);
+  border: 1rpx solid var(--surface-3); background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+}
+.sp-ph-img { width: 100%; height: 100%; display: block; }
+.sp-ph-tx { font-size: var(--fs-title); font-weight: 700; color: var(--white); opacity: 0.85; }
+
+.sp-info { flex: 1 1 auto; min-width: 0; }
+.sp-row { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6rpx; }
+.sp-nm {
+  font-size: var(--fs-body); font-weight: 600; color: var(--text-main);
+  line-height: 1.35; word-break: break-all;
+}
+.sp-yr { font-size: var(--fs-mini); color: var(--text-weak); }
+.sp-kw {
+  display: block; font-size: var(--fs-caption); color: var(--text-sub);
+  line-height: 1.45; margin-top: 4rpx; word-break: break-all;
+}
+.sp-type { display: block; font-size: var(--fs-mini); color: var(--text-weak); margin-top: 4rpx; }
+.sp-tag {
+  display: inline-block; padding: 2rpx 12rpx; border-radius: var(--radius-full);
+  background: var(--surface-2); font-size: var(--fs-mini); font-weight: 600;
+  margin-top: 6rpx;
+}
+.sp-view {
+  flex: 0 0 96rpx; width: 96rpx; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4rpx;
+}
+.sp-view-tx { font-size: var(--fs-mini); color: var(--text-weak); white-space: nowrap; }
+.sp-chev { font-size: var(--fs-title); color: var(--text-weak); line-height: 1; }
+.sp-item.is-next .sp-view-tx, .sp-item.is-next .sp-chev { color: var(--gold); }
+
+/* 「你看到这里了」金线分隔 */
+.sp-split { display: flex; align-items: center; gap: var(--space-sm); }
+.sp-split-l { flex: 1; height: 1rpx; background: var(--gold-a30); }
+.sp-split-tx {
+  display: flex; align-items: center; gap: 6rpx; white-space: nowrap;
+  font-size: var(--fs-mini); font-weight: 600; color: var(--gold);
+}
+.sp-split-dot { width: 10rpx; height: 10rpx; border-radius: 50%; background: var(--gold); }
+
+.sp-endpoint {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md); margin-top: var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--gold-a10); border: 1rpx solid var(--gold-a20);
+}
+.sp-endpoint-d {
+  width: 56rpx; height: 56rpx; flex: 0 0 auto; border-radius: 50%;
+  background: var(--gold); color: var(--gold-btn-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--fs-caption); font-weight: 700;
+}
+.sp-endpoint-tx { min-width: 0; }
+.sp-endpoint-en {
+  font-size: var(--fs-mini); font-weight: 700; color: var(--gold);
+  letter-spacing: 3rpx; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sp-endpoint-cn {
+  font-size: var(--fs-mini); color: var(--text-sub); margin-top: 2rpx;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ============================================================
+ * ③ 完整路线折叠区
+ * ============================================================ */
+.sp-full { padding: var(--space-lg) var(--page-x) 0; }
+.sp-full-sum {
+  padding: var(--space-md); border-radius: var(--radius-md);
+  background: var(--surface-1); border: 1rpx solid var(--surface-3);
+}
+.sp-full-hover { background: var(--surface-2); }
+.sp-full-hd { display: flex; align-items: center; gap: var(--space-sm); }
+.sp-full-t { flex: 1 1 auto; min-width: 0; font-size: var(--fs-title); font-weight: 600; color: var(--text-main); }
+.sp-full-num {
+  flex: 0 0 auto; padding: 4rpx 20rpx; border-radius: var(--radius-full);
+  background: var(--gold-a10); border: 1rpx solid var(--gold-a20);
+  font-size: var(--fs-mini); color: var(--gold); font-weight: 600; white-space: nowrap;
+}
+.sp-full-chev {
+  flex: 0 0 auto; font-size: var(--fs-title); color: var(--text-weak);
+  line-height: 1; transform: rotate(0deg);
+}
+.sp-full-chev.is-open { transform: rotate(180deg); }
+.sp-full-desc {
+  font-size: var(--fs-mini); color: var(--text-weak);
+  line-height: 1.6; margin-top: var(--space-xs);
+}
+.sp-full-body { display: flex; flex-direction: column; gap: var(--space-sm); padding-top: var(--space-sm); }
+
+/* ============================================================
+ * ④ 五段链 + 金色终点卡
+ * ============================================================ */
+.sp-chain-body { position: relative; }
+.sp-chain-item { display: flex; gap: var(--space-md); padding: var(--space-xs) 0; }
+.sp-chain-rail {
+  position: relative; width: 4rpx; flex: 0 0 4rpx;
+  background: linear-gradient(180deg, var(--gold-a30), var(--gold-a06));
+}
+.sp-chain-dot {
+  position: absolute; left: 50%; top: 30rpx; width: 20rpx; height: 20rpx;
+  margin-left: -10rpx; border-radius: 50%; background: var(--gold);
+  box-shadow: 0 0 0 8rpx var(--gold-a10);
+}
+.sp-chain-tx { flex: 1 1 auto; min-width: 0; }
+.sp-chain-t { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); margin-bottom: 4rpx; }
+.sp-chain-d { font-size: var(--fs-caption); color: var(--text-sub); line-height: 1.6; word-break: break-all; }
+.sp-chain-end {
+  flex: 1 1 auto; min-width: 0; padding: var(--space-md);
+  border-radius: var(--radius-md); background: var(--surface-1);
+  border: 1rpx solid var(--gold-a20); box-shadow: var(--glow-gold);
+}
+.sp-chain-end-t { font-size: var(--fs-body); font-weight: 700; color: var(--gold); }
+.sp-chain-end-d { font-size: var(--fs-caption); color: var(--gold); margin-top: 4rpx; line-height: 1.5; }
+.sp-chain-end-note { font-size: var(--fs-caption); color: var(--text-sub); margin-top: var(--space-sm); line-height: 1.6; }
+
+/* ============================================================
+ * ⑤ 底部入口 / 合规声明
+ * ============================================================ */
+.sp-entry {
+  padding: var(--space-xl) var(--page-x) var(--space-lg);
+  margin-top: var(--space-lg); border-top: 1rpx solid var(--surface-3);
+  text-align: center;
+}
+.sp-brand { font-size: var(--fs-body); font-weight: 700; color: var(--gold); letter-spacing: 2rpx; }
+.sp-entry-t { font-size: var(--fs-body); font-weight: 600; color: var(--text-main); margin: var(--space-sm) 0 var(--space-md); }
+.sp-entry-btn { width: 100%; }
+.sp-entry-link {
+  padding: var(--space-sm) 0; font-size: var(--fs-caption); color: var(--text-weak);
+}
+.sp-link-hover { color: var(--gold); }
+.sp-legal {
+  font-size: var(--fs-mini); color: var(--text-weak);
+  line-height: 1.6; margin-top: var(--space-md);
+}
+
+.sp-empty { padding: var(--space-xl) var(--page-x); font-size: var(--fs-caption); color: var(--text-weak); }

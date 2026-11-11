@@ -26,14 +26,26 @@
  *   3. next.html 会强制清空 id 并赋值 phase=6，不影响本表作为数据源的完整性。
  *   4. 更新方式：只改本文件，页面自动跟随。禁止把片单写死进 HTML / 组件。
  *
- * 最近一次核对：2026-09-10
+ * 最近一次核对：2026-09-10（2026-11-09 复核时未逐条重新核验）
  * 来源交叉验证：Marvel Studios 官方档期 / SDCC 2026 Hall H 公布 / 多家主流媒体档期表一致
+ *
+ * 待核实标记（本轮修复新增，不得当作官方结论）：
+ *   · black-panther-3 / ghost-rider 的 2028 年档期带 pendingReview: true，
+ *     仅代表项目内曾登记的说法，需内容负责人对照官方来源复核后再对外表述。
+ *   · visionquest（series.js）的上线日期、集数与剧情关联同为 pendingReview。
+ *
+ * 字段补充：
+ *   contentId  与 movies.js 中「未上映预置条目」的 id 建立引用（不新增第二套作品数据）；
+ *              next.html 据此去重，避免同一部片同时出现在「已上映」和「即将上映」。
+ *   seriesNo   专题页终点圆点的展示序号（如 5），仅用于视觉，不是官方片名的一部分。
  * ============================================================ */
 
 window.MCU_UPCOMING = [
   {
     id: 'avengers-5',
-    title: '复仇者联盟5：毁灭之日',
+    contentId: 'doomsday',       /* 关联 movies.js 未上映预置条目，供 next.html 去重 */
+    seriesNo: 5,                /* 专题终点圆点展示序号，非官方片名的一部分 */
+    title: '复仇者联盟：末日',  /* 正式中文名与 movies.js 的 cn 保持一致 */
     en: 'Avengers: Doomsday',
     date: '2026-12-18',
     phase: 6,
@@ -43,13 +55,15 @@ window.MCU_UPCOMING = [
   },
   {
     id: 'avengers-6',
-    title: '复仇者联盟6：秘密战争',
+    contentId: 'secretwars',
+    seriesNo: 6,
+    title: '复仇者联盟：秘密战争',
     en: 'Avengers: Secret Wars',
     date: '2027-12-17',
     phase: 6,
     poster: '',
     status: 'dated',
-    note: '多元宇宙传奇终章，承接《毁灭之日》。'
+    note: '多元宇宙传奇终章，承接《复仇者联盟：末日》。'
   },
   {
     id: 'black-panther-3',
@@ -59,7 +73,8 @@ window.MCU_UPCOMING = [
     phase: null,
     poster: '',
     status: 'dated',
-    note: '瑞恩·库格勒回归执导。所属阶段官方尚未公布。'
+    pendingReview: true,        /* 2028 年档期待官方来源核实 */
+    note: '瑞恩·库格勒回归执导。所属阶段官方尚未公布；2028 年档期待官方来源核实。'
   },
   {
     id: 'ghost-rider',
@@ -69,6 +84,7 @@ window.MCU_UPCOMING = [
     phase: null,
     poster: '',
     status: 'tba',
-    note: 'SDCC 2026 公布，档期仅定到年份。所属阶段官方尚未公布。'
+    pendingReview: true,        /* 档期与所属阶段待官方来源核实 */
+    note: 'SDCC 2026 公布，档期仅定到年份；所属阶段与档期待官方来源核实。'
   }
 ];

@@ -1,10 +1,14 @@
 /* ============================================================
  * MCU 宇宙导航 - 剧集数据（Disney+ / Marvel Studios 出品）
  * ------------------------------------------------------------
- * 数据口径：仅收录已正式上线、且被 Marvel 官方时间线（2026-06-02 发布）
- * 列入"Complete MCU Timeline"的 Disney+ 剧集。
+ * 数据口径：以已正式上线、且被 Marvel 官方时间线（2026-06-02 发布）
+ * 列入"Complete MCU Timeline"的 Disney+ 剧集为主。
  * 首播日期 / 阶段 / 集数交叉核对自 Marvel 官方时间线 与
  * 维基百科 MCU television series 词条（辅助源）。
+ *
+ * 例外：visionquest 为「已官宣待映」预置条目（releaseStatus: 'upcoming'）。
+ * 其上线日期、集数与「直连《复仇者联盟：末日》」的剧情关联均为项目内整理推断，
+ * 带 pendingReview: true，待官方来源核实；不进入观影路线 / 进度 / 统计。
  *
  * type = 'series'；importance 取值见 content.js 的 MCU_IMPORTANCE。
  * coLabel 为故事时间线大致年代（用于按时间线排序，非精确序号）。
@@ -13,6 +17,18 @@
  * ============================================================ */
 
 window.MCU_SERIES = [
+  { /* P1-B(2026-10-20) 新增；2026-11-09 标为「未上映预置条目」。
+       上线日期、集数与「直连《末日》」的剧情关联均为项目内整理推断，待官方核实。 */
+    id: 'visionquest', cn: '幻视探索', en: 'Vision Quest',
+    year: 2026, date: '2026-11-01', phase: 6, type: 'series',
+    releaseStatus: 'upcoming', pendingReview: true,
+    importance: 'optional', episodes: '待官方公布', saga: 'multiverse',
+    coLabel: '2026 年',
+    role: '以幻视为核心的多元宇宙支线，紧接《旺达幻视》与《阿加莎》，直连《复仇者联盟：末日》。',
+    sf: '幻视在失去与重建自我之间展开新的探索，牵出与末日危机相关的线索。',
+    chars: []
+  },
+
   {
     id: 'wandavision', cn: '旺达幻视', en: 'WandaVision',
     year: 2021, date: '2021-01-15', phase: 4, type: 'series',

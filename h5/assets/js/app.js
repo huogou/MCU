@@ -19,7 +19,10 @@
 (function (global) {
   'use strict';
 
+  /* MCU_CONTENT 仅含已上映内容（资料库 / 路线 / 进度 / 统计的唯一口径）；
+     MCU_CONTENT_ALL 额外含未上映预置条目，只用于按 id 查详情与保留关系引用。 */
   var CONTENT = global.MCU_CONTENT || [];
+  var ALL_CONTENT = global.MCU_CONTENT_ALL || CONTENT;
   var RELS    = global.MCU_RELATIONS || [];
   var ROUTES  = global.MCU_ROUTES || [];
   var CHARS   = global.MCU_CHARACTERS || [];
@@ -62,7 +65,7 @@
   /* ========== 1. 数据索引 ========== */
 
   var byId = {};
-  CONTENT.forEach(function (m) { byId[m.id] = m; });
+  ALL_CONTENT.forEach(function (m) { byId[m.id] = m; });
 
   var charById = {};
   CHARS.forEach(function (c) { charById[c.id] = c; });
@@ -122,6 +125,12 @@ var VIEW_MODES = {
     },
 
     get: function (id) { return byId[id] || null; },
+    /* 未上映预置条目：历史 localStorage 记录不删除，但不计入「已看」统计；
+       作品正式上映后只要把 releaseStatus 改为 released，历史记录会自动重新计入。 */
+    isUpcoming: function (id) {
+      var m = byId[id];
+      return !!m && m.releaseStatus === 'upcoming';
+    },
     getChar: function (id) { return charById[id] || null; },
 
     /* 角色「出现作品数量」：从全部内容的 chars 反查（电影/剧集/特别呈现/短片都算），
@@ -258,9 +267,13 @@ var VIEW_MODES = {
       if (s.watched[id]) unmarkWatched(s, id); else markWatched(s, id);
       return touch(s), !!s.watched[id];
     },
-    count: function () { return Object.keys(readState().watched).length; },
+    count: function () {
+      return Object.keys(readState().watched).filter(function (id) { return !data.isUpcoming(id); }).length;
+    },
     total: function () { return CONTENT.length; },
-    seenIds: function () { return Object.keys(readState().watched); },
+    seenIds: function () {
+      return Object.keys(readState().watched).filter(function (id) { return !data.isUpcoming(id); });
+    },
     clear: function () { writeState({ watched: {}, want_to_watch: {}, favorite: {}, saved_routes: [], milestones_shown: {} }); },
 
     /* V1.3 6.1：「我的 MCU 旅程」里程碑（5/10/20 部）。每个最多出现一次，
@@ -1125,33 +1138,43 @@ var VIEW_MODES = {
         + '</div>';
     },
 
-    /* SEO：canonical + Open Graph（JS 输出，部署到任意域名都自动生成正确 URL）
-     * canonical 去掉状态参数（?r= / ?from= / ?focus=），只保留内容定义参数
-     * （movie.html / route-detail.html 的 ?id=），避免参数化 URL 被搜索引擎重复收录。
-     * ⚠ route-detail.html 必须在内，否则 canonical 会把 ?id= 洗掉，
-     *   导致 3 条基础路线全部指向同一个无参 URL。 */
+    /* SEO：canonical + Open Graph
+     * 静态页在 <head> 里已写死规范 URL（data-static="1"），不执行 JS 的抓取器也能读到；
+     * 参数化页在运行时按「内容定义参数」生成 canonical，避免把 ?id= 洗掉
+     * 造成详情页互相重复（route-detail / movie / special / news-detail 都在 KEEP 内）。
+     * 规范 URL 统一：/index.html → /，/special → /special.html，消除重复入口自指。 */
     injectSeoTags: function (currentPage) {
       try {
+        var NORM_PATH = { '/index.html': '/', '/special': '/special.html' };
         var KEEP = {
           'movie.html': ['id'],
           'routes.html': ['r'],
           'route-detail.html': ['id'],
-          /* 专题页：?id= 是「内容定义参数」（avengers-doomsday），必须保留，
-             否则 canonical 会被洗成无参 URL 与首页重复收录。 */
-          'special.html': ['id']
+          'special.html': ['id'],
+          'news-detail.html': ['id'],
+          'topic-detail.html': ['id']
         };
         var u = new URL(global.location.href);
+        /* 唯一规范域名：即使从遗留非 www 入口直达，canonical / og:url 也一律指向 www HTTPS，
+           不再随着访问域名变化，避免产生两套规范地址。 */
+        var CANON_ORIGIN = 'https://www.mcuatlas.xyz';
+        var path = NORM_PATH[u.pathname] || u.pathname;
         var q = new URLSearchParams();
         (KEEP[currentPage] || []).forEach(function (k) {
           var v = u.searchParams.get(k);
           if (v) q.set(k, v);
         });
-        var canon = u.origin + u.pathname + (q.toString() ? '?' + q.toString() : '');
+        var canon = CANON_ORIGIN + path + (q.toString() ? '?' + q.toString() : '');
 
-        var link = document.createElement('link');
-        link.rel = 'canonical';
+        var link = document.querySelector('link[rel="canonical"]');
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'canonical';
+          document.head.appendChild(link);
+        }
+        /* 静态页无内容定义参数时以 <head> 中的规范 URL 为准（统一 `/` 而非 `/index.html`）。 */
+        if (link.getAttribute('data-static') === '1' && !q.toString()) canon = link.href;
         link.href = canon;
-        document.head.appendChild(link);
 
         var descEl = document.querySelector('meta[name="description"]');
         var pairs = [

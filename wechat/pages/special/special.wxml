@@ -1,0 +1,168 @@
+<!-- 复联5补课路线专题 · V1.3.0
+     信息架构对齐 h5/special.html：Hero → 核心路线 → 完整路线(折叠) → 五段链 → 底部入口
+     全部为 WXML 条件渲染 + setData；无 DOM / innerHTML / details / 外链 / 播放器 -->
+<view class="sp-page" wx:if="{{hasRoute}}">
+
+  <!-- ═══ ① Hero ═══ -->
+  <view class="sp-hero">
+    <view class="sp-hero-bg"></view>
+    <view class="sp-hero-in">
+      <view class="sp-name">{{title}}</view>
+      <view class="sp-tagline">{{tagline}}</view>
+      <view wx:if="{{hasHeroDate}}" class="sp-hero-date">
+        <text class="sp-hero-date-d">{{heroDate}}</text>
+        <view class="sp-hero-date-l"></view>
+        <text class="sp-hero-date-en">{{heroEn}}</text>
+      </view>
+      <view class="sp-actions">
+        <view class="sp-btn sp-btn-primary" bindtap="onGoCore" hover-class="sp-btn-hover" hover-stay-time="80">先补这 {{coreCount}} 部 ›</view>
+        <view wx:if="{{hasFull}}" class="sp-btn sp-btn-ghost" bindtap="onGoFull" hover-class="sp-btn-hover" hover-stay-time="80">完整补课 {{fullCount}} 部 ›</view>
+      </view>
+      <view class="sp-actions-note">{{heroNote}}</view>
+      <view class="sp-disclaimer">{{disclaimer}}</view>
+    </view>
+  </view>
+
+  <!-- ═══ ② 核心路线（起点条 + 8 节点 + 进度徽章 + 终点条） ═══ -->
+  <view class="sp-sec" id="sp-core">
+    <view class="sp-sec-hd">
+      <view class="sp-sec-t"><view class="sp-sec-bar"></view><text class="sp-sec-tx">{{coreTitle}}</text></view>
+      <view class="sp-badge"><view class="sp-badge-dot"></view>{{badge}}</view>
+    </view>
+
+    <view class="sp-origin">
+      <view class="sp-origin-d"></view>
+      <view class="sp-origin-tx">
+        <view class="sp-origin-t">你已看完《{{originCn}}》</view>
+        <view class="sp-origin-k">{{originKw}}</view>
+      </view>
+    </view>
+
+    <view class="sp-list">
+      <block wx:for="{{coreNodes}}" wx:key="key">
+        <view class="sp-item {{item.seen ? 'is-watched' : ''}} {{item.isNext ? 'is-next' : ''}}"
+              data-work-id="{{item.workId}}" bindtap="onGoMovie" hover-class="sp-item-hover" hover-stay-time="80">
+          <view class="sp-num-hit" data-work-id="{{item.workId}}" catchtap="onToggle">
+            <view class="sp-num {{item.seen ? 'done' : ''}} {{item.isNext ? 'next' : ''}}">
+              <text wx:if="{{item.seen}}">✓</text>
+              <text wx:else>{{index + 1}}</text>
+            </view>
+          </view>
+          <view class="sp-ph" style="border-color:{{item.phaseColor}};">
+            <image wx:if="{{item.poster && !item.imgErr}}" class="sp-ph-img" src="{{item.poster}}"
+                   mode="aspectFill" lazy-load="true" binderror="onImgError" data-key="{{item.key}}" />
+            <text wx:else class="sp-ph-tx">{{item.letter}}</text>
+          </view>
+          <view class="sp-info">
+            <view class="sp-row">
+              <text class="sp-nm">{{item.name}}</text>
+              <text wx:if="{{item.year}}" class="sp-yr">{{item.year}}</text>
+            </view>
+            <text wx:if="{{item.kw}}" class="sp-kw">{{item.kw}}</text>
+            <text wx:if="{{item.phaseText}}" class="sp-tag" style="color:{{item.phaseColor}};">{{item.phaseText}}</text>
+          </view>
+          <view class="sp-view">
+            <text class="sp-view-tx">查看作品</text>
+            <text class="sp-chev">›</text>
+          </view>
+        </view>
+        <view wx:if="{{item.splitAfter}}" class="sp-split">
+          <view class="sp-split-l"></view>
+          <view class="sp-split-tx"><view class="sp-split-dot"></view>你看到这里了</view>
+          <view class="sp-split-l"></view>
+        </view>
+      </block>
+    </view>
+
+    <view class="sp-endpoint">
+      <view class="sp-endpoint-d">{{endpointNum}}</view>
+      <view class="sp-endpoint-tx">
+        <view class="sp-endpoint-en">{{endpointEn}}</view>
+        <view class="sp-endpoint-cn">{{endpointCn}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ③ 完整路线（默认折叠，WXML 条件渲染） ═══ -->
+  <view wx:if="{{hasFull}}" class="sp-full" id="sp-full">
+    <view class="sp-full-sum" bindtap="onToggleFull" hover-class="sp-full-hover" hover-stay-time="80">
+      <view class="sp-full-hd">
+        <text class="sp-full-t">{{fullTitle}}</text>
+        <text class="sp-full-num">{{fullCount}} 部</text>
+        <text class="sp-full-chev {{fullOpen ? 'is-open' : ''}}">⌄</text>
+      </view>
+      <view class="sp-full-desc">{{fullDesc}}</view>
+    </view>
+
+    <view wx:if="{{fullOpen}}" class="sp-full-body">
+      <block wx:for="{{fullNodes}}" wx:key="key">
+        <view class="sp-item {{item.seen ? 'is-watched' : ''}} {{item.isNext ? 'is-next' : ''}}"
+              data-work-id="{{item.workId}}" bindtap="onGoMovie" hover-class="sp-item-hover" hover-stay-time="80">
+          <view class="sp-num-hit" data-work-id="{{item.workId}}" catchtap="onToggle">
+            <view class="sp-num {{item.seen ? 'done' : ''}} {{item.isNext ? 'next' : ''}}">
+              <text wx:if="{{item.seen}}">✓</text>
+              <text wx:else>{{index + 1}}</text>
+            </view>
+          </view>
+          <view class="sp-ph" style="border-color:{{item.phaseColor}};">
+            <image wx:if="{{item.poster && !item.imgErr}}" class="sp-ph-img" src="{{item.poster}}"
+                   mode="aspectFill" lazy-load="true" binderror="onImgError" data-key="{{item.key}}" />
+            <text wx:else class="sp-ph-tx">{{item.letter}}</text>
+          </view>
+          <view class="sp-info">
+            <view class="sp-row"><text class="sp-nm">{{item.name}}</text></view>
+            <text wx:if="{{item.typeLabel}}" class="sp-type">{{item.typeLabel}}</text>
+            <text wx:if="{{item.phaseText}}" class="sp-tag" style="color:{{item.phaseColor}};">{{item.phaseText}}</text>
+          </view>
+          <view class="sp-view">
+            <text class="sp-view-tx">查看作品</text>
+            <text class="sp-chev">›</text>
+          </view>
+        </view>
+        <view wx:if="{{item.splitAfter}}" class="sp-split">
+          <view class="sp-split-l"></view>
+          <view class="sp-split-tx"><view class="sp-split-dot"></view>你看到这里了</view>
+          <view class="sp-split-l"></view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- ═══ ④ 五段主题线索 + 毁灭之日金色终点卡 ═══ -->
+  <view class="sp-sec" id="sp-chain">
+    <view class="sp-sec-hd"><view class="sp-sec-t"><view class="sp-sec-bar"></view><text class="sp-sec-tx">{{chainTitle}}</text></view></view>
+    <view class="sp-chain-body">
+      <view class="sp-chain-item" wx:for="{{chainItems}}" wx:key="key">
+        <view class="sp-chain-rail"><view class="sp-chain-dot"></view></view>
+        <view class="sp-chain-tx">
+          <view class="sp-chain-t">{{item.t}}</view>
+          <view class="sp-chain-d">{{item.d}}</view>
+        </view>
+      </view>
+      <view class="sp-chain-item">
+        <view class="sp-chain-rail"><view class="sp-chain-dot"></view></view>
+        <view class="sp-chain-end">
+          <view class="sp-chain-end-t">{{chainEndShort}}</view>
+          <view class="sp-chain-end-d">{{chainEndInfo}}</view>
+          <view class="sp-chain-end-note">{{chainEndDesc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ═══ ⑤ 底部入口（仅小程序内部路由） ═══ -->
+  <view class="sp-entry" id="sp-entry">
+    <view class="sp-brand">MCU Atlas</view>
+    <view class="sp-entry-t">{{entryTitle}}</view>
+    <view class="sp-btn sp-btn-primary sp-entry-btn"
+          bindtap="onEntry" data-route="{{entryPrimary.route}}" data-mode="{{entryPrimary.mode}}"
+          hover-class="sp-btn-hover" hover-stay-time="80">{{entryPrimary.text}} ›</view>
+    <view class="sp-entry-link" wx:for="{{entryLinks}}" wx:key="text"
+          bindtap="onEntry" data-route="{{item.route}}" data-mode="{{item.mode}}"
+          hover-class="sp-link-hover" hover-stay-time="80">{{item.text}}</view>
+    <view class="sp-legal">本小程序只整理观看顺序，不提供播放/下载。</view>
+  </view>
+
+</view>
+
+<view wx:else class="sp-empty">暂无专题内容。</view>

@@ -2,7 +2,7 @@
 <view class="mcu-page pano-page">
   <view class="page-head">
     <view class="page-title">宇宙全景图</view>
-    <view class="page-sub">按阶段浏览 · 金色 ✓ 为已看 · 点击卡片进入详情</view>
+    <view class="page-sub">按阶段浏览 · 金色 ✓ 为已标记 · 点击卡片进入详情</view>
   </view>
 
   <scroll-view class="pano-timeline" scroll-y>
@@ -14,7 +14,7 @@
             <view class="phase-name">{{item.title}}</view>
             <view class="phase-years">{{item.years}}</view>
           </view>
-          <view class="phase-count">{{item.watched}}/{{item.count}} 已看</view>
+          <view class="phase-count">{{item.watched}}/{{item.count}} 已标记</view>
         </view>
 
         <view class="movie-list">

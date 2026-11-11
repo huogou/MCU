@@ -4,7 +4,7 @@
  * 结构（VDS §2.1，5 模块）：
  *   ① Hero Banner（新增，hero-banner.jpg + 迷你旅程条）
  *   → ② 旅程/推荐卡（简化：去背景图，紧凑电影推荐）
- *   → ③ 功能入口 2×2 视觉卡片（开始观看/时间线/角色图鉴/关系探索）
+ *   → ③ 功能入口 2×2 视觉卡片（观影顺序/时间线/角色图鉴/关系探索）
  *   → ④ 热门角色横滚 → ⑤ 最近观看横滚
  * 数据纪律：全部来自 models（单一可信源），仅装配本页视图模型；
  *   图片 URL 只存在于 visuals.js（经 mcuData 转发层访问，禁硬编码）。
@@ -15,6 +15,8 @@
 const mcuData = require('../../models/mcuData.js');
 const userState = require('../../models/userState.js');
 const recommend = require('../../models/recommend.js');
+/* V1.3.0 首页专题横幅：仅取端内专题数据的标题 / 上映最小映射，不改原有入口卡 */
+const SPECIALS = require('../../data/special-routes.js');
 
 /* 传奇标签映射（saga 取值：infinity / multiverse） */
 const SAGA_LABEL = { infinity: '无限传奇', multiverse: '多元宇宙' };
@@ -36,7 +38,7 @@ const CAMP_MAP = {
 
 /* 功能入口 2×2 视觉卡片（VDS §2.3，4 张；key 驱动跳转分流 + visuals.entryBg 取背景） */
 const ENTRY_CARDS = [
-  { key: 'watch',         title: '开始观看',  desc: '38 部 · 按序排列', icon: '▶', route: '/pages/routes/routes' },
+  { key: 'watch',         title: '观影顺序',  desc: '38 部 · 按序排列', icon: '☰', route: '/pages/routes/routes' },
   { key: 'timeline',      title: '宇宙时间线', desc: '6 阶段 · 脉络清晰', icon: '◷', route: '/pages/panorama/panorama' },
   { key: 'characters',    title: '角色图鉴',  desc: '24 位 · 阵营关系', icon: '✦', route: '/pages/characters/characters' },
   { key: 'relationships', title: '关系探索',  desc: '92 条 · 网络图谱', icon: '⬡', route: '/pages/explore/explore' }
@@ -71,6 +73,7 @@ function movieVM(id) {
 
 Page({
   data: {
+    topic: null,      /* V1.3.0 复联5补课专题横幅（Hero 之后 / 2×2 入口之前） */
     heroBanner: '',   /* ① Hero Banner 背景（hero-banner.jpg） */
     heroMeta: '',     /* Hero 副标题文案（59 部 · 24 角色 · 6 阶段） */
     progressPercent: 0, /* Hero 迷你旅程条进度 */
@@ -114,7 +117,7 @@ Page({
         year: cur.year,
         initial: cur.initial,
         phase: cur.phase,
-        statusLabel: isCurrent ? '当前观看' : '已观看',
+        statusLabel: isCurrent ? '进行中' : '已标记',
         statusCls: isCurrent ? 'st-current' : 'st-done'
       }
     };
@@ -135,7 +138,7 @@ Page({
       name: recMovie.name,
       subInfo: recMovie.year ? ('Phase ' + recMovie.phase + ' · ' + recMovie.year) : recMovie.phaseText,
       reason: hasProgress ? '上一部留下的悬念，从这里继续' : 'MCU 的起点，一切从这里开始',
-      cta: hasProgress ? '继续观看' : '开始观看'
+      cta: '查看详情'
     };
 
     /* ③ 功能入口 2×2（VDS §2.3：bg 经 visuals.entryBg） */
@@ -181,8 +184,19 @@ Page({
       };
     }).filter(Boolean);
 
+    /* V1.3.0 专题横幅：只取专题内部最小映射，不改原有 2×2 入口卡数量/顺序/语义 */
+    const sp = SPECIALS[0] || null;
+    const topicCard = sp ? {
+      id: sp.id,
+      title: sp.title,
+      sub: '复联5之前，先看这 ' + sp.core.items.length + ' 部',
+      date: String((sp.upcoming && sp.upcoming.date) || '').replace(/-/g, '.'),
+      en: String((sp.upcoming && sp.upcoming.en) || '').split(':').pop().trim().toUpperCase()
+    } : null;
+
     /* Hero 副标题（VDS §2.2 文案：总作品动态取，24 角色 / 6 阶段为数据常量） */
     this.setData({
+      topic: topicCard,
       heroBanner: heroBanner,
       heroMeta: total + ' 部 · 24 角色 · 6 阶段',
       progressPercent: progressPercent,
@@ -211,6 +225,12 @@ Page({
   /* Hero 迷你旅程条 → 路线页（Tab） */
   goJourney() {
     wx.switchTab({ url: '/pages/routes/routes' });
+  },
+
+  /* V1.3.0 专题横幅 → 复联5补课路线专题（独立页，不改 Tab） */
+  goTopic() {
+    const id = (this.data.topic && this.data.topic.id) || 'avengers-doomsday';
+    wx.navigateTo({ url: '/pages/special/special?id=' + id });
   },
 
   /* 功能入口 2×2 → 对应页面（路由对齐实际页面；Tab 页用 switchTab） */

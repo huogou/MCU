@@ -10,6 +10,7 @@
 <title>我看完这部，下一部看什么 - MCU 宇宙导航</title>
 <meta name="description" content="选择你刚看完的漫威电影，立刻得到下一部推荐，并说明推荐理由。支持只看主线、完整看懂、按顺序全看三种观影目的。">
 <meta name="keywords" content="看完某部漫威电影之后看什么,漫威电影下一部,漫威观影顺序推荐">
+<link rel="canonical" data-static="1" href="https://www.mcuatlas.xyz/next.html">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -67,8 +68,9 @@
 
   /* ---- 下拉：按内容类型筛选 + 分组 ----
    * 重要：阶段（Phase 1-6）只用于「院线电影」，绝不混入剧集/特别呈现/短片。
-   * 电影按电影专属上映序号（1-38 已上映 + 39-40 即将上映）排序，
-   * 不用 CONTENT 的全局 ro（1-59），避免"第1阶段"里出现短片/剧集。 */
+   * 电影按电影专属上映序号排序（38 部已上映 + 未来计划中未关联详情的条目），
+   * 不用 CONTENT 的全局 ro，避免"第1阶段"里出现短片/剧集。
+   * 未上映预置条目不进入选择器，详见 allMovies()。 */
   var FILTERS = [
     { key: 'movie',   label: '电影' },
     { key: 'series',  label: '剧集' },
@@ -77,20 +79,29 @@
   ];
   var currentFilter = 'movie';   /* 页面默认进入【电影】 */
 
-  /* 院线电影全集（含尚未上映），带电影专属序号 _morder / _status */
+  /* 「我刚看完」只能选已上映作品。
+     未上映预置条目（releaseStatus='upcoming'）不进入选择器，因此不会被标记为已上映/已看；
+     未来计划中已通过 contentId 关联到作品详情的条目也不再重复列出，
+     避免同一部片同时以「✅已上映」和「🕐即将上映」出现两次。 */
+  function isReleased(m) { return m.releaseStatus !== 'upcoming'; }
+
   function allMovies() {
-    var released = (window.MCU_MOVIES || []).map(function (m) {
+    var released = (window.MCU_MOVIES || []).filter(isReleased).map(function (m) {
       var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k]; return c;
     }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
     released.forEach(function (m, i) { m._morder = i + 1; m._status = 'released'; });
 
-    var up = (window.MCU_UPCOMING || []).map(function (m) {
+    var linkedIds = {};
+    (window.MCU_MOVIES || []).forEach(function (m) { linkedIds[m.id] = 1; });
+    var up = (window.MCU_UPCOMING || []).filter(function (u) {
+      return !(u.contentId && linkedIds[u.contentId]);
+    }).map(function (m) {
       var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k]; return c;
     }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
     up.forEach(function (m, i) {
       m.type = 'movie'; m.phase = 6;
       m.year = parseInt(String(m.date || '').slice(0, 4), 10) || '';
-      m._morder = released.length + i + 1;   // 39、40
+      m._morder = released.length + i + 1;
       m._status = 'upcoming';
       m.id = '';                            // 尚未上映，不可作为"刚看完"的作品被选中
     });
@@ -98,16 +109,17 @@
   }
 
   function cloneList(arr, type) {
-    return (arr || []).map(function (m) {
+    return (arr || []).filter(isReleased).map(function (m) {
       var c = {}; for (var k in m) if (m.hasOwnProperty(k)) c[k] = m[k];
       if (type) c.type = type; return c;
     }).sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
   }
 
   function movieOpt(m) {
-    var status = m._status === 'upcoming' ? '🕐即将上映' : '✅已上映';
-    var seen = (m._status !== 'upcoming' && m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
-    return '<option value="' + MCU.ui.esc(m.id || '') + '">'
+    var upcoming = m._status === 'upcoming';
+    var status = upcoming ? '🕐即将上映（暂不可选）' : '✅已上映';
+    var seen = (!upcoming && m.id && MCU.progress.isSeen(m.id)) ? ' ✓' : '';
+    return '<option value="' + MCU.ui.esc(m.id || '') + '"' + (upcoming ? ' disabled' : '') + '>'
       + m._morder + '. ' + MCU.ui.esc(m.cn || m.title || '') + '（' + m.year + '）' + status + seen + '</option>';
   }
   function otherOpt(m) {
@@ -200,11 +212,14 @@
     var r = MCU.rec.next(id, mode);
 
     if (!r) {
-      /* 终点信息全部数据驱动：最新已上映取自 MCU_MOVIES 中 date 最大者，
+      /* 终点信息全部数据驱动：最新已上映只取 releaseStatus 非 upcoming 的条目；
          下一部取自 MCU_UPCOMING 中 date 最小（最近）者。禁止硬编码日期。 */
-      var _rel = (window.MCU_MOVIES || []).slice().sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
+      var _rel = (window.MCU_MOVIES || []).filter(isReleased).slice()
+        .sort(function (a, b) { return String(b.date || '').localeCompare(String(a.date || '')); });
       var _latest = _rel[0];
-      var _up = (window.MCU_UPCOMING || []).slice().sort(function (a, b) { return String(a.date || '').localeCompare(String(a.date || '')); })[0];
+      /* 修正原实现将 a.date 与自身比较导致排序失效的问题。 */
+      var _up = (window.MCU_UPCOMING || []).slice()
+        .sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); })[0];
       var _end = '《' + MCU.ui.esc(from.cn) + '》已经是这条路径上的最后一部了。<br>';
       if (_latest) _end += '目前 MCU 最新上映的作品是《' + MCU.ui.esc(_latest.cn) + '》（' + MCU.ui.esc(_latest.date) + '）。<br>';
       if (_up) _end += '接下来是《' + MCU.ui.esc(_up.cn || _up.title) + '》，' + MCU.ui.esc(_up.date) + ' 上映。';

@@ -26,7 +26,7 @@
           <view class="film-en">{{f.en}}</view>
           <view class="film-phase">第 {{f.phase}} 阶段</view>
         </view>
-        <view class="film-status status-{{f.status}}">{{f.status==='watched'?'已看':(f.status==='watching'?'在看':'未看')}}</view>
+        <view class="film-status status-{{f.status}}">{{f.status==='watched'?'已标记':(f.status==='watching'?'在看':'未看')}}</view>
       </view>
     </view>
   </view>

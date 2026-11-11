@@ -2773,5 +2773,276 @@ window.MCU_NEWS = [
       chain_steps_hit: 'Step 6',
       conflict_resolved_at: null,
       conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-10-15-001',
+      title: '《复仇者联盟4：终局之战》重映重夺影史票房冠军，漫威累计破 350 亿美元',
+      summary: '迪士尼官方公告：《复仇者联盟4：终局之战》借助重映场《Endgame: Encore》超越《阿凡达》重夺全球影史票房冠军，并推动漫威影业全球累计票房突破 350 亿美元。本条为迪士尼官方发布内容，非媒体转述。',
+      publish_time: '2026-10-04',
+      first_seen_at: '2026-10-15T12:00:00Z',
+      verification_status: 'official_confirmed',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Walt Disney Company 官方公告页',
+          source_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-box-office-record/',
+          owner_group: '迪士尼官方'
+      },
+        {
+          source_name: 'The Walt Disney Company 官方公告页',
+          source_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-encore-box-office/',
+          owner_group: '迪士尼官方'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'The Walt Disney Company 官方公告页',
+      original_source_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-box-office-record/',
+      official_source: 'The Walt Disney Company 官方公告页',
+      official_source_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-box-office-record/',
+      related_movies: [
+        'endgame'
+      ],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        3
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'official_confirmed',
+          at: '2026-10-15T12:00:00Z',
+          reason: '迪士尼官方公告（官方确认）',
+          evidence_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-box-office-record/'
+      }
+      ],
+      status_changed_at: '2026-10-15T12:00:00Z',
+      status_change_reason: '迪士尼官方公告（官方确认）',
+      status_change_evidence_url: 'https://thewaltdisneycompany.com/news/avengers-endgame-box-office-record/',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'manual_review',
+      chain_steps_hit: 'manual_publish',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-11-06-001',
+      title: '《复仇者联盟：末日》官方倒计时画面新增九座城市名称',
+      summary: '漫威影业官方《复仇者联盟：末日》倒计时画面更新，新增拉斯维加斯、圣保罗、黄金海岸、罗马、洛杉矶、伦敦、首尔、上海和多伦多等九座城市名称。',
+      publish_time: '2026-11-05',
+      first_seen_at: '2026-11-06T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/marvel-studios-updates-avengers-doomsday-clock-months',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: 'https://thedirect.com/article/marvel-studios-updates-avengers-doomsday-clock-months',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-11-06T07:03:29Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/marvel-studios-updates-avengers-doomsday-clock-months'
+      }
+      ],
+      status_changed_at: '2026-11-06T07:03:29Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/marvel-studios-updates-avengers-doomsday-clock-months',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-11-06-002',
+      title: '《夜魔侠：重生》第三季纽约漫展片段展示马特的橙色囚服造型',
+      summary: 'The Direct 在纽约漫展现场观看了《夜魔侠：重生》第三季独家片段。片段中，马特·默多克利用橙色囚服改造临时面罩和装束。这是监狱场景中的临时造型，并非漫威正式更换了夜魔侠的常规战衣配色。',
+      publish_time: '2026-11-05',
+      first_seen_at: '2026-11-06T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'series',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/daredevil-marvel-studios-charlie-cox-costume-next',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: 'https://thedirect.com/article/daredevil-marvel-studios-charlie-cox-costume-next',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [
+        'daredevil-born-again'
+      ],
+      related_characters: [],
+      related_phases: [
+        5
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-11-06T07:03:29Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/daredevil-marvel-studios-charlie-cox-costume-next'
+      }
+      ],
+      status_changed_at: '2026-11-06T07:03:29Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/daredevil-marvel-studios-charlie-cox-costume-next',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-11-06-003',
+      title: '漫威发布《VisionQuest》吉姆·哈蒙德角色海报',
+      summary: '漫威影业发布《VisionQuest》中吉姆·哈蒙德（Jim Hammond，初代霹雳火）的角色海报，配文引用了该角色在第七集中的台词。海报采用火焰中的人物剪影设计。',
+      publish_time: '2026-11-04',
+      first_seen_at: '2026-11-06T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'character',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/visionquest-jim-hammond-human-torch-first-marvel-studios-poster',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: 'https://thedirect.com/article/visionquest-jim-hammond-human-torch-first-marvel-studios-poster',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [],
+      related_series: [
+        'visionquest'
+      ],
+      related_characters: [],
+      related_phases: [],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-11-06T07:03:29Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/visionquest-jim-hammond-human-torch-first-marvel-studios-poster'
+      }
+      ],
+      status_changed_at: '2026-11-06T07:03:29Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/visionquest-jim-hammond-human-torch-first-marvel-studios-poster',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
+  },
+
+  {
+      id: 'news-2026-11-06-004',
+      title: '《复仇者联盟：末日》公布末日博士日语配音演员，森川智之接棒藤原启治',
+      summary: '漫威日本官方公布，森川智之将担任《复仇者联盟：末日》中末日博士的日语配音。小罗伯特·唐尼通过视频亲自宣布这一消息，并向此前长期为钢铁侠日语配音的藤原启治致敬。',
+      publish_time: '2026-11-04',
+      first_seen_at: '2026-11-06T00:00:01Z',
+      verification_status: 'single_source',
+      category: 'movie',
+      reported_by: [
+        {
+          source_name: 'The Direct',
+          source_url: 'https://thedirect.com/article/robert-downey-jr-ties-doctor-doom-iron-man-avengers-doomsday-casting',
+          owner_group: '独立'
+      }
+      ],
+      independent_group_count: 1,
+      original_source: 'unknown',
+      original_source_url: 'https://thedirect.com/article/robert-downey-jr-ties-doctor-doom-iron-man-avengers-doomsday-casting',
+      official_source: '',
+      official_source_url: '',
+      related_movies: [
+        'doomsday'
+      ],
+      related_series: [],
+      related_characters: [],
+      related_phases: [
+        6
+      ],
+      pinned: false,
+      pinned_until: null,
+      pinned_order: 0,
+      pinned_reason: '',
+      status_history: [
+        {
+          from: null,
+          to: 'single_source',
+          at: '2026-11-06T07:03:29Z',
+          reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+          evidence_url: 'https://thedirect.com/article/robert-downey-jr-ties-doctor-doom-iron-man-avengers-doomsday-casting'
+      }
+      ],
+      status_changed_at: '2026-11-06T07:03:29Z',
+      status_change_reason: '仅 1 个独立 owner_group 的可靠媒体报道',
+      status_change_evidence_url: 'https://thedirect.com/article/robert-downey-jr-ties-doctor-doom-iron-man-avengers-doomsday-casting',
+      supersedes_id: null,
+      superseded_by_id: null,
+      report_corrections: [],
+      conflict_statements: [],
+      judged_by: 'rule_validated',
+      chain_steps_hit: 'Step 6',
+      conflict_resolved_at: null,
+      conflict_resolved_by_evidence_url: null
   }
 ];

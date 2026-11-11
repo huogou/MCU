@@ -45,7 +45,7 @@ PANO_CONN.forEach(function (e) {
 /* 三视图：core=主线必看, recommended=推荐观看, all=完整宇宙 */
 const VIEW_MODES = {
   core:        { label: '主线必看', desc: '必看内容，剧情不中断', imps: ['core'] },
-  recommended: { label: '推荐观看', desc: '必看 + 推荐，补齐关键支线', imps: ['core', 'recommended'] },
+  recommended: { label: '推荐路线', desc: '必看 + 推荐，补齐关键支线', imps: ['core', 'recommended'] },
   all:         { label: '完整宇宙', desc: '电影 / 剧集 / 特别呈现 / 短片全收录', imps: ['core', 'recommended', 'optional'] }
 };
 

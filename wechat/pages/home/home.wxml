@@ -24,6 +24,23 @@
     </view>
   </view>
 
+  <!-- ═══ V1.3.0 复联5补课专题横幅（Hero 之后 / 2×2 宇宙入口之前） ═══ -->
+  <view class="v2-topic" wx:if="{{topic}}">
+    <view class="v2-topic-card" bindtap="goTopic" hover-class="v2-topic-hover" hover-stay-time="80">
+      <view class="v2-topic-txt">
+        <view class="v2-topic-tag"><view class="v2-topic-dot"></view>补课专题</view>
+        <view class="v2-topic-title">{{topic.title}}</view>
+        <view class="v2-topic-line"></view>
+        <view class="v2-topic-sub">{{topic.sub}}</view>
+        <view class="v2-topic-btn">查看路线 ›</view>
+      </view>
+      <view class="v2-topic-date">
+        <text class="v2-topic-date-d">{{topic.date}}</text>
+        <text class="v2-topic-date-en">{{topic.en}}</text>
+      </view>
+    </view>
+  </view>
+
   <!-- ═══ ② 旅程/推荐卡（VDS §2.2 简化：紧凑电影推荐，去背景图） ═══ -->
   <view class="journey-card">
     <view class="journey-inner">
@@ -93,7 +110,7 @@
 
   <!-- ═══ ⑥ 最近观看（横滚）（保持） ═══ -->
   <view class="section">
-    <view class="module-title">最近观看</view>
+    <view class="module-title">最近标记</view>
     <scroll-view wx:if="{{recent.length}}" class="recent-scroll" scroll-x enable-flex>
       <view class="recent-row">
         <view class="recent-item" wx:for="{{recent}}" wx:key="id" data-id="{{item.id}}" bindtap="goMovie" hover-class="recent-hover" hover-stay-time="80">
@@ -105,7 +122,7 @@
         </view>
       </view>
     </scroll-view>
-    <view wx:else class="empty-hint">还没有观看记录，从《钢铁侠》开始你的旅程</view>
+    <view wx:else class="empty-hint">还没有观影进度，从《钢铁侠》开始你的旅程</view>
   </view>
 
 </view>

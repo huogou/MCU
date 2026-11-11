@@ -1,10 +1,13 @@
 /* ============================================================
  * MCU 宇宙导航 - 电影主数据
  * ------------------------------------------------------------
- * 数据口径：本文件仅收录 MCU 院线电影（38 部），不含 Disney+ 剧集/特别呈现/短片。
+ * 数据口径：本文件收录 MCU 院线电影主数据，不含 Disney+ 剧集/特别呈现/短片。
  * 截至 2026-08，已上映院线电影共 38 部
  * （《钢铁侠》2008-05-02 → 《蜘蛛侠：崭新之日》2026-07-31）。
- * 全量 59 个 MCU 内容（电影+剧集+特别呈现+短片）由 content.js 统一合成，请勿在此冗余。
+ * 另有 2 部「已官宣待映」预置条目（doomsday / secretwars），
+ * 均带 releaseStatus: 'upcoming'，只用于未来计划、专题与关系引用，
+ * 不进入资料库、观影路线、下一部推荐与观影进度统计。
+ * 全量「已上映」MCU 内容由 content.js 统一合成，请勿在此冗余。
  *
  * 为什么用 .js 而不是 .json：
  *   本项目要求「双击 index.html 即可运行」。浏览器在 file:// 协议下
@@ -13,13 +16,14 @@
  *
  * 字段说明：
  *   id       唯一标识，同时用作 URL 参数与关系表外键
- *   cn/en    中英片名
+ *   cn/en    中英片名（正式中文名全站唯一；upcoming.js 的 title 须与此一致）
  *   date     北美上映日期
  *   phase    所属阶段 1-6
  *   saga     infinity（无限传奇）| multiverse（多元宇宙传奇）
- *   ro       上映顺序序号 1-38
- *   co       故事时间线顺序序号 1-38
+ *   ro       上映顺序序号（由 content.js 在「已上映集合」内统一重算）
+ *   co       故事时间线顺序序号（由 content.js 统一重算）
  *   coLabel  故事发生的大致年份（展示用）
+ *   releaseStatus  released（缺省，由 content.js 注入）| upcoming（未上映预置条目）
  *   mainline 是否核心主线（精简主线路线的筛选依据）
  *   starter  是否适合新手第一部接触
  *   role     它在 MCU 中承担什么作用（回答"这部电影的意义"）
@@ -29,6 +33,28 @@
  * ============================================================ */
 
 window.MCU_MOVIES = [
+  { /* P1-B(2026-10-20) 新增；2026-11-09 标为「未上映预置条目」：
+       保留 id 供未来计划 / 专题 / 关系引用，但不进入路线、进度与统计。 */
+    id: 'doomsday', cn: '复仇者联盟：末日', en: 'Avengers: Doomsday',
+    year: 2026, date: '2026-12-18', phase: 6, saga: 'multiverse',
+    releaseStatus: 'upcoming',
+    ro: 39, co: 39, coLabel: '2026 年',   /* ro/co 由 content.js 对未上映条目置空 */
+    mainline: false, starter: false,
+    role: '多元宇宙传奇的收官之战之一，集结新老复仇者跨越多元宇宙对抗末日威胁。',
+    sf: '复仇者联盟与新老盟友跨越多元宇宙，直面将改写现实本身的终极危机。',
+    chars: []
+  },
+  { /* P1-B(2026-10-20) 新增；2026-11-09 标为「未上映预置条目」 */
+    id: 'secretwars', cn: '复仇者联盟：秘密战争', en: 'Avengers: Secret Wars',
+    year: 2027, date: '2027-12-17', phase: 6, saga: 'multiverse',
+    releaseStatus: 'upcoming',
+    ro: 40, co: 40, coLabel: '2027 年',   /* ro/co 由 content.js 对未上映条目置空 */
+    mainline: false, starter: false,
+    role: '多元宇宙传奇的真正终章，多元宇宙存续的决战。',
+    sf: '各条故事线在秘密战争中被推向决定性的交汇，现实本身面临重塑。',
+    chars: []
+  },
+
   {
     id: 'iron-man', cn: '钢铁侠', en: 'Iron Man',
     year: 2008, date: '2008-05-02', phase: 1, saga: 'infinity',

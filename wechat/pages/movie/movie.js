@@ -5,7 +5,7 @@
  *       line 674-966 样式 + line 1474-1790 三态页面结构）
  * 恢复范围：Hero 区 + 状态三态 + 主 CTA 三态联动 + 观看资源折叠模块
  *          + 为什么现在看 + 前后关联（上映序）+ 看完之后（下一部推荐）
- *          + userState 状态联动（开始观看 / 标记为已观看）
+ *          + userState 状态联动（标记想看 / 标记为已看）
  * 数据纪律：
  *   - 全部来自 models（mcuData / userState / recommend）与 data/*.js（单一可信源），
  *     不引入第二套数据；「为什么现在看」用 CONTENT.role（已在数据内，回答"为何重要"），
@@ -87,7 +87,7 @@ Page({
 
     /* 状态 + CTA */
     status: { cls: 'unwatched', text: '未观看', ico: 'circle' },
-    cta: { state: 'unwatched', cls: 'primary', text: '开始观看' },
+    cta: { state: 'unwatched', cls: 'primary', text: '标记想看' },
 
     /* 资源模块（V1.2 合规：固定为观看说明，不提供播放/下载入口） */
     resource: { exists: false, title: '观看说明', sub: '本工具仅整理观看顺序，不提供播放与下载', pending: false },
@@ -105,7 +105,7 @@ Page({
     mainChars: [],
 
     /* 看完之后 */
-    mark: { marked: false, text: '标记为已观看' },
+    mark: { marked: false, text: '标记为已看' },
     nextRec: null,
 
     /* 成就弹窗（V1.1 Step5：仅观影完成后触发，shown 去重防频繁弹窗） */
@@ -185,8 +185,8 @@ Page({
     const nb = mcuData.panoNeighbors(id);
     const prev = nb.prev;
     const next = nb.next;
-    const seqPrev = posterCard(prev, prev ? (userState.isSeen(prev.id) ? '已看' : '前一部') : '', false);
-    const seqCur = posterCard(m, userState.isSeen(id) ? '已看' : '当前', true);
+    const seqPrev = posterCard(prev, prev ? (userState.isSeen(prev.id) ? '已标记' : '前一部') : '', false);
+    const seqCur = posterCard(m, userState.isSeen(id) ? '已标记' : '当前', true);
     const seqNext = posterCard(next, next ? '下一部' : '', false);
 
     /* 看完之后 */
@@ -201,7 +201,7 @@ Page({
             poster: (vx && vx.poster) ? vx.poster : '',
             posterClass: 'poster-p' + (nx.content.phase || 1),
             letter: (nx.content.cn || '').charAt(0),
-            label: state === 'watched' ? '继续看下一部' : '看完这部之后',
+            label: state === 'watched' ? '查看下一部' : '看完这部之后',
             why: nx.why
           };
         })()
@@ -234,20 +234,20 @@ Page({
   },
 
   buildStatus(state) {
-    if (state === 'watched') return { cls: 'watched', text: '已观看', ico: 'check' };
-    if (state === 'watching') return { cls: 'watching', text: '正在观看', ico: 'play' };
+    if (state === 'watched') return { cls: 'watched', text: '已标记', ico: 'check' };
+    if (state === 'watching') return { cls: 'watching', text: '正在观看', ico: 'circle' };
     return { cls: 'unwatched', text: '未观看', ico: 'circle' };
   },
 
   buildCta(state) {
-    if (state === 'watched') return { state: 'watched', cls: 'done', text: '已观看' };
-    if (state === 'watching') return { state: 'watching', cls: 'primary', text: '继续观看' };
-    return { state: 'unwatched', cls: 'primary', text: '开始观看' };
+    if (state === 'watched') return { state: 'watched', cls: 'done', text: '已标记' };
+    if (state === 'watching') return { state: 'watching', cls: 'primary', text: '查看说明' };
+    return { state: 'unwatched', cls: 'primary', text: '标记想看' };
   },
 
   buildMark(state) {
-    if (state === 'watched') return { marked: true, text: '已标记为观看' };
-    return { marked: false, text: '标记为已观看' };
+    if (state === 'watched') return { marked: true, text: '已标记' };
+    return { marked: false, text: '标记为已看' };
   },
 
   buildWhy(m) {
@@ -255,7 +255,7 @@ Page({
     const route = mcuData.routeById('newcomer');
     if (route && route.items) {
       const idx = route.items.indexOf(m.id);
-      if (idx >= 0) ctx = '你正沿「新手入坑」路线观看，这是第 ' + (idx + 1) + ' 部。';
+      if (idx >= 0) ctx = '你正沿「新手入坑」路线观影，这是第 ' + (idx + 1) + ' 部。';
     }
     return { ctx: ctx, text: m.role || '' };
   },
@@ -272,26 +272,32 @@ Page({
       wx.showToast({ title: '已加入正在观看', icon: 'none' });
       this.refresh();
     } else if (this._state === 'watching') {
-      /* 继续观看：滚动到观看说明区（无播放器、无资源入口） */
+      /* 查看说明：滚动到观看说明区（无播放器、无资源入口） */
       this.setData({ resourceExpanded: true });
     }
     /* watched：done 态，无操作 */
   },
 
-  /* 标记为已观看（V1.1 Step5：完成后触发成就检测，仅弹一次，不频繁打扰） */
+  /* 标记 / 取消标记（V1.3.0 整改：放开原 return 阻断，允许取消并已取消提示；成就仅在新标记时检测） */
   onMarkWatched() {
-    if (this._state === 'watched') return;
-    this.setData({ achPopup: null });            /* 先清旧弹窗（防残留） */
-    userState.toggle(this.data.id);            /* → 已观看 */
-    wx.showToast({ title: '已标记为已观看', icon: 'none' });
+    const wasWatched = this._state === 'watched';
+    this.setData({ achPopup: null });
+    userState.toggle(this.data.id);            /* → 切换 已标记 状态 */
+    if (wasWatched) {
+      wx.showToast({ title: '已取消标记', icon: 'none' });
+    } else {
+      wx.showToast({ title: '已标记为已看', icon: 'none' });
+    }
     this.refresh();
-    /* 成就检测：新解锁且未提示过的，弹出（多个时只弹第一个，其余在成就墙可见） */
-    const fresh = achievements.check();
-    if (fresh && fresh.length) {
-      const first = fresh[0];
-      if (!achievements.isShown(first.id)) {
-        achievements.markShown(first.id);
-        this.setData({ achPopup: first });
+    if (!wasWatched) {
+      /* 成就检测：新解锁且未提示过的，弹出（多个时只弹第一个，其余在成就墙可见） */
+      const fresh = achievements.check();
+      if (fresh && fresh.length) {
+        const first = fresh[0];
+        if (!achievements.isShown(first.id)) {
+          achievements.markShown(first.id);
+          this.setData({ achPopup: first });
+        }
       }
     }
   },

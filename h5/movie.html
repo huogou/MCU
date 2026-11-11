@@ -54,6 +54,26 @@
     return;
   }
 
+  /* 未上映预置条目：保留可访问的详情页与关系引用，但不提供
+     「标记已看 / 下一部推荐 / 进度统计」等只适用于已上映内容的交互。 */
+  if (m.releaseStatus === 'upcoming') {
+    document.title = m.cn + '（未上映） - MCU 宇宙导航';
+    box.innerHTML = '<div class="card">'
+      + '<div class="hd"><h1>' + MCU.ui.esc(m.cn) + '</h1></div>'
+      + '<p class="lead">' + MCU.ui.esc(m.en || '') + ' · ' + MCU.ui.esc(m.date || '') + '（计划上映）</p>'
+      + '<p>' + MCU.ui.esc(m.role || '') + '</p>'
+      + (m.sf ? '<p class="dim">' + MCU.ui.esc(m.sf) + '</p>' : '')
+      + '<div class="dim" style="margin-top:12px;line-height:1.7">'
+      +   '本作品尚未上映，暂不纳入观影路线、作品资料库、下一部推荐与观影进度统计。'
+      +   '档期与相关资料以官方公布为准。'
+      + '</div>'
+      + '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'
+      +   '<a class="btn" href="routes.html">查看观影路线</a>'
+      +   '<a class="btn" href="index.html">返回首页</a>'
+      + '</div></div>';
+    return;
+  }
+
   /* 动态标题：让每部作品的详情页拥有独立、不重复的 title（SEO） */
   document.title = m.cn + ' - MCU 宇宙导航';
 

@@ -14,6 +14,10 @@
  * ============================================================ */
 
 window.MCU_CHARACTERS = [
+  { id: 'ultron', cn: '奥创', en: 'Ultron', camp: 'villain',
+    first: 'age-of-ultron',
+    note: '由托尼·斯塔克与布鲁斯·班纳以奥创计划创造的AI，觉醒后将人类视为威胁，成为复仇者最危险的造物之一。' },
+
   { id: 'tony', cn: '托尼·斯塔克 / 钢铁侠', en: 'Tony Stark', camp: 'avengers',
     first: 'iron-man',
     note: 'MCU 的第一个主角，也是弧线最完整的一个。他的每次决策失误都会成为下一部电影的起因。' },

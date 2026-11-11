@@ -95,7 +95,7 @@ const progress = {
     const c = Object.keys(s.watched).length;
     const shown = s.milestones_shown || {};
     const TEXTS = {
-      5:  { title: '你的 MCU 旅程已经开始了', desc: '已看 5 部，保存进度，下次继续。' },
+      5:  { title: '你的 MCU 旅程已经开始了', desc: '已标记 5 部，保存进度，下次继续。' },
       10: { title: '你已经走过 MCU 的一段旅程', desc: '保存观影进度，换设备也能继续。' },
       20: { title: '你的 MCU 旅程已经走得很远了', desc: '保存进度和路线，继续从这里出发。' }
     };

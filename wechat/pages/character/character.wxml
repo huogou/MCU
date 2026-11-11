@@ -54,7 +54,7 @@
           <view class="film-cn">{{item.cn}}</view>
           <view class="film-en">{{item.en}}<text wx:if="{{item.typeLabel}}"> · {{item.typeLabel}}</text></view>
         </view>
-        <view class="film-status status-{{item.status}}">{{item.status==='watched'?'已看':(item.status==='watching'?'在看':'未看')}}</view>
+        <view class="film-status status-{{item.status}}">{{item.status==='watched'?'已标记':(item.status==='watching'?'在看':'未看')}}</view>
       </view>
     </view>
   </view>

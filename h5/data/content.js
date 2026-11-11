@@ -59,7 +59,23 @@ window.MCU_IMPORTANCE_RANK = { core: 0, recommended: 1, optional: 2 };
   };
   content.forEach(function (c) {
     for (var k in DEFAULT_SOURCE) if (!(k in c)) c[k] = DEFAULT_SOURCE[k];
+    /* 发布状态：缺省即已上映；未上映条目必须在源数据显式标注。 */
+    if (!c.releaseStatus) c.releaseStatus = 'released';
   });
+
+  /* 未上映条目不继承「已核验」来源口径，也不占用上映/时间线序号。
+     保留在 MCU_CONTENT_ALL 中，仅供作品详情、未来计划与关系引用。 */
+  content.forEach(function (c) {
+    if (c.releaseStatus !== 'upcoming') return;
+    c.source = '项目内整理（未上映预置条目，非官方核验数据）';
+    c.verified_at = null;
+    c.confidence = 'pending_review';
+    c.ro = null;
+    c.co = null;
+  });
+
+  /* 已上映集合：资料库 / 观影路线 / 下一部推荐 / 进度 / 统计 / 地图的唯一口径。 */
+  var released = content.filter(function (c) { return c.releaseStatus !== 'upcoming'; });
 
   /* 故事时间线序（tl / co）：四类内容统一用「故事年份」作主排序键。
    * 主排序键取自 coLabel 中的年份（电影与剧集/特别呈现/短片用同一把尺子），
@@ -76,16 +92,18 @@ window.MCU_IMPORTANCE_RANK = { core: 0, recommended: 1, optional: 2 };
     var d = (c.date || '').match(/(\d{4})-(\d{2})-(\d{2})/);
     return d ? (+d[1]) * 10000 + (+d[2]) * 100 + (+d[3]) : 99999999;
   }
-  content.sort(function (a, b) {
+  released.sort(function (a, b) {
     var ya = storyYear(a), yb = storyYear(b);
     if (ya !== yb) return ya - yb;
     return storySub(a) - storySub(b);
   });
-  content.forEach(function (c, i) { c.co = i + 1; });   // co = 故事时间线序（chronology order）
+  released.forEach(function (c, i) { c.co = i + 1; });   // co = 故事时间线序（chronology order）
 
   /* 上映序（ro / order）：统一按发布日期排（电影与剧集同尺度），与 co 严格分离 */
-  content.sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
-  content.forEach(function (c, i) { c.ro = i + 1; });   // ro = 上映顺序（release order）
+  released.sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); });
+  released.forEach(function (c, i) { c.ro = i + 1; });   // ro = 上映顺序（release order）
 
-  window.MCU_CONTENT = content;
+  /* 全部内容（含未上映）：只用于按 id 查详情与保留关系引用，绝不参与「已看」统计。 */
+  window.MCU_CONTENT_ALL = content;
+  window.MCU_CONTENT = released;
 })();

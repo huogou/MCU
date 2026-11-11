@@ -151,7 +151,7 @@ window.MCU_RELATIONS = [
   { from: 'eternals', to: 'fantastic-four', type: 'world', weight: 1,
     why: '两部都把 MCU 的尺度推向宇宙级存在——天神组与吞星。它们代表 MCU 世界观里凌驾于英雄之上的那一层力量。' },
   { from: 'fantastic-four', to: 'brand-new-day', type: 'world', weight: 2,
-    why: '两部都是第六阶段为年底《复联5：毁灭之日》做汇流准备的作品，分别负责引入平行宇宙一方和收拢地球一方。' },
+    why: '两部都是第六阶段为年底《复仇者联盟：末日》做汇流准备的作品，分别负责引入平行宇宙一方和收拢地球一方。' },
   { from: 'thunderbolts', to: 'fantastic-four', type: 'world', weight: 1,
     why: '《雷霆特攻队》收尾第五阶段并组建新一代队伍，《神奇四侠：初露锋芒》开启第六阶段并引入平行宇宙。这是 MCU 的一次阶段交接。' },
   { from: 'deadpool-wolverine', to: 'brand-new-day', type: 'world', weight: 1,

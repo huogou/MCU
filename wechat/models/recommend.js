@@ -13,9 +13,9 @@ const userState = require('./userState.js');
 const { REL_TYPES } = require('../data/relations.js');
 
 const MODES = {
-  mainline: { label: '只想看主线', desc: '跳过支线，用最短路径把故事看完' },
-  understand: { label: '想完整看懂', desc: '补上理解剧情必需的前置作品' },
-  complete: { label: '想按顺序全看', desc: '严格按上映顺序，一部不落' }
+  mainline: { label: '只看主线', desc: '跳过支线，用最短路径把故事看完' },
+  understand: { label: '想完整理解', desc: '补上理解剧情必需的前置作品' },
+  complete: { label: '按上映顺序', desc: '严格按上映顺序，一部不落' }
 };
 
 function _result(content, why, fallback) {

@@ -39,7 +39,7 @@
  * MCU 宇宙导航 H5 · 复联5补课路线专题页
  * ------------------------------------------------------------
  * 页面：special.html   路由：/special?id=avengers-doomsday
- * 规格：同步/复联5补课路线专题-H5-设计AI正式规格-V1.md
+ * 规格：docs/同步/复联5补课路线专题-H5-设计AI正式规格-V1.md
  *
  * 数据纪律：
  *   - 作品名称一律 MCU.data.get(workId).cn，本文件不写任何作品中文名
@@ -89,9 +89,10 @@
   var U_CN   = U ? String(U.title || U.cn || '') : '';            /* 中文片名，取自 upcoming */
   /* 短英文名从 en 的冒号后半段派生，不落库、不硬编码 */
   var U_SHORT = U ? (String(U.en || '').split(':').pop().trim()) : '';
-  /* 终点圆点数字从中文片名里的序号派生，不硬编码 */
-  var U_NUM = U_CN.match(/联盟(\d+)/);
-  U_NUM = U_NUM ? U_NUM[1] : '';
+  /* 终点圆点序号取 upcoming.js 的显式 seriesNo（专题视觉序号，非官方片名的一部分）；
+     旧专题数据无该字段时回退到从中文片名派生，保证平滑兼容。 */
+  var U_NUM = U && U.seriesNo ? String(U.seriesNo) : '';
+  if (!U_NUM && U_CN) { var _numM = U_CN.match(/联盟(\d+)/); U_NUM = _numM ? _numM[1] : ''; }
 
   /* ---------- SEO（title / description 由数据拼装，无作品名硬编码） ---------- */
   document.title = route.title + '：' + route.core.items.length + ' 部核心 + '

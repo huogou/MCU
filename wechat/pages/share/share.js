@@ -486,7 +486,7 @@ Page({
       ctx.fillStyle = C.textWeak;
       ctx.font = '20px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('最近观看', W / 2, 644);
+      ctx.fillText('最近标记', W / 2, 644);
       var pw = 120, ph = 160, gap = 30;
       var totalW = recents.length * pw + (recents.length - 1) * gap;
       var sx = (W - totalW) / 2;
@@ -514,7 +514,7 @@ Page({
     ctx.fillText(d.routeTagline, W / 2, 308);
     ctx.fillStyle = C.textSub;
     ctx.font = '26px sans-serif';
-    ctx.fillText('已看 ' + d.routeWatched + ' / ' + d.routeTotal + ' 部', W / 2, 362);
+    ctx.fillText('已标记 ' + d.routeWatched + ' / ' + d.routeTotal + ' 部', W / 2, 362);
     var barW = 400, barX = (W - barW) / 2, barY = 392;
     ctx.fillStyle = C.surface3;
     ctx.fillRect(barX, barY, barW, 10);
@@ -680,7 +680,7 @@ Page({
   onShareAppMessage: function () {
     var t = this.data.type;
     var id = this.data.id || '';
-    var title = '我在用 MCU 宇宙导航' + (t === 'progress' ? '，已看完 ' + this.data.count + ' / ' + this.data.total + ' 部' : (t === 'route' ? '，正在走「' + this.data.routeName + '」' : '，推荐《' + this.data.movieCn + '》'));
+    var title = '我在用 MCU 宇宙导航' + (t === 'progress' ? '，已标记 ' + this.data.count + ' / ' + this.data.total + ' 部' : (t === 'route' ? '，正在走「' + this.data.routeName + '」' : '，推荐《' + this.data.movieCn + '》'));
     shareData.record(t);
     return {
       title: title,

@@ -44,8 +44,7 @@
     <!-- ② 主 CTA -->
     <view class="movie-cta-section">
       <view class="movie-cta {{cta.cls}}" bindtap="onPrimaryCta">
-        <view wx:if="{{cta.state !== 'watched'}}" class="ico ico-play"></view>
-        <view wx:else class="ico ico-check"></view>
+        <view wx:if="{{cta.state === 'watched'}}" class="ico ico-check"></view>
         <text>{{cta.text}}</text>
       </view>
     </view>
