@@ -1,0 +1,218 @@
+<style>
+    .vc-tabs-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-tabs-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-tabs-label {
+        font-size: calc(13px / var(--font-size-scale, 1));
+        margin-bottom: var(--cos-space-sm);
+        font-weight: var(--cos-font-medium);
+        color: var(--cos-color-text-minor);
+    }
+
+    /* item 少时铺满一行；item 多时不换行，可横向滚动 */
+    .vc-tabs-segmented {
+        display: flex;
+        flex-wrap: nowrap;
+        background-color: var(--cos-color-bg-raised);
+        padding: 2px;
+        border-radius: var(--cos-rounded-sm);
+        gap: var(--cos-space-xxs);
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vc-tabs-segmented::-webkit-scrollbar {
+        display: none;
+    }
+
+    .vc-tabs-option {
+        flex: 1 0 auto;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-tabs-option:focus,
+    .vc-tabs-option:active {
+        outline: none;
+    }
+
+    .vc-tabs-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        outline: none;
+    }
+
+    .vc-tabs-option input:focus,
+    .vc-tabs-option input:active {
+        outline: none;
+    }
+
+    .vc-tabs-option span {
+        display: block;
+        text-align: center;
+        padding: var(--cos-space-xs) var(--cos-space-sm);
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        border-radius: var(--cos-rounded-sm);
+        transition: all var(--cos-transition-duration-moderate);
+        font-weight: var(--cos-font-regular);
+        line-height: calc(14px / var(--font-size-scale, 1));
+        white-space: nowrap;
+    }
+
+    .vc-tabs-option input:checked + span {
+        background-color: var(--cos-color-bg-dent);
+        color: var(--cos-color-text-primary);
+        font-weight: var(--cos-font-medium);
+        -webkit-text-stroke: var(--cos-font-medium-stroke);
+    }
+
+    /* 拖拽中光标反馈 */
+    .vc-tabs-segmented.vc-tabs-dragging {
+        cursor: grabbing;
+        user-select: none;
+    }
+</style>
+
+<!-- 基础：item 数量少时铺满容器 -->
+<div class="vc-tabs-section">
+    <div class="vc-tabs-label">基础分段</div>
+    <div class="vc-tabs-segmented" role="radiogroup" aria-label="模式选择">
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-basic" value="study" checked />
+            <span>模式一</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-basic" value="exam" />
+            <span>模式二</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-basic" value="practice" />
+            <span>模式三</span>
+        </label>
+    </div>
+</div>
+
+<!-- 多项：整体不换行，item 文字不换行，超出横向滚动 -->
+<div class="vc-tabs-section">
+    <div class="vc-tabs-label">多项横滑</div>
+    <div class="vc-tabs-segmented" role="radiogroup" aria-label="分类选择">
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="all" checked />
+            <span>全部</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="recommend" />
+            <span>推荐</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="hot" />
+            <span>热门</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="new" />
+            <span>最新</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="follow" />
+            <span>关注</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="collect" />
+            <span>收藏</span>
+        </label>
+        <label class="vc-tabs-option">
+            <input type="radio" name="vc-tabs-scroll" value="history" />
+            <span>历史记录</span>
+        </label>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const tabs = document.querySelectorAll('.vc-tabs-option input[type="radio"]');
+        tabs.forEach((tab) => {
+            tab.addEventListener("change", function () {
+                if (this.checked) {
+                    // 选中项自动滚入可视区域，便于多项横滑场景
+                    const label = this.closest('.vc-tabs-option');
+                    if (label && typeof label.scrollIntoView === 'function') {
+                        label.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'nearest',
+                            inline: 'nearest',
+                        });
+                    }
+                }
+            });
+        });
+
+        // PC 端没有触摸滚动，需要用鼠标按下拖拽来横滑。
+        // 移动端保留原生 touch 滚动，不接管。
+        const DRAG_THRESHOLD = 4;
+        document.querySelectorAll('.vc-tabs-segmented').forEach((track) => {
+            let startX = 0;
+            let startScrollLeft = 0;
+            let dragging = false;
+            let moved = false;
+
+            track.addEventListener('pointerdown', (e) => {
+                if (e.pointerType !== 'mouse') return;
+                // 无溢出时不进入拖拽，避免干扰正常点击
+                if (track.scrollWidth <= track.clientWidth) return;
+                dragging = true;
+                moved = false;
+                startX = e.clientX;
+                startScrollLeft = track.scrollLeft;
+                track.classList.add('vc-tabs-dragging');
+            });
+
+            track.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const delta = e.clientX - startX;
+                if (!moved && Math.abs(delta) > DRAG_THRESHOLD) {
+                    moved = true;
+                    // 越过阈值才捕获指针，保证短按仍是普通点击
+                    track.setPointerCapture(e.pointerId);
+                }
+                if (moved) {
+                    e.preventDefault();
+                    track.scrollLeft = startScrollLeft - delta;
+                }
+            });
+
+            const endDrag = (e) => {
+                if (!dragging) return;
+                dragging = false;
+                track.classList.remove('vc-tabs-dragging');
+                if (track.hasPointerCapture && track.hasPointerCapture(e.pointerId)) {
+                    track.releasePointerCapture(e.pointerId);
+                }
+            };
+
+            track.addEventListener('pointerup', endDrag);
+            track.addEventListener('pointercancel', endDrag);
+
+            // 拖拽结束后的那次 click 不应改变选中项
+            track.addEventListener('click', (e) => {
+                if (!moved) return;
+                moved = false;
+                e.preventDefault();
+                e.stopPropagation();
+            }, true);
+
+            // 拖拽时禁止文本/元素被选中
+            track.addEventListener('dragstart', (e) => e.preventDefault());
+        });
+    })();
+</script>

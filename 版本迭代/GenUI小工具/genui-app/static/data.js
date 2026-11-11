@@ -1,384 +1,67 @@
 /* ============================================================
- * MCU 观影助手 · GenUI 轻量版专用数据集（构建期生成，请勿手工编辑）
+ * MCU 观影助手 · GenUI V2.0 专用数据集（构建期生成，请勿手工编辑）
  * ------------------------------------------------------------
- * 由 genui-app/tools/build-data.cjs 从母项目 h5/data/{movies,series,routes,special-routes}.js 自动生成。
- * 数据单一可信源为母项目；本文件仅做字段裁剪。
- * 重新生成：node genui-app/tools/build-data.cjs
- * ============================================================ */window.MCU_GENUI_DATA = {
-  "version": "2026-10-30",
-  "phases": {
-    "1": "第一阶段 · 无限传奇开启",
-    "2": "第二阶段 · 复仇者集结",
-    "3": "第三阶段 · 终局之战",
-    "4": "第四阶段 · 多元宇宙",
-    "5": "第五阶段 · 多元宇宙新篇",
-    "6": "第六阶段 · 崭新之日"
-  },
+ * 由 genui-app-tools/build-data.cjs 从母项目 h5/data/{movies,series,routes,special-routes,relations}.js 自动生成。
+ * 数据单一可信源为母项目；本文件仅做字段裁剪与文案派生，构建期含字数预算断言。
+ * 重新生成：node genui-app-tools/build-data.cjs
+ * ============================================================ */
+window.MCU_GENUI_DATA = {
+  "version": "2026-11-03",
   "routes": [
     {
-      "id": "newcomer",
-      "name": "新手入门",
-      "desc": "第一次看漫威，照这个顺序看这 12 部就够了",
-      "count": 12,
+      "id": "newcomer", "name": "新手入门", "count": 12,
+      "intro": {"forWho":"完全没看过 MCU，或只零散看过一两部——这条路线就是为你准备的。","why":"MCU 有 30 多部，全看门槛太高，中途弃剧的风险远大于\"错过细节\"的损失。这条路线只留 12 部，先把主干立住。","order":"按世界观建立顺序：起源 → 组队 → 裂痕 → 终局，每一步都在为下一步铺垫。","outcome":"看完这 12 部，你就能了解无限传奇的主干故事，并具备继续探索其他分支的基础。"},
       "items": [
-        {
-          "id": "iron-man",
-          "name": "钢铁侠",
-          "year": 2008,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "captain-america-first-avenger",
-          "name": "美国队长：复仇者先锋",
-          "year": 2011,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "thor",
-          "name": "雷神",
-          "year": 2011,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "avengers",
-          "name": "复仇者联盟",
-          "year": 2012,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "winter-soldier",
-          "name": "美国队长2：冬日战士",
-          "year": 2014,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "guardians",
-          "name": "银河护卫队",
-          "year": 2014,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "age-of-ultron",
-          "name": "复仇者联盟2：奥创纪元",
-          "year": 2015,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "civil-war",
-          "name": "美国队长3：内战",
-          "year": 2016,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "thor-ragnarok",
-          "name": "雷神3：诸神黄昏",
-          "year": 2017,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "black-panther",
-          "name": "黑豹",
-          "year": 2018,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "infinity-war",
-          "name": "复仇者联盟3：无限战争",
-          "year": 2018,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "endgame",
-          "name": "复仇者联盟4：终局之战",
-          "year": 2019,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        }
+        {"id":"iron-man","name":"钢铁侠","year":2008,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"入坑第一站：起源故事不依赖任何前作，单看就是一个完整好故事。","role":"整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。","gains":["托尼如何成为钢铁侠","\"复仇者计划\"从何而来"],"next":"片尾彩蛋的\"复仇者计划\"，在《复仇者联盟》中正式兑现。"},
+        {"id":"captain-america-first-avenger","name":"美国队长：复仇者先锋","year":2011,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"入坑友好：二战背景的起源故事，不需要任何前作，单看也完整。","role":"MCU 故事时间线上最早的一部。宇宙魔方、九头蛇、霍华德·斯塔克这三条影响深远的线索都从这里发源。","gains":["血清如何造出美队","宇宙魔方的来历"],"next":"下一部《复仇者联盟》：美队冰封七十年后醒来，第一场仗就是它。"},
+        {"id":"thor","name":"雷神","year":2011,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"入坑友好：一个关于傲慢与成长的独立故事，看完就认识索尔和洛基。","role":"把 MCU 从\"地球科技\"拓展到\"九界神话\"。洛基这个贯穿全宇宙的角色从这里开始。","gains":["索尔为何被放逐","洛基的来历"],"next":"承接《复仇者联盟》：这部结尾坠入虚空的洛基，正是它的反派。"},
+        {"id":"avengers","name":"复仇者联盟","year":2012,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"系列首次大集结：六位互不对付的英雄被迫组成一支队伍。","role":"第一阶段的收束点，也是 MCU 商业模式成立的证明：分散的独立电影可以汇成一场集体战役。","gains":["英雄如何组队","洛基为何入侵地球"],"next":"下一部《冬日战士》：正面处理纽约之战后神盾局扩权的后果。"},
+        {"id":"winter-soldier","name":"美国队长2：冬日战士","year":2014,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"谍战式悬念：神盾局早已被渗透，队长还要面对一名身手相当的杀手。","role":"整个 MCU 格局的转折点。神盾局在这部里倒塌，从此英雄失去了官方靠山，也直接引出《内战》的对立。","gains":["神盾局为何倒塌","冬兵的真实身份"],"next":"下一部《奥创纪元》：神盾局倒了，复仇者独立行动后的第一场大祸。"},
+        {"id":"guardians","name":"银河护卫队","year":2014,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"入坑友好：全新角色、全新舞台，不看前面的电影也能跟上。","role":"把 MCU 正式拓展到宇宙尺度。灭霸、收藏家、力量宝石都在这里第一次被完整展示。","gains":["灭霸与卡魔拉的父女关系","无限宝石成体系"],"next":"关联《奥创纪元》：宇宙线暂歇，地球线继续拼无限宝石的另一半。"},
+        {"id":"age-of-ultron","name":"复仇者联盟2：奥创纪元","year":2015,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"一次出于好意的失控：想造防御系统，却造出要灭绝人类的 AI。","role":"复仇者内部矛盾的正式爆发点。托尼擅自造出奥创，团队信任崩塌，为《内战》铺好全部动机。","gains":["奥创为何诞生","团队信任如何崩塌"],"next":"下一部《内战》：索科维亚的伤亡直接催生管控协议，分裂由此开始。"},
+        {"id":"civil-war","name":"美国队长3：内战","year":2016,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"英雄之间的正面决裂：一份管控协议，把复仇者分成两派。","role":"复仇者的正式解体。它同时完成了三件事：拆散团队、引入蜘蛛侠、引入黑豹——三条后续主线在这一部里同时启动。","gains":["协议为何引起分裂","蜘蛛侠与黑豹登场"],"next":"下一部《无限战争》：复仇者四分五裂，灭霸正是在他们最散时动手。"},
+        {"id":"thor-ragnarok","name":"雷神3：诸神黄昏","year":2017,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"看点是一次彻底的推翻重来：锤子没了、阿斯加德危在旦夕。","role":"重塑了雷神这个角色，同时把阿斯加德彻底摧毁。片尾那艘难民船，正是《无限战争》开场被灭霸屠杀的那艘。","gains":["索尔如何失去一切","阿斯加德的结局"],"next":"下一部《无限战争》：一头一尾是同一艘飞船，中间没有间隔。"},
+        {"id":"black-panther","name":"黑豹","year":2018,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"推荐","reason":"新手路线里少数的支线：不依赖前作、独立完整，把瓦坎达这块世界观拼图补全。","role":"完整建立瓦坎达这个国家。这个地点在《无限战争》成为决战战场，在第四阶段又承接了黑豹传承。","gains":["瓦坎达与振金科技","特查拉继承王位"],"next":"关联《复仇者联盟3：无限战争》：瓦坎达是地球决战的战场。"},
+        {"id":"infinity-war","name":"复仇者联盟3：无限战争","year":2018,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"反派真正赢了一次：英雄在毫无准备的状态下迎战灭霸。","role":"十年铺垫的总兑现。前面十九部电影埋的线索在这一部里全部收拢，也是 MCU 第一次让反派真正赢了。","gains":["六颗宝石如何集齐","英雄为何失败"],"next":"下一部《终局之战》：同一个故事的上下半场，结局没有写完。"},
+        {"id":"endgame","name":"复仇者联盟4：终局之战","year":2019,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"五年后的最后一次机会：每个人都必须做出自己的选择。","role":"无限传奇的终点。二十二部电影、十一年的故事在这里收尾，也是 MCU 迄今为止情感浓度最高的一部。","gains":["时间旅行如何成立","无限传奇如何收尾"],"next":"下一部《蜘蛛侠：英雄远征》：无限传奇的正式收官。"}
       ]
     },
     {
-      "id": "essential",
-      "name": "主线精选",
-      "desc": "想理清主线剧情，按这个顺序看这 18 部",
-      "count": 18,
+      "id": "essential", "name": "主线精选", "count": 18,
+      "intro": {"forWho":"时间有限，不想全看，只想搞懂主线剧情。","why":"MCU 并不是每部都在推进同一个故事。这条路线把对主线可选的支线全部摘掉，只留实质推动剧情的必看。","order":"只取标记为「核心主线」的 18 部院线电影，按北美上映顺序排列。","outcome":"理清从无限传奇到多元宇宙的主干走向，跳过的支线不看也不影响理解主线。"},
       "items": [
-        {
-          "id": "iron-man",
-          "name": "钢铁侠",
-          "year": 2008,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "thor",
-          "name": "雷神",
-          "year": 2011,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "captain-america-first-avenger",
-          "name": "美国队长：复仇者先锋",
-          "year": 2011,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "avengers",
-          "name": "复仇者联盟",
-          "year": 2012,
-          "phase": 1,
-          "phaseShort": "第一阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "winter-soldier",
-          "name": "美国队长2：冬日战士",
-          "year": 2014,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "guardians",
-          "name": "银河护卫队",
-          "year": 2014,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "age-of-ultron",
-          "name": "复仇者联盟2：奥创纪元",
-          "year": 2015,
-          "phase": 2,
-          "phaseShort": "第二阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "civil-war",
-          "name": "美国队长3：内战",
-          "year": 2016,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "doctor-strange",
-          "name": "奇异博士",
-          "year": 2016,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "spider-man-homecoming",
-          "name": "蜘蛛侠：英雄归来",
-          "year": 2017,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "thor-ragnarok",
-          "name": "雷神3：诸神黄昏",
-          "year": 2017,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "infinity-war",
-          "name": "复仇者联盟3：无限战争",
-          "year": 2018,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "endgame",
-          "name": "复仇者联盟4：终局之战",
-          "year": 2019,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "far-from-home",
-          "name": "蜘蛛侠：英雄远征",
-          "year": 2019,
-          "phase": 3,
-          "phaseShort": "第三阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "no-way-home",
-          "name": "蜘蛛侠：英雄无归",
-          "year": 2021,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "multiverse-of-madness",
-          "name": "奇异博士2：疯狂多元宇宙",
-          "year": 2022,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "fantastic-four",
-          "name": "神奇四侠：初露锋芒",
-          "year": 2025,
-          "phase": 6,
-          "phaseShort": "第六阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "brand-new-day",
-          "name": "蜘蛛侠：崭新之日",
-          "year": 2026,
-          "phase": 6,
-          "phaseShort": "第六阶段",
-          "isSeries": false,
-          "type": "movie"
-        }
+        {"id":"iron-man","name":"钢铁侠","year":2008,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"主线的第一颗种子：片尾彩蛋第一次说出\"复仇者计划\"。","role":"整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。","gains":["托尼如何成为钢铁侠","\"复仇者计划\"从何而来"],"next":"片尾彩蛋的\"复仇者计划\"，在《复仇者联盟》中正式兑现。"},
+        {"id":"thor","name":"雷神","year":2011,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"洛基的动机全在这部里，不看就接不上《复仇者联盟》。","role":"把 MCU 从\"地球科技\"拓展到\"九界神话\"。洛基这个贯穿全宇宙的角色从这里开始。","gains":["索尔为何被放逐","洛基的来历"],"next":"承接《复仇者联盟》：这部结尾坠入虚空的洛基，正是它的反派。"},
+        {"id":"captain-america-first-avenger","name":"美国队长：复仇者先锋","year":2011,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"二战起源，美队与巴基的关系从这部立起。","role":"MCU 故事时间线上最早的一部。宇宙魔方、九头蛇、霍华德·斯塔克这三条影响深远的线索都从这里发源。","gains":["血清如何造出美队","宇宙魔方的来历"],"next":"下一部《复仇者联盟》：美队冰封七十年后醒来，第一场仗就是它。"},
+        {"id":"avengers","name":"复仇者联盟","year":2012,"phase":1,"phaseShort":"第一阶段","isSeries":false,"type":"movie","badge":"必看","reason":"六位互不对付的英雄被迫组队，第一次集体迎战洛基。","role":"第一阶段的收束点，也是 MCU 商业模式成立的证明：分散的独立电影可以汇成一场集体战役。","gains":["英雄如何组队","洛基为何入侵地球"],"next":"下一部《冬日战士》：正面处理纽约之战后神盾局扩权的后果。"},
+        {"id":"winter-soldier","name":"美国队长2：冬日战士","year":2014,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"神盾局在这部解体，复仇者从此只能自己扛。","role":"整个 MCU 格局的转折点。神盾局在这部里倒塌，从此英雄失去了官方靠山，也直接引出《内战》的对立。","gains":["神盾局为何倒塌","冬兵的真实身份"],"next":"下一部《奥创纪元》：神盾局倒了，复仇者独立行动后的第一场大祸。"},
+        {"id":"guardians","name":"银河护卫队","year":2014,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"宇宙线的起点：灭霸与卡魔拉的关系在这里第一次展开。","role":"把 MCU 正式拓展到宇宙尺度。灭霸、收藏家、力量宝石都在这里第一次被完整展示。","gains":["灭霸与卡魔拉的父女关系","无限宝石成体系"],"next":"关联《奥创纪元》：宇宙线暂歇，地球线继续拼无限宝石的另一半。"},
+        {"id":"age-of-ultron","name":"复仇者联盟2：奥创纪元","year":2015,"phase":2,"phaseShort":"第二阶段","isSeries":false,"type":"movie","badge":"必看","reason":"索科维亚的伤亡催生管控协议，内战的分裂从这里开始。","role":"复仇者内部矛盾的正式爆发点。托尼擅自造出奥创，团队信任崩塌，为《内战》铺好全部动机。","gains":["奥创为何诞生","团队信任如何崩塌"],"next":"下一部《内战》：索科维亚的伤亡直接催生管控协议，分裂由此开始。"},
+        {"id":"civil-war","name":"美国队长3：内战","year":2016,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"复仇者在这里正式解体，灭霸等的就是这个空档。","role":"复仇者的正式解体。它同时完成了三件事：拆散团队、引入蜘蛛侠、引入黑豹——三条后续主线在这一部里同时启动。","gains":["协议为何引起分裂","蜘蛛侠与黑豹登场"],"next":"下一部《无限战争》：复仇者四分五裂，灭霸正是在他们最散时动手。"},
+        {"id":"doctor-strange","name":"奇异博士","year":2016,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"魔法与多元宇宙的入口：时间宝石第一次现身。","role":"把魔法和多元宇宙引入 MCU。时间宝石在这里现身，而\"多元宇宙\"这个词后来撑起了整个第四、五、六阶段。","gains":["魔法体系如何运作","时间宝石的用途"],"next":"关联《诸神黄昏》：片尾彩蛋里索尔来找他，直接接上开场。"},
+        {"id":"spider-man-homecoming","name":"蜘蛛侠：英雄归来","year":2017,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"托尼与彼得的师徒线从这部立起，一路影响到《英雄无归》。","role":"蜘蛛侠 MCU 三部曲的第一部。它把\"托尼是彼得的导师\"这层关系立住，师徒线一路影响到《英雄无归》。","gains":["彼得与托尼的关系","他为何急于证明自己"],"next":"关联《无限战争》：彼得下一次登场，就是被带上泰坦星。"},
+        {"id":"thor-ragnarok","name":"雷神3：诸神黄昏","year":2017,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"雷神彻底重塑的一部：锤子、家乡和父亲在它结束时都没了。","role":"重塑了雷神这个角色，同时把阿斯加德彻底摧毁。片尾那艘难民船，正是《无限战争》开场被灭霸屠杀的那艘。","gains":["索尔如何失去一切","阿斯加德的结局"],"next":"下一部《无限战争》：一头一尾是同一艘飞船，中间没有间隔。"},
+        {"id":"infinity-war","name":"复仇者联盟3：无限战争","year":2018,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"六颗宝石集齐之战：英雄在毫无准备的状态下应战。","role":"十年铺垫的总兑现。前面十九部电影埋的线索在这一部里全部收拢，也是 MCU 第一次让反派真正赢了。","gains":["六颗宝石如何集齐","英雄为何失败"],"next":"下一部《终局之战》：同一个故事的上下半场，结局没有写完。"},
+        {"id":"endgame","name":"复仇者联盟4：终局之战","year":2019,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"时间劫案成立的一战：所有线索在这里一次性兑现。","role":"无限传奇的终点。二十二部电影、十一年的故事在这里收尾，也是 MCU 迄今为止情感浓度最高的一部。","gains":["时间旅行如何成立","无限传奇如何收尾"],"next":"下一部《蜘蛛侠：英雄远征》：无限传奇的正式收官。"},
+        {"id":"far-from-home","name":"蜘蛛侠：英雄远征","year":2019,"phase":3,"phaseShort":"第三阶段","isSeries":false,"type":"movie","badge":"必看","reason":"后钢铁侠时代的第一个答案：没有托尼之后怎么办。","role":"无限传奇的正式收官之作。它处理托尼离开后留下的空位，同时用一个彩蛋把彼得推入下一部的绝境。","gains":["托尼走后留下什么","无限传奇如何收官"],"next":"下一部《英雄无归》：身份被公开，整部电影都在收拾这个烂摊子。"},
+        {"id":"no-way-home","name":"蜘蛛侠：英雄无归","year":2021,"phase":4,"phaseShort":"第四阶段","isSeries":false,"type":"movie","badge":"必看","reason":"一道失控的遗忘咒，把不该出现的东西带进这个世界。","role":"多元宇宙正式打开的那一刻。它既是蜘蛛侠个人故事的成人礼，也是整个第四阶段的结构性转折点。","gains":["咒语为何失控","彼得的身份危机"],"next":"下一部《疯狂多元宇宙》：咒语失控的后果，开场就在收拾。"},
+        {"id":"multiverse-of-madness","name":"奇异博士2：疯狂多元宇宙","year":2022,"phase":4,"phaseShort":"第四阶段","isSeries":false,"type":"movie","badge":"必看","reason":"承接《英雄无归》咒语失控的后果，多元宇宙的规则在这里被正式打破。","role":"第一次真正带观众穿越多个平行宇宙。它也是旺达角色弧线的终点，情绪落点极重。","gains":["多元宇宙如何被穿行","旺达的结局"],"next":"关联《蚁人与黄蜂女：量子狂潮》：多元宇宙规则被打破后引出统领性威胁。"},
+        {"id":"fantastic-four","name":"神奇四侠：初露锋芒","year":2025,"phase":6,"phaseShort":"第六阶段","isSeries":false,"type":"movie","badge":"必看","reason":"全新的平行宇宙登场：第六阶段的另一条线从这里开始。","role":"第六阶段的开篇。它发生在一个独立的平行宇宙里，这四个角色是《复联5：毁灭之日》多宇宙汇合的关键一方。","gains":["Earth-828 复古未来世界","四位成员的异能组合"],"next":"关联《蜘蛛侠：崭新之日》：两部都在为《复联5》做汇流准备。"},
+        {"id":"brand-new-day","name":"蜘蛛侠：崭新之日","year":2026,"phase":6,"phaseShort":"第六阶段","isSeries":false,"type":"movie","badge":"必看","reason":"最新的院线电影：被全世界遗忘的彼得，独自守着纽约。","role":"目前 MCU 最新的院线电影。它承接《英雄无归》被全世界遗忘的结局，同时片尾直接连向《复联5：毁灭之日》。","gains":["彼得为何孤身一人","片尾如何接向复联5"],"next":"片尾直接连向《复联5：毁灭之日》：三条线在那里汇合。"}
       ]
     },
     {
-      "id": "avengers-doomsday",
-      "name": "复联5补课",
-      "desc": "已看完《终局之战》，补这 8 项接上复联5",
-      "count": 8,
+      "id": "avengers-doomsday", "name": "复联5补课", "count": 8,
+      "intro": {"forWho":"已看完《终局之战》，想在《复仇者联盟5：毁灭之日》上映前快速补上前情。","why":"8 部精简补课路线。终局之后时间前跳、多元宇宙开启、跨宇宙角色与新英雄入局——补完接上《复联5：毁灭之日》。","order":"按链条顺序：TVA→多元宇宙→世人所知→穿越者→新秩序→反英雄→入口。","outcome":"三条线汇合到毁灭博士，前面补的每一环都在这里收束。"},
       "items": [
-        {
-          "id": "loki",
-          "name": "洛基 S1",
-          "year": 2021,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": true,
-          "type": "series"
-        },
-        {
-          "id": "loki",
-          "name": "洛基 S2",
-          "year": 2023,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": true,
-          "type": "series"
-        },
-        {
-          "id": "multiverse-of-madness",
-          "name": "奇异博士2：疯狂多元宇宙",
-          "year": 2022,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "no-way-home",
-          "name": "蜘蛛侠：英雄无归",
-          "year": 2021,
-          "phase": 4,
-          "phaseShort": "第四阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "deadpool-wolverine",
-          "name": "死侍与金刚狼",
-          "year": 2024,
-          "phase": 5,
-          "phaseShort": "第五阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "brave-new-world",
-          "name": "美国队长4：勇敢新世界",
-          "year": 2025,
-          "phase": 5,
-          "phaseShort": "第五阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "thunderbolts",
-          "name": "雷霆特攻队*",
-          "year": 2025,
-          "phase": 5,
-          "phaseShort": "第五阶段",
-          "isSeries": false,
-          "type": "movie"
-        },
-        {
-          "id": "fantastic-four",
-          "name": "神奇四侠：初露锋芒",
-          "year": 2025,
-          "phase": 6,
-          "phaseShort": "第六阶段",
-          "isSeries": false,
-          "type": "movie"
-        }
+        {"id":"loki","name":"洛基 S1","year":2021,"phase":4,"phaseShort":"第四阶段","isSeries":true,"type":"series","badge":"必看","reason":"TVA / 时间线：先懂 TVA 与神圣时间线，多元宇宙才有后续。","role":"多元宇宙故事的总开关。TVA 与\"神圣时间线\"的设定，是后续多元宇宙一切的源头。","gains":["TVA 与神圣时间线","洛基的变体身份"],"next":"下一部《洛基 S2》：多元宇宙正式开启。"},
+        {"id":"loki","name":"洛基 S2","year":2023,"phase":4,"phaseShort":"第四阶段","isSeries":true,"type":"series","badge":"必看","reason":"多元宇宙正式开启：承接 S1 的神圣时间线破裂，多元宇宙成主线。","role":"多元宇宙故事的总开关。TVA 与\"神圣时间线\"的设定，是后续多元宇宙一切的源头。","gains":["神圣时间线为何破裂","多元宇宙如何开启"],"next":"关联《奇异博士2：疯狂多元宇宙》：它的前提正是多元宇宙开启。"},
+        {"id":"multiverse-of-madness","name":"奇异博士2：疯狂多元宇宙","year":2022,"phase":4,"phaseShort":"第四阶段","isSeries":false,"type":"movie","badge":"必看","reason":"宇宙碰撞：多元宇宙的规则在这里被正式打破。","role":"第一次真正带观众穿越多个平行宇宙。它也是旺达角色弧线的终点，情绪落点极重。","gains":["多元宇宙如何被穿行","旺达的结局"],"next":"关联《蚁人与黄蜂女：量子狂潮》：它引出统领性的新威胁。"},
+        {"id":"no-way-home","name":"蜘蛛侠：英雄无归","year":2021,"phase":4,"phaseShort":"第四阶段","isSeries":false,"type":"movie","badge":"必看","reason":"多元宇宙暴露于人：一道失控的咒语，把多元宇宙撕开了口子。","role":"多元宇宙正式打开的那一刻。它既是蜘蛛侠个人故事的成人礼，也是整个第四阶段的结构性转折点。","gains":["咒语为何失控","多元宇宙如何被撕开"],"next":"下一部《蜘蛛侠：崭新之日》：结局把彼得推回了原点。"},
+        {"id":"deadpool-wolverine","name":"死侍与金刚狼","year":2024,"phase":5,"phaseShort":"第五阶段","isSeries":false,"type":"movie","badge":"推荐","reason":"穿越者入局：死侍要找的那个金刚狼，来自另一个宇宙。","role":"正式把福斯的 X 战警／死侍宇宙并入 MCU 多元宇宙体系。它为后面变种人的登场清好了法理障碍。","gains":["死侍为何要找金刚狼","变种人如何并入 MCU"],"next":"关联《勇敢新世界》：变种人进门之后，地球政治格局也在变。"},
+        {"id":"brave-new-world","name":"美国队长4：勇敢新世界","year":2025,"phase":5,"phaseShort":"第五阶段","isSeries":false,"type":"movie","badge":"推荐","reason":"新世界秩序：山姆接过盾牌后的第一部个人电影。","role":"完成美国队长盾牌的交接，同时把《无敌浩克》里的旧角色重新拉回主线——这是那部电影十七年后第一次真正被启用。","gains":["山姆如何接住盾牌","政治漩涡中的抉择"],"next":"关联《雷霆特攻队》：另一批非典型英雄接着被推上台。"},
+        {"id":"thunderbolts","name":"雷霆特攻队*","year":2025,"phase":5,"phaseShort":"第五阶段","isSeries":false,"type":"movie","badge":"推荐","reason":"反英雄集结：一批边缘角色凑成新队伍，为复联5做人员储备。","role":"第五阶段的收官。它把此前散落在各部电影里的边缘角色收拢成一支新队伍，为《复联5》做人员储备。","gains":["这批人为何凑到一起","新队伍如何成型"],"next":"关联《神奇四侠：初露锋芒》：第六阶段由此开启，并引入平行宇宙。"},
+        {"id":"fantastic-four","name":"神奇四侠：初露锋芒","year":2025,"phase":6,"phaseShort":"第六阶段","isSeries":false,"type":"movie","badge":"必看","reason":"入口开启：平行宇宙 Earth-828 登场，是复联5多宇宙汇合的关键一方。","role":"第六阶段的开篇。它发生在一个独立的平行宇宙里，这四个角色是《复联5：毁灭之日》多宇宙汇合的关键一方。","gains":["Earth-828 的世界设定","四位成员的异能组合"],"next":"关联《蜘蛛侠：崭新之日》：两部都在为《复联5》做汇流准备。"}
       ]
     }
   ]

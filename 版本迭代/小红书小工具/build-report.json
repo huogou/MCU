@@ -1,0 +1,50 @@
+{
+  "generatedBy": "build-data.js",
+  "source": "../../h5/data",
+  "sourceCounts": {
+    "movie": 40,
+    "series": 15,
+    "special": 2,
+    "short": 5,
+    "contentReleased": 59,
+    "contentAll": 62,
+    "characters": 25,
+    "relations": 92,
+    "routes": 11,
+    "specialRoutes": 1,
+    "upcoming": 4,
+    "posters": 38,
+    "stills": 38
+  },
+  "outputCounts": {
+    "content": 59,
+    "movie": 38,
+    "series": 14,
+    "special": 2,
+    "short": 5,
+    "characters": 24,
+    "relations": 92,
+    "routes": 11,
+    "specialRoutes": 1,
+    "upcoming": 2
+  },
+  "filtered": {
+    "excludedContent": [],
+    "droppedRelations": 0,
+    "droppedCharacterRefs": 0,
+    "droppedUpcoming": [
+      "black-panther-3",
+      "ghost-rider"
+    ]
+  },
+  "warnings": [],
+  "imageCoverage": {
+    "posters": "38 条海报记录（未写入包体）",
+    "stills": "38 条剧照记录（未写入包体）",
+    "reason": "容器不联网、且图片会突破体积门禁；小红书端采用程序化视觉卡，不引用外部或相对图片路径。"
+  },
+  "artifact": {
+    "file": "dist\\assets\\data.js",
+    "bytes": 72812
+  }
+}

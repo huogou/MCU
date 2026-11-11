@@ -1,0 +1,530 @@
+<style>
+    /* 清掉 body 默认 margin（8px）与可能的 padding，避免卡片被挤偏、出现滚动条 */
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .cos-icon {
+        font-family: "cos-icon" !important;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .cos-icon-info-source::before {
+        content: "\e693";
+    }
+
+    .cos-icon-refresh::before {
+        content: "\e779";
+    }
+
+    .cos-icon-volume::before {
+        content: "\e793";
+    }
+
+    .cos-icon-mute::before {
+        content: "\e780";
+    }
+
+    .cos-icon-play-circle::before {
+        content: "\e76b";
+    }
+
+    .cos-icon-pause-circle::before {
+        content: "\e756";
+    }
+
+    /* padding-top 100% 撑出 1:1，内部元素随容器宽度等比缩放 */
+    .vc-component-wrapper {
+        padding-top: 100%;
+        height: 0;
+        position: relative;
+        width: 100%;
+    }
+
+    .vc-component-container {
+        position: absolute;
+        inset: 0;
+        background: var(--cos-vcard-color-bg);
+        border-radius: var(--cos-rounded-sm);
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        user-select: none;
+        overscroll-behavior: none;
+    }
+
+    .c-darkmode .vc-component-container,
+    .darkmode .vc-component-container,
+    .cos-dark .vc-component-container {
+        border: 0.5px solid var(--cos-image-color-border);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .vc-component-container {
+            border: 0.5px solid var(--cos-image-color-border);
+        }
+    }
+
+    /* 作用域限定在卡片内，不影响产物外的样式 */
+    .vc-component-container * {
+        box-sizing: border-box;
+    }
+
+    /* 表头：45px 高，内间距左右上 15px、下 12px，底部 0.5px 描边 */
+    .vc-component-header {
+        height: 45px;
+        padding: 15px 15px 12px;
+        font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+        line-height: 1;
+        color: var(--cos-color-text-minor);
+        font-weight: 400;
+        border-radius: var(--cos-rounded-sm) var(--cos-rounded-sm) 0 0;
+        border-bottom: 0.5px solid var(--cos-color-border-minor);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+    }
+    .vc-component-header-title {
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    /* 提示 icon：cosmic icon 字体，16×16，与标题间距 3px */
+    .vc-component-tips {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
+        margin-left: 3px;
+        font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+        color: var(--cos-color-text-slim);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 伪元素向外撑出 44px 热区，不影响布局与视觉尺寸 */
+    .vc-component-tips::after {
+        content: "";
+        position: absolute;
+        inset: -14px;
+    }
+
+    /* 表头右侧操作区：只能放 icon 操作按钮，最多 3 个；不得放可见文案或其他内容。
+        icon 均为 18×18px，相邻间距 18px；margin-left: auto 靠右，
+        右边距由表头的 padding 给出 15px；无按钮时删除整个容器。 */
+    .vc-component-header-actions {
+        margin-left: auto;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    /* 声音按钮（可选）：表头右侧，18×18 的 cosmic icon。
+        只有作品实际有声音时才放，默认静音；无声音时不要加。
+        点击后同步切换实际声音与静音 / 开启 icon。 */
+
+    /* 播放按钮（可选）：表头右侧，18×18 的 cosmic icon。
+        只有存在可播放、暂停的持续过程时才放，默认非播放态；静态内容或短暂的一次性动画不要加。
+        点击后同步切换实际播放状态与播放 / 暂停 icon。 */
+
+    /* 重置按钮（必选）：表头右侧，18×18 的 cosmic icon。
+        所有作品都要有，框架写死，禁止删除。纯参数 / 纯拖拽作品的重置用于把
+        全部参数与视图恢复到初始态；有持续动画、多步骤、留痕状态的一并恢复到初始态。 */
+
+    /* 表头右侧 icon 操作按钮公共样式。靠右与按钮间距由 .vc-component-header-actions 控制，
+        不用 absolute 定位，长标题的 ellipsis 才不会被按钮压住。 */
+    .vc-component-control-btn {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        color: var(--cos-color-text);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-component-control-btn:active {
+        opacity: 0.2;
+    }
+
+    .vc-component-control-btn .cos-icon {
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: calc(var(--cos-text-headline-sm) / var(--font-size-scale, 1));
+        line-height: calc(var(--cos-text-headline-sm) / var(--font-size-scale, 1));
+    }
+
+    .vc-component-control-btn .cos-icon-refresh {
+        transform-origin: center;
+    }
+
+    .vc-component-icon-rotating {
+        animation: vc-component-rotate 600ms ease;
+    }
+
+    @keyframes vc-component-rotate {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* 说明气泡：默认在表头下方，居中对齐 icon */
+    .vc-component-tips-tooltip {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translate(-50%, -4px);
+        background: var(--cos-color-bg-bubble);
+        color: var(--cos-color-text-inverse);
+        min-width: 18px;
+        text-align: left;
+        border-radius: var(--cos-rounded-md);
+        font-size: calc(14px / var(--font-size-scale, 1));
+        line-height: calc(20px / var(--font-size-scale, 1));
+        white-space: normal;
+        word-break: break-word;
+        /* 宽度上限由 JS 按卡片实际宽度写入，避免多行文案超出卡片 */
+        max-width: var(--vc-tooltip-max-width, 100%);
+        width: max-content;
+        padding: var(--cos-space-xs) var(--cos-space-sm);
+        display: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        z-index: 20;
+        box-sizing: border-box;
+    }
+
+    .vc-component-tips-tooltip::after {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(calc(-50% + var(--vc-tooltip-arrow-shift, 0px)));
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid var(--cos-color-bg-bubble);
+    }
+
+    .vc-component-tips-tooltip.visible {
+        display: block;
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    /* PC 端改用浮层配色 + 阴影，区别于移动端的深色气泡 */
+    .vc-component-tips-tooltip.pc {
+        color: var(--cos-color-text);
+        background-color: var(--cos-color-bg);
+        box-shadow: 0px 6px 21px 0px #1e1f2433;
+    }
+
+    .vc-component-tips-tooltip.pc::after {
+        border-bottom: 6px solid var(--cos-color-bg);
+    }
+
+    .vc-component-card-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* 画布区：flex:1 撑满剩余空间，保证高度占比 ≥ 50% */
+    .vc-component-demo {
+        flex: 1;
+        min-height: 0;
+    }
+    /* 操作区：交互控件集中放这里，不散落在画布区 */
+    .vc-component-operate {
+        padding: 0 12px 12px;
+        flex-shrink: 0;
+    }
+</style>
+
+<!-- 形态 A（表头 + 画布区 + 操作区）。形态 B（整屏画布）去掉 .vc-component-operate，
+        并把表头浮在画布之上、按画布背景明度换一套配色。 -->
+<div class="vc-component-wrapper">
+    <div class="vc-component-container" id="vc-component-container">
+        <div class="vc-component-header">
+            <span class="vc-component-header-title">小工具 · 项目名称</span>
+            <span
+                class="vc-component-tips"
+                id="vc-component-tips"
+                tabindex="0"
+                role="button"
+                aria-label="功能说明"
+            >
+                <i class="cos-icon cos-icon-info-source" aria-hidden="true"></i>
+                <span class="vc-component-tips-tooltip" id="vc-component-tips-tooltip">操作提示文字，可以写得比较长，用来说明当前功能怎么用；超出卡片宽度时会自动换行并避让卡片左右边缘</span>
+            </span>
+            <!-- 表头右侧操作区：只放 icon 操作按钮，最多 3 个；无按钮时删除整个容器 -->
+            <div class="vc-component-header-actions">
+                <!-- 声音按钮：可选，不需要声音的作品直接删掉这个 span；默认静音 -->
+                <span
+                    class="vc-component-control-btn"
+                    id="vc-component-sound"
+                    title="开启声音"
+                    tabindex="0"
+                    role="button"
+                    aria-label="开启声音"
+                >
+                    <i class="cos-icon cos-icon-mute" aria-hidden="true"></i>
+                </span>
+                <!-- 重置按钮：必选，所有作品都要有，禁止删除 -->
+                <span
+                    class="vc-component-control-btn"
+                    id="vc-component-reset"
+                    title="重置"
+                    tabindex="0"
+                    role="button"
+                    aria-label="重置"
+                >
+                    <i class="cos-icon cos-icon-refresh" aria-hidden="true"></i>
+                </span>
+                <!-- 播放按钮：可选，不需要播放 / 暂停的作品直接删掉这个 span；默认非播放态 -->
+                <span
+                    class="vc-component-control-btn"
+                    id="vc-component-play"
+                    title="播放"
+                    tabindex="0"
+                    role="button"
+                    aria-label="播放"
+                >
+                    <i class="cos-icon cos-icon-play-circle" aria-hidden="true"></i>
+                </span>
+            </div>
+        </div>
+        <div class="vc-component-card-wrapper">
+            <!-- 画布区：canvas / svg / 主内容 -->
+            <div class="vc-component-demo" id="vc-component-demo"></div>
+            <!-- 操作区：滑动条 / 按钮 / Tabs -->
+            <div class="vc-component-operate"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        var tipsTrigger = document.getElementById('vc-component-tips');
+        var tipsTooltip = document.getElementById('vc-component-tips-tooltip');
+        var tipsBoundary = document.getElementById('vc-component-container');
+        var isPC = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+        // 避让边界取卡片，而不是视口，气泡不会越过卡片描边
+        var TIPS_PADDING = 12;
+
+        function getBoundaryRect() {
+            return tipsBoundary
+                ? tipsBoundary.getBoundingClientRect()
+                : { left: 0, right: window.innerWidth || document.documentElement.clientWidth };
+        }
+
+        function showTipsTooltip() {
+            if (!tipsTooltip) return;
+            if (isPC) {
+                tipsTooltip.classList.add('pc');
+            }
+            // 重置上一次的位置偏移，避免基于已偏移状态再次计算
+            tipsTooltip.style.marginLeft = '';
+            tipsTooltip.style.removeProperty('--vc-tooltip-arrow-shift');
+            // 先按卡片宽度限制气泡最大宽度，长文案在卡片内换行
+            var boundary = getBoundaryRect();
+            tipsTooltip.style.setProperty(
+                '--vc-tooltip-max-width',
+                (boundary.right - boundary.left - TIPS_PADDING * 2) + 'px'
+            );
+            tipsTooltip.classList.add('visible');
+            // 在下一帧测量，确保元素已完成布局
+            (window.requestAnimationFrame || function (cb) { return setTimeout(cb, 0); })(adjustTipsTooltipPosition);
+        }
+        function adjustTipsTooltipPosition() {
+            if (!tipsTooltip || !tipsTooltip.classList.contains('visible')) return;
+            var rect = tipsTooltip.getBoundingClientRect();
+            var boundary = getBoundaryRect();
+            var shift = 0;
+            if (rect.right > boundary.right - TIPS_PADDING) {
+                shift = -(rect.right - (boundary.right - TIPS_PADDING));
+            } else if (rect.left < boundary.left + TIPS_PADDING) {
+                shift = (boundary.left + TIPS_PADDING) - rect.left;
+            }
+            if (shift !== 0) {
+                tipsTooltip.style.marginLeft = shift + 'px';
+                // 三角箭头反向位移以继续指向锚点元素中心
+                tipsTooltip.style.setProperty('--vc-tooltip-arrow-shift', (-shift) + 'px');
+            }
+        }
+
+        function hideTipsTooltip() {
+            if (!tipsTooltip) return;
+            tipsTooltip.classList.remove('visible');
+            // 隐藏后不参与布局，避免初始/关闭状态撑出横向滚动
+            tipsTooltip.style.marginLeft = '';
+            tipsTooltip.style.removeProperty('--vc-tooltip-arrow-shift');
+            tipsTooltip.style.removeProperty('--vc-tooltip-max-width');
+        }
+
+        function toggleTipsTooltip() {
+            if (tipsTooltip.classList.contains('visible')) {
+                hideTipsTooltip();
+            } else {
+                showTipsTooltip();
+            }
+        }
+        if (tipsTrigger && tipsTooltip) {
+            if (isPC) {
+                tipsTrigger.addEventListener('mouseenter', showTipsTooltip);
+                tipsTrigger.addEventListener('mouseleave', hideTipsTooltip);
+                tipsTrigger.addEventListener('focus', showTipsTooltip);
+                tipsTrigger.addEventListener('blur', hideTipsTooltip);
+            } else {
+                tipsTrigger.addEventListener('click', function (evt) {
+                    evt.stopPropagation();
+                    toggleTipsTooltip();
+                });
+                document.addEventListener('click', hideTipsTooltip);
+                tipsTooltip.addEventListener('click', function (evt) {
+                    evt.stopPropagation();
+                });
+            }
+            tipsTrigger.addEventListener('keydown', function (evt) {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    toggleTipsTooltip();
+                }
+            });
+        }
+
+        // ── 声音按钮（可选）────────────────────────────────────────────
+        var soundTrigger = document.getElementById('vc-component-sound');
+        var soundIcon = soundTrigger && soundTrigger.querySelector('.cos-icon');
+        var isSoundMuted = true;
+
+        // 在这里同步作品实际的声音状态
+        function setDemoSoundMuted(muted) {
+
+        }
+
+        function updateSoundIcon() {
+            if (!soundTrigger || !soundIcon) return;
+            soundIcon.classList.toggle('cos-icon-mute', isSoundMuted);
+            soundIcon.classList.toggle('cos-icon-volume', !isSoundMuted);
+            var actionLabel = isSoundMuted ? '开启声音' : '关闭声音';
+            soundTrigger.setAttribute('title', actionLabel);
+            soundTrigger.setAttribute('aria-label', actionLabel);
+        }
+
+        function handleSound() {
+            isSoundMuted = !isSoundMuted;
+            setDemoSoundMuted(isSoundMuted);
+            updateSoundIcon();
+        }
+
+        if (soundTrigger) {
+            updateSoundIcon();
+            soundTrigger.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                handleSound();
+            });
+            soundTrigger.addEventListener('keydown', function (evt) {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    handleSound();
+                }
+            });
+        }
+
+        // ── 播放按钮（可选）────────────────────────────────────────────
+        var playTrigger = document.getElementById('vc-component-play');
+        var playIcon = playTrigger && playTrigger.querySelector('.cos-icon');
+        var isDemoPlaying = false;
+
+        // 在这里同步作品实际的播放状态；播放结束时也要把状态和 icon 恢复为非播放态
+        function setDemoPlaying(playing) {
+
+        }
+
+        function updatePlayIcon() {
+            if (!playTrigger || !playIcon) return;
+            playIcon.classList.toggle('cos-icon-play-circle', !isDemoPlaying);
+            playIcon.classList.toggle('cos-icon-pause-circle', isDemoPlaying);
+            var actionLabel = isDemoPlaying ? '暂停' : '播放';
+            playTrigger.setAttribute('title', actionLabel);
+            playTrigger.setAttribute('aria-label', actionLabel);
+        }
+
+        function handlePlay() {
+            isDemoPlaying = !isDemoPlaying;
+            setDemoPlaying(isDemoPlaying);
+            updatePlayIcon();
+        }
+
+        if (playTrigger) {
+            updatePlayIcon();
+            playTrigger.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                handlePlay();
+            });
+            playTrigger.addEventListener('keydown', function (evt) {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    handlePlay();
+                }
+            });
+        }
+
+        // ── 重置按钮（必选）────────────────────────────────────────────
+        var resetTrigger = document.getElementById('vc-component-reset');
+        var resetIcon = resetTrigger && resetTrigger.querySelector('.cos-icon-refresh');
+
+        // 把动画、轨迹、临时高亮、运动状态与各项参数一并恢复到初始态
+        function resetDemo() {
+
+        }
+
+        function spinResetIcon() {
+            if (!resetIcon) return;
+            // 先摘掉 class 再强制一次重排，连续点击时动画才会重新播放
+            resetIcon.classList.remove('vc-component-icon-rotating');
+            void resetIcon.offsetWidth;
+            resetIcon.classList.add('vc-component-icon-rotating');
+        }
+
+        function handleReset() {
+            spinResetIcon();
+            resetDemo();
+            isDemoPlaying = false;
+            updatePlayIcon();
+        }
+
+        if (resetTrigger) {
+            resetTrigger.addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                handleReset();
+            });
+            resetTrigger.addEventListener('keydown', function (evt) {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    handleReset();
+                }
+            });
+        }
+    })();
+</script>

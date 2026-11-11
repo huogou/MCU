@@ -1,0 +1,268 @@
+# V3.0 用户状态与数据结构设计
+
+> 版本：V1.1　日期：2026-11-10　状态：规划稿 · 收口修订 · 待 ChatGPT 复审
+> 配套主文档：《MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.1》
+> 修订说明：V1.1 按收口指令重写「迁移与异常恢复」「MCU_USER 字段精化」「统一状态操作机制」三章；存储后端规则**以 V2.0 实际代码 `dist/assets/progress.js` 为依据**，不按理想化假设编写。
+> 性质：**全部为设计，未实现、未测试**。V2.0 已有能力作为事实引用并标注来源。
+
+---
+
+## 0. 关联文件索引
+
+| 类别 | 文件 | 绝对路径 |
+|---|---|---|
+| 主文档 | 产品需求与架构设计 V1.1 | `D:\SEO\发挥余热\漫威电影宇宙导航\版本迭代\小红书小工具\V3.0-规划与架构设计\MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.1.txt` |
+| 配套 | 功能模块与优先级清单 | `…\V3.0-规划与架构设计\V3.0 功能模块与优先级清单.txt` |
+| 配套 | 三大系统功能联动流程图 | `…\V3.0-规划与架构设计\V3.0 三大系统功能联动流程图.txt` |
+| 配套 | 平台能力与技术风险清单 | `…\V3.0-规划与架构设计\V3.0 平台能力与技术风险清单.txt` |
+| 汇总 | 收口修订记录 / 未解决风险清单 | `…\V3.0-规划与架构设计\V3.0 收口修订记录 V1.1.txt`、`…\V3.0-规划与架构设计\V3.0 未解决风险与待确认事项清单.txt` |
+| 事实依据 | V2.0 存储代码 | `D:\SEO\发挥余热\漫威电影宇宙导航\版本迭代\小红书小工具\dist\assets\progress.js` |
+| 事实依据 | V2.0 决策记录 | `D:\SEO\发挥余热\漫威电影宇宙导航\版本迭代\小红书小工具\决策记录.md` |
+| 历史稿 | V1.0 五份 | `…\V3.0-规划与架构设计\附件\V1.0历史稿\` |
+
+---
+
+## 1. 设计原则（V1.1 冻结）
+
+1. **内容数据单一来源**：作品/角色/关系/路线只读来自包内 `data.js`（构建期由 `h5/data/*` 生成），视图不持有副本。
+2. **用户状态单一来源**：所有写入必须经 `MCUUser` 的七个业务方法（§4），**禁止任何业务视图直接调用存储适配层或直接改内存状态**。
+3. **派生不落库**：路线完成度、百分比、统计由 `watched` 派生（沿用 V2.0 `routeProgress`/`percent`）。
+4. **迁移安全优先于可用性**：未知版本数据保留、不覆盖、不自动清空；迁移失败保留旧键（§3）。
+5. **容量硬约束**：单 Storage key ≤1MB、总 ≤10MB（决策记录 D-20260928-05 / D-20261110-03）；所有数组与映射设明确上限与截断规则（§2.3）。
+6. **不保证永久**：平台 Storage 可被清理；所有用户状态可丢失重建，不阻断核心浏览功能。
+
+---
+
+## 2. MCU_USER 数据模型（v2，V1.1 修订）
+
+### 2.1 存储键与整体结构
+
+- **新键**：`mcu-xhs-user-v2`（`version: 2`）；**旧键**：`mcu-xhs-progress-v1`（V2.0，`version: 1`）。
+- 单个 JSON 字符串存储；不使用多 key 分片（单 key 容量足够，且避免跨 key 一致性问题）。
+
+```js
+{
+  version: 2,
+  preferences: {                     // 白名单键，缺省补全
+    exploreDefaultFilter: 'all',     // 'all'|'character'|'content'
+    cardStyle: 'default',            // 分享卡视觉变体（P2 预留）
+    reduceMotion: false
+  },
+  likedCharacters: ['tony'],         // 仅 charId（MCU_CHARACTERS）
+  likedTeams: ['avengers'],          // 仅 campId（MCU_CAMPS 8 阵营）
+  watched: { 'iron-man': 'ISO', 'loki|洛基 S1': 'ISO' },  // 沿用 V2.0 分季键规则
+  want: ['civil-war'],               // 仅 contentId
+  favorite: ['avengers'],            // 仅 contentId（作品收藏）
+  currentRoute: {
+    routeId: 'a5-core',              // 必须存在于 MCU_ROUTES / MCU_SPECIAL_ROUTES
+    position: 3,                     // 0-based，items 索引；仅作导航定位
+    updatedAt: 'ISO'
+  },
+  recentExplore: [                   // 上限 20，按 at 倒序
+    { type: 'character', id: 'tony', at: 'ISO' }
+  ],
+  quiz: {
+    scores: [                        // 上限 50，按 at 倒序
+      { quizId: 'phase1-basic', quizVersion: 'qb-1.0', topic: 'phase1',
+        correct: 8, total: 10, at: 'ISO' }
+    ],
+    bestStreak: 10                   // 派生字段，见 §2.2
+  },
+  achievements: {                    // 映射：id -> 解锁时间（状态与时间合一）
+    'a5-core-done': 'ISO'
+  },
+  shareRecords: [                    // 上限 30，仅必要信息
+    { cardType: 'a5core', at: 'ISO' }
+  ],
+  updatedAt: 'ISO'
+}
+```
+
+### 2.2 字段精化（对应修订指令 §二.2）
+
+| 字段 | V1.1 明确定义 | 与 V1.0 差异 |
+|---|---|---|
+| `currentRoute` | `routeId` 指向真实路线；`position` **仅用于「继续上次路线」的跳转定位与列表高亮**，不代表完成度。起始规则：首次进入且无记录 → `position` = 由 `watched` 派生的**第一个未完成节点索引**；全部完成 → 取 0 并标记已完成。路线切换：调用 `setCurrentRoute(newRouteId)` 写入新 routeId，`position` **按新路线重新由 watched 派生**，不继承旧值。恢复逻辑：读取时校验 routeId 仍在 `data.js` 且 position ∈ [0, items.length-1]；失效则钳制/重算并在同一次 update 内修正，不删除整条记录。**路线完成度始终由 watched 经 `routeProgress()` 派生，不落库、不由 position 推断。** | 补全用途/起始/切换/恢复 |
+| `quiz.scores[]` | 六字段齐全：`quizId`（题库题目集 id）、`quizVersion`（题库版本，题目变更后成绩不跨版本混算）、`topic`、`correct`、`total`、`at`。 | 补 quizId / quizVersion |
+| `quiz.bestStreak` | **采用更简单的明确规则**：定义为「历史最高单次全对题数」= `scores` 中 `correct === total` 的 `total` 最大值，无则 0；**由 `scores` 派生、不独立落库**，避免重复维护。若产品要求「真实连续答对段长」，需逐题答题日志（存储与实现成本上升），列为待确认项 Q-05。 | 明确规则 + 改派生 |
+| `achievements` | 由 V1.0 的 `{unlocked:[], at:{}}` 双结构合并为**单映射 `id -> ISO时间`**：键存在即已解锁，值即解锁时间，天然去重、无需两处维护。 | 合并，消除重复维护 |
+| `favorite` | **仅作品收藏 `contentId[]`**，不收角色、不收路线；写入前校验存在于 `MCU_CONTENT`。 | 限定类型 |
+| `likedCharacters` | **仅角色 `charId[]`**，校验存在于 `MCU_CHARACTERS`。 | 限定类型 |
+| `likedTeams` | **仅阵营 `campId[]`**，取值限于 `MCU_CAMPS` 的 8 个键。 | 限定类型 |
+| `shareRecords` | 精简为 `{cardType, at}`，**移除 relatedIds**；仅用于分享行为计数/去重，**不承担个人档案展示**（档案所需内容由 watched/quiz/achievements 派生）。 | 精简，防过度存储 |
+
+### 2.3 全量上限与截断规则（对应修订指令 §二.2 末条）
+
+| 字段 | 类型 | 上限 | 截断 / 超限规则 | 依据 |
+|---|---|---|---|---|
+| `preferences` | 对象 | 固定 3 个白名单键 | 非白名单键丢弃，缺省键补默认值 | 逐字段校验 |
+| `watched` | 映射 | ≤200 键 | 不静默截断；写入时校验 `splitKey(key).base` 属于 `MCU_CONTENT`，未知键拒绝；超限时拒绝新增并提示 | V2.0 `isKnownKey` |
+| `want` | 数组 | 50 | 超限时**拒绝新增并提示**（不静默 FIFO，避免丢失用户意图） | 设计裁定 |
+| `favorite` | 数组 | 50 | 同上 | 设计裁定 |
+| `likedCharacters` | 数组 | 50 | 同上 | 设计裁定 |
+| `likedTeams` | 数组 | 8 | 天然有界（阵营总数） | `MCU_CAMPS` |
+| `recentExplore` | 数组 | 20 | 追加后按 `at` 倒序保留最新 20，丢弃最旧（FIFO） | 时间序日志，可丢 |
+| `quiz.scores` | 数组 | 50 | 按 `at` 倒序保留最新 50 | 同上 |
+| `achievements` | 映射 | 100 键 | 按解锁时间保留最新 100 | 同上 |
+| `shareRecords` | 数组 | 30 | 按 `at` 倒序保留最新 30 | 同上 |
+| `currentRoute` | 单对象 | 1 | 覆盖式写入，不留历史 | 设计裁定 |
+
+> 估算：全字段满载仍远低于单 key 1MB（以文本为主，量级约几十 KB）；具体数值待 CodeBuddy 实施阶段以实测复核（Q-06）。
+
+---
+
+## 3. 数据迁移与异常恢复（V1.1 重写，对应修订指令 §二.1）
+
+### 3.1 V2.0 存储后端实际行为（事实依据：`progress.js`）
+
+| 项 | 实际代码行为 | 行号 |
+|---|---|---|
+| 主路径判定 | `storageAvailable()`（setStorage+getStorage 均存在）**且** `Math.floor(buildVersion/1000) >= 9460`（客户端 ≥9.46.0，末 3 位为编译号忽略）→ 走 `xhs.miniTool` | L73–84, L19 |
+| 版本读取 | 先同步读 `window.xhs.launchOptions.miniToolEnv.buildVersion`，缺失时异步 `getLaunchOptions()`，异常返回 0 | L61–71 |
+| 降级（读） | 版本不足/API 不可用 → `localStorage`；`getStorage` **Promise reject** → 回退 `localStorage.getItem`；再不可用 → `memoryFallback` | L97–122 |
+| 降级（写） | `setStorage` **Promise reject** → 回退 `localStorage.setItem`（保留当次操作）；再失败 → `memoryFallback = str` | L124–152 |
+| **已知边界** | `getStorage` **成功返回但 `res.data` 为空/null** → L103 直接返回 `null`，**不会**再回读 localStorage 副本。即「xhs 写失败降级到 localStorage 的当次数据，在后续 xhs 读正常的会话中不会被自动恢复」 | L102–103 |
+| 清除 | 9.46+ 优先 `removeStorage`，失败回退 `setStorage({key,data:''})`；**无论 xhs 结果如何，始终**清 `localStorage` 副本并置 `memoryFallback=null`（防旧数据回流） | L154–185 |
+| 损坏数据 | `parse()`：JSON 整体不可解析或根非对象 → `emptyData()`；否则**逐字段**校验（`watched` 仅留 string 值、`want` 过滤非 string、`updatedAt` 仅 string）→ **局部保留合法字段**，非全量清空 | L33–53 |
+
+**V1.1 结论**：优先级 = `xhs Storage(≥9.46)` > `localStorage` > `memory`；降级**仅由「API 不可用 / 版本不足 / 调用 reject」触发**，不由「读成功但为空」触发。V1.1 不得假设「双副本自动恢复」；§3.1 的已知边界列入未解决风险 R-04。
+
+### 3.2 迁移流程（v1 → v2，六条安全规则）
+
+```
+启动 → MCUUser.init()
+  │
+  ├─ 读旧键 mcu-xhs-progress-v1（xhs 优先；reject 才回退 localStorage；
+  │    V1.1 新增：两后端均尝试并比对，规避 §3.1 已知边界）
+  │    及新键 mcu-xhs-user-v2
+  │
+  ├─ [新键已存在且校验通过] → 跳过迁移（幂等：不重复写、不重复清旧键）
+  │
+  ├─ [旧数据 version 未知/缺失/非数字/>2] → ★保留原始、禁止写入覆盖★
+  │    内存以 emptyData() 只读运行，不持久化、不清键、不 emit 写入成功
+  │    UI 提示「检测到较新版本数据，已完整保留」；功能仍可浏览
+  │
+  ├─ [旧数据损坏] → 逐字段校验（沿用 V2.0 parse 范式并扩展到全部 v2 字段）
+  │    仅丢弃非法字段/元素，保留合法部分；原始损坏串不覆盖、不清空
+  │
+  └─ [version === 1] → 执行迁移：
+       ① 映射 watched / want → v2，其余字段补默认
+       ② 写新键 setStorage({key:'mcu-xhs-user-v2', data})
+       ③ ★重新读取 getStorage 并校验（version===2、关键字段类型、长度/校验和）★
+       ④ 仅当 ③ 通过 → 才允许清理旧键（沿用 V2.0 removeRaw）
+       ⑤ 任一环节抛错/回读不一致 → ★保留旧键★，记录失败原因，下次启动重试
+```
+
+| 规则 | V1.1 要求 | V1.0 旧表述（已废止） |
+|---|---|---|
+| 未知版本 | 保留原始数据、禁止自动写入覆盖、不清空 | 「回退空态并提示」——会覆盖，已废止 |
+| 幂等 | 以「新键存在且校验通过」为前置；重复执行不重复追加、不覆盖新键、不重复清旧键 | 未明确 |
+| 写入后校验 | 写新键 → **重新读取并校验成功** → 才清理旧键 | 「可选清理旧键」，无回读校验 |
+| 失败保留 | 迁移失败保留旧键 | 未明确 |
+| 损坏数据 | 逐字段校验、局部保留、原串不覆盖 | 「回退空态」过于笼统 |
+| 后端规则 | 按 §3.1 实际代码，明确优先级/降级/恢复 | 笼统「三级降级」 |
+
+### 3.3 异常与恢复对照
+
+| 场景 | 处理 |
+|---|---|
+| xhs 读 reject | 回退 localStorage 副本；均无 → 内存空态（不写盘） |
+| xhs 读成功但为空 | **不**自动回读 localStorage（V2.0 边界，R-04）；V1.1 迁移阶段额外主动比对两后端 |
+| xhs 写 reject | 降级 localStorage 写当次数据；标记 `persisted:degraded` |
+| 全部后端写失败 | `memoryFallback` 保当次操作，内存状态**不回滚**，UI 提示「仅本次会话有效」 |
+| 未知版本 | 见 §3.2，原始保留 |
+| 迁移失败 | 旧键保留，可重试 |
+| 清除进度 | 沿用 V2.0 `removeRaw`：removeStorage 优先 / setStorage 空串回退 / 同步清 localStorage 与 memory |
+
+---
+
+## 4. 统一状态操作机制（V1.1 新增，对应修订指令 §二.3）
+
+### 4.1 底层 `MCUUser.update(mutator)`（唯一写入口）
+
+```
+update(mutator) →
+  ① 参数校验（mutator 必须为函数；非法直接拒绝）
+  ② 以当前 state 快照执行 mutator → 返回 newState 或 null（null 表示无变更，直接返回）
+  ③ 规范化：逐字段校验 + 去重 + 应用 §2.3 上限/截断规则
+  ④ 持久化 writeRaw(JSON.stringify(newState))
+  ⑤ 结果分派：
+       成功          → 更新内存 cache → emit(state, {persisted:true, backend, changedFields})
+       降级成功      → 同上，但 persisted:'degraded'，提示可能不持久
+       全部失败      → 内存保留新状态（不回滚）+ emit(state, {persisted:false, backend:'memory'})
+                        + UI 提示「仅本次会话有效」
+  ⑥ 返回 {ok, changed, persisted, backend, changedFields}
+```
+
+- **通知机制**：`emit(state, meta)` 广播给订阅者（首页 / 进度页 / 档案 / 路线 / 路径编排）；订阅者**只读刷新**，不写状态。
+- **禁止旁路**：业务视图不得直接调用 `writeRaw`、`setStorage`、`localStorage.setItem`，也不得直接修改 `cache`。所有变更必须走 §4.2 七个方法 → `update()`。
+- **重复操作**：由各方法内部判定为「无变更」→ 返回 `changed:false`，**不写盘、不 emit 成功通知**（避免无意义 IO 与 UI 抖动）。
+
+### 4.2 七个统一业务方法
+
+| 方法 | 参数与校验 | 重复操作处理 | 持久化失败行为 | 通知 |
+|---|---|---|---|---|
+| `addToWant(contentId)` | string；须存在于 `MCU_CONTENT`；若已 `watched`（含分季已看）→ 拒绝（沿用 V2.0 `toggleWant` 规则） | 已在 `want` → 幂等 `changed:false` | 按 §4.1 ⑤ | `emit` changedFields:['want'] |
+| `removeFromWant(contentId)` | string + 类型校验 | 不在 `want` → 幂等 `changed:false` | 同上 | `emit` ['want'] |
+| `markWatched(key)` | string；`isKnownKey`（`splitKey().base` 属于 CONTENT）；沿用 V2.0 `isDone`/`splitKey` | 已 watched → 幂等，**不覆盖原时间**；取消用独立 `unmarkWatched`（避免误触 toggle） | 同上 | `emit` ['watched','want']（V2.0 标记已看会同步移出 want） |
+| `setCurrentRoute(routeId, position?)` | routeId 须存在于 `MCU_ROUTES`/`MCU_SPECIAL_ROUTES`；position 缺省按 §2.2 派生；非法/越界 → 钳制到 [0, items.length-1] | 同 routeId 且同 position → `changed:false` | 同上 | `emit` ['currentRoute'] |
+| `recordQuizResult({quizId,quizVersion,topic,correct,total,at})` | 六字段类型与范围校验（0≤correct≤total、total>0、quizId/quizVersion 非空、at 为 ISO） | 同一 `(quizId, quizVersion, at)` 视为重复提交 → 幂等拒绝，不追加 scores；跨 quizVersion 允许并存 | 同上 | `emit` ['quiz']（bestStreak 派生重算） |
+| `unlockAchievement(id, at?)` | id 须在离线成就规则表内；at 缺省 = now | 已存在 id → 幂等 `changed:false`，**不覆盖原解锁时间** | 同上 | `emit` ['achievements'] |
+| `addRecentExplore({type,id,at})` | type ∈ {character, content}；id 须存在于对应数据集 | 与最新一条 `type+id` 相同 → 更新该条 `at`，不追加（防刷屏）；否则追加后按 §2.3 截断 | 同上 | `emit` ['recentExplore'] |
+
+> 未在本表列出的字段（preferences / likedCharacters / likedTeams / favorite / shareRecords）同样**只允许**经 `update()` 变更，实施阶段须补齐对应方法或由 `update()` 白名单 mutator 覆盖，不得由视图直写。
+
+---
+
+## 5. 三系统共享机制
+
+```
+        ┌──────── 只读内容数据（data.js，构建期注入）────────┐
+        │ MCU_CONTENT / CHARACTERS / RELATIONS / ROUTES    │
+        │ CAMPS / SPECIAL_ROUTES / UPCOMING                 │
+        └──────────────────────┬───────────────────────────┘
+                               │ 只读引用（id 关联，不复制）
+    探索系统 ─┐                ▼                ┌─ 观影系统
+    互动系统 ─┼── 七个业务方法 ─▶ MCUUser ── emit ─┼─ 首页控制台
+    首页控制台┘                │                 └─ 个人档案
+                               ▼ 持久化
+                 xhs(≥9.46) / localStorage / memory
+```
+
+- 读取：视图通过 `MCUUser.get(field)` 或派生函数只读；订阅 `emit` 刷新，不缓存副本。
+- 写入：唯一路径「业务方法 → update() → 持久化 → emit」。
+- 派生不落库：百分比、路线进度、成就判定、`bestStreak` 实时计算。
+
+---
+
+## 6. V2.0 兼容
+
+- 旧键 `mcu-xhs-progress-v1`：`{version:1, watched:{}, want:[], updatedAt}`；V1.1 按 §3.2 迁移，`watched`/`want` 无损转入 v2。
+- 旧键清理时机、是否保留一个版本周期 → 待裁定（Q-04）。
+- **H5 端 `mcu_nav_user_v1` 与 XHS 端是不同平台、不同键**，V3.0 只兼容 XHS 自身 v1，不跨平台读取；平台不支持小工具间/跨载体状态共享（见平台风险清单）。
+
+---
+
+## 7. 内容数据复用清单（单一可信源）
+
+| 数据 | 全局变量 | 用途 | 现状（V2.0 构建结果） |
+|---|---|---|---|
+| 作品全集 | `MCU_CONTENT` | 探索/观影/档案 | 59 部（电影38/剧集14/特别2/短片5） |
+| 角色 | `MCU_CHARACTERS` | 角色探索/轻量关联/组队 | 24 个骨架；**人物↔人物关系边为 TODO** |
+| 关系 | `MCU_RELATIONS` | 宇宙关系/时间线 | 92 条，**作品↔作品**，非人物关系 |
+| 路线 | `MCU_ROUTES` | 观影顺序/currentRoute | 11 条（含 4 生成式） |
+| 复联5专题 | `MCU_SPECIAL_ROUTES` | 补课/挑战 | 8+15，已就绪 |
+| 阵营 | `MCU_CAMPS` | likedTeams/组队器 | 8 阵营 |
+| 未来作品 | `MCU_UPCOMING` | 档期/边界 | 2 部（pendingReview 已过滤） |
+
+---
+
+## 8. 置信度
+
+- 存储后端规则（§3.1）：**高**（逐行复核 `progress.js` 实际代码，含已知边界）。
+- 迁移六条安全规则、七个业务方法：**中高**（设计自洽，未实施、未测试，待 CodeBuddy 实施验证）。
+- 上限数值与 <1MB 估算：**中**（量级推断，待实测复核 Q-06）。
+- 真机 Storage 行为：**中**（V2.0 仅 Node 模拟通过，真机未验证）。
+- 「不将规划表述为已实现」：全文遵守；V2.0 事实均标注代码来源。
+
+*本文件为 V1.1 设计稿；凡标「待裁定 / 待确认」项，见《V3.0 未解决风险与待确认事项清单》，不得作为已定结论用于开发。*

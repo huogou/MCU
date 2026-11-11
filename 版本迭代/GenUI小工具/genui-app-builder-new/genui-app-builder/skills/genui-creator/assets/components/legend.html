@@ -1,0 +1,54 @@
+<style>
+    .vc-legend-card {
+        background-color: var(--cos-color-bg-dent);
+        border-radius: var(--cos-rounded-md);
+        padding: var(--cos-space-sm);
+        box-sizing: border-box;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Legend 图例样式 - 从 lens-imaging.html 提取 */
+    .vc-legend {
+        background: var(--cos-color-bg-raised);
+        border-radius: var(--cos-rounded-xs);
+        height: 24px;
+        padding: var(--cos-space-none) 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        width: fit-content;
+    }
+
+    .vc-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    .vc-legend-item span {
+        font-size: var(--cos-text-caption);
+        color: var(--cos-color-text-tiny);
+    }
+
+    .vc-legend-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+</style>
+
+<div class="vc-legend-card">
+    <div class="vc-legend">
+        <div class="vc-legend-item">
+            <div class="vc-legend-dot" style="background-color: var(--cos-color-text-warning)"></div>
+            <span>平行光</span>
+        </div>
+        <div class="vc-legend-item">
+            <div class="vc-legend-dot" style="background-color: var(--cos-color-text-primary)"></div>
+            <span>过心光</span>
+        </div>
+    </div>
+</div>

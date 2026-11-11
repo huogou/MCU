@@ -1,0 +1,279 @@
+<style>
+    /* 步骤进度条组件样式 */
+    .vc-step-progress {
+        --progress-dot-size: 18px;
+        --progress-line-height: 2px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .vc-step-progress::before {
+        content: "";
+        position: absolute;
+        left: calc(var(--progress-dot-size) / 2);
+        right: calc(var(--progress-dot-size) / 2);
+        top: 50%;
+        height: var(--progress-line-height);
+        transform: translateY(-50%);
+        background-image: repeating-linear-gradient(
+            to right,
+            rgba(170, 171, 174, 0.45) 0,
+            rgba(170, 171, 174, 0.45) 6px,
+            transparent 6px,
+            transparent 12px
+        );
+    }
+
+    .vc-step-progress-active {
+        position: absolute;
+        left: calc(var(--progress-dot-size) / 2);
+        top: 50%;
+        width: calc(100% - var(--progress-dot-size));
+        height: var(--progress-line-height);
+        background: var(--cos-color-text-primary);
+        transform: translateY(-50%) scaleX(var(--progress-active, 0));
+        transform-origin: left center;
+        border-radius: 999px;
+        transition: transform 0.3s ease;
+    }
+
+    .vc-step-progress-steps {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+
+    .vc-step-progress-dot {
+        position: relative;
+        width: var(--progress-dot-size);
+        height: var(--progress-dot-size);
+        border-radius: 50%;
+        border: 1px solid rgba(170, 171, 174, 0.6);
+        background: var(--cos-color-bg-dent);
+        color: var(--cos-color-text-minor);
+        font-size: calc(11px / var(--font-size-scale, 1));
+        font-weight: var(--cos-font-medium);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* 用伪元素向外撑出热区至 44px，不影响布局与视觉尺寸 */
+    .vc-step-progress-dot::after {
+        content: "";
+        position: absolute;
+        inset: -13px;
+        border-radius: 50%;
+    }
+
+    .vc-step-progress-dot:active {
+        transform: scale(0.9);
+    }
+
+    .vc-step-progress-dot.completed {
+        background: var(--cos-color-text-primary);
+        border-color: var(--cos-color-text-primary);
+        color: var(--cos-color-text-inverse);
+    }
+
+    .vc-step-progress-dot.current {
+        border-color: var(--cos-color-text-primary);
+        color: var(--cos-color-text-primary);
+        background: var(--cos-color-bg-dent);
+    }
+
+    /* 控制按钮：复用 button 组件最新样式，三个平铺各占等宽 */
+    .vc-step-progress-controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 24px;
+        align-items: center;
+    }
+
+    .vc-step-progress-controls .vc-button {
+        flex: 1;
+    }
+
+    /* Button 基础样式（同步自 button.html） */
+    .vc-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        text-decoration: none;
+        font-weight: var(--cos-font-medium);
+        -webkit-text-stroke: var(--cos-font-medium-stroke);
+        line-height: 1;
+        transition: all 0.2s;
+        white-space: nowrap;
+        vertical-align: middle;
+        -webkit-tap-highlight-color: transparent;
+        height: 40px;
+        padding: var(--cos-space-none) 20px;
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        border-radius: var(--cos-rounded-full);
+    }
+
+    .vc-button-primary {
+        background-color: var(--cos-color-bg-primary);
+        color: var(--cos-color-text-on-primary);
+    }
+
+    .vc-button-primary:hover:not(:disabled) {
+        background-color: var(--cos-color-bg-primary-hover);
+    }
+
+    .vc-button-primary:active:not(:disabled) {
+        opacity: 0.2;
+    }
+
+    .vc-button-plain {
+        background-color: var(--cos-color-bg-raised);
+        color: var(--cos-color-text-on-primary-light);
+    }
+
+    .vc-button-plain:active:not(:disabled) {
+        opacity: 0.2;
+    }
+
+    .vc-button:disabled {
+        cursor: not-allowed;
+        opacity: var(--cos-opacity-40);
+    }
+</style>
+
+<div class="vc-step-progress-section">
+    <div class="vc-step-progress" id="vc-step-progress">
+        <div class="vc-step-progress-active" id="vc-step-progress-active"></div>
+        <div class="vc-step-progress-steps" id="vc-step-progress-steps">
+            <!-- 步骤点由 JS 动态生成 -->
+        </div>
+    </div>
+
+    <div class="vc-step-progress-controls">
+        <button class="vc-button vc-button-plain" id="vc-step-progress-prev">上一步</button>
+        <button class="vc-button vc-button-primary" id="vc-step-progress-next">下一步</button>
+        <button class="vc-button vc-button-plain" id="vc-step-progress-reset">重置</button>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        var progressEl = document.getElementById('vc-step-progress');
+        var stepsContainer = document.getElementById('vc-step-progress-steps');
+        var prevBtn = document.getElementById('vc-step-progress-prev');
+        var nextBtn = document.getElementById('vc-step-progress-next');
+        var resetBtn = document.getElementById('vc-step-progress-reset');
+
+        var state = {
+            totalSteps: 5,
+            currentStep: 0,
+            completed: []
+        };
+
+        // 初始化步骤点
+        function initSteps() {
+            stepsContainer.innerHTML = '';
+            state.completed = [];
+
+            for (var i = 0; i < state.totalSteps; i++) {
+                var dot = document.createElement('div');
+                dot.className = 'vc-step-progress-dot';
+                dot.setAttribute('data-step', i);
+                dot.setAttribute('role', 'button');
+                dot.setAttribute('aria-label', '跳到步骤' + (i + 1));
+                dot.textContent = i + 1;
+                stepsContainer.appendChild(dot);
+                state.completed.push(false);
+            }
+
+            updateUI();
+        }
+
+        // 更新 UI
+        function updateUI() {
+            var dots = stepsContainer.querySelectorAll('.vc-step-progress-dot');
+
+            for (var i = 0; i < dots.length; i++) {
+                dots[i].classList.remove('completed', 'current');
+                if (state.completed[i]) {
+                    dots[i].classList.add('completed');
+                } else if (i === state.currentStep) {
+                    dots[i].classList.add('current');
+                }
+            }
+
+            // 更新进度条
+            var progress = state.totalSteps > 1 ? state.currentStep / (state.totalSteps - 1) : 0;
+            progressEl.style.setProperty('--progress-active', Math.min(1, progress));
+
+            // 更新按钮状态
+            prevBtn.disabled = state.currentStep === 0;
+            nextBtn.disabled = state.currentStep >= state.totalSteps;
+            nextBtn.textContent = state.currentStep >= state.totalSteps - 1 ? '完成' : '下一步';
+        }
+
+        // 点击步骤点：直接跳到该步骤，之前的步骤标记为已完成
+        function goToStep(step) {
+            if (step < 0 || step >= state.totalSteps || step === state.currentStep) return;
+            state.currentStep = step;
+            for (var i = 0; i < state.totalSteps; i++) {
+                state.completed[i] = i < step;
+            }
+            // 触发震动
+            updateUI();
+        }
+
+        function nextStep() {
+            if (state.currentStep < state.totalSteps) {
+                state.completed[state.currentStep] = true;
+                state.currentStep++;
+                // 触发震动
+                updateUI();
+            }
+        }
+
+        function prevStep() {
+            if (state.currentStep > 0) {
+                state.currentStep--;
+                state.completed[state.currentStep] = false;
+                // 触发震动
+                updateUI();
+            }
+        }
+
+        function reset() {
+            state.currentStep = 0;
+            for (var i = 0; i < state.completed.length; i++) {
+                state.completed[i] = false;
+            }
+            // 触发震动
+            updateUI();
+        }
+
+        prevBtn.addEventListener('click', prevStep);
+        nextBtn.addEventListener('click', nextStep);
+        resetBtn.addEventListener('click', reset);
+        stepsContainer.addEventListener('click', function (e) {
+            var dot = e.target.closest('.vc-step-progress-dot');
+            if (!dot) return;
+            goToStep(Number(dot.getAttribute('data-step')));
+        });
+
+        initSteps();
+    })();
+</script>

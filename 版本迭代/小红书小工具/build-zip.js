@@ -5,6 +5,9 @@ const zlib = require('zlib');
 const src = path.join(__dirname, 'dist');
 const out = path.join(__dirname, 'mcu-atlas-minitool.zip');
 
+/* 打包前先同步 H5 数据，保证 dist/assets/data.js 始终来自母库 */
+require('./build-data').build();
+
 try { fs.unlinkSync(out); } catch (e) {}
 
 const files = [];

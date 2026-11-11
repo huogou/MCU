@@ -1,0 +1,324 @@
+<style>
+    @font-face {
+        font-family: "cos-icon";
+        font-weight: 400;
+        src: url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_d5697db.eot");
+        src:
+            url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_d5697db.eot#iefix") format("embedded-opentype"),
+            url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_ef4cfa7.woff2") format("woff2"),
+            url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_e4bac34.woff") format("woff"),
+            url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_2f46f27.ttf") format("truetype"),
+            url("https://ms.bdstatic.com/se/static/font/cosmic/wise/cos-icon_d661b6b.svg#cos-icon") format("svg");
+    }
+
+    .cos-icon {
+        font-family: "cos-icon" !important;
+        font-style: normal;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    .cos-icon-info-source::before {
+        content: "\e693";
+    }
+
+    .vc-tooltip-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-tooltip-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-tooltip-label {
+        font-size: calc(13px / var(--font-size-scale, 1));
+        color: var(--cos-color-text-minor);
+        font-weight: var(--cos-font-medium);
+        line-height: 1;
+        margin-bottom: 10px;
+    }
+
+    /* 触发点：图标 + 文字均可作为锚点 */
+    .vc-tooltip-trigger {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1;
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-tooltip-trigger-icon {
+        display: block;
+        font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+        line-height: 1;
+        color: var(--cos-color-text-slim);
+    }
+
+    /* 伪元素向外撑出 44px 热区，不影响布局与视觉尺寸（热区挂在触发点 span 上） */
+    .vc-tooltip-trigger::after {
+        content: "";
+        position: absolute;
+        inset: -14px;
+    }
+
+    /* 避让容器：气泡的宽度与左右位置都被限制在这个框内 */
+    .vc-tooltip-boundary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--cos-space-sm) var(--cos-space-xl);
+        border: 1px dashed var(--cos-color-border-minor);
+        border-radius: var(--cos-rounded-md);
+    }
+
+    /* 气泡：默认在下方，居中对齐锚点 */
+    .vc-tooltip-bubble {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 50%;
+        transform: translate(-50%, -4px);
+        background: var(--cos-color-bg-bubble);
+        color: var(--cos-color-text-inverse);
+        min-width: 18px;
+        text-align: left;
+        border-radius: var(--cos-rounded-md);
+        font-size: calc(14px / var(--font-size-scale, 1));
+        line-height: calc(20px / var(--font-size-scale, 1));
+        white-space: normal;
+        word-break: break-word;
+        /* 宽度上限由 JS 按避让容器的实际宽度写入，避免多行文案超出容器 */
+        max-width: var(--vc-tooltip-max-width, calc(100vw - 16px));
+        width: max-content;
+        padding: var(--cos-space-xs) var(--cos-space-sm);
+        display: none;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        z-index: 20;
+        box-sizing: border-box;
+    }
+
+    .vc-tooltip-bubble::after {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(calc(-50% + var(--vc-tooltip-arrow-shift, 0px)));
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-bottom: 6px solid var(--cos-color-bg-bubble);
+    }
+
+    /* 气泡在上方时，箭头跟着翻到底部指向锚点 */
+    .vc-tooltip-bubble.is-top {
+        top: auto;
+        bottom: calc(100% + 10px);
+        transform: translate(-50%, 4px);
+    }
+
+    .vc-tooltip-bubble.is-top::after {
+        top: auto;
+        bottom: -6px;
+        border-bottom: none;
+        border-top: 6px solid var(--cos-color-bg-bubble);
+    }
+
+    .vc-tooltip-bubble.visible {
+        display: block;
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    /* PC 端改用浮层配色 + 阴影，区别于移动端的深色气泡 */
+    .vc-tooltip-bubble.pc {
+        color: var(--cos-color-text);
+        background-color: var(--cos-color-bg);
+        box-shadow: 0px 6px 21px 0px #1e1f2433;
+    }
+
+    .vc-tooltip-bubble.pc::after {
+        border-bottom: 6px solid var(--cos-color-bg);
+    }
+
+    .vc-tooltip-bubble.pc.is-top::after {
+        border-top: 6px solid var(--cos-color-bg);
+    }
+</style>
+
+<div class="vc-tooltip-section">
+    <div class="vc-tooltip-label">气泡在容器内避让</div>
+    <div class="vc-tooltip-boundary">
+        <span
+            class="vc-tooltip-trigger"
+            data-vc-tooltip
+            data-vc-tooltip-boundary=".vc-tooltip-boundary"
+            data-vc-tooltip-text="贴左边的触发点，气泡向右侧偏移，箭头仍指向图标中心"
+        >
+            <i class="cos-icon cos-icon-info-source vc-tooltip-trigger-icon" aria-hidden="true"></i>
+        </span>
+        <span
+            class="vc-tooltip-trigger"
+            data-vc-tooltip
+            data-vc-tooltip-boundary=".vc-tooltip-boundary"
+            data-vc-tooltip-text="居中的触发点，气泡两侧都有空间时保持居中对齐"
+        >
+            <i class="cos-icon cos-icon-info-source vc-tooltip-trigger-icon" aria-hidden="true"></i>
+        </span>
+        <span
+            class="vc-tooltip-trigger"
+            data-vc-tooltip
+            data-vc-tooltip-boundary=".vc-tooltip-boundary"
+            data-vc-tooltip-text="贴右边的触发点，长文案会在容器内换行，气泡不会越过容器右边缘"
+        >
+            <i class="cos-icon cos-icon-info-source vc-tooltip-trigger-icon" aria-hidden="true"></i>
+        </span>
+    </div>
+</div>
+
+<script>
+    /**
+     * Tooltip 组件 - 纯 JavaScript 实现
+     * 触发方式：PC 端 hover/focus，移动端点击；点击其他区域关闭
+     * 气泡会在避让容器内自动避让左右边缘，视口下方空间不足时翻转到上方
+     *
+     * 避让容器默认取视口。触发点上加 data-vc-tooltip-boundary="<选择器>"
+     * 可改为指定容器（如卡片 .vc-component-container），
+     * 长文案会在该容器内换行，不会越过容器左右边缘。
+     */
+    (function () {
+        'use strict';
+
+        // 气泡与避让边界之间保留的安全距离
+        var PADDING = 12;
+
+        var isPC = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+        var instances = [];
+
+        function hideOthers(except) {
+            instances.forEach(function (inst) {
+                if (inst !== except) inst.hide();
+            });
+        }
+
+        function createTooltip(trigger) {
+            var bubble = document.createElement('span');
+            bubble.className = 'vc-tooltip-bubble';
+            bubble.textContent = trigger.dataset.vcTooltipText || '';
+            trigger.appendChild(bubble);
+
+            var boundarySelector = trigger.dataset.vcTooltipBoundary || '';
+            var api;
+
+            // 横向避让边界：默认视口，配了 boundary 就用对应容器
+            function getBoundaryRect() {
+                var el = boundarySelector ? trigger.closest(boundarySelector) : null;
+                if (!el && boundarySelector) el = document.querySelector(boundarySelector);
+                if (el) return el.getBoundingClientRect();
+                return {
+                    left: 0,
+                    right: window.innerWidth || document.documentElement.clientWidth
+                };
+            }
+
+            function show() {
+                // 展示前先收起其他气泡，避免多个同时出现
+                hideOthers(api);
+                if (isPC) bubble.classList.add('pc');
+                // 重置上一次的位置偏移，避免基于已偏移状态再次计算
+                bubble.style.marginLeft = '';
+                bubble.style.removeProperty('--vc-tooltip-arrow-shift');
+                bubble.classList.remove('is-top');
+                // 先按容器宽度限制气泡最大宽度，长文案在容器内换行
+                var boundary = getBoundaryRect();
+                bubble.style.setProperty(
+                    '--vc-tooltip-max-width',
+                    (boundary.right - boundary.left - PADDING * 2) + 'px'
+                );
+                bubble.classList.add('visible');
+                // 在下一帧测量，确保元素已完成布局
+                (window.requestAnimationFrame || function (cb) { return setTimeout(cb, 0); })(adjustPosition);
+            }
+
+            function adjustPosition() {
+                if (!bubble.classList.contains('visible')) return;
+                var boundary = getBoundaryRect();
+
+                var rect = bubble.getBoundingClientRect();
+                var shift = 0;
+                if (rect.right > boundary.right - PADDING) {
+                    shift = -(rect.right - (boundary.right - PADDING));
+                } else if (rect.left < boundary.left + PADDING) {
+                    shift = (boundary.left + PADDING) - rect.left;
+                }
+                if (shift !== 0) {
+                    bubble.style.marginLeft = shift + 'px';
+                    // 三角箭头反向位移以继续指向瞄点元素中心
+                    bubble.style.setProperty('--vc-tooltip-arrow-shift', (-shift) + 'px');
+                }
+
+                // 下方空间不足且上方更充裕时，翻转到上方展示。
+                // 上下翻转看的是视口，容器只约束左右与宽度，
+                // 否则气泡在小容器里会无谓地往上翻
+                rect = bubble.getBoundingClientRect();
+                var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+                if (rect.bottom > viewportHeight - PADDING) {
+                    bubble.classList.add('is-top');
+                }
+            }
+
+            function hide() {
+                bubble.classList.remove('visible');
+                // 隐藏后不参与布局，避免初始/关闭状态撑出横向滚动
+                bubble.style.marginLeft = '';
+                bubble.style.removeProperty('--vc-tooltip-arrow-shift');
+                bubble.style.removeProperty('--vc-tooltip-max-width');
+            }
+
+            if (isPC) {
+                trigger.addEventListener('mouseenter', show);
+                trigger.addEventListener('mouseleave', hide);
+                trigger.addEventListener('focus', show);
+                trigger.addEventListener('blur', hide);
+            } else {
+                trigger.addEventListener('click', function (evt) {
+                    evt.stopPropagation();
+                    if (bubble.classList.contains('visible')) hide();
+                    else show();
+                });
+                bubble.addEventListener('click', function (evt) {
+                    evt.stopPropagation();
+                });
+            }
+            trigger.addEventListener('keydown', function (evt) {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    if (bubble.classList.contains('visible')) hide();
+                    else show();
+                }
+            });
+
+            api = { show: show, hide: hide };
+            return api;
+        }
+
+        var tooltips = [].map.call(document.querySelectorAll('[data-vc-tooltip]'), function (trigger) {
+            trigger.setAttribute('tabindex', '0');
+            return createTooltip(trigger);
+        });
+        instances = tooltips;
+
+        if (!isPC) {
+            document.addEventListener('click', function () {
+                tooltips.forEach(function (tooltip) { tooltip.hide(); });
+            });
+        }
+
+        window.VcTooltip = { instances: tooltips };
+    })();
+</script>

@@ -1,0 +1,328 @@
+<style>
+    .vc-slider-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-slider-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-slider-row {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .vc-slider-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        touch-action: pan-y;
+        cursor: default;
+    }
+
+    /* 轨道区域：视觉高度 18px，但通过 padding + 负 margin 扩大触控热区至 44px */
+    .vc-slider-track-area {
+        position: relative;
+        height: 18px;
+        width: 100%;
+        cursor: pointer;
+        touch-action: none;
+        box-sizing: content-box;
+        padding: 13px 0;
+        margin: -13px 0;
+    }
+
+    .vc-slider-track-bg {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: var(--cos-color-border-tiny);
+        border-radius: 2px;
+        top: 50%;
+        margin-top: -2px;
+        left: 0;
+    }
+
+    .vc-slider-track-active {
+        position: absolute;
+        height: 4px;
+        background: var(--cos-color-text-primary);
+        border-radius: 2px;
+        top: 50%;
+        margin-top: -2px;
+        left: 0;
+    }
+
+    .vc-slider-thumb {
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        background: var(--cos-color-bg-raised);
+        border: 1px solid var(--cos-color-text-primary);
+        top: 50%;
+        margin-top: -9px;
+        transform: translateX(-50%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        z-index: 2;
+        box-sizing: border-box;
+    }
+
+    /* 拖动态：滑块放大反馈 */
+    .vc-slider-thumb.active {
+        transform: translateX(-50%) scale(1.2);
+    }
+
+    /* 气泡提示：拖动时浮于滑块上方 */
+    .vc-slider-tooltip {
+        position: absolute;
+        top: -49px;
+        transform: translateX(-50%);
+        background: var(--cos-color-bg-bubble);
+        color: var(--cos-color-text-inverse);
+        min-width: 18px;
+        text-align: center;
+        border-radius: var(--cos-rounded-md);
+        font-size: calc(14px / var(--font-size-scale, 1));
+        line-height: calc(40px / var(--font-size-scale, 1));
+        white-space: nowrap;
+        padding: var(--cos-space-none) var(--cos-space-sm);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+        z-index: 20;
+    }
+
+    .vc-slider-tooltip::after {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: var(--arrow-left, 50%);
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid var(--cos-color-bg-bubble);
+    }
+
+    .vc-slider-tooltip.visible {
+        opacity: 1;
+        transform: translateX(-50%);
+    }
+
+    .vc-slider-tooltip.pc {
+        color: var(--cos-color-text);
+        background-color: var(--cos-color-bg);
+        box-shadow: 0px 6px 21px 0px #1e1f2433;
+    }
+
+    .vc-slider-tooltip.pc::after {
+        border-top: 6px solid var(--cos-color-bg);
+    }
+
+    .vc-slider-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2px;
+        color: var(--cos-color-text-minor);
+        font-size: calc(var(--cos-text-caption) / var(--font-size-scale, 1));
+        line-height: calc(12px / var(--font-size-scale, 1));
+        pointer-events: none;
+        padding: var(--cos-space-none) var(--cos-space-3xs);
+    }
+
+    .vc-slider-value {
+        font-variant-numeric: tabular-nums;
+    }
+</style>
+
+<div class="vc-slider-section">
+    <div class="vc-slider-row">
+        <div
+            class="vc-slider-container"
+            id="vc-slider-demo"
+            data-min="0"
+            data-max="100"
+            data-unit="%"
+        >
+            <div class="vc-slider-track-area" id="vc-slider-track-area">
+                <div class="vc-slider-track-bg"></div>
+                <div class="vc-slider-track-active" id="vc-slider-track-active"></div>
+                <div class="vc-slider-thumb" id="vc-slider-thumb"></div>
+                <div class="vc-slider-tooltip" id="vc-slider-tooltip"></div>
+            </div>
+
+            <div class="vc-slider-info">
+                <span>当前值</span>
+                <span class="vc-slider-value" id="vc-slider-value">40%</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const container = document.getElementById("vc-slider-demo");
+        const trackArea = document.getElementById("vc-slider-track-area");
+        const trackActive = document.getElementById("vc-slider-track-active");
+        const thumb = document.getElementById("vc-slider-thumb");
+        const tooltip = document.getElementById("vc-slider-tooltip");
+        const valueText = document.getElementById("vc-slider-value");
+
+        if (!container || !trackArea || !tooltip || !valueText) return;
+
+        const min = parseFloat(container.dataset.min);
+        const max = parseFloat(container.dataset.max);
+        const unit = container.dataset.unit || "";
+
+        let currentValue = 40;
+        let isDragging = false;
+        let tooltipHideTimeout = null;
+        var isPC = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+
+        function format(val) {
+            return Math.round(val);
+        }
+
+        const showTooltip = () => {
+            if (tooltipHideTimeout) {
+                clearTimeout(tooltipHideTimeout);
+                tooltipHideTimeout = null;
+            }
+            if (isPC) {
+                tooltip.classList.add("pc");
+            }
+            tooltip.classList.add("visible");
+        };
+
+        const hideTooltip = (immediate = false) => {
+            if (tooltipHideTimeout) clearTimeout(tooltipHideTimeout);
+            if (immediate) {
+                tooltip.classList.remove("visible");
+            } else {
+                tooltipHideTimeout = setTimeout(() => {
+                    tooltip.classList.remove("visible");
+                }, 200);
+            }
+        };
+
+        const TOOLTIP_EDGE_MARGIN = 12;
+
+        function updateVisual(val) {
+            currentValue = Math.max(min, Math.min(max, val));
+            const percentage = (currentValue - min) / (max - min);
+            const percentStr = (percentage * 100) + "%";
+
+            trackActive.style.width = percentStr;
+            thumb.style.left = percentStr;
+
+            const displayVal = format(currentValue) + unit;
+            valueText.textContent = displayVal;
+            tooltip.textContent = displayVal;
+
+            const trackRect = trackArea.getBoundingClientRect();
+            const trackWidth = trackRect.width;
+            const thumbPos = percentage * trackWidth;
+
+            tooltip.style.left = thumbPos + "px";
+            tooltip.style.setProperty("--arrow-left", "50%");
+
+            const tooltipRect = tooltip.getBoundingClientRect();
+            const tooltipWidth = tooltipRect.width;
+            const minArrowEdge = 15;
+            const maxArrowOffset = tooltipWidth / 2 - minArrowEdge;
+
+            const tooltipLeftInTrack = tooltipRect.left;
+            const innerWidth = window.innerWidth;
+            const tooltipRightInTrack = innerWidth - tooltipRect.right;
+
+            if (tooltipLeftInTrack < TOOLTIP_EDGE_MARGIN) {
+                const shift = TOOLTIP_EDGE_MARGIN - tooltipLeftInTrack;
+                const clampedShift = Math.min(shift, maxArrowOffset);
+                tooltip.style.left = (thumbPos + clampedShift) + "px";
+                tooltip.style.setProperty("--arrow-left", `calc(50% - ${clampedShift}px)`);
+            } else if (tooltipRightInTrack < TOOLTIP_EDGE_MARGIN) {
+                const shift = TOOLTIP_EDGE_MARGIN - tooltipRightInTrack;
+                const clampedShift = Math.min(shift, maxArrowOffset);
+                tooltip.style.left = (thumbPos - clampedShift) + "px";
+                tooltip.style.setProperty("--arrow-left", `calc(50% + ${clampedShift}px)`);
+            }
+        }
+
+        function handleMove(clientX) {
+            const rect = trackArea.getBoundingClientRect();
+            let percentage = (clientX - rect.left) / rect.width;
+            percentage = Math.max(0, Math.min(1, percentage));
+
+            const val = min + percentage * (max - min);
+            const roundedVal = format(val);
+
+            if (roundedVal !== format(currentValue)) {
+                // 触发震动
+            }
+
+            updateVisual(val);
+        }
+
+        const blockIosSwipe = (evt) => {
+            if (evt.cancelable) evt.preventDefault();
+        };
+
+        trackArea.addEventListener("touchstart", blockIosSwipe, { passive: false });
+        trackArea.addEventListener("touchmove", blockIosSwipe, { passive: false });
+
+        trackArea.addEventListener("pointerdown", (e) => {
+            if (e.pointerType === "touch") blockIosSwipe(e);
+            container.dataset.interacting = "true";
+            isDragging = true;
+            thumb.classList.add("active");
+            showTooltip();
+            trackArea.setPointerCapture(e.pointerId);
+            handleMove(e.clientX);
+        });
+
+        trackArea.addEventListener("pointermove", (e) => {
+            if (!isDragging) return;
+            if (e.pointerType === "touch") blockIosSwipe(e);
+            handleMove(e.clientX);
+        });
+
+        trackArea.addEventListener("pointerup", (e) => {
+            isDragging = false;
+            thumb.classList.remove("active");
+            delete container.dataset.interacting;
+            trackArea.releasePointerCapture(e.pointerId);
+            hideTooltip();
+        });
+
+        trackArea.addEventListener("pointercancel", (e) => {
+            isDragging = false;
+            thumb.classList.remove("active");
+            delete container.dataset.interacting;
+            trackArea.releasePointerCapture(e.pointerId);
+            hideTooltip(true);
+        });
+
+        if (isPC) {
+            thumb.addEventListener("pointerenter", () => {
+                if (!isDragging) {
+                    updateVisual(currentValue);
+                    showTooltip();
+                }
+            });
+
+            thumb.addEventListener("pointerleave", () => {
+                if (!isDragging) {
+                    hideTooltip();
+                }
+            });
+        }
+
+        updateVisual(currentValue);
+    })();
+</script>

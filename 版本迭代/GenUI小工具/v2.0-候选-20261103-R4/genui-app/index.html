@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MCU观影助手</title>
+    <style>
+        /* ============================================================
+         * 外壳样式：严格照搬 genui-creator/assets/layout.html
+         * 1:1 卡片 + 45px 表头 + 画布区 + 操作区，颜色一律走 --cos-* token
+         * （本区块与 .vc-* / .cos-* / .vc-button-* 均为官方冻结件，严禁改动）
+         * ============================================================ */
+
+        /* 清掉 body 默认 margin（8px）与可能的 padding，避免卡片被挤偏、出现滚动条 */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .cos-icon {
+            font-family: "cos-icon" !important;
+            font-style: normal;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .cos-icon-info-source::before {
+            content: "\e693";
+        }
+
+        .cos-icon-refresh::before {
+            content: "\e779";
+        }
+
+        /* padding-top 100% 撑出 1:1，内部元素随容器宽度等比缩放 */
+        .vc-component-wrapper {
+            padding-top: 100%;
+            height: 0;
+            position: relative;
+            width: 100%;
+        }
+
+        .vc-component-container {
+            position: absolute;
+            inset: 0;
+            background: var(--cos-vcard-color-bg);
+            border-radius: var(--cos-rounded-sm);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            user-select: none;
+            overscroll-behavior: none;
+        }
+
+        .c-darkmode .vc-component-container,
+        .darkmode .vc-component-container,
+        .cos-dark .vc-component-container {
+            border: 0.5px solid var(--cos-image-color-border);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .vc-component-container {
+                border: 0.5px solid var(--cos-image-color-border);
+            }
+        }
+
+        /* 作用域限定在卡片内，不影响产物外的样式 */
+        .vc-component-container * {
+            box-sizing: border-box;
+        }
+
+        /* 表头：45px 高，内间距左右上 15px、下 12px，底部 0.5px 描边 */
+        .vc-component-header {
+            height: 45px;
+            padding: 15px 15px 12px;
+            font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+            line-height: 1;
+            color: var(--cos-color-text-minor);
+            font-weight: 400;
+            border-radius: var(--cos-rounded-sm) var(--cos-rounded-sm) 0 0;
+            border-bottom: 0.5px solid var(--cos-color-border-minor);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .vc-component-header-title {
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        /* 提示 icon：cosmic icon 字体，16×16，与标题间距 3px */
+        .vc-component-tips {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            line-height: 1;
+            margin-left: 3px;
+            font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+            color: var(--cos-color-text-slim);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 伪元素向外撑出 44px 热区，不影响布局与视觉尺寸 */
+        .vc-component-tips::after {
+            content: "";
+            position: absolute;
+            inset: -14px;
+        }
+
+        /* 表头右侧操作区：只放 icon 操作按钮 */
+        .vc-component-header-actions {
+            margin-left: auto;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .vc-component-control-btn {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            color: var(--cos-color-text);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .vc-component-control-btn:active {
+            opacity: 0.2;
+        }
+
+        .vc-component-control-btn .cos-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(var(--cos-text-headline-sm) / var(--font-size-scale, 1));
+            line-height: calc(var(--cos-text-headline-sm) / var(--font-size-scale, 1));
+        }
+
+        .vc-component-control-btn .cos-icon-refresh {
+            transform-origin: center;
+        }
+
+        .vc-component-icon-rotating {
+            animation: vc-component-rotate 600ms ease;
+        }
+
+        @keyframes vc-component-rotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 说明气泡：默认在表头下方，居中对齐 icon */
+        .vc-component-tips-tooltip {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translate(-50%, -4px);
+            background: var(--cos-color-bg-bubble);
+            color: var(--cos-color-text-inverse);
+            min-width: 18px;
+            text-align: left;
+            border-radius: var(--cos-rounded-md);
+            font-size: calc(14px / var(--font-size-scale, 1));
+            line-height: calc(20px / var(--font-size-scale, 1));
+            white-space: normal;
+            word-break: break-word;
+            max-width: var(--vc-tooltip-max-width, 100%);
+            width: max-content;
+            padding: var(--cos-space-xs) var(--cos-space-sm);
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 20;
+            box-sizing: border-box;
+        }
+
+        .vc-component-tips-tooltip::after {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(calc(-50% + var(--vc-tooltip-arrow-shift, 0px)));
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid var(--cos-color-bg-bubble);
+        }
+
+        .vc-component-tips-tooltip.visible {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+
+        /* PC 端改用浮层配色 + 阴影，区别于移动端的深色气泡 */
+        .vc-component-tips-tooltip.pc {
+            color: var(--cos-color-text);
+            background-color: var(--cos-color-bg);
+            box-shadow: 0px 6px 21px 0px #1e1f2433;
+        }
+
+        .vc-component-tips-tooltip.pc::after {
+            border-bottom: 6px solid var(--cos-color-bg);
+        }
+
+        .vc-component-card-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* 画布区：flex:1 撑满剩余空间，保证高度占比 ≥ 50% */
+        .vc-component-demo {
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* 操作区：交互控件集中放这里，不散落在画布区 */
+        .vc-component-operate {
+            padding: 0 12px 12px;
+            flex-shrink: 0;
+        }
+
+        /* ============================================================
+         * 画布内容区 · 信息架构重设计 V2.0（分页：路线介绍 + 逐部作品）
+         * 依据：docs/产品/GenUI-MCU观影助手-信息架构重设计V2.0.html（V2.0-R3）
+         * 纪律：--mcu-* token 仅在 .mcu-route-canvas 作用域内声明，
+         *       不触碰 --cos-* 官方变量；不引用任何图片/外链资源。
+         * ============================================================ */
+
+        /* Token 容器（深色档案馆）：声明于画布根容器，避免污染全局 */
+        .mcu-route-canvas {
+            --mcu-bg: #080B12;
+            --mcu-surface: #161D2B;
+            --mcu-surface-2: #1E2636;
+            --mcu-line: #2A3447;
+            --mcu-gold: #F2B233;
+            --mcu-gold-btn-text: #1A1206;
+            --mcu-text: #E8ECF4;
+            --mcu-text-sub: #8E98AA;
+            --mcu-text-weak: #6E7889;
+            --mcu-p1: #5B8DEF;
+            --mcu-p2: #28B487;
+            --mcu-p3: #F0A932;
+            --mcu-p4: #8B6FE8;
+            --mcu-p5: #E8483F;
+            --mcu-p6: #C25B8E;
+            --mcu-mono-font: "SF Mono", "Menlo", "Consolas", "Courier New", monospace;
+
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            background: var(--mcu-bg);
+            color: var(--mcu-text);
+        }
+
+        /* 横向翻页轨道：transform 驱动，手势只绑定在此元素
+           注意：裁剪交给画布根容器（overflow:hidden），轨道本身不得再加 overflow:hidden，
+           否则 translateX 后轨道自身的裁剪盒会随之左移，把当前页整页裁掉。 */
+        .mcu-page-track {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: row;
+            touch-action: none;
+            will-change: transform;
+            transition: transform 200ms ease-out;
+        }
+
+        /* 单页：占满轨道宽度，纵向三段（页头 / 字段 / 由页码条固定承载进度） */
+        .mcu-page {
+            flex: 0 0 100%;
+            width: 100%;
+            min-width: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 页头：kicker 10/12 + 标题行 16/22 = 36px */
+        .mcu-page-head {
+            flex: none;
+            min-height: 36px;
+            padding: 0 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .mcu-page-kicker {
+            font-family: var(--mcu-mono-font);
+            font-size: 10px;
+            line-height: 12px;
+            color: var(--mcu-text-weak);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .mcu-page-kicker b {
+            color: var(--mcu-gold);
+            font-weight: 400;
+        }
+
+        .mcu-page-kicker .ph.p1 { color: var(--mcu-p1); }
+        .mcu-page-kicker .ph.p2 { color: var(--mcu-p2); }
+        .mcu-page-kicker .ph.p3 { color: var(--mcu-p3); }
+        .mcu-page-kicker .ph.p4 { color: var(--mcu-p4); }
+        .mcu-page-kicker .ph.p5 { color: var(--mcu-p5); }
+        .mcu-page-kicker .ph.p6 { color: var(--mcu-p6); }
+
+        .mcu-page-title-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+            line-height: 22px;
+            min-height: 22px;
+        }
+
+        .mcu-page-title {
+            flex: 1;
+            min-width: 0;
+            font-size: 16px;
+            line-height: 22px;
+            font-weight: 700;
+            color: var(--mcu-text);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* 推荐级别徽章（三态）/ 剧集标签 */
+        .mcu-badge {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 15px;
+            border-radius: 3px;
+            padding: 0 5px;
+        }
+
+        .mcu-badge-core {
+            background: var(--mcu-gold);
+            color: var(--mcu-gold-btn-text);
+        }
+
+        .mcu-badge-recommended {
+            color: var(--mcu-gold);
+            border: 1px solid var(--mcu-gold);
+            background: transparent;
+        }
+
+        .mcu-badge-optional {
+            color: var(--mcu-text-sub);
+            border: 1px solid var(--mcu-line);
+            background: var(--mcu-surface-2);
+        }
+
+        .mcu-series-tag {
+            flex: none;
+            display: inline-flex;
+            align-items: center;
+            font-size: 9px;
+            line-height: 13px;
+            color: var(--mcu-gold);
+            border: 1px solid var(--mcu-gold);
+            border-radius: 3px;
+            padding: 0 4px;
+        }
+
+        /* 字段区：4 个文字字段 / 4 个介绍块（同构），行内标签布局
+           V2.0-R4（R4-1）：间距弹性（gap 为最小值 4px）+ 纵向铺满（space-between），
+           富余高度由间距吸收，不再沉底形成大片留白；页码条仍由 .mcu-pager 贴底。 */
+        .mcu-page-fields,
+        .mcu-page-blocks {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 4px;
+            padding: 0 14px;
+            overflow: hidden;
+        }
+
+        .mcu-field-row,
+        .mcu-block-row {
+            display: flex;
+            gap: 8px;
+            line-height: 16px;
+        }
+
+        .mcu-field-label,
+        .mcu-block-label {
+            flex: none;
+            width: 52px;
+            font-size: 10px;
+            line-height: 18px;
+            color: var(--mcu-gold);
+            background: var(--mcu-surface);
+            border: 1px solid rgba(242, 178, 51, 0.35);
+            border-radius: 3px;
+            text-align: center;
+            align-self: flex-start;
+        }
+
+        .mcu-field-body,
+        .mcu-block-body {
+            flex: 1;
+            min-width: 0;
+            font-size: 12px;
+            line-height: 16px;
+            color: var(--mcu-text);
+        }
+
+        .mcu-field-body .kw {
+            color: var(--mcu-gold);
+            font-weight: 600;
+        }
+
+        /* 页码条：◀ 当前/总页 ▶ + 底部内嵌 2px 金色作品进度条
+           不设 margin-top：360 档实测 36+163+26=225 ≤ 227（留 2px 余量，防真机字体度量浮差） */
+        .mcu-pager {
+            flex: none;
+            position: relative;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            border-top: 1px solid var(--mcu-line);
+            font-size: 14px;
+            color: var(--mcu-text-sub);
+            overflow: hidden;
+        }
+
+        .mcu-pager-track {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 100%;
+            background: var(--mcu-line);
+        }
+
+        .mcu-pager-progress {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 0;
+            background: var(--mcu-gold);
+            transition: width 0.2s ease;
+        }
+
+        .mcu-pager-btn {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            background: none;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1;
+            color: var(--mcu-gold);
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mcu-pager-btn.is-disabled {
+            color: #4A5568;
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        .mcu-pager-num {
+            font-family: var(--mcu-mono-font);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--mcu-text);
+            letter-spacing: 0.5px;
+        }
+
+        /* 屏幕阅读器专用（翻页播报，不占布局） */
+        .mcu-sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+
+        /* ============================================================
+         * 操作区 Tabs：照搬 assets/components/tabs.html 的分段控件结构与样式
+         * （官方冻结件，结构与样式保留）
+         * ============================================================ */
+        .vc-tabs-section {
+            margin: 0;
+        }
+
+        .vc-tabs-segmented {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 32px;
+            padding: 2px;
+            border-radius: var(--cos-rounded-md);
+            background: var(--cos-color-fill-quaternary);
+        }
+
+        .vc-tabs-option {
+            flex: 1;
+            min-width: 0;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: calc(var(--cos-rounded-md) - 2px);
+            font-size: calc(13px / var(--font-size-scale, 1));
+            line-height: 1;
+            color: var(--cos-color-text-minor);
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .vc-tabs-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            height: 0;
+        }
+
+        .vc-tabs-option.vc-tabs-option-active {
+            background: var(--cos-color-bg);
+            color: var(--cos-color-text);
+            font-weight: 500;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+        }
+
+        /* 操作区按钮官方类（冻结件，保留定义） */
+        .vc-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            user-select: none;
+            text-decoration: none;
+            font-weight: var(--cos-font-medium);
+            -webkit-text-stroke: var(--cos-font-medium-stroke);
+            line-height: 1;
+            transition: all 0.2s;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-tap-highlight-color: transparent;
+            height: 40px;
+            padding: var(--cos-space-none) 20px;
+            font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+            border-radius: var(--cos-rounded-full);
+        }
+
+        .vc-button-plain {
+            background-color: var(--cos-color-bg-raised);
+            color: var(--cos-color-text-on-primary-light);
+        }
+
+        .vc-button-plain:active:not(:disabled) {
+            opacity: 0.2;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 形态 A（表头 + 画布区 + 操作区），骨架照搬官方 layout.html（冻结） -->
+    <div class="vc-component-wrapper">
+        <div class="vc-component-container" id="vc-component-container">
+            <div class="vc-component-header">
+                <span class="vc-component-header-title">小工具 · MCU观影助手</span>
+                <span
+                    class="vc-component-tips"
+                    id="vc-component-tips"
+                    tabindex="0"
+                    role="button"
+                    aria-label="功能说明"
+                >
+                    <i class="cos-icon cos-icon-info-source" aria-hidden="true"></i>
+                    <span class="vc-component-tips-tooltip" id="vc-component-tips-tooltip">每条路线先看一页介绍（适合谁/为什么/怎么排/看完获得），再逐部翻页看推荐理由与作用。点下方切换路线。</span>
+                </span>
+                <!-- 表头右侧操作区：只放 icon 操作按钮。重置会回到默认路线新手入门第 1 页 -->
+                <div class="vc-component-header-actions">
+                    <span
+                        class="vc-component-control-btn"
+                        id="vc-component-reset"
+                        title="重置"
+                        tabindex="0"
+                        role="button"
+                        aria-label="重置"
+                    >
+                        <i class="cos-icon cos-icon-refresh" aria-hidden="true"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="vc-component-card-wrapper">
+                <!-- 画布区 -->
+                <div class="vc-component-demo" id="vc-component-demo"></div>
+                <!-- 操作区：COSUI 官方 Tabs，三个路线入口 -->
+                <div class="vc-component-operate" id="vc-component-operate">
+                    <div class="vc-tabs-section">
+                        <div class="vc-tabs-segmented" role="radiogroup" aria-label="观影路线">
+                            <label class="vc-tabs-option vc-tabs-option-active" data-route="0">
+                                <input type="radio" name="mcu-route" value="0" checked />
+                                <span>新手入门</span>
+                            </label>
+                            <label class="vc-tabs-option" data-route="1">
+                                <input type="radio" name="mcu-route" value="1" />
+                                <span>主线精选</span>
+                            </label>
+                            <label class="vc-tabs-option" data-route="2">
+                                <input type="radio" name="mcu-route" value="2" />
+                                <span>复联5补课</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./static/data.js"></script>
+    <script>
+        (function () {
+            'use strict';
+
+            /* ── 交互打点：唯一允许的产物外接口，调用前判空 ── */
+            function sendLog(area) {
+                if (window.genui && typeof window.genui.sendLog === 'function') {
+                    window.genui.sendLog({ area: area });
+                }
+            }
+
+            var DATA = window.MCU_GENUI_DATA;
+            var ROUTES = DATA.routes;
+
+            /* 翻页冷却（§8.1）：锁内忽略一切滑动与按钮触发 */
+            var PAGE_LOCK_MS = 300;
+            /* 滑动判定阈值（§8.1）：|Δx| ≥ 24 且 |Δx| ≥ 1.5|Δy| */
+            var SWIPE_MIN_X = 24;
+            var SWIPE_RATIO = 1.5;
+
+            var BADGE_CLASS = {
+                '必看': 'mcu-badge-core',
+                '推荐': 'mcu-badge-recommended',
+                '补充': 'mcu-badge-optional'
+            };
+
+            /* 当前状态：默认「新手入门 · 第 1 页」；平台禁存储，每次打开为初始态 */
+            var state = {
+                routeIndex: 0,
+                pageIndex: 0
+            };
+
+            var busy = false;
+            var busyTimer = null;
+            var trackEl = null;
+            var pagerEls = null;
+
+            var demo = document.getElementById('vc-component-demo');
+            var tabEls = Array.prototype.slice.call(
+                document.querySelectorAll('.vc-component-operate .vc-tabs-option')
+            );
+
+            function esc(s) {
+                return String(s == null ? '' : s)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            function pad2(n) {
+                return String(n).padStart(2, '0');
+            }
+
+            function currentRoute() {
+                return ROUTES[state.routeIndex];
+            }
+
+            function totalPages() {
+                return (currentRoute().items || []).length + 1;
+            }
+
+            /* ── 页头：介绍页 = 路线名 kicker；作品页 = ITEM k/N · PHASE · 年 · 类型 ── */
+            function headIntro(route) {
+                var html = '<div class="mcu-page-head">';
+                html += '<div class="mcu-page-kicker">— MCU WATCH ORDER · <b>' + esc(route.name) + '</b></div>';
+                html += '<div class="mcu-page-title-row"><div class="mcu-page-title">路线介绍</div></div>';
+                html += '</div>';
+                return html;
+            }
+
+            function headItem(item, index, count) {
+                var html = '<div class="mcu-page-head">';
+                html += '<div class="mcu-page-kicker">ITEM ' + pad2(index + 1) + '/' + pad2(count) +
+                    ' · <span class="ph p' + item.phase + '">PHASE ' + pad2(item.phase) + '</span>' +
+                    ' · ' + item.year + ' · ' + (item.isSeries ? '剧' : '电影') + '</div>';
+                html += '<div class="mcu-page-title-row">';
+                html += '<div class="mcu-page-title">' + esc(item.name) + '</div>';
+                html += '<span class="mcu-badge ' + (BADGE_CLASS[item.badge] || 'mcu-badge-optional') + '">' +
+                    esc(item.badge) + '</span>';
+                if (item.isSeries) {
+                    html += '<span class="mcu-series-tag">剧</span>';
+                }
+                html += '</div>';
+                html += '</div>';
+                return html;
+            }
+
+            /* ── 介绍页 4 块（§11.2）：适合谁 / 为什么 / 怎么排 / 看完获得 ── */
+            function blocksHtml(intro) {
+                var blocks = [
+                    ['适合谁', intro.forWho],
+                    ['为什么', intro.why],
+                    ['怎么排', intro.order],
+                    ['看完获得', intro.outcome]
+                ];
+                var html = '<div class="mcu-page-fields mcu-page-blocks">';
+                blocks.forEach(function (b) {
+                    html += '<div class="mcu-block-row">';
+                    html += '<span class="mcu-block-label">' + esc(b[0]) + '</span>';
+                    html += '<span class="mcu-block-body">' + esc(b[1]) + '</span>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                return html;
+            }
+
+            /* ── 作品页 4 个文字字段：为什么看它 / 它的作用 / 看完你会懂 / 后续关联 ── */
+            function fieldsHtml(item, highlightKw) {
+                var reason = esc(item.reason);
+                /* 补课路线的推荐理由以 kw 开头（§10.2 mock：kw 金色强调），不改变字数 */
+                if (highlightKw) {
+                    var cut = reason.indexOf('：');
+                    if (cut > 0) {
+                        reason = '<span class="kw">' + reason.slice(0, cut + 1) + '</span>' + reason.slice(cut + 1);
+                    }
+                }
+                var gains = '看懂：①' + esc(item.gains[0]) + ' ②' + esc(item.gains[1]) + '。';
+                var rows = [
+                    ['为什么看它', reason],
+                    ['它的作用', esc(item.role)],
+                    ['看完你会懂', gains],
+                    ['后续关联', esc(item.next)]
+                ];
+                var html = '<div class="mcu-page-fields">';
+                rows.forEach(function (r) {
+                    html += '<div class="mcu-field-row">';
+                    html += '<span class="mcu-field-label">' + esc(r[0]) + '</span>';
+                    html += '<span class="mcu-field-body">' + r[1] + '</span>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                return html;
+            }
+
+            /* ── 页码条：◀ 当前/总页 ▶ + 底部 2px 作品进度条 ── */
+            function pagerHtml(total) {
+                var html = '<div class="mcu-pager" id="mcu-pager">';
+                html += '<span class="mcu-pager-track"></span>';
+                html += '<span class="mcu-pager-progress" id="mcu-pager-progress"></span>';
+                html += '<button type="button" class="mcu-pager-btn mcu-pager-prev is-disabled" id="mcu-pager-prev" aria-label="上一页" aria-disabled="true">◀</button>';
+                html += '<span class="mcu-pager-num" id="mcu-pager-num">1 / ' + total + '</span>';
+                html += '<button type="button" class="mcu-pager-btn mcu-pager-next" id="mcu-pager-next" aria-label="下一页" aria-disabled="false">▶</button>';
+                html += '<span class="mcu-sr-only" id="mcu-pager-live" aria-live="polite"></span>';
+                html += '</div>';
+                return html;
+            }
+
+            /* ── 渲染当前路线：介绍页 + N 页作品，全部塞进横向轨道 ── */
+            function render() {
+                var route = currentRoute();
+                var items = route.items || [];
+                var total = items.length + 1;
+
+                var html = '<div class="mcu-route-canvas">';
+                html += '<div class="mcu-page-track" id="mcu-page-track" role="region" tabindex="-1" aria-label="' +
+                    esc(route.name) + '观影路线，共 ' + total + ' 页">';
+                html += '<section class="mcu-page" data-page="0" aria-label="路线介绍">' +
+                    headIntro(route) + blocksHtml(route.intro) + '</section>';
+                items.forEach(function (it, i) {
+                    html += '<section class="mcu-page" data-page="' + (i + 1) + '" aria-label="' +
+                        esc(it.name) + '">' +
+                        headItem(it, i, items.length) +
+                        fieldsHtml(it, route.id === 'avengers-doomsday') +
+                        '</section>';
+                });
+                html += '</div>';
+                html += pagerHtml(total);
+                html += '</div>';
+
+                demo.innerHTML = html;
+
+                trackEl = document.getElementById('mcu-page-track');
+                pagerEls = {
+                    num: document.getElementById('mcu-pager-num'),
+                    live: document.getElementById('mcu-pager-live'),
+                    prev: document.getElementById('mcu-pager-prev'),
+                    next: document.getElementById('mcu-pager-next'),
+                    progress: document.getElementById('mcu-pager-progress')
+                };
+
+                bindSwipe(trackEl);
+                bindPager(pagerEls);
+                state.pageIndex = 0;
+                applyPage(true);
+            }
+
+            /* ── 页码/进度条/禁用态同步（页码 = 路线内绝对进度）── */
+            function syncPager() {
+                var total = totalPages();
+                var page = state.pageIndex;
+                var items = currentRoute().items || [];
+                if (pagerEls.num) {
+                    pagerEls.num.textContent = (page + 1) + ' / ' + total;
+                }
+                if (pagerEls.live) {
+                    pagerEls.live.textContent = '第 ' + (page + 1) + ' 页，共 ' + total + ' 页';
+                }
+                /* 作品进度 = (k−1)/N，介绍页 0%、末页 100% */
+                if (pagerEls.progress) {
+                    var pct = items.length ? (page / items.length) * 100 : 0;
+                    pagerEls.progress.style.width = pct + '%';
+                }
+                var atFirst = page <= 0;
+                var atLast = page >= total - 1;
+                if (pagerEls.prev) {
+                    pagerEls.prev.classList.toggle('is-disabled', atFirst);
+                    pagerEls.prev.setAttribute('aria-disabled', atFirst ? 'true' : 'false');
+                }
+                if (pagerEls.next) {
+                    pagerEls.next.classList.toggle('is-disabled', atLast);
+                    pagerEls.next.setAttribute('aria-disabled', atLast ? 'true' : 'false');
+                }
+            }
+
+            /* ── 应用页码：immediate = 无动画（切路线/重置时立即回位）── */
+            function applyPage(immediate) {
+                if (!trackEl) return;
+                if (immediate) {
+                    trackEl.style.transition = 'none';
+                }
+                trackEl.style.transform = 'translateX(' + (-state.pageIndex * 100) + '%)';
+                if (immediate) {
+                    /* 强制回流后再恢复过渡，避免切路线时出现滑动动画 */
+                    void trackEl.offsetWidth;
+                    trackEl.style.transition = '';
+                }
+                syncPager();
+            }
+
+            function lockBusy() {
+                busy = true;
+                if (busyTimer) { clearTimeout(busyTimer); }
+                busyTimer = setTimeout(function () {
+                    busy = false;
+                    busyTimer = null;
+                }, PAGE_LOCK_MS);
+            }
+
+            /* ── 翻页：dir=1 下一页 / dir=-1 上一页；首末页 no-op ── */
+            function goPage(dir, area) {
+                if (busy) return false;
+                var total = totalPages();
+                var target = state.pageIndex + dir;
+                if (target < 0 || target > total - 1) return false;
+                state.pageIndex = target;
+                applyPage(false);
+                lockBusy();
+                sendLog(area || 'page');
+                return true;
+            }
+
+            function bindPager(els) {
+                if (els.prev) {
+                    els.prev.addEventListener('click', function () {
+                        goPage(-1, 'page');
+                    });
+                }
+                if (els.next) {
+                    els.next.addEventListener('click', function () {
+                        goPage(1, 'page');
+                    });
+                }
+            }
+
+            /* ── 滑动翻页：只绑定轨道；touch-action:none 物理隔离，滑动不切路线 ── */
+            function bindSwipe(track) {
+                if (!track) return;
+
+                var startX = 0;
+                var startY = 0;
+                var tracking = false;
+
+                function begin(x, y) {
+                    if (busy) return;
+                    startX = x;
+                    startY = y;
+                    tracking = true;
+                }
+
+                function end(x, y) {
+                    if (!tracking) return;
+                    tracking = false;
+                    var dx = x - startX;
+                    var dy = y - startY;
+                    if (Math.abs(dx) < SWIPE_MIN_X) return;
+                    if (Math.abs(dx) < SWIPE_RATIO * Math.abs(dy)) return;
+                    goPage(dx < 0 ? 1 : -1, 'page');
+                }
+
+                if (window.PointerEvent) {
+                    track.addEventListener('pointerdown', function (evt) {
+                        begin(evt.clientX, evt.clientY);
+                        if (track.setPointerCapture) {
+                            try { track.setPointerCapture(evt.pointerId); } catch (e) { /* 忽略 */ }
+                        }
+                    });
+                    track.addEventListener('pointerup', function (evt) {
+                        end(evt.clientX, evt.clientY);
+                    });
+                    track.addEventListener('pointercancel', function () {
+                        tracking = false;
+                    });
+                } else {
+                    track.addEventListener('touchstart', function (evt) {
+                        if (!evt.touches || !evt.touches.length) return;
+                        begin(evt.touches[0].clientX, evt.touches[0].clientY);
+                    }, { passive: true });
+                    track.addEventListener('touchend', function (evt) {
+                        if (!evt.changedTouches || !evt.changedTouches.length) return;
+                        end(evt.changedTouches[0].clientX, evt.changedTouches[0].clientY);
+                    }, { passive: true });
+                    track.addEventListener('touchcancel', function () {
+                        tracking = false;
+                    }, { passive: true });
+                }
+            }
+
+            /* ── Tabs 切换：三个路线入口（沿用官方 .vc-tabs-* 结构）；页码重置为第 1 页 ── */
+            function onTabChange(idx, area) {
+                if (idx === state.routeIndex) return;
+                state.routeIndex = idx;
+                state.pageIndex = 0;
+                tabEls.forEach(function (t) {
+                    var active = (parseInt(t.getAttribute('data-route'), 10) === idx);
+                    t.classList.toggle('vc-tabs-option-active', active);
+                    var input = t.querySelector('input');
+                    if (input) { input.checked = active; }
+                });
+                render();
+                sendLog(area);
+            }
+
+            tabEls.forEach(function (el) {
+                el.addEventListener('click', function () {
+                    onTabChange(parseInt(el.getAttribute('data-route'), 10), 'operation');
+                });
+                el.addEventListener('keydown', function (evt) {
+                    if (evt.key === 'Enter' || evt.key === ' ') {
+                        evt.preventDefault();
+                        onTabChange(parseInt(el.getAttribute('data-route'), 10), 'operation');
+                    }
+                });
+            });
+
+            /* ── 重置：恢复默认路线（新手入门）第 1 页 ── */
+            var resetTrigger = document.getElementById('vc-component-reset');
+            var resetIcon = resetTrigger && resetTrigger.querySelector('.cos-icon-refresh');
+
+            function spinResetIcon() {
+                if (!resetIcon) return;
+                resetIcon.classList.remove('vc-component-icon-rotating');
+                void resetIcon.offsetWidth;
+                resetIcon.classList.add('vc-component-icon-rotating');
+            }
+
+            function resetDemo() {
+                state.routeIndex = 0;
+                state.pageIndex = 0;
+                tabEls.forEach(function (t) {
+                    var active = (parseInt(t.getAttribute('data-route'), 10) === 0);
+                    t.classList.toggle('vc-tabs-option-active', active);
+                    var input = t.querySelector('input');
+                    if (input) { input.checked = active; }
+                });
+                render();
+            }
+
+            function handleReset() {
+                spinResetIcon();
+                resetDemo();
+                sendLog('operation');
+            }
+
+            if (resetTrigger) {
+                resetTrigger.addEventListener('click', function (evt) {
+                    evt.stopPropagation();
+                    handleReset();
+                });
+                resetTrigger.addEventListener('keydown', function (evt) {
+                    if (evt.key === 'Enter' || evt.key === ' ') {
+                        evt.preventDefault();
+                        handleReset();
+                    }
+                });
+            }
+
+            /* ── 提示气泡：照搬 layout.html 实现 ── */
+            var tipsTrigger = document.getElementById('vc-component-tips');
+            var tipsTooltip = document.getElementById('vc-component-tips-tooltip');
+            var tipsBoundary = document.getElementById('vc-component-container');
+            var isPC = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+            var TIPS_PADDING = 12;
+
+            function getBoundaryRect() {
+                return tipsBoundary
+                    ? tipsBoundary.getBoundingClientRect()
+                    : { left: 0, right: window.innerWidth || document.documentElement.clientWidth };
+            }
+
+            function showTipsTooltip() {
+                if (!tipsTooltip) return;
+                if (isPC) { tipsTooltip.classList.add('pc'); }
+                tipsTooltip.style.marginLeft = '';
+                tipsTooltip.style.removeProperty('--vc-tooltip-arrow-shift');
+                var boundary = getBoundaryRect();
+                tipsTooltip.style.setProperty(
+                    '--vc-tooltip-max-width',
+                    (boundary.right - boundary.left - TIPS_PADDING * 2) + 'px'
+                );
+                tipsTooltip.classList.add('visible');
+                (window.requestAnimationFrame || function (cb) { return setTimeout(cb, 0); })(adjustTipsTooltipPosition);
+            }
+
+            function adjustTipsTooltipPosition() {
+                if (!tipsTooltip || !tipsTooltip.classList.contains('visible')) return;
+                var rect = tipsTooltip.getBoundingClientRect();
+                var boundary = getBoundaryRect();
+                var shift = 0;
+                if (rect.right > boundary.right - TIPS_PADDING) {
+                    shift = -(rect.right - (boundary.right - TIPS_PADDING));
+                } else if (rect.left < boundary.left + TIPS_PADDING) {
+                    shift = (boundary.left + TIPS_PADDING) - rect.left;
+                }
+                if (shift !== 0) {
+                    tipsTooltip.style.marginLeft = shift + 'px';
+                    tipsTooltip.style.setProperty('--vc-tooltip-arrow-shift', (-shift) + 'px');
+                }
+            }
+
+            function hideTipsTooltip() {
+                if (!tipsTooltip) return;
+                tipsTooltip.classList.remove('visible');
+                tipsTooltip.style.marginLeft = '';
+                tipsTooltip.style.removeProperty('--vc-tooltip-arrow-shift');
+                tipsTooltip.style.removeProperty('--vc-tooltip-max-width');
+            }
+
+            function toggleTipsTooltip() {
+                if (tipsTooltip.classList.contains('visible')) {
+                    hideTipsTooltip();
+                } else {
+                    showTipsTooltip();
+                }
+            }
+
+            if (tipsTrigger && tipsTooltip) {
+                if (isPC) {
+                    tipsTrigger.addEventListener('mouseenter', showTipsTooltip);
+                    tipsTrigger.addEventListener('mouseleave', hideTipsTooltip);
+                    tipsTrigger.addEventListener('focus', showTipsTooltip);
+                    tipsTrigger.addEventListener('blur', hideTipsTooltip);
+                } else {
+                    tipsTrigger.addEventListener('click', function (evt) {
+                        evt.stopPropagation();
+                        toggleTipsTooltip();
+                    });
+                    document.addEventListener('click', hideTipsTooltip);
+                    tipsTooltip.addEventListener('click', function (evt) {
+                        evt.stopPropagation();
+                    });
+                }
+                tipsTrigger.addEventListener('keydown', function (evt) {
+                    if (evt.key === 'Enter' || evt.key === ' ') {
+                        evt.preventDefault();
+                        toggleTipsTooltip();
+                    }
+                });
+            }
+
+            /* 首帧容器可能为 0 宽高，DOM 渲染不依赖测量，无需等尺寸 */
+            render();
+        })();
+    </script>
+</body>
+
+</html>

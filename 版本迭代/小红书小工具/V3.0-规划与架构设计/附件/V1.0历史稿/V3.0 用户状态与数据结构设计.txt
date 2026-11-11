@@ -1,0 +1,154 @@
+# V3.0 用户状态与数据结构设计
+
+> 版本：V1.0　日期：2026-11-10　状态：规划稿 · 待 ChatGPT 产品审查
+> 配套主文档：《MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.0》
+> 说明：本文件定义统一 `MCU_USER` 模型、三系统共享机制、版本升级、异常恢复与 V2.0 兼容。**不落地代码，仅设计。**
+
+---
+
+## 0. 设计原则（冻结）
+
+1. **内容数据单一来源**：作品/角色/关系/路线只读来自包内 `data.js`（构建期由 `h5/data/*` 生成），视图不持有副本。
+2. **用户状态单一来源**：所有用户数据经 `MCUUser` 模块读写，视图/模块不各自维护用户数据。
+3. **不重复维护**：路线进度、百分比、统计均由 `watched` 派生（沿用 F5 `routeProgress`/`percent`），不落冗余字段。
+4. **容量硬约束**：单 Storage key ≤1MB、总 ≤10MB（决策记录 D-20260928-05 / D-20261110-03）。所有数组设上限。
+5. **可迁移**：`version` 字段驱动；损坏数据回退空态。
+
+---
+
+## 1. 存储键与后端（沿用 V2.0 契约）
+
+- **V3.0 键**：`mcu-xhs-user-v2`（替代 `mcu-xhs-progress-v1`）。
+- **后端探测顺序**（沿用 `progress.js`）：`xhs.miniTool` Storage（客户端 ≥9.46）→ `localStorage` → `memory`。写失败降级保留当次操作。
+- **清除**：优先 `removeStorage({key})`，缺失/失败回退 `setStorage({key,data:''})`，并清理 localStorage 副本（沿用 D-20261110-03）。
+- **不保证永久**：平台 Storage 可能被清理；设计上所有用户状态可丢失重建（进度丢失仅影响个性化，不阻断使用）。
+
+---
+
+## 2. MCU_USER 数据模型（v2）
+
+```js
+{
+  version: 2,
+  // —— 偏好（P0，最小集）——
+  preferences: {
+    exploreDefaultFilter: 'all',   // 'all'|'character'|'content'，复用 F2 过滤
+    cardStyle: 'default',          // 分享卡视觉变体（P2 升级预留）
+    reduceMotion: false            // 无障碍，复用 V2.0 prefers-reduced-motion
+  },
+  // —— 喜欢的角色与团队（互动系统输入）——
+  likedCharacters: ['tony', 'steve'],   // charId[]，上限 50
+  likedTeams: ['avengers', 'guardians'],// campId[]，复用 MCU_CAMPS 8 阵营
+  // —— 观影状态（继承并扩展 F5）——
+  watched: { 'iron-man': 'ISO时间', 'loki|洛基 S1': 'ISO时间' }, // 沿用 F5 分季键规则
+  want: ['captain-america-first-avenger'],  // contentId[]，沿用 F5
+  favorite: ['avengers'],          // contentId[]，NEW（与 want 区分：收藏≠想看）
+  // —— 路线（观影系统）——
+  currentRoute: { routeId: 'a5-core', position: 3, updatedAt: 'ISO' }, // NEW
+  // —— 探索记录（首页动态化输入）——
+  recentExplore: [                 // NEW，上限 20，按时间倒序
+    { type: 'character', id: 'tony', at: 'ISO' },
+    { type: 'content',  id: 'avengers', at: 'ISO' }
+  ],
+  // —— 互动系统（P1/P2）——
+  quiz: {                          // NEW
+    scores: [ { topic: 'phase1', correct: 8, total: 10, at: 'ISO' } ], // 上限 50
+    bestStreak: 12
+  },
+  achievements: { unlocked: ['a5-core-done', 'watched-10'], at: { 'a5-core-done': 'ISO' } }, // NEW，规则离线定义
+  shareRecords: [                  // NEW，上限 50，用于档案与去重
+    { cardType: 'a5core', at: 'ISO', relatedIds: ['iron-man'] }
+  ],
+  updatedAt: 'ISO'
+}
+```
+
+### 字段边界说明
+- `watched`/`want`：与 V2.0 `MCUProgress` 完全兼容（键规则、分季键、`isDone` 判定逻辑照搬）。
+- `favorite`：新增，与 `want` 语义区分（收藏=长期标记，想看=计划看）。H5 母库有 `favorite` 概念可对齐。
+- `currentRoute`：仅存「当前路线 + 进度位置」，路线内容本身不存（从 `data.js` 派生）。
+- `recentExplore`：每次探索动作追加，超 20 截断最旧；首页「今日探索推荐」读取此处 + 随机兜底。
+- `quiz`/`achievements`/`shareRecords`：互动系统产出，全部派生或用户动作产生，不含任何官方未确认剧情。
+
+---
+
+## 3. 三系统共享机制
+
+```
+                ┌──────────── 只读内容数据（data.js）────────────┐
+                │ MCU_CONTENT / CHARACTERS / RELATIONS / ROUTES │
+                │ CAMPS / SPECIAL_ROUTES / UPCOMING              │
+                └───────────────────────┬──────────────────────┘
+                                        │ 只读引用（id 关联）
+                                        ▼
+   探索系统 ──┐                  ┌──────────────┐                 ┌── 观影系统
+   互动系统 ──┼── 读写 ─────────▶│  MCUUser 模块 │◀──────── 读写 ──┼── 观影系统
+   首页控制台─┘                  │ (subscribe/   │                 └──
+                                │  emit 通知)   │
+                                └──────┬───────┘
+                                       │ 持久化
+                                       ▼
+                          xhs Storage ≥9.46 / localStorage / memory
+```
+
+- **读取**：任意视图通过 `MCUUser.get(field)` 或派生函数（`watchedCount`/`routeProgress`/`quizBest` 等）读取；不缓存到视图局部变量，订阅 `emit` 刷新。
+- **写入**：所有变更经 `MCUUser.update(mutator)` 统一入口 → 改内存 → 持久化 → `emit` → 各视图响应。避免「A 模块改了、B 模块不知道」。
+- **派生不落库**：百分比、路线进度、成就判定均实时从 `watched`/规则计算，不存冗余。
+- **内容数据零拷贝**：角色/作品详情页只持有 `id`，渲染时查 `data.js`，不复制整段记录。
+
+---
+
+## 4. 数据版本升级
+
+- **迁移函数表**：`MIGRATIONS = { 1: migrateV1ToV2 }`。
+- **v1→v2**：读取 `mcu-xhs-progress-v1` → 映射 `watched`/`want` → 补默认 `preferences`/`likedCharacters`/`currentRoute`/`recentExplore`/`quiz`/`achievements`/`shareRecords` → 写 `mcu-xhs-user-v2` → 可选清理旧键。
+- **未知/未来版本**：`version > 当前支持` → 回退空态并提示（不阻断）。
+- **损坏数据**：JSON.parse 失败或字段类型异常 → 复用 F5 `parse` 容错，逐字段校验后回退空/默认值。
+
+---
+
+## 5. 存储异常与数据恢复
+
+| 场景 | 处理（沿用 V2.0 验证过的逻辑） |
+|---|---|
+| xhs 读失败 | 回退 localStorage 副本；均无 → 空态 |
+| xhs 写失败 | 降级 localStorage；memoryFallback 保当次操作 |
+| 无 xhs 无 localStorage | memory（当次会话有效，刷新丢失，提示） |
+| 数据损坏 | parse 容错 → 空态 |
+| 清除 | removeStorage 优先；失败 setStorage 空串；清 localStorage 副本 |
+| 容量超 1MB | 设计上限防止：`recentExplore`≤20、`shareRecords`≤50、`quiz.scores`≤50、`likedCharacters`≤50；估算全量 < 100KB，远低于 1MB |
+
+---
+
+## 6. V2.0 兼容（关键）
+
+- **旧键**：`mcu-xhs-progress-v1`（`{version:1, watched:{}, want:[], updatedAt:null}`）。
+- **兼容策略**：`MCUUser.init()` 启动时若检测到 v1 且无 v2 → 执行迁移；迁移后保留 v1 一个版本周期（或直接清理，待裁定）。
+- **不破坏**：v1 用户的「已看/想看」无损转入 v2；未升级用户打开 V3.0 不受影响（v3 读不到 v1 时不报错）。
+- **注意**：H5 端 `mcu_nav_user_v1` 与 XHS 端是**不同平台、不同键**，V3.0 仅兼容 XHS 自身 v1，不跨平台读取 H5 键（平台隔离，无法跨小工具/跨载体共享，见交付物⑤）。
+
+---
+
+## 7. 内容数据复用清单（单一可信源）
+
+| 数据 | 全局变量 | V3.0 用途 | 现状 |
+|---|---|---|---|
+| 作品全集 | `MCU_CONTENT` | 探索/观影/档案 | 59 部（已构建，含电影/剧集/特别/短片） |
+| 角色 | `MCU_CHARACTERS` | 角色探索/组队/问答 | 24 个骨架（关系边 TODO） |
+| 关系 | `MCU_RELATIONS` | 宇宙关系/时间线 | 92 条（作品↔作品，非人物） |
+| 路线 | `MCU_ROUTES` | 观影顺序/个性化 | 11 条（4 生成式） |
+| 复联5专题 | `MCU_SPECIAL_ROUTES` | 补课/挑战/问答 | 8+15，已就绪 |
+| 阵营 | `MCU_CAMPS` | 组队器 | 8 阵营，已就绪 |
+| 未来作品 | `MCU_UPCOMING` | 档期/边界 | 2 部（复联5 已定档，其余 pendingReview 过滤） |
+
+---
+
+## 8. 置信度
+
+- 模型与共享机制：高（基于已验证的 `MCUProgress` 扩展，平台契约明确）。
+- 容量测算（<100KB）：高（数组上限可控，文本数据小）。
+- v1→v2 迁移：高（字段映射直接）。
+- 人物关系边缺口对模型的影响：高（已确认 `characters.js` TODO，模型对「英雄关系网络」仅预留 `likedCharacters`/`recentExplore`，关系图数据另行立项）。
+- 真机 Storage 行为：中（仅 Node 模拟，待真机验证）。
+
+*本文件为设计稿；字段上限与迁移策略可在 CodeBuddy 实施阶段细化，但须守住「单 key ≤1MB」「内容数据单一来源」两条硬约束。*

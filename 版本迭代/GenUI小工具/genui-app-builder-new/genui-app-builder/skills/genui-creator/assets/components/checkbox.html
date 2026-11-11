@@ -1,0 +1,103 @@
+<style>
+    .vc-checkbox-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-checkbox-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-checkbox-group {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+    }
+
+    /* Checkbox 基础样式 */
+    .vc-checkbox {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        gap: 8px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-checkbox:focus,
+    .vc-checkbox:active {
+        outline: none;
+    }
+
+    .vc-checkbox-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        outline: none;
+    }
+
+    .vc-checkbox-input:focus,
+    .vc-checkbox-input:active {
+        outline: none;
+    }
+
+    .vc-checkbox-box {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--cos-color-border);
+        border-radius: 4px;
+        background-color: var(--cos-color-bg);
+        transition: all 0.2s;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    .vc-checkbox-input:checked + .vc-checkbox-box {
+        background-color: var(--cos-color-bg-primary);
+        border-color: var(--cos-color-bg-primary);
+    }
+
+    .vc-checkbox-input:checked + .vc-checkbox-box::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -60%) rotate(45deg);
+        width: 4px;
+        height: 8px;
+        border: 2px solid var(--cos-color-text-on-primary);
+        border-top: none;
+        border-left: none;
+    }
+
+    .vc-checkbox-text {
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        cursor: pointer;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="vc-checkbox-section">
+    <div class="vc-checkbox-group">
+        <label class="vc-checkbox">
+            <input type="checkbox" class="vc-checkbox-input" checked />
+            <span class="vc-checkbox-box"></span>
+            <span class="vc-checkbox-text">选项 1</span>
+        </label>
+        <label class="vc-checkbox">
+            <input type="checkbox" class="vc-checkbox-input" />
+            <span class="vc-checkbox-box"></span>
+            <span class="vc-checkbox-text">选项 2</span>
+        </label>
+        <label class="vc-checkbox">
+            <input type="checkbox" class="vc-checkbox-input" />
+            <span class="vc-checkbox-box"></span>
+            <span class="vc-checkbox-text">选项 3</span>
+        </label>
+    </div>
+</div>

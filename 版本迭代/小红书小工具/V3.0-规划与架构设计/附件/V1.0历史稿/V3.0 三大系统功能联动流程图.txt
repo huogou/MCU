@@ -1,0 +1,153 @@
+# V3.0 三大系统功能联动流程图
+
+> 版本：V1.0　日期：2026-11-10　状态：规划稿 · 待 ChatGPT 产品审查
+> 配套主文档：《MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.0》
+> 说明：每条路径含「流程图（ASCII）+ 逐步读取/写入数据表」。R=读取，W=写入。
+> 数据缩写：CONTENT=`MCU_CONTENT`、CHARS=`MCU_CHARACTERS`、RELS=`MCU_RELATIONS`、
+>           ROUTES=`MCU_ROUTES`、A5=`MCU_SPECIAL_ROUTES`、USER=`MCU_USER`(v2)、
+>           QUIZ=离线题库(待建)。
+
+---
+
+## 路径 A · 英雄探索 → 观影计划
+
+### 流程图
+```
+[首页·探索区]
+     │ 点击「宇宙节点」
+     ▼
+[F2 搜索] ──输入「钢铁侠」──▶ [performSearch]
+     │                              │ R: CHARS(匹配cn/en) / CONTENT(匹配cn/en/role/sf)
+     ▼                              ▼
+[角色详情: 托尼·斯塔克]        [作品详情]
+     │ R: CHARS.first→CONTENT      │ R: CONTENT.chars→CHARS / RELS(why)
+     │ R: CONTENT.chars(关联作品)  │
+     ▼                              │
+[关联作品列表] ◀────────────────────┘
+     │ 点击「加入想看」/「加入路线」
+     ▼ W: USER.want.push(id) 或 USER.currentRoute={routeId,position}
+[观影计划已更新]
+     │
+     ▼ （用户后续在路线/详情标记已看）
+W: USER.watched[key]=ISO时间
+     │
+     ▼ 派生(不落库)
+[首页进度% + 路线进度条 刷新]  (emit 通知各视图)
+```
+
+### 逐步读取/写入表
+| 步 | 动作 | 读取 | 写入 | 派生/通知 |
+|---|---|---|---|---|
+| 1 | 搜「钢铁侠」 | CHARS、CONTENT | — | — |
+| 2 | 看角色详情 | CHARS.first→CONTENT | — | — |
+| 3 | 看关联作品 | CONTENT.chars→CHARS、RELS | — | — |
+| 4 | 加入想看 | — | USER.want | emit→进度文案刷新 |
+| 4' | 加入路线 | ROUTES/A5 | USER.currentRoute | emit→首页「继续路线」 |
+| 5 | 标记已看 | — | USER.watched[key] | emit→percent/routeProgress 刷新 |
+
+---
+
+## 路径 B · 观影计划 → 互动挑战
+
+### 流程图
+```
+[首页·观影区] ──点击「复联5补课专题」──▶ [F6 专题页]
+     │                                      │ R: A5.core/full + UPCOMING(档期)
+     ▼                                      ▼
+[路线节点列表] ◀──待看作品高亮────────────┘
+     │ 点击某节点「标记已看」
+     ▼ W: USER.watched[key]=ISO
+[路线进度更新] ──emit──▶ [首页/进度页]
+     │
+     ▼ 触发（条件：路线完成度达阈值 / 用户主动）
+[知识问答入口] ──选「复联5前测」──▶ [问答页]
+     │                              │ R: QUIZ(按 routeId 过滤) + CONTENT/CHARS(出题关联)
+     ▼ 提交答案
+W: USER.quiz.scores.push({topic,correct,total,at})
+     │
+     ▼ 判定成就（规则引擎）
+W: USER.achievements.unlocked.push('a5-core-done') + at
+     │
+     ▼
+[成就卡分享] ──F4升级──▶ writeTempFile→存相册/发笔记
+```
+
+### 逐步读取/写入表
+| 步 | 动作 | 读取 | 写入 | 派生/通知 |
+|---|---|---|---|---|
+| 1 | 进专题 | A5、UPCOMING | — | — |
+| 2 | 看待看作品 | USER.want、A5.items | — | 高亮未看 |
+| 3 | 标记已看 | — | USER.watched[key] | emit→路线%刷新 |
+| 4 | 触发问答 | QUIZ(按route)、CONTENT/CHARS | — | — |
+| 5 | 提交答案 | — | USER.quiz.scores | bestStreak 更新 |
+| 6 | 记录成就 | 成就规则 | USER.achievements | emit→档案/首页 |
+| 7 | 分享成就卡 | — | USER.shareRecords | F4 导出 |
+
+---
+
+## 路径 C · 知识问答 → 角色探索
+
+### 流程图
+```
+[首页·互动区] ──点击「知识问答」──▶ [问答页]
+     │                              │ R: QUIZ(全量/按阶段) + CONTENT/CHARS
+     ▼ 答题
+W: USER.quiz.scores.push(...)
+     │
+     ▼ 答错/查看解析
+[答题涉及的角色或作品] ──点击──▶ [F2 详情]
+     │                              │ R: CHARS / CONTENT.chars / RELS
+     ▼
+[相关资料] ◀────────────────────────┘
+     │ 点击「加入观影计划」
+     ▼ W: USER.want.push(id) 或 USER.currentRoute
+[回到路径 A 闭环] ──标记已看──▶ USER.watched (见路径 A 步5)
+```
+
+### 逐步读取/写入表
+| 步 | 动作 | 读取 | 写入 | 派生/通知 |
+|---|---|---|---|---|
+| 1 | 参加问答 | QUIZ、CONTENT/CHARS | — | — |
+| 2 | 提交成绩 | — | USER.quiz.scores | bestStreak |
+| 3 | 看涉及角色/作品 | CHARS、CONTENT、RELS | — | — |
+| 4 | 进详情 | CONTENT.chars→CHARS | — | — |
+| 5 | 加入观影计划 | ROUTES/A5 | USER.want / currentRoute | emit→首页 |
+
+---
+
+## 闭环说明
+
+```
+        探索系统 ──A──▶ 观影系统 ──B──▶ 互动系统
+           ▲                                 │
+           └──────────── C ──────────────────┘
+        （互动产出反哺探索与观影，状态经 MCU_USER 贯通）
+```
+
+- 三条路径均通过 `MCU_USER` 单一状态贯通；任一动作 `emit` 后首页/进度/档案同步刷新。
+- 所有「写入」仅发生在 `MCU_USER`（及 `shareRecords`）；内容数据（`CONTENT/CHARS/RELS/ROUTES/A5`）全程只读。
+- 路径 B/C 依赖「知识问答」(`QUIZ`)，而 `QUIZ` 当前为**数据缺口**（见主文档 §8④），在题库建成前路径 B 步4–6、路径 C 步1–2 无法完整走通。
+
+---
+
+## 验收用例（对应主文档验收标准④）
+
+| 用例 | 覆盖路径 | 断言 |
+|---|---|---|
+| TC-A1 | A | 搜角色→关联作品→加想看→首页想看数+1 |
+| TC-A2 | A | 标记已看→首页%与路线进度同步 |
+| TC-B1 | B | 复联5路线标记→触发问答→成绩写入→成就解锁 |
+| TC-B2 | B | 成就卡可导出（存相册/发笔记） |
+| TC-C1 | C | 问答→查看涉及角色→进详情→加观影计划 |
+| TC-ALL | A+B+C | 三系统共享同一 `MCU_USER`，无重复数据 |
+
+---
+
+## 置信度
+
+- 路径编排与读写边界：高（基于已验证的 F5 读写 + `data.js` 引用关系）。
+- 「内容只读、状态单写」约束：高（平台 + 单一可信源纪律）。
+- 路径 B/C 对题库的依赖：高（已确认 QUIZ 不存在，标注为阻塞）。
+- 真机走通：中（端能力未真机验证，待用户验收）。
+
+*本文件为设计稿；流程图描述目标态，实施细节由 CodeBuddy 在 P1 阶段落地。*

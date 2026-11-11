@@ -4,17 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>漫威宇宙导航</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-  </style>
   <link rel="stylesheet" href="./assets/style.css" />
 </head>
 <body>
@@ -93,7 +82,31 @@
             <span class="menu-code">04</span>
           </div>
         </div>
-        <div class="home-footer-note">数据源自 MCU Atlas · 38 部院线电影</div>
+        <div class="home-entry-row">
+          <div class="menu-card menu-card-wide" data-action="progress">
+            <div class="menu-orb">
+              <svg viewBox="0 0 24 24" class="menu-svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.5" fill="none" stroke="#F2B233" stroke-width="1.8"/>
+                <path d="M12 7.5 V12 L15.5 14" stroke="#F2B233" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="menu-label">我的观影进度</div>
+            <div class="menu-desc" id="homeProgressDesc">标记已看 · 想看清单</div>
+            <span class="menu-code">P</span>
+          </div>
+          <div class="menu-card menu-card-wide" data-action="a5">
+            <div class="menu-orb">
+              <svg viewBox="0 0 24 24" class="menu-svg" aria-hidden="true">
+                <path d="M12 3 L20 7 V13 C20 17.5 16.5 20.5 12 21 C7.5 20.5 4 17.5 4 13 V7 Z" fill="none" stroke="#E23C3C" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M8.5 12 L11 14.5 L15.5 9.5" stroke="#E23C3C" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="menu-label">复联5补课专题</div>
+            <div class="menu-desc">8 部核心 / 15 部完整路线</div>
+            <span class="menu-code">A5</span>
+          </div>
+        </div>
+        <div class="home-footer-note">数据源自 MCU Atlas · 电影 / 剧集 / 特别呈现 / 短片</div>
       </section>
 
       <!-- F1 观影顺序 -->
@@ -159,16 +172,24 @@
           <h2 class="view-title">分享卡片</h2>
           <p class="view-sub">生成你的漫威专属卡片</p>
         </div>
+        <div class="card-type-row" id="cardTypeRow">
+          <button class="filter-btn active" data-card="custom">自定义</button>
+          <button class="filter-btn" data-card="progress">观影进度卡</button>
+          <button class="filter-btn" data-card="a5core">复联5·8部</button>
+          <button class="filter-btn" data-card="a5full">复联5·15部</button>
+        </div>
         <div class="card-preview-wrap">
           <canvas id="shareCanvas" width="900" height="1200"></canvas>
         </div>
-        <div class="card-form">
+        <div class="card-form" id="cardCustomForm">
           <label class="field-label">卡片标题（最多 20 字）</label>
           <input type="text" id="cardTitle" maxlength="20" placeholder="例如：漫威新手入坑路线" />
           <label class="field-label">一句话看点</label>
           <input type="text" id="cardLine" maxlength="40" placeholder="例如：12 部必看，从钢铁侠到终局之战" />
           <label class="field-label">副标题 / 署名</label>
           <input type="text" id="cardSub" maxlength="30" placeholder="漫威宇宙导航" value="漫威宇宙导航" />
+        </div>
+        <div class="card-form">
           <div class="card-actions">
             <button class="primary-btn" id="genCardBtn">重新生成</button>
             <button class="secondary-btn" id="saveCardBtn">保存相册</button>
@@ -177,10 +198,59 @@
           <p class="tip" id="cardTip">离线预览下，保存 / 发笔记需在 App 内调用端能力。</p>
         </div>
       </section>
+
+      <!-- P2 我的观影进度 -->
+      <section class="view progress-view hidden" id="progressView">
+        <div class="view-head">
+          <h2 class="view-title">我的观影进度</h2>
+          <p class="view-sub">数据仅保存在本机，不上传</p>
+        </div>
+        <div class="progress-hero">
+          <div class="progress-percent" id="pgPercent">0%</div>
+          <div class="progress-bar"><div class="progress-bar-fill" id="pgBar"></div></div>
+          <div class="progress-stats" id="pgStats"></div>
+        </div>
+        <div class="progress-section">
+          <h3 class="progress-section-title">复联5补课路线</h3>
+          <div id="pgA5"></div>
+        </div>
+        <div class="progress-section">
+          <h3 class="progress-section-title">想看清单 <span class="secondary" id="pgWantCount"></span></h3>
+          <div id="pgWantList"></div>
+        </div>
+        <div class="progress-section">
+          <h3 class="progress-section-title">已看作品 <span class="secondary" id="pgWatchedCount"></span></h3>
+          <div id="pgWatchedList"></div>
+        </div>
+        <div class="progress-actions">
+          <button class="secondary-btn" id="pgShareBtn">生成进度分享卡</button>
+          <button class="danger-btn" id="pgClearBtn">清除我的进度</button>
+        </div>
+        <p class="tip" id="pgTip"></p>
+      </section>
+
+      <!-- P3 复联5补课专题 -->
+      <section class="view a5-view hidden" id="a5View">
+        <div id="a5Hero"></div>
+        <div class="a5-cta-row">
+          <button class="primary-btn" id="a5CoreBtn">8 部核心补课路线</button>
+          <button class="secondary-btn" id="a5FullBtn">15 部完整补课路线</button>
+        </div>
+        <div class="a5-route-block" id="a5CoreBlock"></div>
+        <div class="a5-route-block hidden" id="a5FullBlock"></div>
+        <div class="a5-chain" id="a5Chain"></div>
+        <div class="progress-actions">
+          <button class="secondary-btn" id="a5ShareCore">生成 8 部清单分享卡</button>
+          <button class="secondary-btn" id="a5ShareFull">生成 15 部清单分享卡</button>
+        </div>
+        <p class="tip" id="a5Tip"></p>
+      </section>
     </main>
+    <div class="global-tip" id="globalTip" role="status" aria-live="polite"></div>
   </div>
 
   <script src="./assets/data.js"></script>
+  <script src="./assets/progress.js"></script>
   <script src="./assets/app.js"></script>
 </body>
 </html>

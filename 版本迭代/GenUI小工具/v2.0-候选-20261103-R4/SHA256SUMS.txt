@@ -1,0 +1,8 @@
+﻿# 提审包候选 SHA-256（V2.0-R4 · 2026-11-03 · 设计侧独立复核通过前不得提审）
+
+8111eb44cbde79ac771e8bbc5ded37575bf56e5731c33268aa509cf3045e3223  v2.0-候选-20261103-R4/MCU观影助手-GenUI-V2.0-R4-候选.zip
+082cdf2e17a286efcb1642be76ca57dcb3c363b72d69106dfce2f9172722d9f5  v2.0-候选-20261103-R4/genui-app/index.html
+cc1b958e870b5fc58d8f54d6223005afd4d240ca340c5d572448a383cf8497b9  v2.0-候选-20261103-R4/genui-app/static/data.js
+5372306b0ef2677fd88ffe5077d2be53262197ef0d31f325ed872a0368f6088f  genui-app-tools/build-data.cjs
+0c9b513e797bdde152c3dc3d76b586997e7ef735983574a6295a4ed085087ec3  genui-app-tools/guard-frozen.cjs
+449e49042699b3c2329430d8f5c4837906fa89e9c814ebe014093a9a796c46d6  genui-app-tools/e2e-visual.cjs

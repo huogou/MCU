@@ -1,0 +1,95 @@
+<style>
+    .vc-switcher-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-switcher-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-switcher-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Switcher 基础样式 */
+    .vc-switcher {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-switcher:focus,
+    .vc-switcher:active {
+        outline: none;
+    }
+
+    .vc-switcher-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        outline: none;
+    }
+
+    .vc-switcher-input:focus,
+    .vc-switcher-input:active {
+        outline: none;
+    }
+
+    .vc-switcher-track {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        border-radius: var(--cos-rounded-md);
+        background-color: rgba(0, 0, 0, 0.1);
+        border: none;
+        transition: all 0.2s;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    .vc-switcher-thumb {
+        position: absolute;
+        left: 2px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: var(--cos-color-bg-raised);
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+
+    .vc-switcher-input:checked + .vc-switcher-track {
+        background-color: var(--cos-color-bg-primary);
+    }
+
+    .vc-switcher-input:checked + .vc-switcher-track .vc-switcher-thumb {
+        transform: translateY(-50%) translateX(20px);
+    }
+
+    .vc-switcher-text {
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        margin-left: var(--cos-space-xxs);
+        cursor: pointer;
+    }
+</style>
+
+<div class="vc-switcher-section">
+    <div class="vc-switcher-group">
+        <label class="vc-switcher">
+            <input type="checkbox" class="vc-switcher-input" checked />
+            <span class="vc-switcher-track">
+                <span class="vc-switcher-thumb"></span>
+            </span>
+            <span class="vc-switcher-text">开启</span>
+        </label>
+    </div>
+</div>

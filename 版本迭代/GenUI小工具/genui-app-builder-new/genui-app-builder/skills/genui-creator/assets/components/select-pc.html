@@ -1,0 +1,442 @@
+<style>
+    .vc-select-pc-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-select-pc-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-select-pc-label {
+        font-size: calc(13px / var(--font-size-scale, 1));
+        margin-bottom: 6px;
+        font-weight: var(--cos-font-medium);
+        color: var(--cos-color-text-minor);
+        line-height: 1;
+    }
+
+    /* 面板绝对定位的参照物 */
+    .vc-select-pc-wrapper {
+        position: relative;
+    }
+
+    /* 触发器：尺寸与 Input 基础输入框对齐（40px / rounded-md） */
+    .vc-select-pc-trigger {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 40px;
+        padding: var(--cos-space-none) 12px;
+        box-sizing: border-box;
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        line-height: 1;
+        color: var(--cos-color-text);
+        background-color: var(--cos-color-bg);
+        border: 1px solid var(--cos-color-border-minor);
+        border-radius: var(--cos-rounded-md);
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        transition: border-color 0.2s;
+    }
+
+    .vc-select-pc-trigger:hover {
+        border-color: var(--cos-color-border);
+    }
+
+    .vc-select-pc-trigger:focus-visible,
+    .vc-select-pc-trigger.active {
+        border-color: var(--cos-color-bg-primary);
+    }
+
+    /* 前缀插槽：与 Input 插槽输入框同款 */
+    .vc-select-pc-trigger-prefix {
+        color: var(--cos-color-text-minor);
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-right: var(--cos-space-sm);
+    }
+
+    .vc-select-pc-trigger-divider {
+        display: inline-block;
+        width: 1px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-right: var(--cos-space-sm);
+        background-color: var(--cos-color-border-minor);
+    }
+
+    .vc-select-pc-trigger-text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .vc-select-pc-trigger-placeholder {
+        color: var(--cos-color-text-minor);
+        font-weight: var(--cos-font-regular);
+    }
+
+    .vc-select-pc-trigger-arrow {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        margin-left: 8px;
+        background-color: var(--cos-color-text);
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M826.519704 314.519704L525.406815 615.632593a18.962963 18.962963 0 0 1-26.81363 0L197.480296 314.519704l-53.627259 53.646222 301.093926 301.093926a94.814815 94.814815 0 0 0 134.087111 0l301.131852-301.093926-53.665185-53.646222z'/%3E%3C/svg%3E") center / contain no-repeat;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M826.519704 314.519704L525.406815 615.632593a18.962963 18.962963 0 0 1-26.81363 0L197.480296 314.519704l-53.627259 53.646222 301.093926 301.093926a94.814815 94.814815 0 0 0 134.087111 0l301.131852-301.093926-53.665185-53.646222z'/%3E%3C/svg%3E") center / contain no-repeat;
+        transition: transform 0.2s;
+    }
+
+    .vc-select-pc-trigger.active .vc-select-pc-trigger-arrow {
+        transform: rotate(180deg);
+    }
+
+    /* 下拉面板：默认贴触发器下方，空间不足时向上翻转 */
+    .vc-select-pc-panel {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 192px;
+        margin-top: var(--cos-space-3xs);
+        padding: var(--cos-space-3xs);
+        box-sizing: border-box;
+        overflow-y: auto;
+        background-color: var(--cos-color-bg);
+        border: 1px solid var(--cos-color-border-minor);
+        border-radius: var(--cos-rounded-sm);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        z-index: 201;
+    }
+
+    .vc-select-pc-panel.is-above {
+        top: auto;
+        bottom: 100%;
+        margin-top: var(--cos-space-none);
+        margin-bottom: var(--cos-space-3xs);
+    }
+
+    .vc-select-pc-panel::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .vc-select-pc-panel::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .vc-select-pc-panel::-webkit-scrollbar-thumb {
+        background-color: var(--cos-color-bg-raised-inverse);
+        border-radius: 2px;
+    }
+
+    .vc-select-pc-option {
+        display: flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 4px var(--cos-space-xxs);
+        box-sizing: border-box;
+        border-radius: var(--cos-rounded-xs);
+        font-size: calc(var(--cos-text-body-lg) / var(--font-size-scale, 1));
+        line-height: calc(22px / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        cursor: pointer;
+        transition: background-color var(--cos-transition-duration-moderate) var(--cos-transition-easing-accelerate);
+    }
+
+    /* 灰底只在鼠标 hover 或键盘导航高亮时出现 */
+    .vc-select-pc-option:hover,
+    .vc-select-pc-option.is-keyboard-active {
+        background-color: var(--cos-color-bg-dent);
+    }
+
+    .vc-select-pc-option.selected {
+        color: var(--cos-color-text-primary);
+        font-weight: var(--cos-font-medium);
+    }
+
+    .vc-select-pc-option-text {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .vc-select-pc-option.selected::after {
+        content: "";
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        margin-left: auto;
+        background-color: var(--cos-color-text-primary);
+        mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M937.035852 280.310519L434.157037 783.189333a38.115556 38.115556 0 0 1-53.911704 0L86.964148 489.908148l53.627259-53.627259 266.61926 266.619259 476.197926-476.216889 53.627259 53.62726z'/%3E%3C/svg%3E") center / contain no-repeat;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath d='M937.035852 280.310519L434.157037 783.189333a38.115556 38.115556 0 0 1-53.911704 0L86.964148 489.908148l53.627259-53.627259 266.61926 266.619259 476.197926-476.216889 53.627259 53.62726z'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+</style>
+
+<!-- 基础选择器 -->
+<div class="vc-select-pc-section">
+    <div class="vc-select-pc-label">基础选择器</div>
+    <div class="vc-select-pc-wrapper" data-select-id="pc1">
+        <div class="vc-select-pc-trigger" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+            <span class="vc-select-pc-trigger-text vc-select-pc-trigger-placeholder">请选择</span>
+            <span class="vc-select-pc-trigger-arrow"></span>
+        </div>
+    </div>
+</div>
+
+<!-- 插槽选择器 -->
+<div class="vc-select-pc-section">
+    <div class="vc-select-pc-label">插槽选择器</div>
+    <div class="vc-select-pc-wrapper" data-select-id="pc2">
+        <div class="vc-select-pc-trigger" role="combobox" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+            <span class="vc-select-pc-trigger-prefix">城市</span>
+            <span class="vc-select-pc-trigger-divider"></span>
+            <span class="vc-select-pc-trigger-text">北京</span>
+            <span class="vc-select-pc-trigger-arrow"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        'use strict';
+
+        var selectConfigs = {
+            pc1: {
+                placeholder: '请选择',
+                options: [
+                    { value: 'option1', text: '选项 1' },
+                    { value: 'option2', text: '选项 2' },
+                    { value: 'option3', text: '选项 3' },
+                    { value: 'option4', text: '选项 4' },
+                    { value: 'option5', text: '选项 5' },
+                    { value: 'option6', text: '选项 6' }
+                ]
+            },
+            pc2: {
+                placeholder: '请选择',
+                options: [
+                    { value: 'beijing', text: '北京', selected: true },
+                    { value: 'shanghai', text: '上海' },
+                    { value: 'guangzhou', text: '广州' },
+                    { value: 'shenzhen', text: '深圳' }
+                ]
+            }
+        };
+
+        // 同一时刻只允许一个面板展开
+        var openInstance = null;
+
+        function createInstance(wrapper, config) {
+            var trigger = wrapper.querySelector('.vc-select-pc-trigger');
+            var triggerText = wrapper.querySelector('.vc-select-pc-trigger-text');
+            var panel = null;
+            var optionEls = [];
+            var activeIndex = -1;
+            var value = null;
+
+            var selected = config.options.filter(function (opt) { return opt.selected; })[0];
+            if (selected) {
+                setValue(selected.value, selected.text);
+            } else {
+                triggerText.textContent = config.placeholder;
+                triggerText.classList.add('vc-select-pc-trigger-placeholder');
+            }
+
+            function setValue(nextValue, label) {
+                value = nextValue;
+                wrapper.setAttribute('data-value', nextValue);
+                triggerText.textContent = label;
+                triggerText.classList.remove('vc-select-pc-trigger-placeholder');
+            }
+
+            function buildPanel() {
+                panel = document.createElement('div');
+                panel.className = 'vc-select-pc-panel';
+                panel.setAttribute('role', 'listbox');
+
+                optionEls = config.options.map(function (option, index) {
+                    var optionEl = document.createElement('div');
+                    optionEl.className = 'vc-select-pc-option';
+                    optionEl.setAttribute('role', 'option');
+                    optionEl.setAttribute('data-value', option.value);
+
+                    var textEl = document.createElement('span');
+                    textEl.className = 'vc-select-pc-option-text';
+                    textEl.textContent = option.text;
+                    optionEl.appendChild(textEl);
+
+                    optionEl.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        setValue(option.value, option.text);
+                        close();
+                        trigger.focus();
+                    });
+                    optionEl.addEventListener('mouseenter', function () {
+                        setActiveIndex(index, false);
+                    });
+
+                    panel.appendChild(optionEl);
+                    return optionEl;
+                });
+
+                wrapper.appendChild(panel);
+            }
+
+            // fromKeyboard 为 true 时才画高亮底色；
+            // 鼠标场景交给 :hover，避免面板一打开就有一项带灰底
+            function setActiveIndex(index, shouldScroll, fromKeyboard) {
+                activeIndex = index;
+                optionEls.forEach(function (el, i) {
+                    el.classList.toggle('is-keyboard-active', !!fromKeyboard && i === index);
+                    el.setAttribute('aria-selected', String(i === index));
+                });
+                if (shouldScroll && optionEls[index]) {
+                    optionEls[index].scrollIntoView({ block: 'nearest' });
+                }
+            }
+
+            function syncSelectedState() {
+                optionEls.forEach(function (el) {
+                    el.classList.toggle('selected', el.getAttribute('data-value') === value);
+                });
+            }
+
+            // 下方空间不足且上方更充裕时向上翻转
+            function placePanel() {
+                panel.classList.remove('is-above');
+                var triggerRect = trigger.getBoundingClientRect();
+                var panelHeight = panel.offsetHeight;
+                var spaceBelow = window.innerHeight - triggerRect.bottom;
+                var spaceAbove = triggerRect.top;
+                if (spaceBelow < panelHeight + 8 && spaceAbove > spaceBelow) {
+                    panel.classList.add('is-above');
+                }
+            }
+
+            // fromKeyboard 为 true（键盘唤起）时才给当前项画高亮底色
+            function open(fromKeyboard) {
+                if (openInstance && openInstance !== instance) {
+                    openInstance.close();
+                }
+                if (!panel) buildPanel();
+
+                syncSelectedState();
+                panel.style.display = 'block';
+                trigger.classList.add('active');
+                trigger.setAttribute('aria-expanded', 'true');
+                placePanel();
+
+                var selectedIndex = config.options.findIndex(function (opt) {
+                    return opt.value === value;
+                });
+                setActiveIndex(selectedIndex === -1 ? 0 : selectedIndex, true, fromKeyboard);
+
+                openInstance = instance;
+            }
+
+            function close() {
+                if (panel) {
+                    panel.style.display = 'none';
+                    panel.classList.remove('is-above');
+                }
+                setActiveIndex(-1, false, false);
+                trigger.classList.remove('active');
+                trigger.setAttribute('aria-expanded', 'false');
+                if (openInstance === instance) openInstance = null;
+            }
+
+            function isOpen() {
+                return !!panel && panel.style.display === 'block';
+            }
+
+            function commitActive() {
+                var option = config.options[activeIndex];
+                if (option) setValue(option.value, option.text);
+                close();
+            }
+
+            function moveActive(step) {
+                if (!isOpen()) {
+                    open(true);
+                    return;
+                }
+                var next = activeIndex + step;
+                if (next < 0) next = config.options.length - 1;
+                if (next > config.options.length - 1) next = 0;
+                setActiveIndex(next, true, true);
+            }
+
+            trigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (isOpen()) {
+                    close();
+                } else {
+                    open();
+                }
+            });
+
+            trigger.addEventListener('keydown', function (e) {
+                switch (e.key) {
+                    case 'Enter':
+                    case ' ':
+                        e.preventDefault();
+                        if (isOpen()) {
+                            commitActive();
+                        } else {
+                            open();
+                        }
+                        break;
+                    case 'Escape':
+                        if (isOpen()) {
+                            e.preventDefault();
+                            close();
+                        }
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        moveActive(1);
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        moveActive(-1);
+                        break;
+                    case 'Tab':
+                        close();
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            var instance = {
+                close: close,
+                isOpen: isOpen,
+                contains: function (node) {
+                    return wrapper.contains(node);
+                }
+            };
+
+            return instance;
+        }
+
+        var instances = [];
+        document.querySelectorAll('.vc-select-pc-wrapper').forEach(function (wrapper) {
+            var config = selectConfigs[wrapper.getAttribute('data-select-id')];
+            if (config) instances.push(createInstance(wrapper, config));
+        });
+
+        // 点击面板外收起
+        document.addEventListener('click', function (e) {
+            instances.forEach(function (instance) {
+                if (instance.isOpen() && !instance.contains(e.target)) {
+                    instance.close();
+                }
+            });
+        });
+    })();
+</script>

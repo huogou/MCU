@@ -1,0 +1,195 @@
+MCU Atlas · Git 当前变更基准清单
+生成时间：2026-11-06｜执行方：WorkBuddy（只读，未执行 reset/checkout/clean/commit）
+仓库：D:/SEO/发挥余热/漫威电影宇宙导航
+========================================================
+
+【总览】
+  总变更项: 165
+  D(删除)=97  M(修改)=8  ??（未跟踪）=60
+
+【分类口径】
+  A. 本轮 11-06 资讯模块归档产生 = docs/产品/资讯模块 下全部变化（旧扁平文件删除 + 日期归档新增 + 候选审核/采集清单）
+  B. 其他 docs 新增/变化 = docs/ 下但不属于资讯模块归档的项（与本次归档无关）
+  C. 遗留变更（非 docs）= 仓库根及子目录中、与资讯模块归档无关的历史未提交变化
+
+【A. 资讯模块 11-06 归档】 共 114 项  {"D":92,"M":2,"??":20}
+  说明：92 个旧扁平报告被移入 8 个日期目录 + 候选审核/；README.md 与采集清单为新增/修改。
+  [D] docs/产品/资讯模块/2026-10-13资讯候选（待策划审核）.md
+  [D] docs/产品/资讯模块/2026-10-13资讯发布记录.md
+  [D] docs/产品/资讯模块/G10.1生产部署同步报告-精简版.txt
+  [D] docs/产品/资讯模块/G10.1生产部署同步报告.txt
+  [D] docs/产品/资讯模块/G10生产运行阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G10生产运行阶段报告.txt
+  [D] docs/产品/资讯模块/G4.2规范包-精简版.txt
+  [D] docs/产品/资讯模块/G4.3-G5前置门禁关闭报告V1.0-精简版.txt
+  [D] docs/产品/资讯模块/G4.3-G5前置门禁关闭报告V1.0.txt
+  [D] docs/产品/资讯模块/G5-CandidateItemSchema报告.txt
+  [D] docs/产品/资讯模块/G5-RawCaptureSchema报告.txt
+  [D] docs/产品/资讯模块/G5-fixtures测试报告.txt
+  [D] docs/产品/资讯模块/G5-pipeline目录报告.txt
+  [D] docs/产品/资讯模块/G5-回归报告.txt
+  [D] docs/产品/资讯模块/G5-阶段报告.txt
+  [D] docs/产品/资讯模块/G5.2-采集器阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G5.2-采集器阶段报告.txt
+  [D] docs/产品/资讯模块/G5.3-真实采集验证报告-精简版.txt
+  [D] docs/产品/资讯模块/G5.3-真实采集验证报告.txt
+  [D] docs/产品/资讯模块/G5.4-Candidate质量报告.txt
+  [D] docs/产品/资讯模块/G5.4-idempotency-report.txt
+  [D] docs/产品/资讯模块/G5.4阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G5.4阶段报告.txt
+  [D] docs/产品/资讯模块/G5.5-AI整理质量报告-精简版.txt
+  [D] docs/产品/资讯模块/G5.5-AI整理质量报告.txt
+  [D] docs/产品/资讯模块/G5前置条件清单最终版.txt
+  [D] docs/产品/资讯模块/G5开工门禁复核V1.0.txt
+  [D] docs/产品/资讯模块/G5阶段交付-精简版.txt
+  [D] docs/产品/资讯模块/G6阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G6阶段报告.txt
+  [D] docs/产品/资讯模块/G7阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G7阶段报告.txt
+  [D] docs/产品/资讯模块/G8阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/G8阶段报告.txt
+  [D] docs/产品/资讯模块/G9首次生产写入报告-精简版.txt
+  [D] docs/产品/资讯模块/G9首次生产写入报告.txt
+  [D] docs/产品/资讯模块/MCU宇宙导航_资讯数据治理基础建设V1.0-精简版.txt
+  [D] docs/产品/资讯模块/MCU宇宙导航_资讯数据治理基础建设V1.0.txt
+  [D] docs/产品/资讯模块/MCU宇宙导航_资讯治理冻结确认V1.0-精简版.txt
+  [D] docs/产品/资讯模块/MCU宇宙导航_资讯治理冻结确认V1.0.txt
+  [D] docs/产品/资讯模块/N1 FINAL CLOSE REPORT.txt
+  [D] docs/产品/资讯模块/N1.1 AI Provider Adapter 落地报告-精简版.txt
+  [D] docs/产品/资讯模块/N1.1 AI Provider Adapter 落地报告.txt
+  [D] docs/产品/资讯模块/N1.2 Decision Gate 报告-精简版.txt
+  [D] docs/产品/资讯模块/N1.2 Decision Gate 报告.txt
+  [D] docs/产品/资讯模块/N1.2 Implementation-01 落地报告-精简版.txt
+  [D] docs/产品/资讯模块/N1.2 Implementation-01 落地报告.txt
+  [D] docs/产品/资讯模块/N1.2 Implementation-02 前置 Decision Gate 报告-精简版.txt
+  [D] docs/产品/资讯模块/N1.2 Implementation-02 前置 Decision Gate 报告.txt
+  [D] docs/产品/资讯模块/N1.2 P1-D ECS Preflight 清单.txt
+  [D] docs/产品/资讯模块/N1.2 P1-D 人工 Production 验证记录模板.txt
+  [D] docs/产品/资讯模块/N1.2 P1-D 真实 ECS 验证准备报告.txt
+  [D] docs/产品/资讯模块/N1.2 U1 真实 Provider 单次隔离验证报告-精简版.txt
+  [D] docs/产品/资讯模块/N1.2 U1 真实 Provider 单次隔离验证报告.txt
+  [D] docs/产品/资讯模块/N1.2 U1 真实 Provider 单次验证报告 V2.0-精简版.txt
+  [D] docs/产品/资讯模块/N1.2 U1 真实 Provider 单次验证报告 V2.0.txt
+  [D] docs/产品/资讯模块/N1.2 U3 2026-10-14资讯审核记录.md
+  [D] docs/产品/资讯模块/N1.2 实施任务清单.txt
+  [D] docs/产品/资讯模块/N1.2 最小接线设计说明.txt
+  [D] docs/产品/资讯模块/N1生产运行阶段报告-精简版.txt
+  [D] docs/产品/资讯模块/N1生产运行阶段报告.txt
+  [D] docs/产品/资讯模块/S001-html-parser专项设计V1.0.txt
+  [D] docs/产品/资讯模块/source_registryV1.0交付报告-精简版.txt
+  [D] docs/产品/资讯模块/source_registryV1.0交付报告.txt
+  [D] docs/产品/资讯模块/事件去重与合并引擎V1.0交付报告-精简版.txt
+  [D] docs/产品/资讯模块/事件去重与合并引擎V1.0交付报告.txt
+  [D] docs/产品/资讯模块/候选内容审核-20261014.md
+  [D] docs/产品/资讯模块/候选数据CandidateSchemaV1.0.txt
+  [D] docs/产品/资讯模块/历史数据兼容规则V1.0.txt
+  [D] docs/产品/资讯模块/官方来源校验器V1.0交付报告-精简版.txt
+  [D] docs/产品/资讯模块/官方来源校验器V1.0交付报告.txt
+  [D] docs/产品/资讯模块/最新漫威资讯模块V3.0数据接入架构设计方案-精简版.txt
+  [D] docs/产品/资讯模块/最新漫威资讯模块V3.0数据接入架构设计方案.txt
+  [D] docs/产品/资讯模块/真实 AI Provider 决策清单.txt
+  [D] docs/产品/资讯模块/规范-judgedby字段语义V1.0（草案）.txt
+  [D] docs/产品/资讯模块/规范-资讯事件归并与event_key边界V1.0.txt
+  [D] docs/产品/资讯模块/资讯审核规范V1.0.txt
+  [D] docs/产品/资讯模块/资讯模块N1.2 P0 来源URL修复与隔离测试 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 P1 实体关联修复与全量隔离验收报告 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 P1-B 正式实体补齐与积压候选关联复验报告 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 U3 报告冲突核验与积压审计 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 U3 生产数据溯源与实体关联缺陷审计 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 U3 生产观察报告.md
+  [D] docs/产品/资讯模块/资讯模块N1.2 U3 积压复核与生产门禁核验 V1.0.md
+  [D] docs/产品/资讯模块/资讯模块冻结事项裁定补充V1.0-精简版.txt
+  [D] docs/产品/资讯模块/资讯模块冻结事项裁定补充V1.0.txt
+  [D] docs/产品/资讯模块/资讯状态判定器V1.0交付报告-精简版.txt
+  [D] docs/产品/资讯模块/资讯状态判定器V1.0交付报告.txt
+  [D] docs/产品/资讯模块/资讯状态判定器V1.0开发任务书.txt
+  [D] docs/产品/资讯模块/资讯自动更新生产化实施报告V1.md
+  [D] docs/产品/资讯模块/资讯自动更新生产化评估报告V1.md
+  [D] docs/产品/资讯模块/资讯自动更新真实生产闭环验证报告V1.md
+  [M] docs/产品/资讯模块/采集清单/README.md
+  [M] docs/产品/资讯模块/采集清单/今日待审核资讯.md
+  [??] docs/产品/资讯模块/2026-09-22/
+  [??] docs/产品/资讯模块/2026-09-23/
+  [??] docs/产品/资讯模块/2026-09-24/
+  [??] docs/产品/资讯模块/2026-09-30/
+  [??] docs/产品/资讯模块/2026-10-12/
+  [??] docs/产品/资讯模块/2026-10-13/
+  [??] docs/产品/资讯模块/2026-10-14/
+  [??] docs/产品/资讯模块/2026-10-20/
+  [??] docs/产品/资讯模块/README.md
+  [??] docs/产品/资讯模块/候选审核/2026-11-06P0来源覆盖修复最终调整与验收报告.md
+  [??] docs/产品/资讯模块/候选审核/2026-11-06P0部署候选生成与批次自动化整合报告.md
+  [??] docs/产品/资讯模块/候选审核/2026-11-06资讯候选二次核验报告.md
+  [??] docs/产品/资讯模块/候选审核/2026-11-06资讯真实更新准备与生产部署前核查报告.md
+  [??] docs/产品/资讯模块/候选审核/20261106审查材料_分片/
+  [??] docs/产品/资讯模块/候选审核/20261106最终真人审核执行清单.md
+  [??] docs/产品/资讯模块/候选审核/20261106真人审核建议清单.bak-20261106-r2.md
+  [??] docs/产品/资讯模块/候选审核/20261106真人审核建议清单.bak-20261106-r3.md
+  [??] docs/产品/资讯模块/候选审核/20261106真人审核建议清单.bak-20261106.md
+  [??] docs/产品/资讯模块/候选审核/20261106真人审核建议清单.md
+  [??] docs/产品/资讯模块/候选审核/20261106资讯候选全量内容审查材料.md
+
+【B. 其他 docs 新增/变化】 共 8 项  {"??":8}
+  说明：与资讯模块归档无关，属独立新增（GenUI V2.0 设计资产/同步文件、本次分类评估报告）。
+  [??] docs/产品/GenUI-MCU观影助手-信息架构重设计V2.0.html
+  [??] docs/同步/2026-11-03-MCU观影助手GenUI-V2.0-R4-验收记录.md
+  [??] docs/同步/开发AI-V2.0待裁定-内容区留白问题反馈.md
+  [??] docs/同步/开发授权单-MCU观影助手GenUI-V2.0.md
+  [??] docs/同步/设计AI-GenUI观影助手V2.0设计方案与状态说明.md
+  [??] docs/同步/设计AI-V2.0裁定-留白方案与文案压缩及规格修订说明.md
+  [??] docs/技术/Git变更基准清单_20261106.txt
+  [??] docs/技术/docs目录分类评估_整体报告_20261106.txt
+
+【C. 遗留变更（非 docs）】 共 43 项  {"D":5,"M":6,"??":32}
+  说明：版本迭代/GenUI小工具、workspace/news、根级 png 与 _deploy 等历史未提交变化。
+  [D] lightweight-v10-deck.png
+  [D] v14-deck-full.png
+  [D] v141-deck-full.png
+  [M] workspace/news/pipeline/tools/captures-to-candidates.cjs
+  [D] 版本迭代/GenUI小工具/MCU观影助手-GenUI轻量版-V1.0.zip
+  [M] 版本迭代/GenUI小工具/genui-app-tools/build-data.cjs
+  [M] 版本迭代/GenUI小工具/genui-app-tools/e2e-visual.cjs
+  [D] 版本迭代/GenUI小工具/genui-app.zip
+  [M] 版本迭代/GenUI小工具/genui-app/index.html
+  [M] 版本迭代/GenUI小工具/genui-app/static/data.js
+  [M] 版本迭代/GenUI小工具/scratch/e2e-visual-result.json
+  [??] _deploy/
+  [??] r5-360-intro.png
+  [??] r5-360-item.png
+  [??] r5-intro-360-2.png
+  [??] r5-intro-360.png
+  [??] workspace/news/pipeline/tests/fixtures/
+  [??] workspace/news/pipeline/tests/test-capture-sampling.cjs
+  [??] 版本迭代/GenUI小工具/MCU观影助手-GenUI-V2.0实施报告.md
+  [??] 版本迭代/GenUI小工具/MCU观影助手.zip
+  [??] 版本迭代/GenUI小工具/V2.0实施日志.md
+  [??] 版本迭代/GenUI小工具/genui-app-builder-latest.zip
+  [??] 版本迭代/GenUI小工具/genui-app-builder-new/
+  [??] 版本迭代/GenUI小工具/genui-app/index.html.bak-pre-spacing-fix
+  [??] 版本迭代/GenUI小工具/scratch/tmp-r5-verify.cjs
+  [??] 版本迭代/GenUI小工具/scratch/tmp-spacing-verify.cjs
+  [??] 版本迭代/GenUI小工具/scratch/tmp-vw.cjs
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-doomsday-360.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-doomsday-414.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-doomsday-item-360.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-doomsday-item-414.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-intro-360.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-intro-414.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-item-360.png
+  [??] 版本迭代/GenUI小工具/scratch/visual-v2-item-414.png
+  [??] 版本迭代/GenUI小工具/screenshots/R5-介绍页-360.png
+  [??] 版本迭代/GenUI小工具/screenshots/R5-介绍页-414.png
+  [??] 版本迭代/GenUI小工具/v2.0-R5-修订稿-20261105/
+  [??] 版本迭代/GenUI小工具/v2.0-R5-修订稿/
+  [??] 版本迭代/GenUI小工具/v2.0-候选-20261103-R4/
+  [??] 版本迭代/GenUI小工具/v2.0-提审-20261103/
+  [??] 版本迭代/GenUI小工具/外宣物料/
+  [??] 版本迭代/GenUI小工具/独立实测截图-20261103/
+
+========================================================
+【复核要点】
+  1. 97 个 D = 92（归档旧扁平）+ 5（遗留：3 个根 png + 2 个 GenUI zip）。
+  2. 8 个 M = 2（归档：采集清单 README/今日待审核）+ 6（遗留：news 工具 + GenUI 小工具）。
+  3. 59 个 ?? = 20（归档日期目录/候选审核/README）+ 7（其他 docs）+ 32（遗留）。
+  4. 未提交新文件实际用途：见 B 类（GenUI 设计资产/同步/分类报告）与 C 类（GenUI 小工具迭代产物）。
+  5. 本清单为只读快照；按 V1.0 决策 #5，暂不执行 Git commit。

@@ -1,0 +1,101 @@
+<style>
+    .vc-radio-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-radio-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-radio-group {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+    }
+
+    /* Radio 基础样式 */
+    .vc-radio {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+        gap: 8px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .vc-radio:focus,
+    .vc-radio:active {
+        outline: none;
+    }
+
+    .vc-radio-input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        outline: none;
+    }
+
+    .vc-radio-input:focus,
+    .vc-radio-input:active {
+        outline: none;
+    }
+
+    .vc-radio-box {
+        position: relative;
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--cos-color-border);
+        border-radius: 50%;
+        background-color: var(--cos-color-bg);
+        transition: all 0.2s;
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+    .vc-radio-input:checked + .vc-radio-box {
+        border-color: var(--cos-color-bg-primary);
+    }
+
+    .vc-radio-input:checked + .vc-radio-box::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--cos-color-bg-primary);
+    }
+
+    .vc-radio-text {
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        color: var(--cos-color-text);
+        cursor: pointer;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="vc-radio-section">
+    <div class="vc-radio-group">
+        <label class="vc-radio">
+            <input type="radio" name="vc-radio" class="vc-radio-input" value="option1" checked />
+            <span class="vc-radio-box"></span>
+            <span class="vc-radio-text">选项 1</span>
+        </label>
+        <label class="vc-radio">
+            <input type="radio" name="vc-radio" class="vc-radio-input" value="option2" />
+            <span class="vc-radio-box"></span>
+            <span class="vc-radio-text">选项 2</span>
+        </label>
+        <label class="vc-radio">
+            <input type="radio" name="vc-radio" class="vc-radio-input" value="option3" />
+            <span class="vc-radio-box"></span>
+            <span class="vc-radio-text">选项 3</span>
+        </label>
+    </div>
+</div>

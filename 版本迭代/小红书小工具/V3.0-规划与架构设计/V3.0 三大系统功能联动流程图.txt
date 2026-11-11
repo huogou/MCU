@@ -1,0 +1,224 @@
+# V3.0 三大系统功能联动流程图
+
+> 版本：V1.1　日期：2026-11-10　状态：规划稿 · 收口修订 · 待 ChatGPT 复审
+> 配套：《MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.1》《V3.0 用户状态与数据结构设计》
+> V1.1 变更：A/B/C 流程的每一步**改用 V1.1 七个统一业务方法名与字段名**（与数据结构文档 §2/§4 完全一致）；新增 §4「八类重复/异常场景处理矩阵」并嵌入流程图分支。
+> **全部为流程设计，未实现、未测试。**
+
+---
+
+## 0. 关联文件索引
+
+| 类别 | 文件 | 绝对路径 |
+|---|---|---|
+| 主文档 | 产品需求与架构设计 V1.1 | `D:\SEO\发挥余热\漫威电影宇宙导航\版本迭代\小红书小工具\V3.0-规划与架构设计\MCU ATLAS 小红书 V3.0 产品需求与架构设计 V1.1.txt` |
+| 数据契约 | 用户状态与数据结构设计 V1.1 | `…\V3.0-规划与架构设计\V3.0 用户状态与数据结构设计.txt` |
+| 配套 | 功能模块与优先级清单 / 平台能力与技术风险清单 | `…\V3.0-规划与架构设计\` 同名 V1.1 文件 |
+| 汇总 | 收口修订记录 / 未解决风险清单 | `…\V3.0-规划与架构设计\V3.0 收口修订记录 V1.1.txt`、`…\V3.0 未解决风险与待确认事项清单.txt` |
+| 历史稿 | V1.0 五份 | `…\V3.0-规划与架构设计\附件\V1.0历史稿\` |
+
+---
+
+## 1. 数据操作符号约定（与数据结构文档一致）
+
+```
+R  = 只读内容数据：CONTENT / CHARS / RELS / ROUTES / A5 / CAMPS / QUIZ(data.js 构建期注入)
+W  = 经 MCUUser 业务方法写入（唯一路径：方法 → update() → 规范化 → 持久化 → emit）
+E  = emit 通知（订阅者只读刷新：首页 / 进度页 / 档案 / 路线 / 路径编排）
+七个方法：addToWant / removeFromWant / markWatched / setCurrentRoute /
+          recordQuizResult / unlockAchievement / addRecentExplore
+写入目标字段：want / watched / currentRoute / quiz.scores / achievements / recentExplore /
+              shareRecords（分享动作）
+禁止：视图直接调用 writeRaw / setStorage / localStorage.setItem / 直接改 cache
+```
+
+> 说明：流程图中的 `W: 方法名(参数)` 表示「调用该方法」，其内部的校验、重复处理、失败降级与通知见数据结构文档 §4.2；**不再写「W: USER.xxx.push」这类旁路写法**。
+
+---
+
+## 2. 路径 A · 英雄探索 → 观影计划
+
+### 流程图
+```
+[首页·探索区] ──▶ [F2 宇宙节点]
+                      │ R: CHARS / CONTENT（按 cn/en 匹配「钢铁侠」）
+                      ▼
+                 [角色详情: tony]
+                      │ R: CHARS.first → CONTENT；R: CONTENT.chars（共演关联，P1 轻量关联）
+                      │ W: addRecentExplore({type:'character', id:'tony', at})  ── [X1 重复探索]
+                      ▼
+                 [关联作品列表]
+                      │ R: CONTENT / RELS(why)
+                      │ 用户点「加入想看」
+                      ▼
+        ┌───────────────────────────┐
+        │ W: addToWant(contentId)   │◀── [X1 重复加入想看] → changed:false，不写盘
+        │  校验：id∈CONTENT、未 watched│
+        └───────────┬───────────────┘
+                    │ E(['want']) → 首页想看数刷新
+                    ▼
+        [可选] W: setCurrentRoute(routeId)   ◀── [X3 路线切换][X4 位置失效]
+                    │
+                    ▼ 用户后续在路线/详情标记已看
+        ┌───────────────────────────┐
+        │ W: markWatched(key)       │◀── [X2 重复标记已看] → 幂等，不覆盖原时间
+        └───────────┬───────────────┘
+                    │ E(['watched','want'])
+                    ▼ 派生（不落库）
+        [首页进度% / 路线进度条 / currentRoute.position 重算]
+                    │
+                    ▼ [X7 Storage 写入失败] → 降级或 memory，UI 提示
+```
+
+### 逐步读取 / 写入表
+| 步 | 动作 | 读取 | 写入（方法） | 通知 |
+|---|---|---|---|---|
+| A1 | 搜「钢铁侠」 | R: CHARS、CONTENT | — | — |
+| A2 | 记录探索 | — | W: `addRecentExplore({type,id,at})` | E(['recentExplore']) |
+| A3 | 看角色/共演关联 | R: CHARS.first、CONTENT.chars | — | — |
+| A4 | 看关联作品 | R: CONTENT、RELS | — | — |
+| A5 | 加入想看 | R: CONTENT（校验） | W: `addToWant(contentId)` | E(['want']) |
+| A5' | 加入路线 | R: ROUTES/A5（校验） | W: `setCurrentRoute(routeId, position?)` | E(['currentRoute']) |
+| A6 | 标记已看 | R: 分季键规则 | W: `markWatched(key)` | E(['watched','want']) |
+| A7 | 派生展示 | R: watched | — | 订阅者只读刷新 |
+
+---
+
+## 3. 路径 B · 观影计划 → 互动挑战
+
+### 流程图
+```
+[首页·观影区] ──▶ [F6 复联5补课专题]
+                      │ R: A5.core/full + UPCOMING(档期) + CONTENT
+                      │ W: setCurrentRoute('a5-core')  ── [X3 路线切换][X4 位置失效]
+                      ▼
+        [路线节点列表]（待看高亮：R: want + watched 派生）
+                      │ 点「标记已看」
+                      ▼
+        ┌───────────────────────────┐
+        │ W: markWatched(key)       │◀── [X2 重复标记已看]
+        └───────────┬───────────────┘
+                    │ E(['watched','want'])；完成度由 routeProgress(watched) 派生
+                    ▼
+        [进度达阈值 / 用户主动] ──▶ [基础离线知识问答 P1]
+                      │ R: QUIZ(按 routeId + quizVersion) + 题目关联的 CONTENT/CHARS
+                      ▼ 提交答案
+        ┌───────────────────────────────────────────────────┐
+        │ W: recordQuizResult({quizId,quizVersion,topic,     │
+        │      correct,total,at})                            │◀── [X5 成绩重复提交]
+        │  校验 0≤correct≤total；quizId/quizVersion 非空      │
+        └───────────┬───────────────────────────────────────┘
+                    │ E(['quiz'])；bestStreak 由 scores 派生重算
+                    ▼ 成就规则判定
+        ┌───────────────────────────┐
+        │ W: unlockAchievement(id)  │◀── [X6 成就重复解锁]（不覆盖原 at）
+        └───────────┬───────────────┘
+                    │ E(['achievements'])
+                    ▼
+        [F4 基础分享能力] → W: shareRecords 记录 {cardType,at}
+                    │ （生成卡片不依赖 shareRecords；字段精简见数据结构 §2.2）
+                    ▼
+        writeTempFile → saveImageToPhotosAlbum / postNote（端能力，真机未验证）
+```
+
+### 逐步读取 / 写入表
+| 步 | 动作 | 读取 | 写入（方法） | 通知 |
+|---|---|---|---|---|
+| B1 | 进专题 | R: A5、UPCOMING、CONTENT | W: `setCurrentRoute(routeId)` | E(['currentRoute']) |
+| B2 | 看待看 | R: want、A5.items | — | — |
+| B3 | 标记已看 | — | W: `markWatched(key)` | E(['watched','want']) |
+| B4 | 触发问答 | R: QUIZ、CONTENT/CHARS | — | — |
+| B5 | 提交成绩 | — | W: `recordQuizResult({...})` | E(['quiz']) |
+| B6 | 解锁成就 | R: 离线成就规则 | W: `unlockAchievement(id, at?)` | E(['achievements']) |
+| B7 | 分享卡 | R: 派生状态 | W: `shareRecords` 追加 `{cardType,at}` | E(['shareRecords']) |
+
+---
+
+## 4. 路径 C · 知识问答 → 角色探索
+
+### 流程图
+```
+[首页·互动区] ──▶ [基础离线知识问答]
+                      │ R: QUIZ(quizVersion) + 题目关联 CONTENT/CHARS
+                      ▼ 提交答案
+        W: recordQuizResult({quizId,quizVersion,topic,correct,total,at})  ◀── [X5]
+                      │ E(['quiz'])
+                      ▼ 解析 / 答错查看
+        [答题涉及的角色或作品 id] ──▶ [F2 详情]
+                      │ R: CHARS / CONTENT.chars / RELS
+                      │ W: addRecentExplore({type,id,at})  ◀── [X1]
+                      ▼
+        [相关资料] ──▶ 点「加入观影计划」
+        ┌───────────────────────────┐
+        │ W: addToWant(contentId)   │◀── [X1 重复加入想看]
+        │  或 W: setCurrentRoute(...)│◀── [X3][X4]
+        └───────────┬───────────────┘
+                    │ E(['want'] / ['currentRoute'])
+                    ▼
+        [回到路径 A 闭环] → markWatched → 派生进度
+```
+
+### 逐步读取 / 写入表
+| 步 | 动作 | 读取 | 写入（方法） | 通知 |
+|---|---|---|---|---|
+| C1 | 参加问答 | R: QUIZ、CONTENT/CHARS | — | — |
+| C2 | 提交成绩 | — | W: `recordQuizResult({...})` | E(['quiz']) |
+| C3 | 看涉及角色/作品 | R: CHARS、CONTENT、RELS | W: `addRecentExplore({...})` | E(['recentExplore']) |
+| C4 | 进详情 | R: CONTENT.chars → CHARS | — | — |
+| C5 | 加入观影计划 | R: ROUTES/A5 | W: `addToWant` / `setCurrentRoute` | E(['want']/['currentRoute']) |
+
+---
+
+## 5. 八类重复 / 异常场景处理矩阵（V1.1 新增，对应指令 §二.4）
+
+| 编号 | 场景 | 触发点 | 处理规则（与数据结构 §4 一致） | 涉及方法/字段 |
+|---|---|---|---|---|
+| **X1** | 重复加入想看 | `addToWant` 时 id 已在 want | 幂等返回 `changed:false`，不写盘、不 emit 成功通知 | `addToWant` / `want` |
+| **X2** | 重复标记已看 | `markWatched` 时 `isDone(key)` 为真 | 幂等，**不覆盖原 watched 时间**；取消用独立 `unmarkWatched` | `markWatched` / `watched` |
+| **X3** | 路线切换 | `setCurrentRoute` 传入新 routeId | 校验路线存在 → 写新 routeId；`position` **按新路线由 watched 重新派生**，不继承旧值 | `setCurrentRoute` / `currentRoute` |
+| **X4** | 路线位置失效 | 读取时 routeId 不在 `data.js` 或 `position` 越界 | 钳制到 [0, items.length-1] 或重算为第一个未完成索引；同一次 `update()` 内修正，**不删除整条 currentRoute**；路线完成度仍由 watched 派生 | `setCurrentRoute` / `currentRoute` |
+| **X5** | 答题成绩重复提交 | 相同 `(quizId, quizVersion, at)` | 幂等拒绝，不追加 `quiz.scores`；跨 `quizVersion` 允许并存 | `recordQuizResult` / `quiz.scores` |
+| **X6** | 成就重复解锁 | `unlockAchievement` 时 id 已存在 | 幂等 `changed:false`，**不覆盖原解锁时间**（映射 `id -> at` 天然去重） | `unlockAchievement` / `achievements` |
+| **X7** | Storage 写入失败 | `setStorage` reject / 全部后端失败 | xhs reject → 降级 localStorage（标记 `persisted:'degraded'`）；全失败 → memory 保当次操作、**内存不回滚** + `emit(persisted:false)` + UI 提示「仅本次会话有效」 | `MCUUser.update()` |
+| **X8** | 未知版本数据 | `MCUUser.init()` 读到 version 未知/缺失/>`2` | **保留原始数据、禁止自动写入覆盖、不清键**；内存以 `emptyData()` 只读运行，不持久化；UI 提示「已完整保留」；三条路径的浏览功能仍可用，但**不产生任何写入** | 迁移层（§3.2） |
+
+> X7 / X8 发生时，A/B/C 三条路径的**读流程仍可进行**，但 W 步骤结果需按矩阵降级；流程图已用 `[Xn]` 标注分支位置。
+
+---
+
+## 6. 闭环说明
+
+```
+        探索系统 ──A──▶ 观影系统 ──B──▶ 互动系统
+           ▲                                 │
+           └──────────── C ──────────────────┘
+```
+- 三条路径均通过 `MCU_USER` 单一状态贯通；任一写入经 `update()` → `emit` → 各视图只读刷新。
+- 所有 W 仅落在 `MCU_USER`（含 `shareRecords`）；内容数据全程只读。
+- 路径 B/C 依赖离线题库 `QUIZ`（**数据缺口，当前不存在**）；题库建成前 B5–B6、C1–C2 无法完整走通。
+
+---
+
+## 7. 验收用例（对应主文档验收标准 ④ / ⑤）
+
+| 用例 | 覆盖 | 断言 |
+|---|---|---|
+| TC-A1 / A2 | A | 搜角色→关联作品→加想看→首页想看数+1；标记已看→首页%与路线进度同步 |
+| TC-A-X1/X2/X3/X4 | A 异常 | 重复加入/重复标记不改变状态；路线切换重置 position；位置越界被钳制 |
+| TC-B1 / B2 | B | 复联5路线标记→触发问答→成绩写入→成就解锁；成就卡可导出 |
+| TC-B-X5/X6 | B 异常 | 重复提交/重复解锁不追加、不覆盖时间 |
+| TC-C1 | C | 问答→查看涉及角色→进详情→加观影计划 |
+| TC-X7 | 全局 | 写入失败降级路径与提示正确，内存状态不回滚 |
+| TC-X8 | 全局 | 未知版本数据被保留、未发生任何写入覆盖 |
+| TC-MIG | 迁移 | 幂等、回读校验通过后才清旧键、失败保留旧键 |
+
+---
+
+## 8. 置信度
+
+- 流程编排、读写边界、与 V1.1 数据结构的一致性：**高**（方法名/字段名逐项对齐）。
+- 八类异常场景处理规则：**中高**（设计自洽，**未实现、未测试**）。
+- 题库依赖判定：**高**（已确认全库无题库，标为阻塞）。
+- 真机端能力走通：**中**（端能力未真机验证，由用户本人验收）。
+
+*本文件为 V1.1 流程设计稿；完成后交 ChatGPT 复审，立即停止，不进入开发。*

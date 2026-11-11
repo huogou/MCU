@@ -1,0 +1,157 @@
+<style>
+    .vc-button-section {
+        margin-bottom: var(--cos-space-xxl);
+    }
+
+    .vc-button-section:last-of-type {
+        margin-bottom: var(--cos-space-none);
+    }
+
+    .vc-button-label {
+        font-size: calc(13px / var(--font-size-scale, 1));
+        margin-bottom: var(--cos-space-sm);
+        font-weight: var(--cos-font-medium);
+        color: var(--cos-color-text-minor);
+    }
+
+    .vc-button-group {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .vc-button-group .vc-button {
+        flex: 1;
+    }
+
+    /* Button 基础样式 */
+    .vc-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        text-decoration: none;
+        font-weight: var(--cos-font-medium);
+        -webkit-text-stroke: var(--cos-font-medium-stroke);
+        line-height: 1;
+        transition: all 0.2s;
+        white-space: nowrap;
+        vertical-align: middle;
+        -webkit-tap-highlight-color: transparent;
+        height: 40px;
+        padding: var(--cos-space-none) 20px;
+        font-size: calc(var(--cos-text-body) / var(--font-size-scale, 1));
+        border-radius: var(--cos-rounded-full);
+    }
+
+    /* 类型变体 */
+    .vc-button-primary {
+        background-color: var(--cos-color-bg-primary);
+        color: var(--cos-color-text-on-primary);
+    }
+
+    .vc-button-primary:hover:not(:disabled) {
+        background-color: var(--cos-color-bg-primary-hover);
+    }
+
+    .vc-button-primary:active:not(:disabled) {
+        opacity: 0.2;
+    }
+
+    .vc-button-plain {
+        background-color: var(--cos-color-bg-raised);
+        color: var(--cos-color-text-on-primary-light);
+    }
+
+    .vc-button-plain:active:not(:disabled) {
+        opacity: 0.2;
+    }
+
+    .vc-button.vc-button-disabled {
+        cursor: not-allowed;
+        opacity: var(--cos-opacity-40);
+    }
+
+    /* 加载状态 */
+    .vc-button-loading {
+        position: relative;
+        pointer-events: none;
+    }
+
+    .vc-button-loading::before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: vc-button-spin 0.8s linear infinite;
+    }
+
+    @keyframes vc-button-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .vc-button-loading .vc-button-text {
+        opacity: 0;
+    }
+</style>
+
+<!-- 基础按钮 -->
+<div class="vc-button-section">
+    <div class="vc-button-label">基础按钮</div>
+    <div class="vc-button-group">
+        <button class="vc-button vc-button-primary">
+            主要按钮
+        </button>
+        <button class="vc-button vc-button-plain">
+            弱按钮
+        </button>
+    </div>
+</div>
+
+<!-- 禁用状态 -->
+<div class="vc-button-section">
+    <div class="vc-button-label">禁用状态</div>
+    <div class="vc-button-group">
+        <button class="vc-button vc-button-plain vc-button-disabled" disabled>
+            禁用按钮
+        </button>
+    </div>
+</div>
+
+<!-- 加载状态 -->
+<div class="vc-button-section">
+    <div class="vc-button-label">加载状态</div>
+    <div class="vc-button-group">
+        <button class="vc-button vc-button-plain vc-button-loading">
+            <span class="vc-button-text">加载中</span>
+        </button>
+    </div>
+</div>
+
+<script>
+    // 基础交互功能
+    (function () {
+        // 点击事件示例
+        const buttons = document.querySelectorAll(
+            ".vc-button:not(:disabled)",
+        );
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", function (e) {
+                if (this.classList.contains("vc-button-loading")) {
+                    e.preventDefault();
+                    return;
+                }
+            });
+        });
+    })();
+</script>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MCU观影助手 · 信息架构重设计 V2.0（设计与规格）</title>
+<style>
+:root{
+  --ink:#1a1d23; --ink2:#4a4f58; --slim:#8a8f99; --line:#e8e5de; --bg:#f7f5f0; --paper:#ffffff; --gold:#b8860b;
+  --mono:'SF Mono',Menlo,Consolas,'Courier New',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#e9e6df;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;padding:32px 16px;color:var(--ink2)}
+h1{font-size:20px;color:var(--ink);margin-bottom:6px}
+h2{font-size:15px;color:var(--ink);margin:34px 0 10px}
+.sub{font-size:13px;color:var(--slim);margin-bottom:24px;line-height:20px}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;overflow-x:auto}
+.col{display:flex;flex-direction:column;align-items:center;gap:10px}
+.tag{font-size:12px;color:var(--ink2);font-weight:600}
+/* ===== 画布 mock（326/380 两档，1:1） ===== */
+.canvas{width:326px;height:326px;background:var(--paper);border-radius:14px;overflow:hidden;
+  box-shadow:0 4px 16px rgba(26,29,35,.10);display:flex;flex-direction:column;position:relative}
+.w380{width:380px;height:380px}
+.frozen{flex:none;height:99px;background:repeating-linear-gradient(-45deg,#efece5 0 8px,#e7e3da 8px 16px);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;border-bottom:1px dashed #cfcbc1}
+.frozen .ft{font-size:10px;color:#a09a8d;font-weight:600;letter-spacing:1px}
+.frozen .fs{font-family:var(--mono);font-size:9px;color:#b5afa2}
+/* ===== 产品内容区（深色档案馆 V2.0） ===== */
+.zone{flex:1;min-height:0;display:flex;flex-direction:column;background:#080B12;overflow:hidden;position:relative}
+.r-canvas{height:100%;display:flex;flex-direction:column;overflow:hidden;background:#080B12;color:#E8ECF4}
+.r-head{flex:none;padding:0 14px;min-height:36px}
+.r-kicker{font-family:var(--mono);font-size:10px;line-height:12px;color:#6E7889;letter-spacing:.5px}
+.r-kicker b{color:#F2B233;font-weight:400}
+.r-kicker .ph{color:#8E98AA}
+.r-title-row{display:flex;align-items:center;gap:6px;margin-top:2px;line-height:22px;min-height:22px}
+.r-title{font-size:16px;font-weight:700;color:#E8ECF4;white-space:nowrap;overflow:hidden;flex:1;min-width:0}
+.r-fields{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px;padding:0 14px;justify-content:space-between}
+.r-field{display:flex;gap:8px;line-height:16px}
+.r-flabel{flex:none;width:52px;font-size:10px;line-height:18px;color:#F2B233;background:#161D2B;
+  border:1px solid rgba(242,178,51,.35);border-radius:3px;text-align:center;align-self:flex-start}
+.r-fbody{flex:1;min-width:0;font-size:12px;line-height:16px;color:#E8ECF4}
+.r-fbody .kw{color:#F2B233;font-weight:600}
+.r-pager{flex:none;height:26px;display:flex;align-items:center;justify-content:center;gap:14px;
+  border-top:1px solid #2A3447;margin-top:2px;font-size:14px;color:#8E98AA;position:relative;overflow:hidden}
+.r-track{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#2A3447}
+.r-progress{position:absolute;left:0;bottom:0;height:2px;background:#F2B233;transition:width .2s ease}
+.r-pager .num{font-family:var(--mono);font-size:11px;font-weight:600;color:#E8ECF4;letter-spacing:.5px}
+.r-pager .btn{color:#F2B233;cursor:pointer;line-height:1}
+.r-pager .btn.dis{color:#4A5568;cursor:default}
+/* 徽章 */
+.badge{flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;
+  border-radius:3px;padding:0 5px;line-height:15px}
+.badge-core{background:#F2B233;color:#1A1206}
+.badge-reco{color:#F2B233;border:1px solid #F2B233;background:transparent}
+.badge-opt{color:#8E98AA;border:1px solid #2A3447;background:#1E2636}
+.seriesTag{flex:none;display:inline-flex;align-items:center;font-size:9px;line-height:13px;color:#F2B233;
+  border:1px solid #F2B233;border-radius:3px;padding:0 4px}
+/* Tabs mock */
+.tabs{display:flex;gap:6px;width:326px;background:rgba(0,0,0,.05);border-radius:10px;padding:3px}
+.tabs.w380{width:380px}
+.tabs div{flex:1;text-align:center;font-size:12.5px;padding:7px 0;border-radius:8px;color:var(--ink2)}
+.tabs .on{background:#fff;font-weight:600;color:var(--ink);box-shadow:0 1px 3px rgba(26,29,35,.10)}
+.bill{font-family:var(--mono);font-size:10px;color:var(--slim);line-height:17px;background:#fff;border-radius:8px;padding:7px 12px;width:326px}
+.bill.w380{width:380px}
+.bill b{color:var(--ink2)}
+/* 说明区 */
+.note{max-width:1120px;margin:32px auto 0;background:#fff;border-radius:10px;padding:18px 22px;font-size:13px;line-height:22px;overflow-x:auto}
+.note b{color:var(--ink)}
+.note code{font-family:var(--mono);font-size:12px;background:var(--bg);padding:1px 5px;border-radius:3px}
+.note h3{font-size:14px;color:var(--ink);margin:14px 0 6px}
+.note ul,.note ol{padding-left:20px}
+.note .risk{color:#a03a3a;font-weight:600}
+.note .ok{color:#2a7a5a;font-weight:600}
+table{border-collapse:collapse;width:100%;font-size:12.5px;margin:8px 0;word-break:break-word}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg);color:var(--ink);font-weight:600}
+td .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px;border:1px solid rgba(0,0,0,.15)}
+.copybox{background:var(--bg);border-radius:6px;padding:10px 14px;margin:6px 0;font-size:12.5px;line-height:19px}
+.copybox .src{color:var(--slim);font-family:var(--mono);font-size:10px}
+</style>
+</head>
+<body>
+
+<h1>MCU观影助手 · 信息架构重设计 V2.0（设计与规格）</h1>
+<p class="sub">
+产品定位升级：<b>看什么 · 为什么看 · 看完懂什么</b>——不只给顺序，还给理由与收获。<br>
+结构：每条路线 = 1 页路线介绍 + N 页作品（每页 1 部）｜全程无上下滚动，路线内左右滑动/翻页｜横向滑动不影响路线切换（切换走底部官方 Tabs）｜深色档案馆风格。<br>
+本稿为<b>设计与规格交付</b>：未修改 <code>genui-app/</code> 与 <code>h5/</code>，未 git 提交，未提审。数据来源均为母项目 <code>h5/data/*.js</code>（只读引用），未编造剧情联系。
+</p>
+
+<!-- ================= 一、信息架构 ================= -->
+<h2>一、信息架构与页面序列</h2>
+<div class="note">
+<p><b>核心结构</b>：每条路线独立成"一页介绍 + 逐部作品"的翻页序列，页码 = 路线内绝对进度。</p>
+<table>
+  <tr><th>路线</th><th>作品数</th><th>总页数</th><th>页码示例</th><th>数据源（只读）</th></tr>
+  <tr><td>新手入门</td><td>12</td><td>13</td><td>1/13 … 13/13</td><td><code>routes.js</code> → <code>newcomer.items</code></td></tr>
+  <tr><td>主线精选</td><td>18</td><td>19</td><td>1/19 … 19/19</td><td><code>routes.js</code> → <code>essential</code>（generator=mainline）</td></tr>
+  <tr><td>复联5补课</td><td>8（6 电影 + 洛基 S1/S2）</td><td>9</td><td>1/9 … 9/9</td><td><code>special-routes.js</code> → <code>avengers-doomsday.core.items</code></td></tr>
+</table>
+<p><b>页码语义</b>：第 1 页 = 路线介绍页；第 k 页（k≥2）= 该路线第 k−1 部作品。页码格式固定 <code>当前页/总页数</code>（等宽字体）。作品序号与总数由页头 kicker 承载（<code>ITEM 02/12</code> = 第 2 部 / 共 12 部；介绍页不显示作品序号）。<b>进度感知增强</b>：页码条底部内嵌 2px 金色细进度条（作品进度，介绍页 0%、末页 100%，不额外占高）；若平台交互能力允许，页码数字可作为跳转入口（点击展开"编号网格"轻量浮层直达任意作品页，实施前需验证平台容器浮层能力，默认不启用，见 §8.3）。页码条承载页进度，kicker 承载作品序号，进度条承载路线位置——三个维度互补不重复。</p>
+<p><b>翻页边界</b>：第 1 页左滑/点 ▶ → 第 2 页；第 1 页右滑/点 ◀ → 无操作（◀ 禁用态）；末页右滑/点 ◀ → 回倒数第 2 页；末页左滑/点 ▶ → 无操作（▶ 禁用态）。切换路线 → 立即渲染新路线第 1 页、页码重置。</p>
+</div>
+
+<!-- ================= 二、360 视口 ================= -->
+<h2>二、360px 视口（1:1 画布 326×326，内容区 227px）</h2>
+<div class="row">
+
+  <!-- 介绍页：新手入门 -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">— MCU WATCH ORDER · <b>新手入门</b></div>
+            <div class="r-title-row"><div class="r-title">路线介绍</div></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">适合谁</span><span class="r-fbody">完全没看过 MCU，或只零散看过一两部——这条路线就是为你准备的。</span></div>
+            <div class="r-field"><span class="r-flabel">为什么</span><span class="r-fbody">MCU 有 30 多部，全看门槛太高，中途弃剧的风险远大于"错过细节"的损失。这条路线只留 12 部，先把主干立住。</span></div>
+            <div class="r-field"><span class="r-flabel">怎么排</span><span class="r-fbody">按世界观建立顺序：起源 → 组队 → 裂痕 → 终局，每一步都在为下一步铺垫。</span></div>
+            <div class="r-field"><span class="r-flabel">看完获得</span><span class="r-fbody">看完这 12 部，你就能了解无限传奇的主干故事，并具备继续探索其他分支的基础。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:0%"></span><span class="btn dis">◀</span><span class="num">1 / 13</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">新手入门 · 路线介绍页（第 1/13 页）· ◀ 禁用</span>
+    <div class="bill">页头 36 + 4 块 156 + 页码条 26 = 218 ≤ 227 ✓<br>介绍页 4 块：适合谁 2行 / 为什么 3行 / 怎么排 2行 / 看完获得 2行</div>
+  </div>
+
+  <!-- 作品页：钢铁侠（必看） -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 01/12 · <span class="ph">PHASE 01</span> · 2008 · 电影</div>
+            <div class="r-title-row"><div class="r-title">钢铁侠</div><span class="badge badge-core">必看</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody">入坑第一站：起源故事不依赖任何前作，单看就是一个完整好故事。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①托尼如何成为钢铁侠 ②"复仇者计划"从何而来</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">片尾彩蛋的"复仇者计划"，在《复仇者联盟》中正式兑现。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:8.3%"></span><span class="btn">◀</span><span class="num">2 / 13</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">新手入门 · 作品页 01（第 2/13 页）· 必看徽章（实心金）</span>
+    <div class="bill">页头 36 + 4 个文字字段 156 + 页码条 26 = 218 ≤ 227 ✓<br>字段行高：理由 2行 32 + 作用 3行 48 + 懂 2行 32 + 关联 2行 32 + 间距 12 = 156<br>作品页信息 = 1 个推荐级别徽章（标题行内联）+ 4 个文字字段</div>
+  </div>
+
+  <!-- 作品页：黑豹（推荐） -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 10/12 · <span class="ph">PHASE 03</span> · 2018 · 电影</div>
+            <div class="r-title-row"><div class="r-title">黑豹</div><span class="badge badge-reco">推荐</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody">新手路线里少数的支线：不依赖前作、独立完整，把瓦坎达这块世界观拼图补全。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">完整建立瓦坎达这个国家。它在《无限战争》成为决战战场，又承接了黑豹传承。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①瓦坎达与振金科技 ②特查拉继承王位</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">关联《复仇者联盟3：无限战争》：瓦坎达是地球决战的战场。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:83.3%"></span><span class="btn">◀</span><span class="num">11 / 13</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">新手入门 · 作品页 10（第 11/13 页）· 推荐徽章（描边金）</span>
+    <div class="bill">推荐级来源：mainline=false 但被路线收录 → 路线精选逻辑赋「推荐」<br>徽章三级形态见颜色规范表</div>
+  </div>
+
+  <!-- 作品页：奇异博士2（主线精选） -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 16/18 · <span class="ph">PHASE 04</span> · 2022 · 电影</div>
+            <div class="r-title-row"><div class="r-title">奇异博士2：疯狂多元宇宙</div><span class="badge badge-core">必看</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody">承接《英雄无归》咒语失控的后果，多元宇宙的规则在这里被正式打破。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">第一次真正带观众穿越多个平行宇宙，也是旺达角色弧线的终点，情绪落点极重。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①多元宇宙如何被穿行 ②旺达的结局</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">关联《蚁人与黄蜂女：量子狂潮》：多元宇宙规则被打破后引出统领性威胁。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:88.9%"></span><span class="btn">◀</span><span class="num">17 / 19</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div>新手入门</div><div class="on">主线精选</div><div>复联5补课</div></div>
+    <span class="tag">主线精选 · 作品页 16（第 17/19 页）· 同一作品换路线换推荐理由</span>
+    <div class="bill">主线精选语境：理由取 <code>next.mainline.why</code>（承接英雄无归）<br>复联5补课语境下同一部将取 <code>kw「宇宙碰撞」</code> 作理由——同一作品不同路线不同理由</div>
+  </div>
+
+  <!-- 作品页：洛基 S1（剧集） -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 01/08 · <span class="ph">PHASE 04</span> · 2021 · 剧</div>
+            <div class="r-title-row"><div class="r-title">洛基 S1</div><span class="badge badge-core">必看</span><span class="seriesTag">剧</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody"><span class="kw">TVA / 时间线</span>：先懂 TVA 与神圣时间线，多元宇宙才有后续。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">多元宇宙故事的总开关。TVA 与"神圣时间线"的设定，是后续多元宇宙一切的源头。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①TVA 与神圣时间线 ②洛基的变体身份</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">下一部《洛基 S2》：多元宇宙正式开启。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:12.5%"></span><span class="btn">◀</span><span class="num">2 / 9</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div>新手入门</div><div>主线精选</div><div class="on">复联5补课</div></div>
+    <span class="tag">复联5补课 · 作品页 01（第 2/9 页）· 剧集「剧」标签 + kw 链条标签</span>
+    <div class="bill">洛基 S2 年份 2023 沿用 V1.0 已验收口径（build-data 覆盖表）<br>剧集无 next 字段 → 后续关联取自路线内下一站 kw / relations</div>
+  </div>
+
+  <!-- 作品页：神奇四侠（末页边界） -->
+  <div class="col">
+    <div class="canvas">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 326−99=227</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 08/08 · <span class="ph">PHASE 06</span> · 2025 · 电影</div>
+            <div class="r-title-row"><div class="r-title">神奇四侠：初露锋芒</div><span class="badge badge-core">必看</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody"><span class="kw">入口开启</span>：平行宇宙 Earth-828 登场，是复联5多宇宙汇合的关键一方。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">第六阶段的开篇。发生在独立的平行宇宙里，这四个角色是复联5多宇宙汇合的关键一方。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①Earth-828 复古未来世界 ②四位成员的异能组合</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">《蜘蛛侠：崭新之日》与本部一同为《复联5：毁灭之日》做汇流准备。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:100%"></span><span class="btn">◀</span><span class="num">9 / 9</span><span class="btn dis">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs"><div>新手入门</div><div>主线精选</div><div class="on">复联5补课</div></div>
+    <span class="tag">复联5补课 · 末页（第 9/9 页）· ▶ 禁用态</span>
+    <div class="bill">复联5表述边界：仅「多宇宙汇合关键一方 / 做汇流准备」层面（母项目已验证）<br>禁止写入任何未经官方确认的未上映剧情</div>
+  </div>
+</div>
+
+<!-- ================= 三、414 视口 ================= -->
+<h2>三、414px 视口（1:1 画布 380×380，内容区 281px）</h2>
+<div class="row">
+  <div class="col">
+    <div class="canvas w380">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 380−99=281</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">— MCU WATCH ORDER · <b>新手入门</b></div>
+            <div class="r-title-row"><div class="r-title">路线介绍</div></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">适合谁</span><span class="r-fbody">完全没看过 MCU，或只零散看过一两部——这条路线就是为你准备的。</span></div>
+            <div class="r-field"><span class="r-flabel">为什么</span><span class="r-fbody">MCU 有 30 多部，全看门槛太高，中途弃剧的风险远大于"错过细节"的损失。这条路线只留 12 部，先把主干立住。</span></div>
+            <div class="r-field"><span class="r-flabel">怎么排</span><span class="r-fbody">按世界观建立顺序：起源 → 组队 → 裂痕 → 终局，每一步都在为下一步铺垫。</span></div>
+            <div class="r-field"><span class="r-flabel">看完获得</span><span class="r-fbody">看完这 12 部，你就能了解无限传奇的主干故事，并具备继续探索其他分支的基础。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:0%"></span><span class="btn dis">◀</span><span class="num">1 / 13</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs w380"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">414 · 介绍页（第 1/13 页）</span>
+    <div class="bill w380">布局规则与 360 完全一致：字号/行高/行数上限/文案均不变<br>414 每行可容 24 字（360 为 19 字）→ 行数只减不增；富余高度沉入内容区底部</div>
+  </div>
+
+  <div class="col">
+    <div class="canvas w380">
+      <div class="frozen"><div class="ft">冻结区合计 99（勿改）</div><div class="fs">表头 45 + 间隙 10 + 操作区 44 · 380−99=281</div></div>
+      <div class="zone">
+        <div class="r-canvas">
+          <div class="r-head">
+            <div class="r-kicker">ITEM 01/12 · <span class="ph">PHASE 01</span> · 2008 · 电影</div>
+            <div class="r-title-row"><div class="r-title">钢铁侠</div><span class="badge badge-core">必看</span></div>
+          </div>
+          <div class="r-fields">
+            <div class="r-field"><span class="r-flabel">为什么看它</span><span class="r-fbody">入坑第一站：起源故事不依赖任何前作，单看就是一个完整好故事。</span></div>
+            <div class="r-field"><span class="r-flabel">它的作用</span><span class="r-fbody">整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。</span></div>
+            <div class="r-field"><span class="r-flabel">看完你会懂</span><span class="r-fbody">看懂：①托尼如何成为钢铁侠 ②"复仇者计划"从何而来</span></div>
+            <div class="r-field"><span class="r-flabel">后续关联</span><span class="r-fbody">片尾彩蛋的"复仇者计划"，在《复仇者联盟》中正式兑现。</span></div>
+          </div>
+          <div class="r-pager"><span class="r-track"></span><span class="r-progress" style="width:8.3%"></span><span class="btn">◀</span><span class="num">2 / 13</span><span class="btn">▶</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs w380"><div class="on">新手入门</div><div>主线精选</div><div>复联5补课</div></div>
+    <span class="tag">414 · 作品页 01（第 2/13 页）</span>
+    <div class="bill w380">内容区 281 ≥ 218：页面骨架高度不变，富余约 63px 由内容区底部吸收<br>两档同构 = 文案单一来源，验收口径一致</div>
+  </div>
+</div>
+
+<!-- ================= 四、状态与边界 ================= -->
+<h2>四、状态清单与边界行为</h2>
+<div class="note">
+<table>
+  <tr><th>#</th><th>状态</th><th>画布</th><th>Tabs</th><th>页码</th><th>◀ ▶ 按钮</th></tr>
+  <tr><td>1</td><td>默认进入</td><td>新手入门 · 路线介绍页</td><td>第 1 项激活</td><td>1/13</td><td>◀ 禁用 / ▶ 可用</td></tr>
+  <tr><td>2</td><td>介绍页（任意路线）</td><td>4 块介绍内容</td><td>对应项激活</td><td>1/N</td><td>◀ 禁用 / ▶ 可用</td></tr>
+  <tr><td>3</td><td>中间作品页</td><td>4 个文字字段完整 + 徽章</td><td>对应项激活</td><td>k/N</td><td>◀ ▶ 均可用</td></tr>
+  <tr><td>4</td><td>末页</td><td>最后一部作品</td><td>对应项激活</td><td>N/N</td><td>◀ 可用 / ▶ 禁用</td></tr>
+  <tr><td>5</td><td>按钮禁用态</td><td>—</td><td>—</td><td>—</td><td>opacity .25 + aria-disabled，点击/滑动 no-op</td></tr>
+  <tr><td>6</td><td>切换路线</td><td>立即渲染新路线介绍页（无动画）</td><td>激活项跟随</td><td>重置 1/N′</td><td>◀ 禁用</td></tr>
+  <tr><td>7</td><td>重置（表头刷新钮）</td><td>回新手入门介绍页</td><td>第 1 项激活</td><td>1/13</td><td>◀ 禁用</td></tr>
+  <tr><td>8</td><td>暗色外壳</td><td>画布恒为深色 #080B12；外壳边框沿用官方 <code>.cos-dark</code> 0.5px token</td><td>—</td><td>—</td><td>—</td></tr>
+  <tr><td>9</td><td>翻页冷却中</td><td>快速连滑/连点被 300ms busy 锁忽略，锁释放后恢复</td><td>—</td><td>—</td><td>与滑动共用同一 busy 锁</td></tr>
+  <tr><td>10</td><td>控制台</td><td>零 JS 报错；首帧不依赖容器尺寸测量（沿用 V1.0 立即 render 策略）</td><td>—</td><td>—</td><td>—</td></tr>
+</table>
+<p><b>边界行为</b>：第 1 页右滑 / ◀ → no-op（无动画、无翻页、不打点）；末页左滑 / ▶ → no-op；翻页动画 <code>translateX</code> 200ms ease-out；切换路线时 <code>transition:none</code> 立即回位第 1 页。</p>
+</div>
+
+<!-- ================= 五、布局账单 ================= -->
+<h2>五、360 / 414 布局账单（组件尺寸与间距）</h2>
+<div class="note">
+<h3>5.1 画布骨架（冻结件 + 产品内容区）</h3>
+<table>
+  <tr><th>视口</th><th>卡片（1:1）</th><th>冻结区合计</th><th>细分（官方冻结件）</th><th>内容区</th></tr>
+  <tr><td>360</td><td>326 × 326</td><td><b>99px</b></td><td>表头 45 + 间隙 10 + 操作区（Tabs）44</td><td><b>227px</b>（326−99）</td></tr>
+  <tr><td>414</td><td>380 × 380</td><td><b>99px</b></td><td>表头 45 + 间隙 10 + 操作区（Tabs）44</td><td><b>281px</b>（380−99）</td></tr>
+</table>
+<p><b>口径统一说明（V2.0-R1 修正）</b>：冻结区域合计恒为 <code>99px</code>（= 官方表头 45px + 表头与操作区间隙 10px + 操作区 Tabs 44px，依据 V1.0 浏览器实测口径），内容区 = 卡高 − 99。此前"冻结表头 45px / 操作区 ≈46px"为细分值、与 99px 合计并不矛盾，但易误读，现统一以"合计 99px + 三项细分"为唯一口径，360/414 两档一致。</p>
+<h3>5.2 产品内容区内部分配（两档一致，360 为约束口径）</h3>
+<table>
+  <tr><th>模块</th><th>高度</th><th>内容</th></tr>
+  <tr><td>页头 <code>.r-head</code></td><td>36px</td><td>kicker 10px/12px + 标题行 16px/22px（含徽章/剧标签内联）</td></tr>
+  <tr><td>字段/介绍区 <code>.r-fields</code></td><td>156px</td><td>4 行字段块 + 4px 间距 ×3（见 5.3 / 5.4）</td></tr>
+  <tr><td>页码条 <code>.r-pager</code></td><td>26px</td><td>◀ 当前页/总页数 ▶（居中，24px 主行）+ 底部内嵌 2px 金色作品进度条（轨道 #2A3447 / 填充 #F2B233）；顶部 1px hairline #2A3447。进度条不额外占高。</td></tr>
+  <tr><td><b>合计</b></td><td><b>218px（实测约 225px）</b></td><td>≤ 227（360）✓ 余 2–9px；≤ 281（414）✓ 余 56–63px，富余由字段区块间距弹性吸收（V2.0-R4：间距 min 4px、字段区纵向铺满；浏览器实测 360 档间距 6–16px、414 档 24–34px，字段自然行数越少间距越大）。<b>行距度量浮差说明</b>：12px/16px 字体在 Chrome 实测行高浮差约 +7px（字段区 156→163），360 档为紧约束口径——实施时以浏览器实测为准，若溢出优先将字段间距收紧至 4px（回收余量）并保持行数上限不变。</td></tr>
+</table>
+<h3>5.3 作品页字段区（156px = 4 个文字字段 + 间距；推荐级别徽章位于标题行内联）</h3>
+<table>
+  <tr><th>字段（用户侧标签）</th><th>行数上限</th><th>行高（12px/16px）</th><th>高度</th></tr>
+  <tr><td>为什么看它（推荐理由）</td><td>2</td><td>16px</td><td>32px</td></tr>
+  <tr><td>它的作用（剧情作用）</td><td>3</td><td>16px</td><td>48px</td></tr>
+  <tr><td>看完你会懂（信息增量）</td><td>2</td><td>16px</td><td>32px</td></tr>
+  <tr><td>后续关联</td><td>2</td><td>16px</td><td>32px</td></tr>
+  <tr><td>字段间距 gap</td><td colspan="3">弹性（min 4px × 3）；字段区可用高 165/219px，富余由弹性间距吸收、字段区纵向铺满（V2.0-R4）</td></tr>
+  <tr><td><b>合计</b></td><td colspan="3"><b>156px（内容自然高）</b></td></tr>
+</table>
+<h3>5.4 介绍页区块区（156px = 4 块 + 间距，同构）</h3>
+<table>
+  <tr><th>块（用户侧标签）</th><th>行数上限</th><th>高度</th></tr>
+  <tr><td>适合谁</td><td>2</td><td>32px</td></tr>
+  <tr><td>为什么</td><td>3</td><td>48px</td></tr>
+  <tr><td>怎么排</td><td>2</td><td>32px</td></tr>
+  <tr><td>看完获得</td><td>2</td><td>32px</td></tr>
+  <tr><td>块间距 gap</td><td colspan="2">弹性（min 4px × 3）；与作品页字段区间构，富余由弹性间距吸收铺满（V2.0-R4）</td></tr>
+  <tr><td><b>合计</b></td><td colspan="2"><b>156px（内容自然高）</b></td></tr>
+</table>
+<p><b>行内标签布局</b>：标签列固定宽 52px（10px 金字小标签，含描边），正文右侧最小宽 0 可换行；内容宽度 360 = 326−28(左右14px 内边距)−52−8(gap) = <b>238px → 19 全角字/行</b>；414 = 380−28−52−8 = <b>292px → 24 字/行</b>。两档行数上限一致，414 字数更宽裕，行数只减不增。</p>
+</div>
+
+<!-- ================= 六、字体层级与字数预算 ================= -->
+<h2>六、字体层级与字数预算（禁止缩小字体/压缩间距）</h2>
+<div class="note">
+<table>
+  <tr><th>层级</th><th>字号</th><th>行高</th><th>字重</th><th>字体</th><th>用途与预算（360 口径）</th></tr>
+  <tr><td>页面标题（片名/路线名）</td><td>16px</td><td>22px</td><td>700</td><td>系统栈</td><td>单行完整，≤16 字（实测最长 12 字「奇异博士2：疯狂多元宇宙」✓）</td></tr>
+  <tr><td>kicker</td><td>10px</td><td>12px</td><td>400</td><td>等宽栈</td><td>模板串整行 ≤298px（含作品序号/总数如 <code>ITEM 02/12</code>，实测样例 ≈250px ✓）</td></tr>
+  <tr><td>字段/块标签、徽章</td><td>10px</td><td>18px</td><td>600</td><td>系统栈</td><td>标签固定宽 52px；徽章固定内边距 0 5px</td></tr>
+  <tr><td><b>字段正文（可读底线）</b></td><td><b>12px</b></td><td><b>16px</b></td><td>400</td><td>系统栈</td><td><b>19 字/行；1 行 ≤18、2 行 ≤36、3 行 ≤54（含标点）</b></td></tr>
+  <tr><td>页码</td><td>11px</td><td>26px</td><td>600</td><td>等宽栈</td><td><code>3/19</code> ≈28px 宽</td></tr>
+  <tr><td>翻页箭头</td><td>14px</td><td>26px</td><td>400</td><td>系统栈</td><td>◀ ▶</td></tr>
+</table>
+<p><b>字段字数上限表（360 约束口径，全部按预算写满、UI 永不截断）</b>：</p>
+<table>
+  <tr><th>字段/块</th><th>行数</th><th>上限（19 字/行）</th><th>截断策略</th></tr>
+  <tr><td>为什么看它（推荐理由）</td><td>2</td><td>≤36 字</td><td rowspan="6"><b>零省略号</b>：超预算由 build-data 长度断言在构建期报错，UI 不做 truncate 兜底——从机制上根除文字截断</td></tr>
+  <tr><td>它的作用（剧情作用）</td><td>3</td><td>≤54 字</td></tr>
+  <tr><td>看完你会懂（信息增量）</td><td>2</td><td>≤36 字（句式「看懂：①…②…」，2 要点各 ≤15 字）</td></tr>
+  <tr><td>后续关联</td><td>2</td><td>≤36 字（1 条主关联：作品名 + 一句话原因）</td></tr>
+  <tr><td>介绍页 4 块</td><td>2–3</td><td>适合谁 ≤36 / 为什么 ≤54 / 怎么排 ≤36 / 看完获得 ≤39（V2.0-R3 文案口径，含半角数字视觉压缩，实测 2 行成立）</td></tr>
+  <tr><td>页面标题 / 徽章 / 页码</td><td>单行</td><td>标题 ≤16 字 / 徽章 ≤4 字 / 页码固定格式</td></tr>
+</table>
+<p><span class="risk">硬约束说明</span>：正文 ≥12px、行高 16px（行高比 1.33，V2.0-R4 澄清：以像素值 12/16 为准）、卡片间距 ≥4px；不得为塞内容缩小字号或使用负间距；字段净区高度即硬预算（V1.4.1 曾因字段正文被卡片底边裁掉被驳回，本次以"预算制 + 构建期断言"双保险）。</p>
+<h3>6.1 12px 可读性实测复核（V2.0-R1，依据 §16 测试边界）</h3>
+<ul>
+  <li><b>实测方法</b>：本地 HTTP 服务 + Chromium，模拟手机视口（360×640 / 375×667 / 414×896）渲染本设计稿 mock；对 8 个 mock 画布逐字段测量计算样式（font-size / line-height）与文本实际行数。</li>
+  <li><b>实测结果</b>：正文 12px / 行高 16px 在全部 mock 中按预期渲染；360 口径下每行实测容纳 19 全角字（内容宽 238px ÷ 12px），字段行数全部 ≤ 预算（2/3/2/2）；360 内容区 227px 内骨架实测 225px（余 2px）；375/390/414 视口对应内容区 242/257/281px，逐级更宽裕。</li>
+  <li><b>结论</b>：12px 为当前布局约束（1 页 1 部 + 4 个文字字段 + 1 个推荐级别徽章 + 2–3 行 + 无滚动 + 不截断）下的合理下限——字段区预算 156px（实测 163px）由 12px/16px 行距决定；若升为 13px，行高需 18px、字段区 +12~14px，360 档必然溢出，需砍字段行数（信息增量/后续关联降为 1 行）——代价大于收益，故保留 12px。<b>注意</b>：此为设计 Mock 级实测结论，真机字体度量差异将在平台级复核验证（§16）。</li>
+</ul>
+</div>
+
+<!-- ================= 七、颜色 ================= -->
+<h2>七、颜色 Token 与推荐级别徽章</h2>
+<div class="note">
+<h3>7.1 颜色 Token（<code>.mcu-route-canvas</code> 作用域内声明，禁止定义 <code>--cos-*</code>）</h3>
+<table>
+  <tr><th>Token</th><th>值</th><th>用途</th></tr>
+  <tr><td><code>--mcu-bg</code></td><td><span class="sw" style="background:#080B12"></span><code>#080B12</code></td><td>画布根背景（档案馆深空黑）</td></tr>
+  <tr><td><code>--mcu-surface</code></td><td><span class="sw" style="background:#161D2B"></span><code>#161D2B</code></td><td>字段标签底</td></tr>
+  <tr><td><code>--mcu-surface-2</code></td><td><span class="sw" style="background:#1E2636"></span><code>#1E2636</code></td><td>补充徽章底、禁用元素底</td></tr>
+  <tr><td><code>--mcu-line</code></td><td><span class="sw" style="background:#2A3447"></span><code>#2A3447</code></td><td>页码条 hairline、补充徽章描边</td></tr>
+  <tr><td><code>--mcu-gold</code></td><td><span class="sw" style="background:#F2B233"></span><code>#F2B233</code></td><td>唯一强调：kicker 关键段、字段标签、徽章、可用态按钮</td></tr>
+  <tr><td><code>--mcu-gold-btn-text</code></td><td><code>#1A1206</code></td><td>金底上的文字（必看徽章）</td></tr>
+  <tr><td><code>--mcu-text</code></td><td><span class="sw" style="background:#E8ECF4"></span><code>#E8ECF4</code></td><td>片名、正文、页码</td></tr>
+  <tr><td><code>--mcu-text-sub</code></td><td><span class="sw" style="background:#8E98AA"></span><code>#8E98AA</code></td><td>次文（补充徽章文字）</td></tr>
+  <tr><td><code>--mcu-text-weak</code></td><td><span class="sw" style="background:#6E7889"></span><code>#6E7889</code></td><td>弱文（kicker 基底段、禁用态）</td></tr>
+  <tr><td><code>--mcu-p1…p6</code></td><td>六色锚点</td><td>#5B8DEF / #28B487 / #F0A932 / #8B6FE8 / #E8483F / #C25B8E（仅 kicker 的 PHASE 段着色）</td></tr>
+</table>
+<h3>7.2 推荐级别徽章（语义 + 形态双区分）</h3>
+<table>
+  <tr><th>级别</th><th>数据判定</th><th>底</th><th>文字</th><th>描边</th><th>形态</th></tr>
+  <tr><td>必看</td><td>电影 <code>mainline:true</code>；剧集 <code>importance:'core'</code></td><td><code>#F2B233</code></td><td><code>#1A1206</code></td><td>无</td><td><b>实心金</b></td></tr>
+  <tr><td>推荐</td><td>电影 <code>mainline:false</code> 但被任一 V2.0 路线收录；剧集 <code>importance:'recommended'</code></td><td>透明</td><td><code>#F2B233</code></td><td>1px <code>#F2B233</code></td><td><b>描边金</b></td></tr>
+  <tr><td>补充</td><td>剧集 <code>importance:'optional'</code>；未被路线收录的支线</td><td><code>#1E2636</code></td><td><code>#8E98AA</code></td><td>1px <code>#2A3447</code></td><td><b>中性面</b></td></tr>
+</table>
+<p><span class="risk">口径说明</span>：本轮三条路线的实际分布为「新手入门 11 必看 + 1 推荐（黑豹）；主线精选 18 必看；复联5补课 5 必看 + 3 推荐」——「补充」级在本轮数据中不出现（无 optional 剧集入选），此为数据事实非缺陷；设计层已支持三级形态，若产品要求强制可见补充级需另定规则（见待拍板项）。</p>
+<p><span class="risk">金色决策</span>：深色背景采用母项目统一金 <code>#F2B233</code>（MCU 项目总览 §8.1），区别于 V1.0 浅色稿的档案金 <code>#b8860b</code>——深底上 #F2B233 对比度更优且与三端 Token 一致。</p>
+</div>
+
+<!-- ================= 八、交互规则 ================= -->
+<h2>八、交互规则（滑动 / 按钮 / 切换 / 重置 / 打点 / 无障碍）</h2>
+<div class="note">
+<h3>8.1 左右滑动翻页（画布内，仅绑定 <code>.mcu-page-track</code>）</h3>
+<ul>
+  <li>事件：Pointer Events（pointerdown → <code>setPointerCapture</code> → pointermove 累计 → pointerup 判定）；降级 touchstart/touchmove/touchend。</li>
+  <li><code>touch-action:none</code> 于轨道元素：从机制上禁用浏览器水平手势与纵向滚动（硬约束 1/9 双保险）。</li>
+  <li>判定阈值：<code>|Δx| ≥ 24px 且 |Δx| ≥ 1.5×|Δy|</code>（方向锁定）；Δx&lt;0 → 下一页，Δx&gt;0 → 上一页。</li>
+  <li>边界：首页右滑 / 末页左滑 → no-op（不翻页、不打点、无动画）。</li>
+  <li>防抖：翻页后 300ms busy 锁，锁内忽略一切滑动与按钮触发；锁释放后反向滑动立即生效。</li>
+</ul>
+<h3>8.2 手势与路线切换隔离（硬约束 7）</h3>
+<ul>
+  <li>翻页监听只挂载画布轨道；操作区 Tabs 不绑定任何平移逻辑，只响应 tap/键盘。</li>
+  <li>画布 <code>touch-action:none</code> 使横向手势无法冒泡/穿透到操作区——<b>事件隔离 + 物理隔离双保险</b>，滑动永远不会触发路线切换。</li>
+</ul>
+<h3>8.3 上一页/下一页按钮与进度条</h3>
+<ul>
+  <li>形态 <code>[◀] [3/13] [▶] + 底部 2px 金色进度条</code>；◀ ▶ 为 button 语义，<code>aria-label="上一页/下一页"</code>，键盘 Enter/Space 触发；点击与滑动共用 busy 锁。</li>
+  <li>禁用态（首/末页）：<code>opacity:.25</code> + <code>aria-disabled="true"</code> + 事件 guard 返回（不阻断 pointer-events，保证 aria 可读）。</li>
+  <li><b>作品进度条</b>：轨道 <code>.mcu-pager-track</code>（全宽 2px，#2A3447）+ 填充 <code>.mcu-pager-progress</code>（#F2B233，宽度 = 作品进度 (k−1)/N；介绍页 0%、末页 100%），<code>transition: width .2s</code>，内嵌于 26px 页码条、不额外占高。</li>
+  <li><b>跳转入口（条件功能，默认不启用）</b>：页码数字（如 3/13）设为可点击（button + aria-label"打开作品目录"），点击展开轻量浮层——作品编号网格（01…N 编号方块，单屏内不滚动、不触碰冻结外壳），点编号直达对应页。启用前置：需在实施阶段验证 GenUI 平台容器内浮层交互可用（真机 + genui preview）；若平台能力不允许或影响审核，保持纯进度展示即可，不阻塞 P0。</li>
+</ul>
+<h3>8.4 路线切换与重置</h3>
+<ul>
+  <li>Tabs（官方 <code>.vc-tabs-*</code> 结构零改动）：点击 / Enter / Space → 渲染该路线第 1 页 + 页码重置 <code>1/N</code>；沿用 V1.0 键盘实现。</li>
+  <li>重置（表头官方 refresh 钮）：回「新手入门」第 1 页 + Tabs 激活第 1 项 + 官方旋转动画（沿用 <code>spinResetIcon</code>）。</li>
+  <li>打点：沿用 <code>sendLog</code>，覆盖路线切换 / 翻页 / 重置（area 建议 <code>operation</code> / <code>page</code>）。</li>
+</ul>
+<h3>8.5 无障碍</h3>
+<ul>
+  <li>轨道 <code>role="region"</code> + <code>aria-label</code>；页码容器 <code>aria-live="polite"</code>，翻页播报「第 3 页，共 13 页」；画布不抢占 Tab 焦点（轨道 <code>tabindex="-1"</code>）。</li>
+</ul>
+</div>
+
+<!-- ================= 九、类名清单 ================= -->
+<h2>九、组件类名清单（供开发照抄）</h2>
+<div class="note">
+<p><b>保留/改造</b>：<code>.mcu-route-canvas</code>（深色背景 + token 作用域 + <code>overflow:hidden</code>，改造 V1.0 基类）</p>
+<p><b>新增</b>：</p>
+<table>
+  <tr><th>类名</th><th>职责</th></tr>
+  <tr><td><code>.mcu-page-track</code></td><td>横向翻页轨道（flex row，translateX 驱动，touch-action:none）</td></tr>
+  <tr><td><code>.mcu-page</code></td><td>单页（flex:none 100% 宽，flex column）</td></tr>
+  <tr><td><code>.mcu-page-head / .mcu-page-kicker / .mcu-page-title</code></td><td>页头（kicker + 标题行，PHASE 段按 --mcu-pX 着色）</td></tr>
+  <tr><td><code>.mcu-badge / .mcu-badge-core / .mcu-badge-recommended / .mcu-badge-optional</code></td><td>推荐级别三级徽章</td></tr>
+  <tr><td><code>.mcu-series-tag</code></td><td>剧集「剧」标签</td></tr>
+  <tr><td><code>.mcu-field-row / .mcu-field-label / .mcu-field-body</code></td><td>作品页字段行（行内标签 + 正文）</td></tr>
+  <tr><td><code>.mcu-block-row / .mcu-block-label / .mcu-block-body</code></td><td>介绍页 4 块（同构）</td></tr>
+  <tr><td><code>.mcu-pager / .mcu-pager-btn / .mcu-pager-prev / .mcu-pager-next / .mcu-pager-num</code></td><td>页码条（◀ 当前/总页 ▶）</td></tr>
+  <tr><td><code>.mcu-pager-track / .mcu-pager-progress</code></td><td>作品进度条（轨道 + 金色填充，内嵌页码条底部）</td></tr>
+  <tr><td><code>.mcu-jump-layer / .mcu-jump-grid / .mcu-jump-cell</code></td><td>跳转浮层（条件功能，编号网格，默认不启用）</td></tr>
+</table>
+<p><b>删除</b>（整组列表类作废）：<code>.mcu-order-head / .mcu-order-kicker / .mcu-order-title / .mcu-order-routeTag / .mcu-order-list / .mcu-order-item / .mcu-order-no / .mcu-order-name / .mcu-order-series / .mcu-order-year / .mcu-order-phase / .mcu-order-hint</code>。</p>
+<p><b>JS 改造</b>：<code>render()</code> 重写为「路线数据 → 页面轨道」渲染；新增 <code>goPage(dir)</code> / busy 锁 / 滑动判定；<code>onTabChange</code> 追加页码重置；<code>resetDemo</code> 目标 = 新手入门第 1 页。<span class="risk">红线：保留 <code>onTabChange / resetDemo / sendLog / showTipsTooltip / adjustTipsTooltipPosition</code> 函数名与冻结外壳结构</span>（guard-frozen.cjs 依赖）。</p>
+</div>
+
+<!-- ================= 十、关键文案示例 ================= -->
+<h2>十、关键文案示例（含来源映射，可直接落稿）</h2>
+<div class="note">
+<h3>10.1 三条路线介绍页（全量文案）</h3>
+<div class="copybox">
+<b>新手入门</b>（适合谁/为什么/怎么排/看完获得）<br>
+适合谁：完全没看过 MCU，或只零散看过一两部——这条路线就是为你准备的。<span class="src">【改编自 routes.js newcomer.forWho】</span><br>
+为什么：MCU 有 30 多部，全看门槛太高，中途弃剧的风险远大于"错过细节"的损失。这条路线只留 12 部，先把主干立住。<span class="src">【改编自 newcomer.why + desc】</span><br>
+怎么排：按世界观建立顺序：起源 → 组队 → 裂痕 → 终局，每一步都在为下一步铺垫。<span class="src">【新撰句式；因果依据 items 顺序 + 各作 role】</span><br>
+看完获得：看完这 12 部，你就能了解无限传奇的主干故事，并具备继续探索其他分支的基础。<span class="src">【改编自 newcomer.desc 原文】</span>
+</div>
+<div class="copybox">
+<b>主线精选</b><br>
+适合谁：时间有限，不想全看，只想搞懂主线剧情。<span class="src">【改编自 essential.forWho】</span><br>
+为什么：MCU 并不是每部都在推进同一个故事。这条路线把对主线可选的支线全部摘掉，只留实质推动剧情的必看。<span class="src">【改编自 essential.why 原文】</span><br>
+怎么排：只取标记为「核心主线」的 18 部院线电影，按北美上映顺序排列。<span class="src">【新撰句式；事实依据 generator=mainline + ro 排序；V2.0-R4 追认实施版（去内部术语"母项目"+ 补"院线电影"注脚）】</span><br>
+看完获得：理清从无限传奇到多元宇宙的主干走向，跳过的支线不看也不影响理解主线。<span class="src">【改编自 essential.desc】</span>
+</div>
+<div class="copybox">
+<b>复联5补课</b><br>
+适合谁：已看完《终局之战》，想在《复仇者联盟5：毁灭之日》上映前快速补上前情。<span class="src">【改编自 special-routes tagline/origin；片名取自 upcoming.js 已验证数据】</span><br>
+为什么：8 部精简补课路线。终局之后时间前跳、多元宇宙开启、跨宇宙角色与新英雄入局——补完接上《复联5：毁灭之日》。<span class="src">【改编自 heroNote + chain 链主题；V2.0-R4 追认实施压缩版（保留"跨宇宙角色"，≤54 预算）】</span><br>
+怎么排：按链条顺序：TVA→多元宇宙→世人所知→穿越者→新秩序→反英雄→入口。<span class="src">【改编自 core.items 的 kw 序列；V2.0-R4 追认实施压缩版（7 环节全保留）】</span><br>
+看完获得：三条线汇合到毁灭博士，前面补的每一环都在这里收束。<span class="src">【chain.end 原文】</span>
+</div>
+
+<h3>10.2 作品卡全字段示例（5 部代表作品，覆盖三种路线/剧集/徽章级）</h3>
+<div class="copybox">
+<b>钢铁侠 · 新手入门（第 2/13 页）· 必看</b><br>
+为什么看它：入坑第一站：起源故事不依赖任何前作，单看就是一个完整好故事。<span class="src">【sf 独立性 + starter 语义提炼；与"它的作用"（role 原文）视角区分，不重复】</span><br>
+它的作用：整个 MCU 的起点。它确立了这个宇宙的基调，也埋下了后来十年所有故事的第一颗种子。<span class="src">【movies.js role 原文，39 字 ≤54 ✓】</span><br>
+看完你会懂：看懂：①托尼如何成为钢铁侠 ②"复仇者计划"从何而来。<span class="src">【sf + next.mainline.why 提炼】</span><br>
+后续关联：片尾彩蛋的"复仇者计划"，在《复仇者联盟》中正式兑现。<span class="src">【next.mainline.why 裁剪】</span>
+</div>
+<div class="copybox">
+<b>黑豹 · 新手入门（第 11/13 页）· 推荐</b><br>
+为什么看它：新手路线里少数的支线：不依赖前作、独立完整，把瓦坎达这块世界观拼图补全。<span class="src">【路线收录理由 + sf 独立性提炼；V2.0-R4 追认实施压缩版（≤36 预算）】</span><br>
+它的作用：完整建立瓦坎达这个国家。它在《无限战争》成为决战战场，又承接了黑豹传承。<span class="src">【role 原文裁剪，34 字】</span><br>
+看完你会懂：看懂：①瓦坎达与振金科技 ②特查拉继承王位。<span class="src">【sf 提炼】</span><br>
+后续关联：关联《复仇者联盟3：无限战争》：瓦坎达是地球决战的战场。<span class="src">【next.mainline.why 裁剪】</span>
+</div>
+<div class="copybox">
+<b>奇异博士2：疯狂多元宇宙 · 主线精选（第 17/19 页）· 必看</b><br>
+为什么看它：承接《英雄无归》咒语失控的后果，多元宇宙的规则在这里被正式打破。<span class="src">【next.mainline.why 裁剪——与复联5补课语境下的 kw「宇宙碰撞」形成路线差异化】</span><br>
+它的作用：第一次真正带观众穿越多个平行宇宙，也是旺达角色弧线的终点，情绪落点极重。<span class="src">【role 原文，37 字 ≤54 ✓】</span><br>
+看完你会懂：看懂：①多元宇宙如何被穿行 ②旺达的结局。<span class="src">【sf + role 提炼】</span><br>
+后续关联：关联《蚁人与黄蜂女：量子狂潮》：多元宇宙规则被打破后引出统领性威胁。<span class="src">【next.mainline.why 裁剪；V2.0-R4 追认实施压缩版（≤36 预算）】</span>
+</div>
+<div class="copybox">
+<b>洛基 S1 · 复联5补课（第 2/9 页）· 必看 · 剧</b><br>
+为什么看它：<b>TVA / 时间线</b>：先懂 TVA 与神圣时间线，多元宇宙才有后续。<span class="src">【kw 原文 + chain 链首文案裁剪；V2.0-R4 追认实施压缩版（≤36 预算）】</span><br>
+它的作用：多元宇宙故事的总开关。TVA 与"神圣时间线"的设定，是后续多元宇宙一切的源头。<span class="src">【series.js role 原文裁剪，36 字 ≤54 ✓】</span><br>
+看完你会懂：看懂：①TVA 与神圣时间线 ②洛基的变体身份。<span class="src">【role/kw 提炼】</span><br>
+后续关联：下一部《洛基 S2》：多元宇宙正式开启。<span class="src">【剧集无 next → 路线内下一站 kw 兜底】</span>
+</div>
+<div class="copybox">
+<b>神奇四侠：初露锋芒 · 复联5补课（第 9/9 页）· 必看</b><br>
+为什么看它：<b>入口开启</b>：平行宇宙 Earth-828 登场，是复联5多宇宙汇合的关键一方。<span class="src">【kw 原文 + role 裁剪】</span><br>
+它的作用：第六阶段的开篇。发生在独立的平行宇宙里，这四个角色是复联5多宇宙汇合的关键一方。<span class="src">【role 原文裁剪，48 字 ≤54 ✓】</span><br>
+看完你会懂：看懂：①Earth-828 复古未来世界 ②四位成员的异能组合。<span class="src">【sf 提炼】</span><br>
+后续关联：《蜘蛛侠：崭新之日》与本部一同为《复联5：毁灭之日》做汇流准备。<span class="src">【next.mainline.why 裁剪；仅"汇流准备"层面，无剧情猜测】</span>
+</div>
+<p><b>复联5 表述红线（全稿统一）</b>：只允许「多宇宙汇合关键一方 / 为复联5做汇流准备 / 为复联5做人员储备 / 三条线汇合到毁灭博士 / 毁灭博士登场」层面（全部出自母项目已验证文案）；禁止写入任何未经官方确认的未上映剧情、角色命运与结局推断。</p>
+</div>
+
+<!-- ================= 十一、数据映射 ================= -->
+<h2>十一、数据映射表（内容模型 → 母项目数据源，CodeBuddy 照抄）</h2>
+<div class="note">
+<h3>11.1 作品卡字段（4 个文字字段 + 1 个推荐级别徽章）</h3>
+<table>
+  <tr><th>V2.0 字段（用户侧标签）</th><th>派生源</th><th>派生规则</th></tr>
+  <tr><td>推荐级别（徽章）</td><td><code>movies.mainline / movies.starter / series.importance</code> + 路线成员资格</td><td>mainline=true → 必看；剧集 importance=core → 必看；mainline=false 但被任一路线收录 → 推荐；importance=recommended → 推荐；optional → 补充（本轮不出现）</td></tr>
+  <tr><td>推荐理由（为什么看它）</td><td><code>routes.why</code> + <code>special-routes.kw</code> + <code>movies.next.*.why</code></td><td>构建期为每条 (routeId, workId) 单独生成；电影路线 = 路线目标句 + 承转句；补课路线 = kw + chain 链文案 + role 句——同一作品不同路线自然产生不同理由</td></tr>
+  <tr><td>剧情作用（它的作用）</td><td><code>movies.role / series.role</code></td><td>直接引用；超 54 字时压缩（保留地位定性 + 核心事件后果 + 对后续影响）</td></tr>
+  <tr><td>信息增量（看完你会懂）</td><td><code>sf / role / kw</code> + <code>relations.why</code></td><td>句式「看懂：①…②…」，每要点 ≤15 字；内容可回溯母项目原文</td></tr>
+  <tr><td>后续关联</td><td><code>movies.next.mainline.why</code> + <code>relations</code>（from/to 本作、weight≥2、方向为后续）+ 路线内下一站 kw（剧集兜底）</td><td>1 条主关联 ≤36 字；防倒挂规则：目标作品在本路线序号 &gt; 本作序号（或为 upcoming avengers-5）。<b>关联类型判定与措辞分级（V2.0-R1 建立 / R2 收紧）</b>：① 判定关联类型——<code>sequel / prereq</code>（剧情直接承接/前置依赖，依据 relations.type 或 next.why 表述）→ 可用"下一部/承接/紧接"；<code>character / setup / event / world</code>（人物线/伏笔/事件/世界观关联）→ 一律用"关联《作品》"并说明关联性质，禁"承接"字样；② 措辞判定（R2 收紧）——<b>仅 sequel / prereq 型可用"下一部/承接"；其余关联类型一律"关联《作品》"，无论该作品是否路线内下一站</b>（顺序相邻不构成剧情承接证据，如黑豹→《无限战争》为 world 关联，必须用"关联"而非"下一部"）；③ 无充分依据（母项目无 role/next/relations/kw 支撑）时，该字段不硬填，宁缺毋滥。</td></tr>
+</table>
+<h3>11.2 路线介绍页 4 块</h3>
+<table>
+  <tr><th>块</th><th>派生源</th><th>新撰写边界</th></tr>
+  <tr><td>适合谁</td><td>新手/主线 <code>routes.forWho</code>；补课 <code>tagline/origin</code></td><td>仅补课需改写</td></tr>
+  <tr><td>为什么</td><td>新手/主线 <code>routes.why</code>；补课 <code>chain</code> 链主题 + <code>heroNote</code></td><td>仅压缩连接词</td></tr>
+  <tr><td>怎么排</td><td>新手：items 手写序语义；主线：generator=mainline；补课：core kw 链序</td><td><b>整块新撰</b>（陈述可验证事实，禁解释性猜测）</td></tr>
+  <tr><td>看完获得</td><td>新手 <code>desc</code> 结论句；主线 <code>desc</code>；补课 <code>chain.end</code></td><td>仅收束句新撰</td></tr>
+</table>
+<p><b>构建期输出结构（build-data.cjs 扩展，不新增第二套数据源）</b>：</p>
+<pre style="background:#f7f5f0;border-radius:6px;padding:10px 14px;font-family:var(--mono);font-size:12px;line-height:19px;overflow-x:auto">routes: [{
+  id, name, count,
+  intro: { forWho, why, order, outcome },        // 介绍页 4 块
+  items: [{
+    id, name, year, phase, phaseShort, isSeries, type,   // 原字段原样
+    badge: '必看' | '推荐' | '补充',             // F1
+    reason: '',                                 // F2 推荐理由（按路线生成）
+    role: '',                                   // F3 剧情作用
+    gains: ['', ''],                            // F4 信息增量 2 要点
+    next: ''                                    // F5 后续关联
+  }]
+}]</pre>
+<p>运行时：总页数 = 1 + 作品数；第 1 页渲染 <code>intro</code>，第 k 页渲染 <code>items[k−2]</code>；<b>build-data 增加长度断言</b>（字段超预算即构建报错退出）。</p>
+</div>
+
+<!-- ================= 十二、变更清单 ================= -->
+<h2>十二、相对 V1.0 的变更清单</h2>
+<div class="note">
+<table>
+  <tr><th>维度</th><th>V1.0（现状）</th><th>V2.0（本稿）</th></tr>
+  <tr><td>页面结构</td><td>标题 + 一句话路线说明 + 顺序列表（可上下滚动）</td><td>路线介绍页（4 块）+ 逐部作品卡（4 个文字字段 + 1 个推荐级别徽章），无上下滚动</td></tr>
+  <tr><td>信息密度</td><td>每部仅 序号/片名/年份/阶段</td><td>每部 + 推荐级别/推荐理由/剧情作用/信息增量/后续关联</td></tr>
+  <tr><td>路线入口</td><td>3 个 Tabs 标签（仅名称）</td><td>3 个 Tabs + 每路线独立介绍页（适合谁/为什么/怎么排/看完获得）</td></tr>
+  <tr><td>交互</td><td>纵向滚动列表</td><td>横向分页：滑动 + ◀ ▶ + 页码/总页数；滑动不切路线</td></tr>
+  <tr><td>视觉</td><td>浅色纸面列表</td><td>深色 #080B12 + 金色 #F2B233 档案馆风格、徽章三态、字段标签分区</td></tr>
+  <tr><td>数据</td><td>id/name/year/phase/isSeries/type（10.2KB）</td><td>+ intro 4 块 + badge/reason/role/gains/next（估 23–28KB，仍 &lt;0.1MB）</td></tr>
+  <tr><td>外壳/工具链</td><td>冻结件零改动；guard-frozen 断言适配过 V1.0</td><td>冻结件仍零改动；guard-frozen 预计零改动；e2e 需改 3 项旧断言 + 新增约 9 项</td></tr>
+</table>
+</div>
+
+<!-- ================= 十三、已确认决策 ================= -->
+<h2>十三、设计决策确认记录（设计审核已裁定，V2.0-R1）</h2>
+<div class="note">
+<p>以下 9 项经设计审核确认，不再作为待讨论项，实施规格以此为准：</p>
+<table>
+  <tr><th>#</th><th>决策项</th><th>确认结论</th></tr>
+  <tr><td>1</td><td>每页作品数</td><td>每页展示 1 部作品（介绍页 1 页 + N 页作品）</td></tr>
+  <tr><td>2</td><td>介绍页位置</td><td>每条路线第 1 页为路线介绍页，页码计入总数</td></tr>
+  <tr><td>3</td><td>颜色</td><td>深色画布 #080B12，强调色 #F2B233</td></tr>
+  <tr><td>4</td><td>推荐级别</td><td>保留必看 / 推荐 / 补充三级体系（本轮数据实际分布为必看+推荐，「补充」级本轮不出现）</td></tr>
+  <tr><td>5</td><td>洛基 S2 年份</td><td>沿用 2023（V1.0 已验收设计稿覆盖值）</td></tr>
+  <tr><td>6</td><td>复联5 内容</td><td>仅使用已验证信息，禁止写入任何未经官方确认的未上映剧情</td></tr>
+  <tr><td>7</td><td>作品信息字段标签</td><td>为什么看它 / 它的作用 / 看完你会懂 / 后续关联</td></tr>
+  <tr><td>8</td><td>外壳衔接</td><td>保留深色画布与官方浅色外壳（冻结件零改动）</td></tr>
+  <tr><td>9</td><td>主线精选口径注脚</td><td>增加「院线电影主线」说明（18 部均为主干电影，不含剧集）</td></tr>
+</table>
+</div>
+
+<!-- ================= 十五、修订记录 ================= -->
+<h2>十五、修订记录（V2.0-R1 / V2.0-R2）</h2>
+<div class="note">
+<h3>V2.0-R1（2026-11-03 设计审核后）</h3>
+<table>
+  <tr><th>#</th><th>修订项</th><th>修订内容</th><th>位置</th></tr>
+  <tr><td>R1-1</td><td>分页进度感知增强</td><td>① kicker 增加作品序号/总数（ITEM 02/12）；② 页码条底部内嵌 2px 金色作品进度条（轨道 #2A3447 + 填充 #F2B233，不额外占高）；③ 跳转入口列为条件功能（页码数字点击展开编号网格浮层，实施前验证平台容器浮层能力，默认不启用）</td><td>§1 页码语义、§5.2、§8.3、§9、全部 mock</td></tr>
+  <tr><td>R1-2</td><td>手机端字体可读性复核</td><td>补充 12px 正文的浏览器实测复核（模拟手机视口 + 计算样式与行数测量）；结论：12px 在 360 最小口径下为合理下限，375/390/414 视口内容区更宽裕；明确标注「设计 mock 测试」与「真实平台测试」边界（见 §16）</td><td>§6 下方新增复核说明、§16</td></tr>
+  <tr><td>R1-3</td><td>后续关联文案审查</td><td>建立"关联类型判定 + 路线内下一站判定 + 措辞分级"规则；修正 3 组示例措辞（钢铁侠→复联1 去"下一部"；奇异2→量子狂潮 改"关联"；神奇四侠→崭新之日 去"下一部"）；洛基 S1→S2（sequel）保留"下一部"；黑豹→无限战争当时按"路线内下一站"保留"下一部"，<b>经最终验收判定仍属 world 关联误导，已在 R2-1 统一改"关联"</b></td><td>§10.2 示例、§11.1 映射规则、全部 mock</td></tr>
+  <tr><td>R1-4</td><td>尺寸口径统一</td><td>冻结区统一为「合计 99px = 表头 45 + 间隙 10 + 操作区 44」唯一口径；内容区 = 卡高 − 99（360：326−99=227；414：380−99=281）；mock 冻结区注释同步</td><td>§5.1、全部 mock frozen 注释</td></tr>
+  <tr><td>R1-5</td><td>复联5 表述修正</td><td>修正原稿笔误（语句缺"禁止"二字），全文统一为「禁止写入任何未经官方确认的未上映剧情」；已排查 §10.2 红线、§13 决策记录、mock 注释与全部正文位置，无旧表述残留</td><td>§10.2、§13、mock</td></tr>
+  <tr><td>R1-6</td><td>待拍板项收口</td><td>9 项待拍板全部转为"已确认决策记录"（§13），不再作为待讨论项</td><td>§13</td></tr>
+</table>
+<h3>V2.0-R2（最终验收修订，2026-11-03）</h3>
+<table>
+  <tr><th>#</th><th>修订项</th><th>修订内容</th><th>位置</th></tr>
+  <tr><td>R2-1</td><td>黑豹后续关联措辞</td><td>「下一部《复仇者联盟3：无限战争》」统一为「关联《复仇者联盟3：无限战争》」——黑豹→无限战争判定为 world 关联、非剧情承接，即使路线内相邻亦不用"下一部"；措辞分级规则同步收紧（仅 sequel / prereq 可用"下一部/承接"，其余一律"关联《作品》"）</td><td>mock（黑豹卡）、§10.2 示例、§11.1 映射规则</td></tr>
+  <tr><td>R2-2</td><td>字段数量术语统一</td><td>全文统一为「4 个文字字段 + 1 个推荐级别徽章」；清除"5 字段""4 字段"等笼统表述，避免开发理解歧义</td><td>§4 状态表、§5.2/§5.3、§6.1、§11.1、§12、§14、mock bill</td></tr>
+  <tr><td>R2-3</td><td>复联5补课路线介绍修正</td><td>① 删"四环"表述（core 8 项无法与四环建立准确映射——「入口开启」（神奇四侠）在四环之外）→ 改"按补课链条顺序"；② 删"8 部 = 最短路线"（工具内无 15 部完整路线作比较证据）→ 改"8 部精简补课路线"；③ "暴露于人"改为自然化表述「为世人所知」（kw「多元宇宙暴露于人」）；④ 作品卡 kw 标签去除"第 X 环"序号，直接显示 kw</td><td>§10.1（复联5补课介绍页）、§10.2 示例、§11.2 映射、mock（洛基S1/神奇四侠卡）、tag</td></tr>
+  <tr><td>R2-4</td><td>全文一致性复核</td><td>黑豹措辞 / 字段数量术语 / 补课阶段描述 / 360-414 尺寸口径（冻结区 99px = 表头 45 + 间隙 10 + 操作区 44）/ 复联5 未上映表述边界 / 设计 Mock 与真实平台测试边界——逐项全文检索 + 浏览器实测复核通过</td><td>全文</td></tr>
+</table>
+<h3>V2.0-R3（最终局部修订，2026-11-03）</h3>
+<table>
+  <tr><th>#</th><th>修订项</th><th>修订内容</th><th>位置</th></tr>
+  <tr><td>R3-1</td><td>钢铁侠字段去重</td><td>「为什么看它」与「它的作用」视角区分：为什么看它 = 观看价值（起源故事独立完整、新手友好，依据 sf 独立性 + starter 语义）→「入坑第一站：起源故事不依赖任何前作，单看就是一个完整好故事。」；它的作用 = 结构位置（保留 role 原文：起点/基调/伏笔）——不再同义重复</td><td>mock（钢铁侠卡 360/414）、§10.2 示例</td></tr>
+  <tr><td>R3-2</td><td>新手入门「看完获得」表述校准</td><td>消除过度表述：「完整经历了无限传奇」→「了解无限传奇的主干故事，并具备继续探索其他分支的基础」（12 部 = 新手主干，非完整经历，与主线精选口径对齐）；配套字数预算标注 ≤39（含半角数字，实测 2 行成立）</td><td>mock（介绍页 360/414）、§10.1、§6 预算表</td></tr>
+  <tr><td>R3-3</td><td>黑豹同类重复顺修</td><td>问题 1 原则的同类项：黑豹「为什么看它」与「它的作用」原含同义重复（瓦坎达开放 + 无限战争战场），「为什么看它」改为观看价值视角（独立完整 + 补世界观拼图），「它的作用」保留 role 原文</td><td>mock（黑豹卡）、§10.2 示例</td></tr>
+  <tr><td>R3-4</td><td>一致性复核与实测</td><td>两项文案在 HTML mock / 文案示例 / 规格预算中同步；浏览器实测确认：新文案均 2 行内完整、骨架 225 ≤ 227 / 279 ≤ 281、零溢出、字段不重复</td><td>全文</td></tr>
+</table>
+<h3>V2.0-R4（开发实施自测后裁定与规格微修订，2026-11-03）</h3>
+<table>
+  <tr><th>#</th><th>修订项</th><th>修订内容</th><th>位置</th></tr>
+  <tr><td>R4-1</td><td>内容区留白裁定（L1）</td><td>采纳方案 B：字段/介绍块间距由固定 4px×3 改为<b>弹性（min 4px）</b>，字段区纵向铺满（justify-content:space-between）；页码条仍贴底。360 档实测间距约 7px（余量 9px 摊 3 处）、414 档约 25px；字号/行数/零滚动/零截断硬约束不变</td><td>§5.2 合计行、§5.3 gap、§5.4 gap、§14 账单 ⑯、mock CSS</td></tr>
+  <tr><td>R4-2</td><td>宽容器验收口径（L1-Q2）</td><td>>414 宽容器<b>不纳入验收档</b>：真机目标为手机视口，保持 360/414 双档验收口径；宽容器按 1:1 等比放大、以方案 B 口径自然铺满，不做额外承诺、不作为驳回依据；e2e 不新增宽容器正式断言套件</td><td>§14 账单 ⑰</td></tr>
+  <tr><td>R4-3</td><td>文案压缩追认（L2）</td><td>开发附录 A 六处压缩：<b>A2–A6 追认</b>（A2 补课"怎么排"7 环节全保留仅压缩措辞；A3 黑豹"为什么看它"删"故事"；A4 奇异2"后续关联"删冗余；A5 洛基 S1"为什么看它"删时间前跳背景句；A6 主线精选"怎么排"去内部术语+补"院线电影"）；<b>A1 需调整</b>——删"跨宇宙角色"属链主题信息损失，改为保留该词的压缩版「8 部精简补课路线。终局之后时间前跳、多元宇宙开启、跨宇宙角色与新英雄入局——补完接上《复联5：毁灭之日》。」（≤54 预算）；设计稿 §10 示例同步为追认版，规格-实现同源</td><td>§10.1（复联5补课"为什么/怎么排"、主线精选"怎么排"）、§10.2（黑豹/奇异2/洛基S1）、mock 同源</td></tr>
+  <tr><td>R4-4</td><td>行高口径澄清（L3）</td><td>§6「行高 ≥1.4」与 12px/16px（=1.33）矛盾，裁定<b>以像素值 12px/16px 为准</b>，表述改为「行高 16px（行高比 1.33）」；避免验收口径争议</td><td>§6 硬约束说明</td></tr>
+  <tr><td>R4-5</td><td>缺陷修复确认</td><td>开发自测修掉的轨道 overflow:hidden 导致翻页后整页被裁缺陷：修复方向（裁剪交给画布根容器 .mcu-route-canvas overflow:hidden）与规格 §9 一致，确认无规格违反，无需回退</td><td>实施报告遗留 L0（缺陷）</td></tr>
+</table>
+</div>
+
+<!-- ================= 十六、测试范围声明 ================= -->
+<h2>十六、测试范围声明（设计 Mock 测试 vs 真实平台测试）</h2>
+<div class="note">
+<p><b>本轮已完成的测试（设计 Mock 级，2026-11-03 浏览器实测）</b>：</p>
+<ul>
+  <li>8 个 mock 画布在本地 HTTP 服务 + Chromium 中实测：360 内容区 227px / 414 内容区 281px 精确命中；骨架实测 225px ≤ 227（360）/ 279px ≤ 281（414）；全画布零横向溢出；最长片名（奇异博士2：疯狂多元宇宙）单行完整无省略号；12px 正文计算样式与行数逐字段核对通过（见 §6 复核说明）。</li>
+  <li>模拟手机视口（360×640 / 375×667 / 414×896）下复核：正文 12px 渲染、字段行数未超预算、进度条/kicker 序号显示正常。</li>
+</ul>
+<p><b>未完成、需在实施后执行的测试（真实平台级）</b>：</p>
+<ul>
+  <li><code>genui preview</code> 平台预览容器实测（真实 COSUI 外壳 token、1:1 卡片真实缩放）；</li>
+  <li><code>genui check</code> 平台安全检测；</li>
+  <li>真机（Android/iOS 百度 App 内嵌容器）滑动/翻页/浮层（若启用跳转入口）手势实测——平台容器对 <code>touch-action:none</code> 与浮层的实际处理行为只能在此阶段确认；</li>
+  <li>e2e-visual.cjs 双视口断言回归（含新增无滚动/分页/滑动不切路线断言）。</li>
+</ul>
+<p><b>边界声明</b>：本设计稿的实测结论仅代表设计 Mock 在标准 Chromium 下的渲染结果，<b>不代表真实平台测试结论</b>；12px 可读性下限以 360 最小视口口径 + Chromium 实测为验收依据，真机差异（字体度量/渲染引擎）将在 CodeBuddy 落地后的平台级复核中验证，若出现字段溢出按 §5.2 溢出处置方案（字段间距 4→3px）收口。</p>
+</div>
+
+<!-- ================= 十四、验收转译 ================= -->
+<h2>十四、验收标准转译（任务书第八节 → 设计稿可勾选检查单）</h2>
+<div class="note">
+<table>
+  <tr><th>#</th><th>验收点</th><th>本稿满足方式（检查项）</th></tr>
+  <tr><td>1</td><td>用户能理解三路线分别解决什么问题</td><td>三路线各自介绍页 4 块完整（适合谁/为什么/怎么排/看完获得），文案见 §10.1</td></tr>
+  <tr><td>2</td><td>理解为什么这样排序</td><td>介绍页「怎么排」块 + 作品页「为什么看它/后续关联」构成因果链（§10）</td></tr>
+  <tr><td>3</td><td>每部作品观看价值明确</td><td>作品卡 4 个文字字段 + 1 个推荐级别徽章全量渲染，字段预算见 §6，零截断（构建期断言）</td></tr>
+  <tr><td>4</td><td>不再是简单查询清单</td><td>结构 = 介绍页 + 分页作品卡，非 V1.0 单列列表形态；深色档案馆风格</td></tr>
+  <tr><td>5</td><td>全程无需上下滚动</td><td>touch-action:none + overflow:hidden + 布局账单 218 ≤ 227/281；e2e 断言 scrollHeight ≤ clientHeight</td></tr>
+  <tr><td>6</td><td>路线切换和作品翻页正常</td><td>Tabs 切换重置第 1 页；滑动/按钮翻页共用 busy 锁；页码实时更新（§8）</td></tr>
+  <tr><td>7</td><td>信息完整、文字可读、手机端正常</td><td>360/414 双视口同构；正文 ≥12px、行高 ≥1.4、字数预算表（§6）；长片名 12 字单行完整</td></tr>
+  <tr><td>8</td><td>规格可直接交 CodeBuddy 实施</td><td>组件尺寸/间距/字体层级/颜色/分页规则/交互行为全部数值化（§5–§9）+ 数据映射（§11）+ 类名清单（§9）</td></tr>
+  <tr><td>9</td><td>横向滑动不影响路线切换</td><td>滑动仅绑定画布轨道 + touch-action:none 物理隔离 + Tabs 仅 tap/键盘（§8.2）；e2e 断言滑动后 activeTab 不变</td></tr>
+</table>
+<p><b>设计稿实测账单（浏览器复核项，交付前必须全过）</b>：① 内容区实高 ≤227/281；② 页码条贴底；③ 全画布 scrollWidth == clientWidth（零横向溢出）；④ 每字段行数 ≤ 预算；⑤ 最长片名单行完整无省略号；⑥ 徽章三态色值逐项比对；⑦ 首/末页按钮禁用且 no-op；⑧ 翻页后页码精确匹配；⑨ 切路线页码重置；⑩ 画布内滑动后 Tabs 不变；⑪ console 零错误。⑫ 行距浮差容忍：字段区实测较理论预算 +4~7px（12px 字体行高度量），360 档总骨架余量 2~9px，溢出处置见 §5.2 合计行。⑬（V2.0-R1 新增）kicker 作品序号/总数（ITEM k/N）正确渲染且与页码一致；⑭（V2.0-R1 新增）金色进度条宽度 = (k−1)/N（介绍页 0%、末页 100%），翻页后宽度正确更新；⑮（V2.0-R1 新增）12px 正文实测复核结论见 §6.1，测试边界见 §16。⑯（V2.0-R4 新增）字段区纵向铺满：弹性间距 ≥4px、字段区无连续空白（浏览器实测 360 档 6–16px / 414 档 24–34px）；⑰（V2.0-R4）宽容器（>414）不纳入验收档，按 1:1 等比放大、以方案 B 口径自然铺满，不做额外承诺、不作为驳回依据。</p>
+</div>
+
+<p style="margin-top:26px;font-size:12px;color:var(--slim);font-family:var(--mono);line-height:18px">
+设计 AI · 2026-11-03 · V2.0-R4 修订稿（开发实施自测后裁定）· 依据母项目 h5/data/{routes,special-routes,movies,series,relations}.js（只读）· 未改 genui-app/ 与 h5/ · 未 git 提交 · 未提审<br>
+本稿为设计与规格交付（修订记录见 §15，测试边界见 §16），配套状态说明见 docs/同步/设计AI-GenUI观影助手V2.0设计方案与状态说明.md<br>
+<b>V2.0-R4 为实施后裁定稿：开发按本稿口径改样式并重出候选包；设计侧复核通过后再进入平台级测试。</b>
+</p>
+</body>
+</html>

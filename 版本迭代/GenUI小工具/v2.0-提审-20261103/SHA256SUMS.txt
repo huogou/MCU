@@ -1,0 +1,9 @@
+﻿# 提审包 SHA-256（MCU 观影助手 GenUI V2.0 · 2026-11-03 · genui check 已通过 · 设计侧独立验收已通过）
+# 唯一提审包 = MCU观影助手-GenUI-V2.0-提审.zip；同目录候选 v2.0-候选-20261103-R4 的 zip 因 ZIP 内部路径不合规（static\data.js 反斜杠+子目录）已被 genui check 驳回，禁止用于提审
+# 提审包结构与 V1.0 已过审包一致：index.html + data.js 平铺根目录（发布版 index.html 仅将 ./static/data.js 引用改为 ./data.js，diff=1 行）
+
+38bd1406f3866c972530b37e9136bf0230e50d7acff426213fa3a26a6c0e6cf8  MCU观影助手-GenUI-V2.0-提审.zip
+d9b1ee5cf21e8d9f40d155712ed5c73f4f7ca87b663d09514590ab28b1f531a7  index.html
+cc1b958e870b5fc58d8f54d6223005afd4d240ca340c5d572448a383cf8497b9  data.js
+
+zip 体积: 16796 B
